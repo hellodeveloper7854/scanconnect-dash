@@ -1,0 +1,6 @@
+{
+  "name": "Scan Connect",
+  "description": "Secure Automotive Contact & Vehicle Identity Network",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
