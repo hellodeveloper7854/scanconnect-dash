@@ -9,6 +9,7 @@ import { OtpModal } from './components/OtpModal';
 import { VehicleDashboard } from './components/VehicleDashboard';
 import { AboutUsScreen } from './components/AboutUsScreen';
 import { ShopScreen } from './components/ShopScreen';
+import { ContactUsScreen } from './components/ContactUsScreen';
 
 export default function App() {
   const [activeScreen, setActiveScreen] = useState<ScreenType>('register');
@@ -50,6 +51,7 @@ export default function App() {
           onNavigate={(nav) => {
             if (nav === 'about' || nav === 'About') setActiveScreen('about');
             else if (nav === 'shop' || nav === 'Shop') setActiveScreen('shop');
+            else if (nav === 'contact' || nav === 'Contact') setActiveScreen('contact');
           }}
         />
         {/* Interactive OTP Modal */}
@@ -76,6 +78,8 @@ export default function App() {
               setActiveScreen('about');
             } else if (nav === 'shop' || nav === 'Shop') {
               setActiveScreen('shop');
+            } else if (nav === 'contact' || nav === 'Contact') {
+              setActiveScreen('contact');
             }
           }}
         />
@@ -103,6 +107,37 @@ export default function App() {
               setActiveScreen('about');
             } else if (nav === 'shop' || nav === 'Shop') {
               setActiveScreen('shop');
+            } else if (nav === 'contact' || nav === 'Contact') {
+              setActiveScreen('contact');
+            }
+          }}
+        />
+        {/* Interactive OTP Modal */}
+        <OtpModal
+          isOpen={isOtpModalOpen}
+          mobileNumber={otpMobileNumber}
+          onClose={() => setIsOtpModalOpen(false)}
+          onVerifySuccess={handleOtpVerifiedSuccess}
+        />
+      </>
+    );
+  }
+
+  if (activeScreen === 'contact') {
+    return (
+      <>
+        <ContactUsScreen
+          userData={userData}
+          onLogout={() => setActiveScreen('login')}
+          onNavigate={(nav) => {
+            if (nav === 'dashboard' || nav === 'How it works' || nav === 'QR Scan') {
+              setActiveScreen('dashboard');
+            } else if (nav === 'about' || nav === 'About') {
+              setActiveScreen('about');
+            } else if (nav === 'shop' || nav === 'Shop') {
+              setActiveScreen('shop');
+            } else if (nav === 'contact' || nav === 'Contact') {
+              setActiveScreen('contact');
             }
           }}
         />

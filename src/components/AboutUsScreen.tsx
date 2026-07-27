@@ -32,6 +32,10 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
       onNavigate('dashboard');
     } else if (navItem === 'About') {
       onNavigate('about');
+    } else if (navItem === 'Shop') {
+      onNavigate('shop');
+    } else if (navItem === 'Contact') {
+      onNavigate('contact');
     } else {
       alert(`Navigating to ${navItem}`);
     }

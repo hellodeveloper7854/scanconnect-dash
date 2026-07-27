@@ -40,6 +40,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       onNavigate('about');
     } else if (navItem === 'Shop') {
       onNavigate('shop');
+    } else if (navItem === 'Contact') {
+      onNavigate('contact');
     } else {
       alert(`Navigating to ${navItem}`);
     }
