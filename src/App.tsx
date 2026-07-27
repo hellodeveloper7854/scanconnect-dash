@@ -8,6 +8,7 @@ import { LoginWithOtpScreen } from './components/LoginWithOtpScreen';
 import { OtpModal } from './components/OtpModal';
 import { VehicleDashboard } from './components/VehicleDashboard';
 import { AboutUsScreen } from './components/AboutUsScreen';
+import { ShopScreen } from './components/ShopScreen';
 
 export default function App() {
   const [activeScreen, setActiveScreen] = useState<ScreenType>('register');
@@ -47,7 +48,8 @@ export default function App() {
           userData={userData}
           onLogout={() => setActiveScreen('login')}
           onNavigate={(nav) => {
-            if (nav === 'about') setActiveScreen('about');
+            if (nav === 'about' || nav === 'About') setActiveScreen('about');
+            else if (nav === 'shop' || nav === 'Shop') setActiveScreen('shop');
           }}
         />
         {/* Interactive OTP Modal */}
@@ -72,6 +74,35 @@ export default function App() {
               setActiveScreen('dashboard');
             } else if (nav === 'about' || nav === 'About') {
               setActiveScreen('about');
+            } else if (nav === 'shop' || nav === 'Shop') {
+              setActiveScreen('shop');
+            }
+          }}
+        />
+        {/* Interactive OTP Modal */}
+        <OtpModal
+          isOpen={isOtpModalOpen}
+          mobileNumber={otpMobileNumber}
+          onClose={() => setIsOtpModalOpen(false)}
+          onVerifySuccess={handleOtpVerifiedSuccess}
+        />
+      </>
+    );
+  }
+
+  if (activeScreen === 'shop') {
+    return (
+      <>
+        <ShopScreen
+          userData={userData}
+          onLogout={() => setActiveScreen('login')}
+          onNavigate={(nav) => {
+            if (nav === 'dashboard' || nav === 'How it works' || nav === 'QR Scan') {
+              setActiveScreen('dashboard');
+            } else if (nav === 'about' || nav === 'About') {
+              setActiveScreen('about');
+            } else if (nav === 'shop' || nav === 'Shop') {
+              setActiveScreen('shop');
             }
           }}
         />

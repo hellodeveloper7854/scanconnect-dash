@@ -119,6 +119,8 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
           setActiveNav(nav);
           if (nav === 'About' && onNavigate) {
             onNavigate('about');
+          } else if (nav === 'Shop' && onNavigate) {
+            onNavigate('shop');
           }
         }}
       />
