@@ -36,12 +36,14 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
     setActiveNav(navItem);
     if (navItem === 'How it works' || navItem === 'QR Scan') {
       onNavigate('dashboard');
-    } else if (navItem === 'About') {
+    } else if (navItem === 'About' || navItem === 'about') {
       onNavigate('about');
-    } else if (navItem === 'Shop') {
+    } else if (navItem === 'Shop' || navItem === 'shop') {
       onNavigate('shop');
-    } else if (navItem === 'Contact') {
+    } else if (navItem === 'Contact' || navItem === 'contact') {
       onNavigate('contact');
+    } else if (navItem === 'Profile' || navItem === 'profile') {
+      onNavigate('profile');
     } else {
       alert(`Navigating to ${navItem}`);
     }

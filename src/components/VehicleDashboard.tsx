@@ -117,12 +117,14 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         activeNav={activeNav}
         onNavClick={(nav) => {
           setActiveNav(nav);
-          if (nav === 'About' && onNavigate) {
+          if ((nav === 'About' || nav === 'about') && onNavigate) {
             onNavigate('about');
-          } else if (nav === 'Shop' && onNavigate) {
+          } else if ((nav === 'Shop' || nav === 'shop') && onNavigate) {
             onNavigate('shop');
-          } else if (nav === 'Contact' && onNavigate) {
+          } else if ((nav === 'Contact' || nav === 'contact') && onNavigate) {
             onNavigate('contact');
+          } else if ((nav === 'Profile' || nav === 'profile') && onNavigate) {
+            onNavigate('profile');
           }
         }}
       />
