@@ -5,7 +5,7 @@ export const DashboardFooter: React.FC = () => {
   const [guidesOpen, setGuidesOpen] = useState(false);
 
   return (
-    <footer className="relative bg-[#ebaa00] text-white pt-20 pb-12 overflow-hidden">
+    <footer className="relative bg-[#F2BA03] text-white pt-20 pb-12 overflow-hidden">
       {/* Top Slanted Diagonal Border */}
       <div
         className="absolute top-0 inset-x-0 h-16 bg-white pointer-events-none"
