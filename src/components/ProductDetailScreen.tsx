@@ -54,6 +54,10 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   const [cartCount, setCartCount] = useState(0);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [isCheckoutOpen]);
+
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
     if (navItem === 'How it works' || navItem === 'QR Scan') {

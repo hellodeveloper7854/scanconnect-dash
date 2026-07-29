@@ -43,6 +43,10 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   const [activeNav, setActiveNav] = useState('Shop');
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step]);
+
   // Form states for Shipping (Step 1)
   const [fullName, setFullName] = useState(userData.fullName || 'John Doe');
   const [phone, setPhone] = useState(userData.mobileNumber || '+91 98765 43210');

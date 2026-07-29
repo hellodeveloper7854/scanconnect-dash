@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScreenType, UserFormData } from './types';
 import { BackgroundCockpit } from './components/BackgroundCockpit';
 import { RegistrationScreen } from './components/RegistrationScreen';
@@ -13,8 +13,20 @@ import { ContactUsScreen } from './components/ContactUsScreen';
 import { ProfileScreen } from './components/ProfileScreen';
 import { QrScanScreen } from './components/QrScanScreen';
 
+const getInitialScreenFromUrl = (): ScreenType => {
+  const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+  if (path === 'shop') return 'shop';
+  if (path === 'about') return 'about';
+  if (path === 'contact') return 'contact';
+  if (path === 'qr-scan' || path === 'qrscan' || path === 'scan') return 'qr-scan';
+  if (path === 'profile') return 'profile';
+  if (path === 'login') return 'login';
+  if (path === 'register') return 'register';
+  return 'dashboard';
+};
+
 export default function App() {
-  const [activeScreen, setActiveScreen] = useState<ScreenType>('dashboard');
+  const [activeScreen, setActiveScreen] = useState<ScreenType>(getInitialScreenFromUrl);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const [otpMobileNumber, setOtpMobileNumber] = useState('9881860335');
@@ -24,29 +36,55 @@ export default function App() {
     email: 'driver@scanme.com',
   });
 
+  // Sync state with popstate browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      const screen = getInitialScreenFromUrl();
+      setActiveScreen(screen);
+      window.scrollTo(0, 0);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Scroll to top whenever activeScreen changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeScreen]);
+
   const handleGlobalNavigate = (nav: string) => {
-    const normalized = nav.toLowerCase();
+    const normalized = nav.toLowerCase().trim().replace(/^\//, '');
+    let targetScreen: ScreenType = 'dashboard';
+
     if (normalized === 'about') {
-      setActiveScreen('about');
+      targetScreen = 'about';
     } else if (normalized === 'shop') {
-      setActiveScreen('shop');
+      targetScreen = 'shop';
     } else if (normalized === 'contact') {
-      setActiveScreen('contact');
+      targetScreen = 'contact';
     } else if (normalized === 'qr scan' || normalized === 'qr-scan' || normalized === 'qrscan') {
-      setActiveScreen('qr-scan');
+      targetScreen = 'qr-scan';
     } else if (normalized === 'profile') {
-      if (isLoggedIn) {
-        setActiveScreen('profile');
-      } else {
-        setActiveScreen('login');
-      }
+      targetScreen = isLoggedIn ? 'profile' : 'login';
     } else if (normalized === 'login') {
-      setActiveScreen('login');
+      targetScreen = 'login';
     } else if (normalized === 'register') {
-      setActiveScreen('register');
+      targetScreen = 'register';
     } else {
-      setActiveScreen('dashboard');
+      targetScreen = 'dashboard';
     }
+
+    setActiveScreen(targetScreen);
+
+    // Update window URL location path
+    const targetPath = targetScreen === 'dashboard' ? '/' : `/${targetScreen}`;
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState(null, '', targetPath);
+    }
+
+    // Scroll to top when opening a new screen
+    window.scrollTo(0, 0);
   };
 
   const handleRegisterSuccess = (data: UserFormData) => {
