@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
+import { ProductDetailScreen } from './ProductDetailScreen';
 import {
   Building2,
   ShoppingBag,
@@ -33,6 +34,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
   const [activeNav, setActiveNav] = useState('Shop');
   const [visibleProductsCount, setVisibleProductsCount] = useState(6);
   const [cartCount, setCartCount] = useState(0);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
 
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
@@ -169,6 +171,19 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
     setCartCount((prev) => prev + 1);
     alert(`Added to Cart: ${title}\nTotal items in cart: ${cartCount + 1}`);
   };
+
+  if (selectedProduct) {
+    return (
+      <ProductDetailScreen
+        product={selectedProduct}
+        userData={userData}
+        onLogout={onLogout}
+        onNavigate={onNavigate}
+        isLoggedIn={isLoggedIn}
+        onBackToShop={() => setSelectedProduct(null)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-neutral-900 font-sans antialiased">
@@ -367,7 +382,10 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   className="bg-white border border-neutral-200/90 rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between space-y-5 group"
                 >
                   {/* Top Product Image Graphic Box */}
-                  <div className="bg-[#f5b800] rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden aspect-square border border-amber-400/60 shadow-inner">
+                  <div
+                    onClick={() => setSelectedProduct(prod)}
+                    className="bg-[#f5b800] rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden aspect-square border border-amber-400/60 shadow-inner cursor-pointer"
+                  >
                     {/* Simulated Tag Decal */}
                     <div className="bg-white text-neutral-900 rounded-2xl p-4 shadow-xl border-2 border-neutral-950 w-full max-w-[220px] flex flex-col items-center space-y-3">
                       {/* Big QR Code */}
@@ -404,8 +422,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   </div>
 
                   {/* Title & Desc */}
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-extrabold text-neutral-950 leading-snug">
+                  <div className="space-y-2 cursor-pointer" onClick={() => setSelectedProduct(prod)}>
+                    <h3 className="text-lg font-extrabold text-neutral-950 leading-snug hover:text-amber-600 transition-colors">
                       {prod.title}
                     </h3>
                     <p className="text-neutral-500 text-xs leading-relaxed">
@@ -425,9 +443,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     </div>
 
                     <button
-                      onClick={() => handleAddToCart(prod.title)}
+                      onClick={() => setSelectedProduct(prod)}
                       className="w-12 h-12 rounded-full bg-neutral-950 hover:bg-[#f5b800] hover:text-neutral-950 text-white flex items-center justify-center transition-all cursor-pointer shadow-md group-hover:scale-105"
-                      title="Add to cart"
+                      title="View product details"
                     >
                       <ArrowRight className="w-5 h-5" />
                     </button>
