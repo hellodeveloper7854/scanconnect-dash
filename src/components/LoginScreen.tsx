@@ -28,6 +28,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
         
         {/* Left Column - Digital Shield Branding */}
         <div className="lg:col-span-6 flex flex-col items-start space-y-6">
+          {/* Return to Dashboard Home Link */}
+          <button
+            onClick={() => onNavigate('dashboard')}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-amber-400 font-extrabold text-xs uppercase tracking-wider transition-all cursor-pointer border border-amber-400/30"
+          >
+            ← Back to How it works
+          </button>
+
           {/* Shield Emblem */}
           <div className="w-14 h-14 rounded-2xl bg-amber-400 text-neutral-950 flex items-center justify-center shadow-[0_0_25px_rgba(245,184,0,0.4)] border border-amber-300">
             <Shield className="w-8 h-8 fill-neutral-950 stroke-neutral-950" />

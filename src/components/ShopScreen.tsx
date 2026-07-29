@@ -21,12 +21,14 @@ interface ShopScreenProps {
   userData: UserFormData;
   onLogout: () => void;
   onNavigate: (nav: string) => void;
+  isLoggedIn?: boolean;
 }
 
 export const ShopScreen: React.FC<ShopScreenProps> = ({
   userData,
   onLogout,
   onNavigate,
+  isLoggedIn,
 }) => {
   const [activeNav, setActiveNav] = useState('Shop');
   const [visibleProductsCount, setVisibleProductsCount] = useState(6);
@@ -175,6 +177,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         userData={userData}
         onLogout={onLogout}
         activeNav={activeNav}
+        isLoggedIn={isLoggedIn}
         onNavClick={handleHeaderNav}
       />
 

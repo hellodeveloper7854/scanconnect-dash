@@ -13,7 +13,8 @@ import { ContactUsScreen } from './components/ContactUsScreen';
 import { ProfileScreen } from './components/ProfileScreen';
 
 export default function App() {
-  const [activeScreen, setActiveScreen] = useState<ScreenType>('register');
+  const [activeScreen, setActiveScreen] = useState<ScreenType>('dashboard');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const [otpMobileNumber, setOtpMobileNumber] = useState('9881860335');
   const [userData, setUserData] = useState<UserFormData>({
@@ -21,6 +22,29 @@ export default function App() {
     mobileNumber: '9881860335',
     email: 'driver@scanme.com',
   });
+
+  const handleGlobalNavigate = (nav: string) => {
+    const normalized = nav.toLowerCase();
+    if (normalized === 'about') {
+      setActiveScreen('about');
+    } else if (normalized === 'shop') {
+      setActiveScreen('shop');
+    } else if (normalized === 'contact') {
+      setActiveScreen('contact');
+    } else if (normalized === 'profile') {
+      if (isLoggedIn) {
+        setActiveScreen('profile');
+      } else {
+        setActiveScreen('login');
+      }
+    } else if (normalized === 'login') {
+      setActiveScreen('login');
+    } else if (normalized === 'register') {
+      setActiveScreen('register');
+    } else {
+      setActiveScreen('dashboard');
+    }
+  };
 
   const handleRegisterSuccess = (data: UserFormData) => {
     setUserData(data);
@@ -30,6 +54,12 @@ export default function App() {
 
   const handleLoginSuccess = (data: Partial<UserFormData>) => {
     setUserData((prev) => ({ ...prev, ...data }));
+    setIsLoggedIn(true);
+    setActiveScreen('profile');
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
     setActiveScreen('dashboard');
   };
 
@@ -40,7 +70,8 @@ export default function App() {
 
   const handleOtpVerifiedSuccess = () => {
     setIsOtpModalOpen(false);
-    setActiveScreen('dashboard');
+    setIsLoggedIn(true);
+    setActiveScreen('profile');
   };
 
   if (activeScreen === 'dashboard') {
@@ -48,13 +79,9 @@ export default function App() {
       <>
         <VehicleDashboard
           userData={userData}
-          onLogout={() => setActiveScreen('login')}
-          onNavigate={(nav) => {
-            if (nav === 'about' || nav === 'About') setActiveScreen('about');
-            else if (nav === 'shop' || nav === 'Shop') setActiveScreen('shop');
-            else if (nav === 'contact' || nav === 'Contact') setActiveScreen('contact');
-            else if (nav === 'profile' || nav === 'Profile') setActiveScreen('profile');
-          }}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogout}
+          onNavigate={handleGlobalNavigate}
         />
         {/* Interactive OTP Modal */}
         <OtpModal
@@ -72,20 +99,9 @@ export default function App() {
       <>
         <AboutUsScreen
           userData={userData}
-          onLogout={() => setActiveScreen('login')}
-          onNavigate={(nav) => {
-            if (nav === 'dashboard' || nav === 'How it works' || nav === 'QR Scan') {
-              setActiveScreen('dashboard');
-            } else if (nav === 'about' || nav === 'About') {
-              setActiveScreen('about');
-            } else if (nav === 'shop' || nav === 'Shop') {
-              setActiveScreen('shop');
-            } else if (nav === 'contact' || nav === 'Contact') {
-              setActiveScreen('contact');
-            } else if (nav === 'profile' || nav === 'Profile') {
-              setActiveScreen('profile');
-            }
-          }}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogout}
+          onNavigate={handleGlobalNavigate}
         />
         {/* Interactive OTP Modal */}
         <OtpModal
@@ -103,20 +119,9 @@ export default function App() {
       <>
         <ShopScreen
           userData={userData}
-          onLogout={() => setActiveScreen('login')}
-          onNavigate={(nav) => {
-            if (nav === 'dashboard' || nav === 'How it works' || nav === 'QR Scan') {
-              setActiveScreen('dashboard');
-            } else if (nav === 'about' || nav === 'About') {
-              setActiveScreen('about');
-            } else if (nav === 'shop' || nav === 'Shop') {
-              setActiveScreen('shop');
-            } else if (nav === 'contact' || nav === 'Contact') {
-              setActiveScreen('contact');
-            } else if (nav === 'profile' || nav === 'Profile') {
-              setActiveScreen('profile');
-            }
-          }}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogout}
+          onNavigate={handleGlobalNavigate}
         />
         {/* Interactive OTP Modal */}
         <OtpModal
@@ -134,20 +139,9 @@ export default function App() {
       <>
         <ContactUsScreen
           userData={userData}
-          onLogout={() => setActiveScreen('login')}
-          onNavigate={(nav) => {
-            if (nav === 'dashboard' || nav === 'How it works' || nav === 'QR Scan') {
-              setActiveScreen('dashboard');
-            } else if (nav === 'about' || nav === 'About') {
-              setActiveScreen('about');
-            } else if (nav === 'shop' || nav === 'Shop') {
-              setActiveScreen('shop');
-            } else if (nav === 'contact' || nav === 'Contact') {
-              setActiveScreen('contact');
-            } else if (nav === 'profile' || nav === 'Profile') {
-              setActiveScreen('profile');
-            }
-          }}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogout}
+          onNavigate={handleGlobalNavigate}
         />
         {/* Interactive OTP Modal */}
         <OtpModal
@@ -165,20 +159,9 @@ export default function App() {
       <>
         <ProfileScreen
           userData={userData}
-          onLogout={() => setActiveScreen('login')}
-          onNavigate={(nav) => {
-            if (nav === 'dashboard' || nav === 'How it works' || nav === 'QR Scan') {
-              setActiveScreen('dashboard');
-            } else if (nav === 'about' || nav === 'About') {
-              setActiveScreen('about');
-            } else if (nav === 'shop' || nav === 'Shop') {
-              setActiveScreen('shop');
-            } else if (nav === 'contact' || nav === 'Contact') {
-              setActiveScreen('contact');
-            } else if (nav === 'profile' || nav === 'Profile') {
-              setActiveScreen('profile');
-            }
-          }}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogout}
+          onNavigate={handleGlobalNavigate}
         />
         {/* Interactive OTP Modal */}
         <OtpModal
@@ -197,14 +180,14 @@ export default function App() {
       <main className="flex-1 flex flex-col justify-center">
         {activeScreen === 'register' && (
           <RegistrationScreen
-            onNavigate={(screen) => setActiveScreen(screen)}
+            onNavigate={handleGlobalNavigate}
             onSubmitSuccess={handleRegisterSuccess}
           />
         )}
 
         {activeScreen === 'login' && (
           <LoginScreen
-            onNavigate={(screen) => setActiveScreen(screen)}
+            onNavigate={handleGlobalNavigate}
             onSubmitSuccess={handleLoginSuccess}
           />
         )}
@@ -212,13 +195,13 @@ export default function App() {
         {activeScreen === 'send-otp' && (
           <SendOtpScreen
             onSendOtp={handleSendOtpTrigger}
-            onNavigate={(screen) => setActiveScreen(screen)}
+            onNavigate={handleGlobalNavigate}
           />
         )}
 
         {activeScreen === 'login-options' && (
           <LoginWithOtpScreen
-            onNavigate={(screen) => setActiveScreen(screen)}
+            onNavigate={handleGlobalNavigate}
             onSelectOtpLogin={() => {
               setOtpMobileNumber(userData.mobileNumber || '9881860335');
               setIsOtpModalOpen(true);

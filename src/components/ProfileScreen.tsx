@@ -24,12 +24,14 @@ interface ProfileScreenProps {
   userData: UserFormData;
   onLogout: () => void;
   onNavigate: (nav: string) => void;
+  isLoggedIn?: boolean;
 }
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   userData,
   onLogout,
   onNavigate,
+  isLoggedIn,
 }) => {
   const [activeNav, setActiveNav] = useState('Profile');
 
@@ -170,6 +172,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         userData={userData}
         onLogout={onLogout}
         activeNav={activeNav}
+        isLoggedIn={isLoggedIn}
         onNavClick={handleHeaderNav}
       />
 

@@ -7,6 +7,7 @@ interface DashboardHeaderProps {
   onLogout: () => void;
   activeNav?: string;
   onNavClick?: (nav: string) => void;
+  isLoggedIn?: boolean;
 }
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
@@ -14,6 +15,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onLogout,
   activeNav = 'How it works',
   onNavClick,
+  isLoggedIn = false,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -101,81 +103,92 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
             </button>
 
-            {/* User Profile Avatar with Dropdown */}
-            <div className="relative flex items-center gap-1">
-              <button
-                onClick={() => {
-                  setUserDropdownOpen(false);
-                  handleNav('Profile');
-                }}
-                title="View My Profile"
-                className="flex items-center p-0.5 rounded-full hover:ring-2 hover:ring-black/30 transition-all cursor-pointer group"
-              >
-                <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-                  alt="User Avatar"
-                  referrerPolicy="no-referrer"
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border-2 border-white shadow-sm group-hover:scale-105 transition-transform"
-                />
-              </button>
+            {/* User Profile Avatar / Login Button */}
+            {isLoggedIn ? (
+              <div className="relative flex items-center gap-1">
+                <button
+                  onClick={() => {
+                    setUserDropdownOpen(false);
+                    handleNav('Profile');
+                  }}
+                  title="View My Profile"
+                  className="flex items-center p-0.5 rounded-full hover:ring-2 hover:ring-black/30 transition-all cursor-pointer group"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+                    alt="User Avatar"
+                    referrerPolicy="no-referrer"
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border-2 border-white shadow-sm group-hover:scale-105 transition-transform"
+                  />
+                </button>
 
-              <button
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                title="Account Menu"
-                className="p-1 text-neutral-900 hover:bg-black/10 rounded-full transition-colors cursor-pointer"
-              >
-                <ChevronDown className="w-4 h-4 stroke-[2.5]" />
-              </button>
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  title="Account Menu"
+                  className="p-1 text-neutral-900 hover:bg-black/10 rounded-full transition-colors cursor-pointer"
+                >
+                  <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                </button>
 
-              {/* User Dropdown Menu */}
-              {userDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-neutral-200 py-2 text-neutral-800 z-50 animate-fade-in">
-                  <div
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      handleNav('Profile');
-                    }}
-                    className="px-4 py-2 border-b border-neutral-100 hover:bg-amber-50/60 cursor-pointer transition-colors"
-                  >
-                    <p className="text-xs font-bold text-neutral-900 uppercase truncate">
-                      {userData.fullName || 'Kartik Ghodake'}
-                    </p>
-                    <p className="text-[11px] text-neutral-500 font-mono truncate">
-                      {userData.email || 'driver@scanme.com'}
-                    </p>
-                  </div>
-                  <div className="py-1">
-                    <button
+                {/* User Dropdown Menu */}
+                {userDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-neutral-200 py-2 text-neutral-800 z-50 animate-fade-in">
+                    <div
                       onClick={() => {
                         setUserDropdownOpen(false);
                         handleNav('Profile');
                       }}
-                      className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-amber-50 flex items-center gap-2 text-neutral-900 cursor-pointer"
+                      className="px-4 py-2 border-b border-neutral-100 hover:bg-amber-50/60 cursor-pointer transition-colors"
                     >
-                      <User className="w-4 h-4 text-[#f5b800]" /> My Profile
-                    </button>
-                    <button
-                      onClick={() => {
-                        setUserDropdownOpen(false);
-                        alert(`Vehicle ID: SC-MH12-9881\nStatus: Active Privacy Shield`);
-                      }}
-                      className="w-full text-left px-4 py-2 text-xs font-semibold hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
-                    >
-                      <Car className="w-4 h-4 text-[#f5b800]" /> Vehicle Details
-                    </button>
-                    <button
-                      onClick={() => {
-                        setUserDropdownOpen(false);
-                        onLogout();
-                      }}
-                      className="w-full text-left px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 flex items-center gap-2 cursor-pointer"
-                    >
-                      <LogOut className="w-4 h-4 text-red-600" /> Logout
-                    </button>
+                      <p className="text-xs font-bold text-neutral-900 uppercase truncate">
+                        {userData.fullName || 'Kartik Ghodake'}
+                      </p>
+                      <p className="text-[11px] text-neutral-500 font-mono truncate">
+                        {userData.email || 'driver@scanme.com'}
+                      </p>
+                    </div>
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          setUserDropdownOpen(false);
+                          handleNav('Profile');
+                        }}
+                        className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-amber-50 flex items-center gap-2 text-neutral-900 cursor-pointer"
+                      >
+                        <User className="w-4 h-4 text-[#f5b800]" /> My Profile
+                      </button>
+                      <button
+                        onClick={() => {
+                          setUserDropdownOpen(false);
+                          alert(`Vehicle ID: SC-MH12-9881\nStatus: Active Privacy Shield`);
+                        }}
+                        className="w-full text-left px-4 py-2 text-xs font-semibold hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
+                      >
+                        <Car className="w-4 h-4 text-[#f5b800]" /> Vehicle Details
+                      </button>
+                      <button
+                        onClick={() => {
+                          setUserDropdownOpen(false);
+                          onLogout();
+                        }}
+                        className="w-full text-left px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 flex items-center gap-2 cursor-pointer"
+                      >
+                        <LogOut className="w-4 h-4 text-red-600" /> Logout
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => handleNav('Profile')}
+                title="Login or Register Account"
+                className="px-3.5 py-1.5 sm:px-4 sm:py-2 bg-neutral-950 hover:bg-neutral-800 text-amber-400 font-extrabold text-xs sm:text-sm rounded-full shadow-md transition-all cursor-pointer flex items-center gap-1.5 border border-amber-400/30"
+              >
+                <User className="w-3.5 h-3.5 text-amber-400" />
+                <span>Login / Register</span>
+              </button>
+            )}
 
             {/* Mobile Hamburger Button */}
             <button
@@ -200,15 +213,32 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               {item}
             </button>
           ))}
-          <button
-            onClick={() => {
-              setMobileMenuOpen(false);
-              onLogout();
-            }}
-            className="block w-full text-left py-2 px-3 rounded-lg text-red-700 font-extrabold hover:bg-red-500/10"
-          >
-            Logout
-          </button>
+          {isLoggedIn ? (
+            <>
+              <button
+                onClick={() => handleNav('Profile')}
+                className="block w-full text-left py-2 px-3 rounded-lg hover:bg-black/5 font-extrabold flex items-center gap-2"
+              >
+                <User className="w-4 h-4" /> My Profile
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onLogout();
+                }}
+                className="block w-full text-left py-2 px-3 rounded-lg text-red-700 font-extrabold hover:bg-red-500/10"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => handleNav('Profile')}
+              className="block w-full text-left py-2 px-3 rounded-lg bg-neutral-950 text-amber-400 font-extrabold hover:bg-neutral-900"
+            >
+              Login / Register
+            </button>
+          )}
         </div>
       )}
     </header>

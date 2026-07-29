@@ -21,12 +21,14 @@ interface ContactUsScreenProps {
   userData: UserFormData;
   onLogout: () => void;
   onNavigate: (nav: string) => void;
+  isLoggedIn?: boolean;
 }
 
 export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
   userData,
   onLogout,
   onNavigate,
+  isLoggedIn,
 }) => {
   const [activeNav, setActiveNav] = useState('Contact');
 
@@ -76,6 +78,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
         userData={userData}
         onLogout={onLogout}
         activeNav={activeNav}
+        isLoggedIn={isLoggedIn}
         onNavClick={handleHeaderNav}
       />
 

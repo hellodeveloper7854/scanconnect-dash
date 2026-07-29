@@ -31,9 +31,10 @@ interface VehicleDashboardProps {
   userData: UserFormData;
   onLogout: () => void;
   onNavigate?: (nav: string) => void;
+  isLoggedIn?: boolean;
 }
 
-export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, onLogout, onNavigate }) => {
+export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, onLogout, onNavigate, isLoggedIn }) => {
   const [activeNav, setActiveNav] = useState('How it works');
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -115,6 +116,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         userData={userData}
         onLogout={onLogout}
         activeNav={activeNav}
+        isLoggedIn={isLoggedIn}
         onNavClick={(nav) => {
           setActiveNav(nav);
           if ((nav === 'About' || nav === 'about') && onNavigate) {

@@ -30,6 +30,14 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNaviga
         
         {/* Left Column - Hero Branding & Metrics */}
         <div className="lg:col-span-6 flex flex-col items-start space-y-6">
+          {/* Return to Dashboard Home Link */}
+          <button
+            onClick={() => onNavigate('dashboard')}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-amber-400 font-extrabold text-xs uppercase tracking-wider transition-all cursor-pointer border border-amber-400/30"
+          >
+            ← Back to How it works
+          </button>
+
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#807200]/40 border border-amber-400/40 text-amber-300 text-xs font-extrabold tracking-widest uppercase rounded-sm">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />

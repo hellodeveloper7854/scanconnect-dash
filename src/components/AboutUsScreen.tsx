@@ -17,12 +17,14 @@ interface AboutUsScreenProps {
   userData: UserFormData;
   onLogout: () => void;
   onNavigate: (nav: string) => void;
+  isLoggedIn?: boolean;
 }
 
 export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
   userData,
   onLogout,
   onNavigate,
+  isLoggedIn,
 }) => {
   const [activeNav, setActiveNav] = useState('About');
 
@@ -50,6 +52,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
         userData={userData}
         onLogout={onLogout}
         activeNav={activeNav}
+        isLoggedIn={isLoggedIn}
         onNavClick={handleHeaderNav}
       />
 
