@@ -11,6 +11,7 @@ import { AboutUsScreen } from './components/AboutUsScreen';
 import { ShopScreen } from './components/ShopScreen';
 import { ContactUsScreen } from './components/ContactUsScreen';
 import { ProfileScreen } from './components/ProfileScreen';
+import { QrScanScreen } from './components/QrScanScreen';
 
 export default function App() {
   const [activeScreen, setActiveScreen] = useState<ScreenType>('dashboard');
@@ -31,6 +32,8 @@ export default function App() {
       setActiveScreen('shop');
     } else if (normalized === 'contact') {
       setActiveScreen('contact');
+    } else if (normalized === 'qr scan' || normalized === 'qr-scan' || normalized === 'qrscan') {
+      setActiveScreen('qr-scan');
     } else if (normalized === 'profile') {
       if (isLoggedIn) {
         setActiveScreen('profile');
@@ -138,6 +141,26 @@ export default function App() {
     return (
       <>
         <ContactUsScreen
+          userData={userData}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogout}
+          onNavigate={handleGlobalNavigate}
+        />
+        {/* Interactive OTP Modal */}
+        <OtpModal
+          isOpen={isOtpModalOpen}
+          mobileNumber={otpMobileNumber}
+          onClose={() => setIsOtpModalOpen(false)}
+          onVerifySuccess={handleOtpVerifiedSuccess}
+        />
+      </>
+    );
+  }
+
+  if (activeScreen === 'qr-scan') {
+    return (
+      <>
+        <QrScanScreen
           userData={userData}
           isLoggedIn={isLoggedIn}
           onLogout={handleLogout}
