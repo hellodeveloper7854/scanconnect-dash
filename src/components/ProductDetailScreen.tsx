@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
+import { CheckoutFlowScreen } from './CheckoutFlowScreen';
 import {
   Star,
   Truck,
@@ -51,6 +52,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   const [activeThumbnail, setActiveThumbnail] = useState(0);
   const [activeTab, setActiveTab] = useState<'how' | 'security' | 'reviews'>('how');
   const [cartCount, setCartCount] = useState(0);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
@@ -82,8 +84,26 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   ];
 
   const handleBuyNow = () => {
-    alert(`Proceeding to checkout for ${productTitle} (${productPrice})`);
+    setIsCheckoutOpen(true);
   };
+
+  if (isCheckoutOpen) {
+    return (
+      <CheckoutFlowScreen
+        userData={userData}
+        onLogout={onLogout}
+        onNavigate={onNavigate}
+        isLoggedIn={isLoggedIn}
+        onBackToProduct={() => setIsCheckoutOpen(false)}
+        product={{
+          id: product?.id || 1,
+          title: productTitle,
+          desc: product?.desc || '',
+          price: productPrice
+        }}
+      />
+    );
+  }
 
   const handleAddToCart = () => {
     setCartCount(prev => prev + 1);
