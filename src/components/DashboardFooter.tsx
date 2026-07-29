@@ -5,22 +5,28 @@ export const DashboardFooter: React.FC = () => {
   const [guidesOpen, setGuidesOpen] = useState(false);
 
   return (
-    <footer className="relative bg-[#f5b800] text-neutral-900 pt-16 pb-8 overflow-hidden">
-      {/* Top Slanted Diagonal Accent */}
+    <footer className="relative bg-[#ebaa00] text-white pt-20 pb-12 overflow-hidden">
+      {/* Top Slanted Diagonal Border */}
+      <div
+        className="absolute top-0 inset-x-0 h-16 bg-white pointer-events-none"
+        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 0, 0 100%)' }}
+      />
+      {/* An alternative crisp slope clip on the footer itself or top white overlay */}
       <div 
-        className="absolute top-0 inset-x-0 h-10 bg-white"
-        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 0)' }}
+        className="absolute top-0 left-0 right-0 h-16 bg-white pointer-events-none"
+        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 12px, 0 54px)' }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-4">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10 pt-4">
+        
         {/* Top Tagline & Social Icons */}
-        <div className="mb-12">
-          <p className="text-base sm:text-lg font-medium text-neutral-900 max-w-xl mb-6">
+        <div className="mb-14 space-y-6">
+          <p className="text-base sm:text-lg font-semibold text-white/95 max-w-xl leading-snug">
             Privacy-first contact tags for vehicles. Made in India by NGF132 Pvt Ltd.
           </p>
 
-          {/* Social Icons */}
-          <div className="flex items-center space-x-3">
+          {/* Social Icons - Dark Olive Circles with White Icons */}
+          <div className="flex items-center space-x-3.5">
             {[
               { Icon: Youtube, label: 'YouTube', href: '#' },
               { Icon: Instagram, label: 'Instagram', href: '#' },
@@ -35,7 +41,7 @@ export const DashboardFooter: React.FC = () => {
                   e.preventDefault();
                   alert(`Visit SCAN CONNECT on ${label}`);
                 }}
-                className="w-10 h-10 rounded-full bg-[#837000] text-[#f5b800] flex items-center justify-center hover:bg-neutral-900 hover:text-white transition-colors cursor-pointer"
+                className="w-10 h-10 rounded-full bg-[#524500] hover:bg-[#3d3300] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer shadow-xs"
                 title={label}
               >
                 <Icon className="w-5 h-5 fill-current" />
@@ -47,14 +53,14 @@ export const DashboardFooter: React.FC = () => {
         {/* 5 Column Link Section */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 pb-12">
           {/* Column 1: SHOP */}
-          <div>
-            <h4 className="text-base font-black tracking-wider text-neutral-950 uppercase mb-4">
+          <div className="space-y-4">
+            <h4 className="text-base font-black tracking-wider text-white uppercase font-sans">
               SHOP
             </h4>
-            <ul className="space-y-2.5 text-sm font-medium text-neutral-900">
+            <ul className="space-y-3 text-sm font-medium text-white/90">
               {['Car & Bike tag', 'Car SCAN ME tag', 'How it works', 'Free eTag'].map((link) => (
                 <li key={link}>
-                  <button onClick={() => alert(`Shop item: ${link}`)} className="hover:underline cursor-pointer">
+                  <button onClick={() => alert(`Shop item: ${link}`)} className="hover:underline cursor-pointer text-left">
                     {link}
                   </button>
                 </li>
@@ -63,14 +69,14 @@ export const DashboardFooter: React.FC = () => {
           </div>
 
           {/* Column 2: ABOUT */}
-          <div>
-            <h4 className="text-base font-black tracking-wider text-neutral-950 uppercase mb-4">
+          <div className="space-y-4">
+            <h4 className="text-base font-black tracking-wider text-white uppercase font-sans">
               ABOUT
             </h4>
-            <ul className="space-y-2.5 text-sm font-medium text-neutral-900">
+            <ul className="space-y-3 text-sm font-medium text-white/90">
               {['Contact', 'Become a reseller', 'Franchise login', 'Investors', 'Blog'].map((link) => (
                 <li key={link}>
-                  <button onClick={() => alert(`About: ${link}`)} className="hover:underline cursor-pointer">
+                  <button onClick={() => alert(`About: ${link}`)} className="hover:underline cursor-pointer text-left">
                     {link}
                   </button>
                 </li>
@@ -79,11 +85,11 @@ export const DashboardFooter: React.FC = () => {
           </div>
 
           {/* Column 3: ALL AUTO TOOLS */}
-          <div>
-            <h4 className="text-base font-black tracking-wider text-neutral-950 uppercase mb-4">
+          <div className="space-y-4">
+            <h4 className="text-base font-black tracking-wider text-white uppercase font-sans">
               ALL AUTO TOOLS
             </h4>
-            <ul className="space-y-2.5 text-sm font-medium text-neutral-900">
+            <ul className="space-y-3 text-sm font-medium text-white/90">
               {[
                 'Car loan calculator',
                 'Fuel prices',
@@ -92,7 +98,7 @@ export const DashboardFooter: React.FC = () => {
                 'Auto FAQ',
               ].map((link) => (
                 <li key={link}>
-                  <button onClick={() => alert(`Tool: ${link}`)} className="hover:underline cursor-pointer">
+                  <button onClick={() => alert(`Tool: ${link}`)} className="hover:underline cursor-pointer text-left">
                     {link}
                   </button>
                 </li>
@@ -101,14 +107,14 @@ export const DashboardFooter: React.FC = () => {
           </div>
 
           {/* Column 4: PRIVACY POLICY */}
-          <div>
-            <h4 className="text-base font-black tracking-wider text-neutral-950 uppercase mb-4">
+          <div className="space-y-4">
+            <h4 className="text-base font-black tracking-wider text-white uppercase font-sans">
               PRIVACY POLICY
             </h4>
-            <ul className="space-y-2.5 text-sm font-medium text-neutral-900">
+            <ul className="space-y-3 text-sm font-medium text-white/90">
               {['Terms & conditions', 'Refund & returns', 'Shipping policy'].map((link) => (
                 <li key={link}>
-                  <button onClick={() => alert(`Policy: ${link}`)} className="hover:underline cursor-pointer">
+                  <button onClick={() => alert(`Policy: ${link}`)} className="hover:underline cursor-pointer text-left">
                     {link}
                   </button>
                 </li>
@@ -117,18 +123,18 @@ export const DashboardFooter: React.FC = () => {
           </div>
 
           {/* Column 5: CONTACT */}
-          <div>
-            <h4 className="text-base font-black tracking-wider text-neutral-950 uppercase mb-4">
+          <div className="space-y-4">
+            <h4 className="text-base font-black tracking-wider text-white uppercase font-sans">
               CONTACT
             </h4>
-            <ul className="space-y-2.5 text-sm font-medium text-neutral-900">
+            <ul className="space-y-3 text-sm font-medium text-white/90">
               <li>
-                <a href="mailto:rj@sampark.me" className="hover:underline font-mono">
+                <a href="mailto:rj@sampark.me" className="hover:underline block">
                   rj@sampark.me
                 </a>
               </li>
               <li>
-                <a href="tel:08047359856" className="hover:underline font-mono">
+                <a href="tel:08047359856" className="hover:underline block">
                   080-473-59856
                 </a>
               </li>
@@ -136,21 +142,21 @@ export const DashboardFooter: React.FC = () => {
           </div>
         </div>
 
-        {/* Horizontal Divider Line */}
-        <div className="border-t border-neutral-900/20 my-6" />
+        {/* Thin Horizontal Divider Line */}
+        <div className="border-t border-white/60 my-6" />
 
         {/* Bottom Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-neutral-900">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold text-white/95">
           <div className="relative">
             <button
               onClick={() => setGuidesOpen(!guidesOpen)}
-              className="flex items-center gap-1.5 hover:underline cursor-pointer font-semibold"
+              className="flex items-center gap-2 hover:underline cursor-pointer"
             >
               <span>Guides & articles</span>
-              <ChevronDown className={`w-4 h-4 transition-transform ${guidesOpen ? 'rotate-180' : ''}`} />
+              <span className="text-[10px]">▼</span>
             </button>
             {guidesOpen && (
-              <div className="absolute left-0 bottom-full mb-2 w-56 bg-neutral-900 text-white rounded-lg p-3 shadow-xl text-xs space-y-1.5 z-50">
+              <div className="absolute left-0 bottom-full mb-2 w-56 bg-neutral-900 text-white rounded-xl p-3.5 shadow-2xl text-xs space-y-2 z-50">
                 <p className="font-bold border-b border-neutral-700 pb-1 text-[#f5b800]">Popular Guides:</p>
                 <p className="hover:text-[#f5b800] cursor-pointer" onClick={() => alert('Guide 1: How ScanConnect Masks Calls')}>
                   • How Masked Calls Work
@@ -165,11 +171,13 @@ export const DashboardFooter: React.FC = () => {
             )}
           </div>
 
-          <p className="text-neutral-900/80 font-mono">
+          <p className="text-white/90">
             © 2026 SCAN CONNECT - NGF132 Pvt Ltd
           </p>
         </div>
+
       </div>
     </footer>
   );
 };
+
