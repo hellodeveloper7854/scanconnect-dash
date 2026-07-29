@@ -44,7 +44,7 @@ export const DashboardFooter: React.FC = () => {
                 className="w-10 h-10 rounded-full bg-[#524500] hover:bg-[#3d3300] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer shadow-xs"
                 title={label}
               >
-                <Icon className="w-5 h-5 fill-current" />
+                <Icon className="w-5 h-5" strokeWidth={2} />
               </a>
             ))}
           </div>

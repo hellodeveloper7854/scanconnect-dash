@@ -36,7 +36,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#f5b800] text-neutral-900 shadow-md">
+    <header className="sticky top-0 z-50 bg-[#f5b800] text-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           
@@ -48,7 +48,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 text-sm sm:text-base font-bold text-neutral-900">
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 text-sm sm:text-base font-bold text-white">
             {navItems.map((item) => {
               const isActive = activeNav === item;
               return (
@@ -57,8 +57,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   onClick={() => handleNav(item)}
                   className={`transition-colors relative py-1 cursor-pointer ${
                     isActive
-                      ? 'text-neutral-950 underline decoration-2 underline-offset-4'
-                      : 'hover:text-neutral-950/80'
+                      ? 'text-white underline decoration-2 underline-offset-4 font-black'
+                      : 'text-white/90 hover:text-white'
                   }`}
                 >
                   {item}
@@ -85,7 +85,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             {/* Notification Bell */}
             <button
               onClick={() => alert(`Notifications (2):\n• Parking ping from SC-MH12-9881\n• Shield security scan complete`)}
-              className="relative p-2 text-neutral-900 hover:bg-black/5 rounded-full transition-colors cursor-pointer"
+              className="relative p-2 text-white hover:bg-black/10 rounded-full transition-colors cursor-pointer"
               title="Notifications"
             >
               <Bell className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
@@ -97,7 +97,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             {/* Help / FAQ Icon */}
             <button
               onClick={() => alert('ScanConnect Helpdesk:\nCall 080-473-59856 or email rj@sampark.me for 24/7 driver support.')}
-              className="p-2 text-neutral-900 hover:bg-black/5 rounded-full transition-colors cursor-pointer"
+              className="p-2 text-white hover:bg-black/10 rounded-full transition-colors cursor-pointer"
               title="Support & FAQ"
             >
               <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
@@ -112,7 +112,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     handleNav('Profile');
                   }}
                   title="View My Profile"
-                  className="flex items-center p-0.5 rounded-full hover:ring-2 hover:ring-black/30 transition-all cursor-pointer group"
+                  className="flex items-center p-0.5 rounded-full hover:ring-2 hover:ring-white/40 transition-all cursor-pointer group"
                 >
                   <img
                     src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
@@ -125,7 +125,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                   title="Account Menu"
-                  className="p-1 text-neutral-900 hover:bg-black/10 rounded-full transition-colors cursor-pointer"
+                  className="p-1 text-white hover:bg-black/10 rounded-full transition-colors cursor-pointer"
                 >
                   <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
@@ -193,7 +193,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-neutral-900 hover:bg-black/5 rounded-lg"
+              className="md:hidden p-2 text-white hover:bg-black/10 rounded-lg"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -203,12 +203,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#e0a800] border-t border-black/10 px-4 pt-2 pb-4 space-y-2 font-bold text-neutral-900">
+        <div className="md:hidden bg-[#e0a800] border-t border-white/20 px-4 pt-2 pb-4 space-y-2 font-bold text-white">
           {navItems.map((item) => (
             <button
               key={item}
               onClick={() => handleNav(item)}
-              className="block w-full text-left py-2 px-3 rounded-lg hover:bg-black/5 transition-colors"
+              className="block w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 transition-colors"
             >
               {item}
             </button>
@@ -217,7 +217,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <>
               <button
                 onClick={() => handleNav('Profile')}
-                className="block w-full text-left py-2 px-3 rounded-lg hover:bg-black/5 font-extrabold flex items-center gap-2"
+                className="block w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 font-extrabold flex items-center gap-2"
               >
                 <User className="w-4 h-4" /> My Profile
               </button>
@@ -226,7 +226,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   setMobileMenuOpen(false);
                   onLogout();
                 }}
-                className="block w-full text-left py-2 px-3 rounded-lg text-red-700 font-extrabold hover:bg-red-500/10"
+                className="block w-full text-left py-2 px-3 rounded-lg text-red-200 font-extrabold hover:bg-red-500/20"
               >
                 Logout
               </button>
