@@ -279,10 +279,6 @@ export default function App() {
         onVerifySuccess={handleOtpVerifiedSuccess}
       />
 
-      {/* Footer copyright */}
-      <footer className="w-full py-4 text-center text-[10px] text-neutral-500 font-mono border-t border-white/5 bg-neutral-950/80">
-        © {new Date().getFullYear()} SCAN CONNECT • SECURE AUTOMOTIVE NETWORK • ALL RIGHTS RESERVED
-      </footer>
     </BackgroundCockpit>
   );
 }

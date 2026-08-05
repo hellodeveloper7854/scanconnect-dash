@@ -23,47 +23,47 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
   };
 
   return (
-    <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 flex items-center justify-center">
+    <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex items-center justify-center">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
         
         {/* Left Column - Digital Shield Branding */}
         <div className="lg:col-span-6 flex flex-col items-start space-y-6">
-          {/* Return to Dashboard Home Link */}
+          {/* Back Button */}
           <button
             onClick={() => onNavigate('dashboard')}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-amber-400 font-extrabold text-xs uppercase tracking-wider transition-all cursor-pointer border border-amber-400/30"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-[#F2BA03] font-extrabold text-xs uppercase tracking-wider transition-all cursor-pointer border border-[#F2BA03]/30 shadow-md"
           >
             ← Back to How it works
           </button>
 
           {/* Shield Emblem */}
-          <div className="w-14 h-14 rounded-2xl bg-amber-400 text-neutral-950 flex items-center justify-center shadow-[0_0_25px_rgba(245,184,0,0.4)] border border-amber-300">
+          <div className="w-12 h-[50px] bg-[#F2BA03] text-neutral-950 flex items-center justify-center rounded-lg shadow-[0_0_25px_rgba(242,186,3,0.4)]">
             <Shield className="w-8 h-8 fill-neutral-950 stroke-neutral-950" />
           </div>
 
           {/* Heading */}
           <div className="space-y-1">
-            <h1 className="text-4xl sm:text-6xl md:text-6xl font-black tracking-tight text-white font-sans leading-[1.05]">
+            <h1 className="text-4xl sm:text-[48px] font-extrabold tracking-[-0.64px] text-white font-sans leading-[47px]">
               Your Vehicle&apos;s <br />
-              <span className="text-amber-400 font-black block mt-0.5 drop-shadow-[0_2px_10px_rgba(245,184,0,0.3)]">
+              <span className="text-[#F2BA03] font-black block mt-1 drop-shadow-[0_2px_12px_rgba(242,186,3,0.35)]">
                 Digital Shield.
               </span>
             </h1>
           </div>
 
           {/* Description */}
-          <p className="text-neutral-300 text-base md:text-lg max-w-md font-normal leading-relaxed">
+          <p className="text-[#E2E2E2] text-lg sm:text-[20px] leading-[26px] max-w-xl font-normal">
             Connect safely with other drivers while maintaining your privacy. Join the fleet of secure vehicle services today.
           </p>
 
-          {/* Encryption & Privacy Badges */}
-          <div className="pt-4 flex flex-wrap gap-3 w-full">
-            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-neutral-900/80 border border-white/10 text-neutral-300 text-xs font-bold uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4 text-amber-400" />
+          {/* Encryption & Privacy Badges (Trust Indicators) */}
+          <div className="pt-2 flex flex-col sm:flex-row gap-4 w-full max-w-lg">
+            <div className="flex-1 flex items-center gap-3 px-4 py-3.5 h-[54px] bg-black/40 border border-white/10 backdrop-blur-[2px] rounded-lg text-white text-xs font-bold uppercase tracking-[0.6px]">
+              <ShieldCheck className="w-5 h-5 text-[#F2BA03] shrink-0" />
               <span>ENCRYPTED CONNECTION</span>
             </div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-neutral-900/80 border border-white/10 text-neutral-300 text-xs font-bold uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4 text-amber-400" />
+            <div className="flex-1 flex items-center gap-3 px-4 py-3.5 h-[54px] bg-black/40 border border-white/10 backdrop-blur-[2px] rounded-lg text-white text-xs font-bold uppercase tracking-[0.6px]">
+              <ShieldCheck className="w-5 h-5 text-[#F2BA03] shrink-0" />
               <span>PRIVACY FIRST</span>
             </div>
           </div>
@@ -71,33 +71,33 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
 
         {/* Right Column - Login Glassmorphic Card */}
         <div className="lg:col-span-6 flex justify-center lg:justify-end w-full">
-          <div className="w-full max-w-md bg-neutral-900/65 backdrop-blur-xl border border-white/15 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+          <div className="w-full max-w-[480px] bg-white/[0.08] backdrop-blur-[6px] border border-white/10 rounded-xl p-8 sm:p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] relative overflow-hidden">
             
-            {/* Top Right Secure Hub Badge */}
-            <div className="absolute top-4 right-4 bg-amber-400 text-neutral-950 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-sm shadow-md font-mono transform rotate-1">
-              SECURE HUB
+            {/* Top Right Secure Hub Badge (Skewed per Figma spec) */}
+            <div className="absolute top-4 right-4 bg-[#F2BA03] text-black text-xs sm:text-[14px] font-black uppercase tracking-wider px-3.5 py-1.5 shadow-md -skew-x-12">
+              <span className="skew-x-12 block">SECURE HUB</span>
             </div>
 
             {/* Card Header */}
-            <div className="mb-6 pt-1">
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">
+            <div className="mb-6 pt-2">
+              <h2 className="text-2xl sm:text-[32px] font-extrabold text-white tracking-[-0.64px] uppercase leading-[38px]">
                 LOGIN
               </h2>
-              <p className="text-neutral-400 text-xs sm:text-sm mt-1">
+              <p className="text-[#E2E2E2] text-sm font-semibold leading-[21px] mt-1">
                 Please enter your vehicle dashboard credentials
               </p>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Vehicle ID / Email */}
-              <div>
-                <label className="block text-[10px] font-bold tracking-widest text-neutral-300 uppercase mb-1.5">
+              <div className="space-y-2">
+                <label className="block text-xs font-bold tracking-[0.6px] text-white uppercase">
                   VEHICLE ID / EMAIL
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
-                    <Mail className="w-4 h-4" />
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#5E5E5E]">
+                    <Mail className="w-5 h-5" />
                   </div>
                   <input
                     type="text"
@@ -105,19 +105,19 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
                     value={vehicleEmail}
                     onChange={(e) => setVehicleEmail(e.target.value)}
                     placeholder="driver@scanme.com"
-                    className="w-full pl-10 pr-4 py-3 bg-neutral-200/90 text-neutral-900 font-medium placeholder-neutral-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all font-mono"
+                    className="w-full h-[59px] pl-12 pr-4 bg-white/90 text-[#1B1C1C] font-normal placeholder-[#6B7280] rounded-none text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] transition-all"
                   />
                 </div>
               </div>
 
               {/* Access Key */}
-              <div>
-                <label className="block text-[10px] font-bold tracking-widest text-neutral-300 uppercase mb-1.5">
+              <div className="space-y-2">
+                <label className="block text-xs font-bold tracking-[0.6px] text-white uppercase">
                   ACCESS KEY
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
-                    <Lock className="w-4 h-4" />
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#5E5E5E]">
+                    <Lock className="w-5 h-5" />
                   </div>
                   <input
                     type="password"
@@ -125,26 +125,26 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
                     value={accessKey}
                     onChange={(e) => setAccessKey(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-4 py-3 bg-neutral-200/90 text-neutral-900 font-medium placeholder-neutral-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all font-mono"
+                    className="w-full h-[59px] pl-12 pr-4 bg-white/90 text-[#1B1C1C] font-normal placeholder-[#6B7280] rounded-none text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] transition-all"
                   />
                 </div>
               </div>
 
               {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between text-xs pt-1">
-                <label className="flex items-center gap-2 cursor-pointer text-neutral-300 font-bold tracking-wider text-[11px]">
+                <label className="flex items-center gap-2 cursor-pointer text-white font-bold tracking-[0.6px] text-xs">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded bg-neutral-800 border-white/20 text-amber-400 focus:ring-amber-400 focus:ring-offset-neutral-900 cursor-pointer"
+                    className="w-5 h-5 rounded-none bg-transparent border-2 border-white text-[#F2BA03] focus:ring-[#F2BA03] cursor-pointer"
                   />
                   <span>REMEMBER ME</span>
                 </label>
                 <button
                   type="button"
                   onClick={() => alert('Password reset instructions sent to your registered email.')}
-                  className="text-amber-400 font-bold hover:underline tracking-wider text-[11px] uppercase cursor-pointer"
+                  className="text-[#F2BA03] font-bold hover:underline tracking-[0.6px] text-xs uppercase cursor-pointer"
                 >
                   FORGOT KEY?
                 </button>
@@ -154,35 +154,32 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full mt-3 py-3.5 px-4 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs sm:text-sm uppercase tracking-widest rounded-lg shadow-lg shadow-amber-400/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full h-[57px] mt-2 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-base uppercase tracking-[1.6px] rounded-none shadow-md active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isSubmitting ? (
                   <span>AUTHENTICATING...</span>
                 ) : (
                   <>
                     <span>LOGIN</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-5 h-5" />
                   </>
                 )}
               </button>
 
               {/* Divider */}
-              <div className="relative my-5">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-white/10" />
-                </div>
-                <div className="relative flex justify-center text-[10px]">
-                  <span className="bg-neutral-900/90 px-3 text-neutral-400 font-bold uppercase tracking-widest font-mono">
-                    NEW USER?
-                  </span>
-                </div>
+              <div className="flex items-center gap-3 my-4">
+                <div className="flex-1 h-[1px] bg-white/20" />
+                <span className="text-white/50 text-xs font-bold uppercase tracking-[0.6px]">
+                  OR
+                </span>
+                <div className="flex-1 h-[1px] bg-white/20" />
               </div>
 
               {/* Register Vehicle Button */}
               <button
                 type="button"
                 onClick={() => onNavigate('register')}
-                className="w-full py-3.5 px-4 bg-black/80 hover:bg-black/90 border border-white/20 text-white font-bold text-xs uppercase tracking-widest rounded-lg transition-all cursor-pointer text-center"
+                className="w-full h-[57px] bg-black hover:bg-neutral-900 border border-white/20 text-white font-normal text-base uppercase tracking-[1.6px] rounded-none transition-all cursor-pointer text-center"
               >
                 REGISTER VEHICLE
               </button>
@@ -195,3 +192,4 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
     </div>
   );
 };
+
