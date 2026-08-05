@@ -119,7 +119,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               </span>
             </div>
             <div className={`flex flex-col items-start w-[94px] h-[24px]`}>
-              <span className={`font-['Rubik'] font-medium text-[16px] sm:text-[20px] leading-[24px] ${step === 1 ? 'text-[#736B00]' : step === 3 ? 'text-[#9CA3AF]' : 'text-[#6B7280]'}`}>
+              <span className={`font-['Rubik'] font-medium text-[16px] sm:text-[18px] leading-[24px] ${step === 1 ? 'text-[#736B00]' : step === 3 ? 'text-[#9CA3AF]' : 'text-[#6B7280]'}`}>
                 SHIPPING
               </span>
             </div>
@@ -147,7 +147,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               </span>
             </div>
             <div className={`flex flex-col items-start w-[93px] h-[24px] ${step === 2 ? '' : 'opacity-50'}`}>
-              <span className={`font-['Rubik'] font-medium text-[16px] sm:text-[20px] leading-[24px] ${step === 2 ? 'text-[#736B00]' : 'text-[#5F5E5E]'}`}>
+              <span className={`font-['Rubik'] font-medium text-[16px] sm:text-[18px] leading-[24px] ${step === 2 ? 'text-[#736B00]' : 'text-[#5F5E5E]'}`}>
                 PAYMENT
               </span>
             </div>
@@ -172,7 +172,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               </span>
             </div>
             <div className={`flex flex-col items-start w-[75px] h-[24px] ${step === 3 ? '' : 'opacity-50'}`}>
-              <span className={`font-['Rubik'] font-medium text-[16px] sm:text-[20px] leading-[24px] ${step === 3 ? 'text-[#736B00]' : 'text-[#5F5E5E]'}`}>
+              <span className={`font-['Rubik'] font-medium text-[16px] sm:text-[18px] leading-[24px] ${step === 3 ? 'text-[#736B00]' : 'text-[#5F5E5E]'}`}>
                 REVIEW
               </span>
             </div>
@@ -190,7 +190,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 
                 {/* Heading 2 */}
                 <div className="flex items-center justify-between">
-                  <h2 className="font-['Rubik'] font-medium text-[24px] leading-[31px] text-[#1B1C1C]">
+                  <h2 className="font-['Rubik'] font-medium text-[20px] sm:text-[22px] leading-[28px] text-[#1B1C1C]">
                     Shipping Information
                   </h2>
                   {onBackToProduct && (
@@ -294,7 +294,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               <div className="lg:col-span-5 bg-[#FFFFFF] border border-[#CCC7AA] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] rounded-[12px] p-[31px_32px_32px] flex flex-col gap-[24px]">
                 
                 {/* Heading 3 */}
-                <h3 className="font-['Rubik'] font-medium text-[24px] leading-[31px] text-[#1B1C1C]">
+                <h3 className="font-['Rubik'] font-medium text-[18px] sm:text-[20px] leading-[26px] text-[#1B1C1C]">
                   Order Summary
                 </h3>
 
@@ -705,7 +705,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
 
               {/* Heading 1 */}
               <div className="flex flex-col items-center">
-                <h1 className="font-['Plus_Jakarta_Sans'] font-bold text-[28px] sm:text-[40px] leading-[36px] sm:leading-[48px] tracking-[-0.4px] text-[#1B1C1C]">
+                <h1 className="font-['Plus_Jakarta_Sans'] font-bold text-[24px] sm:text-[30px] leading-[32px] sm:leading-[38px] tracking-[-0.4px] text-[#1B1C1C]">
                   Thank You for Your Order!
                 </h1>
               </div>
@@ -736,7 +736,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 {/* Details Container */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-[16px]">
-                    <h3 className="font-['Plus_Jakarta_Sans'] font-semibold text-[18px] sm:text-[24px] leading-[31px] text-[#1B1C1C] truncate">
+                    <h3 className="font-['Plus_Jakarta_Sans'] font-semibold text-[18px] sm:text-[20px] leading-[26px] text-[#1B1C1C] truncate">
                       {productTitle}
                     </h3>
                     <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#1B1C1C] shrink-0">
@@ -788,7 +788,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
 
               {/* Heading & Subtitle */}
               <div className="space-y-[8px]">
-                <h2 className="font-['Plus_Jakarta_Sans'] font-semibold text-[20px] sm:text-[24px] leading-[31px] text-[#1B1C1C]">
+                <h2 className="font-['Plus_Jakarta_Sans'] font-semibold text-[18px] sm:text-[20px] leading-[26px] text-[#1B1C1C]">
                   How was your experience?
                 </h2>
                 <p className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">

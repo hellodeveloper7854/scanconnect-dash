@@ -230,7 +230,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             </div>
 
             {/* Title */}
-            <h1 className="text-3xl sm:text-4xl font-black text-[#0F0F0F] tracking-tight font-sans leading-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#0F0F0F] tracking-tight font-sans leading-tight">
               {productTitle}
             </h1>
 
@@ -241,7 +241,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
             {/* Price Row */}
             <div className="flex items-baseline gap-3 pt-1">
-              <span className="text-4xl sm:text-5xl font-black text-[#0F0F0F] font-sans tracking-tight">
+              <span className="text-3xl sm:text-4xl font-bold text-[#0F0F0F] font-sans tracking-tight">
                 {productPrice}
               </span>
               <span className="text-lg text-neutral-400 line-through font-medium">
