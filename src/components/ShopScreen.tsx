@@ -12,10 +12,10 @@ import {
   GraduationCap,
   ArrowRight,
   Truck,
-  CheckCircle,
-  QrCode,
   ShieldCheck,
-  Plus
+  QrCode,
+  Star,
+  Package
 } from 'lucide-react';
 
 interface ShopScreenProps {
@@ -53,7 +53,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
     } else if (navItem === 'Profile' || navItem === 'profile') {
       onNavigate('profile');
     } else {
-      alert(`Navigating to ${navItem}`);
+      onNavigate(navItem.toLowerCase());
     }
   };
 
@@ -101,7 +101,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       id: 1,
       tag: 'PREMIUM PACK',
       rating: '4.4',
-      title: '(Pack of 2)Car SCAN CONNECT tag',
+      title: '(Pack of 2) Car SCAN CONNECT tag',
       desc: 'Let people call you for any issues with your parked car without sharing your phone number.',
       price: '₹499',
     },
@@ -109,7 +109,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       id: 2,
       tag: 'PREMIUM PACK',
       rating: '4.4',
-      title: '(Pack of 2)Car SCAN CONNECT tag',
+      title: '(Pack of 2) Car SCAN CONNECT tag',
       desc: 'Let people call you for any issues with your parked car without sharing your phone number.',
       price: '₹499',
     },
@@ -117,7 +117,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       id: 3,
       tag: 'PREMIUM PACK',
       rating: '4.4',
-      title: '(Pack of 2)Car SCAN CONNECT tag',
+      title: '(Pack of 2) Car SCAN CONNECT tag',
       desc: 'Let people call you for any issues with your parked car without sharing your phone number.',
       price: '₹499',
     },
@@ -125,7 +125,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       id: 4,
       tag: 'PREMIUM PACK',
       rating: '4.4',
-      title: '(Pack of 2)Car SCAN CONNECT tag',
+      title: '(Pack of 2) Car SCAN CONNECT tag',
       desc: 'Let people call you for any issues with your parked car without sharing your phone number.',
       price: '₹499',
     },
@@ -133,7 +133,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       id: 5,
       tag: 'PREMIUM PACK',
       rating: '4.4',
-      title: '(Pack of 2)Car SCAN CONNECT tag',
+      title: '(Pack of 2) Car SCAN CONNECT tag',
       desc: 'Let people call you for any issues with your parked car without sharing your phone number.',
       price: '₹499',
     },
@@ -141,7 +141,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       id: 6,
       tag: 'PREMIUM PACK',
       rating: '4.4',
-      title: '(Pack of 2)Car SCAN CONNECT tag',
+      title: '(Pack of 2) Car SCAN CONNECT tag',
       desc: 'Let people call you for any issues with your parked car without sharing your phone number.',
       price: '₹499',
     },
@@ -171,11 +171,6 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
     },
   ];
 
-  const handleAddToCart = (title: string) => {
-    setCartCount((prev) => prev + 1);
-    alert(`Added to Cart: ${title}\nTotal items in cart: ${cartCount + 1}`);
-  };
-
   if (selectedProduct) {
     return (
       <ProductDetailScreen
@@ -190,7 +185,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-neutral-900 font-sans antialiased">
+    <div className="min-h-screen flex flex-col bg-white text-[#0F0F0F] font-sans antialiased">
       {/* Top Header */}
       <DashboardHeader
         userData={userData}
@@ -203,95 +198,72 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       {/* Main Content */}
       <main className="flex-1">
         {/* 1. SHOP HERO BANNER SECTION */}
-        <section className="py-12 sm:py-16 bg-[#fbfbfe]">
+        <section className="py-12 sm:py-16 lg:py-20 bg-white border-b border-neutral-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
               
               {/* Left Column Text */}
-              <div className="lg:col-span-6 space-y-5">
-                <span className="text-xs font-bold tracking-wider text-neutral-500 uppercase font-mono block">
-                  &gt; SHOP
-                </span>
+              <div className="lg:col-span-6 space-y-6">
+                {/* Shop Badge */}
+                <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs">
+                  <Package className="w-3.5 h-3.5 text-[#F2BA03]" />
+                  <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
+                    OFFICIAL STORE
+                  </span>
+                </div>
 
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-neutral-950 tracking-tight leading-[1.08] font-sans">
+                <h1 className="text-3xl sm:text-4xl lg:text-[42px] lg:leading-[1.15] font-black text-[#0F0F0F] tracking-tight font-sans">
                   Smart Protection <br />
-                  <span className="text-[#f5b800]">for your commute.</span>
+                  <span className="text-[#F2BA03]">for your commute.</span>
                 </h1>
 
-                <p className="text-neutral-600 text-sm sm:text-base leading-relaxed max-w-lg font-normal">
+                <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal max-w-xl">
                   One-time purchase, lifetime security. Professional privacy-first contact tags for your car and bike. Free express delivery on all orders.
                 </p>
 
                 {/* Badges Pill Row */}
                 <div className="flex flex-wrap items-center gap-3 pt-2">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white border border-neutral-200 rounded-full text-xs font-bold text-neutral-800 shadow-2xs">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-neutral-200 rounded-full text-xs font-bold text-[#0F0F0F] shadow-xs">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     <span>950,000+ Tags Active</span>
                   </div>
 
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white border border-neutral-200 rounded-full text-xs font-bold text-neutral-800 shadow-2xs">
-                    <Truck className="w-4 h-4 text-neutral-600" />
-                    <span>Free Delivery</span>
+                  <div className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-neutral-200 rounded-full text-xs font-bold text-[#0F0F0F] shadow-xs">
+                    <Truck className="w-4 h-4 text-[#F2BA03]" />
+                    <span>Free Delivery Across India</span>
                   </div>
                 </div>
               </div>
 
               {/* Right Column Graphic Vector Illustration */}
               <div className="lg:col-span-6 flex justify-center lg:justify-end">
-                <div className="relative w-full max-w-lg bg-gradient-to-tr from-amber-50/50 via-sky-50/30 to-amber-100/40 rounded-3xl p-6 sm:p-8 flex items-center justify-center border border-neutral-100 shadow-xs">
+                <div className="relative rounded-3xl overflow-hidden shadow-xl border border-neutral-200 max-w-lg w-full bg-[#0F0F0F] p-8 sm:p-10 flex flex-col items-center justify-center min-h-[360px] sm:min-h-[420px] group">
                   
-                  {/* Custom Graphic Scene */}
-                  <div className="relative w-full flex items-end justify-between gap-4 py-4">
-                    
-                    {/* Sleek Red Car Vector */}
-                    <div className="w-1/2 relative z-10">
-                      <div className="bg-red-600 rounded-2xl p-4 shadow-xl text-white space-y-2 border-2 border-red-700 transform -rotate-1">
-                        <div className="flex items-center justify-between border-b border-red-500/60 pb-2">
-                          <span className="text-[10px] font-black uppercase tracking-wider font-mono bg-neutral-950 px-2 py-0.5 rounded text-[#f5b800]">
-                            MH12-9881
-                          </span>
-                          <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
-                        </div>
-                        <div className="h-16 bg-neutral-900 rounded-xl p-2 flex items-center justify-center border border-red-500/40">
-                          <div className="w-12 h-12 bg-[#f5b800] rounded-lg p-1 text-neutral-950 flex flex-col items-center justify-center">
-                            <QrCode className="w-8 h-8" />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex justify-around px-4 -mt-2">
-                        <div className="w-8 h-8 rounded-full bg-neutral-900 border-2 border-neutral-700 shadow-md" />
-                        <div className="w-8 h-8 rounded-full bg-neutral-900 border-2 border-neutral-700 shadow-md" />
-                      </div>
+                  {/* Subtle Background Radial Accent */}
+                  <div className="absolute inset-0 bg-radial from-[#F2BA03]/10 via-transparent to-transparent pointer-events-none" />
+
+                  {/* Simulated Tag Card Decal */}
+                  <div className="relative z-10 bg-white text-[#0F0F0F] rounded-2xl p-6 shadow-2xl border-2 border-[#F2BA03] max-w-xs w-full flex flex-col items-center space-y-4 group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-36 h-36 bg-[#0F0F0F] p-3 rounded-xl flex items-center justify-center shadow-inner">
+                      <svg className="w-full h-full text-[#F2BA03]" viewBox="0 0 100 100" fill="currentColor">
+                        <path d="M0 0h30v30H0zM10 10h10v10H10zM70 0h30v30H70zM80 10h10v10H80zM0 70h30v30H0zM10 80h10v10H10zM40 0h10v20H40zM50 30h20v10H50zM30 40h10v30H30zM50 50h30v10H50zM80 60h20v40H80zM40 80h20v20H40z"/>
+                      </svg>
                     </div>
 
-                    {/* Smartphone Map Route */}
-                    <div className="w-2/5 bg-amber-500 rounded-3xl p-3 shadow-2xl border-4 border-amber-600 text-neutral-950 relative z-20 transform rotate-2">
-                      <div className="w-8 h-1 bg-amber-700 rounded-full mx-auto mb-2" />
-                      <div className="bg-white rounded-2xl p-3 shadow-inner space-y-2 text-[10px]">
-                        <div className="flex items-center gap-1.5 font-bold text-neutral-900">
-                          <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                          <span>Protected Scan</span>
-                        </div>
-                        <div className="h-20 bg-sky-50 rounded-xl border border-sky-100 relative p-2 overflow-hidden">
-                          {/* Route line */}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-full h-1 bg-amber-400 transform -rotate-12" />
-                          </div>
-                          <div className="relative z-10 w-4 h-4 bg-red-600 rounded-full text-white flex items-center justify-center text-[8px] font-bold shadow-md">
-                            📍
-                          </div>
-                        </div>
-                      </div>
+                    <div className="text-center space-y-1">
+                      <span className="bg-[#0F0F0F] text-[#F2BA03] text-[10px] font-black px-3 py-1 rounded font-mono uppercase tracking-widest inline-block">
+                        SCAN CONNECT TAG
+                      </span>
+                      <p className="text-[10px] font-semibold text-[#5D5F5F] pt-1">
+                        Wrong Parking &bull; Emergency Contact &bull; Instant Call Routing
+                      </p>
                     </div>
+                  </div>
 
-                    {/* Commuter Person Illustration */}
-                    <div className="w-1/4 flex flex-col items-center justify-end z-30">
-                      <div className="w-10 h-10 rounded-full bg-amber-800 text-white flex items-center justify-center font-bold text-xs shadow-md">
-                        👤
-                      </div>
-                      <div className="w-8 h-16 bg-blue-900 rounded-t-xl mt-1 shadow-sm" />
-                    </div>
-
+                  {/* Bottom Trust Tag */}
+                  <div className="relative z-10 mt-6 flex items-center gap-2 text-neutral-300 text-xs font-medium">
+                    <ShieldCheck className="w-4 h-4 text-[#F2BA03]" />
+                    <span>Scan to Connect &bull; Zero Privacy Leak</span>
                   </div>
 
                 </div>
@@ -303,46 +275,49 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
 
         {/* 2. SERVICE ECOSYSTEM SECTION */}
-        <section className="py-20 bg-white">
+        <section className="py-16 sm:py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             {/* Header Badge & Titles */}
-            <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-              <span className="inline-block px-4 py-1 bg-[#f5b800] text-neutral-950 text-xs font-black uppercase tracking-widest rounded-full shadow-2xs font-mono">
-                Our Reach
-              </span>
+            <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-4">
+              <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
+                <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
+                  OUR REACH
+                </span>
+              </div>
 
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-900 font-sans">
+              <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-[#0F0F0F] font-sans">
                 Service Ecosystem
               </h2>
 
-              <p className="text-neutral-600 text-sm sm:text-base leading-relaxed font-normal">
-                Intelligent parking solutions tailored for every stakeholder. From urban municipalities to private retail giants, SCAN ME streamlines the digital physical transition.
+              <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal">
+                Intelligent parking solutions tailored for every stakeholder. From urban municipalities to private retail giants, SCAN CONNECT streamlines the digital physical transition.
               </p>
             </div>
 
             {/* 6 Grid Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {ecosystemServices.map((svc) => {
                 const IconComp = svc.icon;
                 return (
                   <div
                     key={svc.id}
-                    className="bg-white border border-neutral-200/90 rounded-2xl p-8 sm:p-10 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between items-center text-center space-y-6"
+                    className="bg-white border border-neutral-200 rounded-2xl p-8 sm:p-10 shadow-xs hover:shadow-xl transition-all flex flex-col justify-between items-center text-center space-y-6 group"
                   >
                     <div className="flex flex-col items-center space-y-4">
                       {/* Circle Icon */}
-                      <div className="w-16 h-16 rounded-full bg-amber-50 border border-[#f5b800]/40 flex items-center justify-center text-[#f5b800]">
-                        <IconComp className="w-7 h-7 stroke-[2]" />
+                      <div className="w-16 h-16 rounded-full bg-[#F2BA03]/10 border border-[#F2BA03]/30 flex items-center justify-center text-[#F2BA03] group-hover:scale-110 transition-transform">
+                        <IconComp className="w-7 h-7 stroke-[2.2]" />
                       </div>
 
                       {/* Card Title */}
-                      <h3 className="text-xl font-bold text-neutral-900 leading-tight whitespace-pre-line">
+                      <h3 className="text-xl font-bold text-[#0F0F0F] leading-tight whitespace-pre-line">
                         {svc.title}
                       </h3>
 
                       {/* Card Body */}
-                      <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed max-w-xs">
+                      <p className="text-[#5D5F5F] text-xs sm:text-sm leading-relaxed max-w-xs">
                         {svc.desc}
                       </p>
                     </div>
@@ -350,7 +325,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     {/* Learn More Link */}
                     <button
                       onClick={() => alert(`Details for ecosystem: ${svc.title.replace('\n', ' ')}`)}
-                      className="text-xs font-bold text-[#f5b800] hover:text-[#d19d00] tracking-wider uppercase inline-flex items-center gap-1.5 cursor-pointer pt-2"
+                      className="text-xs font-bold text-[#0F0F0F] hover:text-[#F2BA03] tracking-wider uppercase inline-flex items-center gap-1.5 cursor-pointer pt-2 transition-colors"
                     >
                       <span>LEARN MORE</span> <ArrowRight className="w-4 h-4" />
                     </button>
@@ -364,108 +339,120 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
 
         {/* 3. OUR PRODUCT SECTION */}
-        <section className="py-20 bg-neutral-50/70 border-t border-neutral-100">
+        <section className="py-16 sm:py-20 bg-neutral-50/60 border-t border-neutral-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             {/* Section Header */}
-            <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-900 font-sans">
-                Our Product
+            <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-4">
+              <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs">
+                <Package className="w-3.5 h-3.5 text-[#F2BA03]" />
+                <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
+                  CATALOGUE
+                </span>
+              </div>
+
+              <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-[#0F0F0F] font-sans">
+                Our Products
               </h2>
 
-              <p className="text-neutral-600 text-sm sm:text-base leading-relaxed font-normal">
-                Intelligent parking solutions tailored for every stakeholder. From urban municipalities to private retail giants, SCAN ME streamlines the digital physical transition.
+              <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal">
+                Intelligent parking contact tags tailored for cars, bikes, households, and commercial fleets. Instant call routing with maximum privacy protection.
               </p>
             </div>
 
             {/* Product Cards Grid (3 cards per row) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12">
               {initialProducts.slice(0, visibleProductsCount).map((prod) => (
                 <div
                   key={prod.id}
-                  className="bg-white border border-neutral-200/90 rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between space-y-5 group"
+                  className="bg-white border border-neutral-200 rounded-3xl p-5 sm:p-6 shadow-xs hover:shadow-xl transition-all flex flex-col justify-between space-y-5 group"
                 >
                   {/* Top Product Image Graphic Box */}
                   <div
                     onClick={() => setSelectedProduct(prod)}
-                    className="bg-[#f5b800] rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden aspect-square border border-amber-400/60 shadow-inner cursor-pointer"
+                    className="bg-[#F2BA03] rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden aspect-square border border-[#F2BA03] shadow-inner cursor-pointer"
                   >
                     {/* Simulated Tag Decal */}
-                    <div className="bg-white text-neutral-900 rounded-2xl p-4 shadow-xl border-2 border-neutral-950 w-full max-w-[220px] flex flex-col items-center space-y-3">
+                    <div className="bg-white text-[#0F0F0F] rounded-2xl p-4 shadow-xl border-2 border-[#0F0F0F] w-full max-w-[220px] flex flex-col items-center space-y-3 group-hover:scale-105 transition-transform duration-300">
                       {/* Big QR Code */}
-                      <div className="w-32 h-32 bg-neutral-950 p-2 rounded-xl flex items-center justify-center border border-neutral-800">
-                        <QrCode className="w-full h-full text-[#f5b800]" />
+                      <div className="w-32 h-32 bg-[#0F0F0F] p-2.5 rounded-xl flex items-center justify-center shadow-inner">
+                        <svg className="w-full h-full text-[#F2BA03]" viewBox="0 0 100 100" fill="currentColor">
+                          <path d="M0 0h30v30H0zM10 10h10v10H10zM70 0h30v30H70zM80 10h10v10H80zM0 70h30v30H0zM10 80h10v10H10zM40 0h10v20H40zM50 30h20v10H50zM30 40h10v30H30zM50 50h30v10H50zM80 60h20v40H80zM40 80h20v20H40z"/>
+                        </svg>
                       </div>
 
-                      {/* NGF132 Logo */}
-                      <span className="text-[10px] font-black tracking-wider uppercase font-mono text-neutral-800">
-                        NGF132
+                      {/* SCAN CONNECT Logo */}
+                      <span className="text-[10px] font-black tracking-wider uppercase font-mono text-[#0F0F0F]">
+                        SCAN CONNECT
                       </span>
 
                       {/* Icon Strip */}
-                      <div className="w-full border-t border-neutral-200 pt-2 flex items-center justify-around text-neutral-800 text-[10px] font-bold">
+                      <div className="w-full border-t border-neutral-200 pt-2 flex items-center justify-around text-[#0F0F0F] text-[10px] font-bold">
                         <span title="Parking Alert">🏠</span>
                         <span title="No Parking">🚫</span>
                         <span title="Emergency">⚠️</span>
                         <span title="Call Owner">📞</span>
                       </div>
-                      <p className="text-[8px] text-center font-semibold text-neutral-600 leading-tight">
-                        Wrong Parking, Emergency Contact, any issue with the vehicle, Scan the QR.
+                      <p className="text-[8px] text-center font-semibold text-[#5D5F5F] leading-tight">
+                        Wrong Parking, Emergency Contact, Scan to Call Owner.
                       </p>
                     </div>
                   </div>
 
                   {/* Badge & Rating Row */}
                   <div className="flex items-center justify-between text-xs pt-1">
-                    <span className="px-3 py-1 bg-neutral-100 text-neutral-700 font-bold rounded-full text-[10px] uppercase tracking-wider">
+                    <span className="px-3 py-1 bg-neutral-100 text-[#0F0F0F] font-mono font-bold rounded-full text-[10px] uppercase tracking-wider">
                       {prod.tag}
                     </span>
-                    <span className="font-extrabold text-amber-500 flex items-center gap-1 font-mono text-xs">
-                      ★ {prod.rating}
+                    <span className="font-extrabold text-[#0F0F0F] flex items-center gap-1 font-mono text-xs">
+                      <Star className="w-3.5 h-3.5 fill-[#F2BA03] text-[#F2BA03]" />
+                      <span>{prod.rating}</span>
                     </span>
                   </div>
 
                   {/* Title & Desc */}
                   <div className="space-y-2 cursor-pointer" onClick={() => setSelectedProduct(prod)}>
-                    <h3 className="text-lg font-extrabold text-neutral-950 leading-snug hover:text-amber-600 transition-colors">
+                    <h3 className="text-lg font-extrabold text-[#0F0F0F] leading-snug group-hover:text-[#F2BA03] transition-colors">
                       {prod.title}
                     </h3>
-                    <p className="text-neutral-500 text-xs leading-relaxed">
+                    <p className="text-[#5D5F5F] text-xs sm:text-sm leading-relaxed">
                       {prod.desc}
                     </p>
                   </div>
 
-                  {/* Bottom Price & Add to Cart Button */}
+                  {/* Bottom Price & View Button */}
                   <div className="flex items-center justify-between pt-3 border-t border-neutral-100">
                     <div>
-                      <span className="text-[10px] font-bold tracking-widest text-neutral-400 uppercase font-mono block">
+                      <span className="text-[10px] font-bold tracking-widest text-[#5D5F5F] uppercase font-mono block">
                         PRICE
                       </span>
-                      <span className="text-2xl font-black text-neutral-950 font-sans">
+                      <span className="text-2xl font-black text-[#0F0F0F] font-sans">
                         {prod.price}
                       </span>
                     </div>
 
                     <button
                       onClick={() => setSelectedProduct(prod)}
-                      className="w-12 h-12 rounded-full bg-neutral-950 hover:bg-[#f5b800] hover:text-neutral-950 text-white flex items-center justify-center transition-all cursor-pointer shadow-md group-hover:scale-105"
+                      className="h-[44px] px-5 bg-[#0F0F0F] hover:bg-[#F2BA03] text-white hover:text-[#0F0F0F] font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs"
                       title="View product details"
                     >
-                      <ArrowRight className="w-5 h-5" />
+                      <span>VIEW</span>
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Bottom "See More >" Button */}
+            {/* Bottom "See More" Button */}
             {visibleProductsCount < initialProducts.length && (
-              <div className="flex justify-start pt-4">
+              <div className="flex justify-center pt-4">
                 <button
                   onClick={() => setVisibleProductsCount(initialProducts.length)}
-                  className="px-6 py-3 bg-[#f5b800] hover:bg-amber-400 text-neutral-950 font-extrabold text-sm uppercase tracking-wider rounded-xl shadow-sm transition-colors cursor-pointer flex items-center gap-1"
+                  className="h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
                 >
-                  <span>See More</span> &gt;
+                  <span>SEE MORE PRODUCTS</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             )}
@@ -480,3 +467,4 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
     </div>
   );
 };
+
