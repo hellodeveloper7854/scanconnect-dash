@@ -42,23 +42,23 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           
           {/* Left Brand Logo */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNav('How it works')}>
-            <div className="text-white text-2xl sm:text-3xl font-black tracking-tight font-sans drop-shadow-sm flex items-center gap-1.5">
+            <div className="text-white text-2xl sm:text-[28px] font-extrabold tracking-tight font-['Rubik','Plus_Jakarta_Sans',sans-serif] drop-shadow-xs flex items-center gap-1.5">
               <span>SCAN CONNECT</span>
             </div>
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 text-sm sm:text-base font-bold text-white">
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 text-base font-medium font-['Comic_Relief','Comic_Sans_MS','Inter',sans-serif] text-white">
             {navItems.map((item) => {
               const isActive = activeNav === item;
               return (
                 <button
                   key={item}
                   onClick={() => handleNav(item)}
-                  className={`transition-colors relative py-1 cursor-pointer ${
+                  className={`transition-all relative py-1 cursor-pointer ${
                     isActive
-                      ? 'text-white underline decoration-2 underline-offset-4 font-black'
-                      : 'text-white/90 hover:text-white'
+                      ? 'text-white underline decoration-2 underline-offset-8 font-bold'
+                      : 'text-white/95 hover:text-white'
                   }`}
                 >
                   {item}
@@ -73,10 +73,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <button
               onClick={triggerSosAlert}
               title="Trigger Emergency SOS"
-              className={`relative group px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full font-black text-xs sm:text-sm text-white flex items-center justify-center cursor-pointer transition-all ${
+              className={`relative group w-9 h-9 sm:w-10 sm:h-10 rounded-full font-extrabold text-xs text-white flex items-center justify-center cursor-pointer transition-all shadow-sm ${
                 sosActive
                   ? 'bg-red-700 animate-bounce ring-4 ring-red-400'
-                  : 'bg-red-600 hover:bg-red-700 shadow-md shadow-red-600/30 active:scale-95'
+                  : 'bg-[#FF0022] hover:bg-red-700 active:scale-95 border border-white/30'
               }`}
             >
               <span>SOS</span>
@@ -90,7 +90,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             >
               <Bell className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
               {notificationsCount > 0 && (
-                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 border-2 border-[#f5b800] rounded-full" />
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 border-2 border-[#EFCE1F] rounded-full" />
               )}
             </button>
 
@@ -112,13 +112,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     handleNav('Profile');
                   }}
                   title="View My Profile"
-                  className="flex items-center p-0.5 rounded-full hover:ring-2 hover:ring-white/40 transition-all cursor-pointer group"
+                  className="flex items-center p-0.5 rounded-xl hover:ring-2 hover:ring-white/40 transition-all cursor-pointer group"
                 >
                   <img
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80"
                     alt="User Avatar"
                     referrerPolicy="no-referrer"
-                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border-2 border-white shadow-sm group-hover:scale-105 transition-transform"
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-cover border-2 border-white/80 shadow-xs group-hover:scale-105 transition-transform"
                   />
                 </button>
 
