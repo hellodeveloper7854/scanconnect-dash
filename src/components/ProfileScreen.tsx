@@ -182,38 +182,40 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           
           {/* HEADER TITLE */}
           <div className="space-y-2">
-            <h1 className="text-4xl sm:text-5xl font-black text-[#f5b800] tracking-tight font-sans">
+            <h1 className="text-4xl sm:text-[64px] sm:leading-[48px] font-semibold text-[#F2BA03] tracking-[-0.4px] font-sans">
               Profile
             </h1>
-            <p className="text-neutral-600 text-sm sm:text-base max-w-2xl font-normal leading-relaxed">
+            <p className="text-[#5D5F5F] text-lg sm:text-[24px] sm:leading-[29px] max-w-4xl font-medium">
               Manage your administrative identity, security protocols, and safety contacts.
             </p>
           </div>
 
           {/* MAIN GRID LAYOUT */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
             {/* LEFT COLUMN (IDENTITY, SECURITY, ACTIVE SESSIONS, EMERGENCY CONTACTS) */}
-            <div className="lg:col-span-8 space-y-6">
+            <div className="lg:col-span-8 space-y-8">
               
               {/* 1. IDENTITY CARD */}
-              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xs border border-neutral-100/80">
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+              <div className="bg-white rounded-xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(15,15,15,0.05)] border border-[#EEEEEE]">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8">
                   
                   {/* Profile Photo with Camera Overlay Badge */}
-                  <div className="relative shrink-0">
-                    <img
-                      src={avatarUrl}
-                      alt="Profile Avatar"
-                      referrerPolicy="no-referrer"
-                      className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl object-cover border-2 border-neutral-100 shadow-sm"
-                    />
+                  <div className="relative shrink-0 w-[128px] h-[128px]">
+                    <div className="w-[128px] h-[128px] bg-[#EFEDED] border-2 border-[#CCC7AA] rounded-xl overflow-hidden flex items-center justify-center">
+                      <img
+                        src={avatarUrl}
+                        alt="Profile Avatar"
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     <button
                       onClick={handleAvatarChange}
                       title="Update profile picture"
-                      className="absolute -bottom-2 -right-2 w-8 h-8 rounded-lg bg-[#f5b800] hover:bg-amber-400 text-neutral-950 flex items-center justify-center shadow-md transition-transform active:scale-90 cursor-pointer border-2 border-white"
+                      className="absolute -bottom-2 -right-2 w-[30px] h-[32px] rounded-lg bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] flex items-center justify-center shadow-md transition-transform active:scale-95 cursor-pointer border border-white"
                     >
-                      <Camera className="w-4 h-4 stroke-[2.2]" />
+                      <Camera className="w-3.5 h-3.5 stroke-[2.5]" />
                     </button>
                   </div>
 
@@ -221,41 +223,41 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   <div className="w-full space-y-4">
                     {/* Row 1: Full Name & ID Number */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-1.5">
-                        <label className="block text-[11px] font-extrabold tracking-wider text-neutral-400 uppercase font-mono">
+                      <div className="space-y-2">
+                        <label className="block text-xs font-bold tracking-[1.2px] text-[#5D5F5F] uppercase">
                           FULL NAME
                         </label>
                         <input
                           type="text"
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
-                          className="w-full px-4 py-2.5 bg-neutral-50/70 border border-neutral-200 rounded-xl text-neutral-900 font-semibold text-sm focus:bg-white focus:ring-2 focus:ring-[#f5b800] outline-none transition-all"
+                          className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all"
                         />
                       </div>
 
-                      <div className="space-y-1.5">
-                        <label className="block text-[11px] font-extrabold tracking-wider text-neutral-400 uppercase font-mono">
+                      <div className="space-y-2">
+                        <label className="block text-xs font-bold tracking-[1.2px] text-[#5D5F5F] uppercase">
                           ID NUMBER
                         </label>
                         <input
                           type="text"
                           value={idNumber}
                           onChange={(e) => setIdNumber(e.target.value)}
-                          className="w-full px-4 py-2.5 bg-neutral-50/70 border border-neutral-200 rounded-xl text-neutral-900 font-semibold text-sm focus:bg-white focus:ring-2 focus:ring-[#f5b800] outline-none transition-all font-mono"
+                          className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#5D5F5F] font-normal text-base focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all font-mono"
                         />
                       </div>
                     </div>
 
                     {/* Row 2: Email Address */}
-                    <div className="space-y-1.5">
-                      <label className="block text-[11px] font-extrabold tracking-wider text-neutral-400 uppercase font-mono">
+                    <div className="space-y-2">
+                      <label className="block text-xs font-bold tracking-[1.2px] text-[#5D5F5F] uppercase">
                         EMAIL ADDRESS
                       </label>
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-neutral-50/70 border border-neutral-200 rounded-xl text-neutral-900 font-semibold text-sm focus:bg-white focus:ring-2 focus:ring-[#f5b800] outline-none transition-all"
+                        className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -265,48 +267,48 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
 
               {/* 2. SECURITY & ACTIVE SESSIONS ROW */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 
                 {/* Security Card */}
-                <div className="bg-white rounded-2xl p-6 shadow-2xs border border-neutral-100/80 space-y-5">
+                <div className="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(15,15,15,0.05)] border border-[#EEEEEE] space-y-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#f5b800]/20 text-neutral-900 flex items-center justify-center">
-                      <Lock className="w-5 h-5 text-amber-600 stroke-[2.2]" />
+                    <div className="w-10 h-10 rounded-lg bg-[rgba(255,239,0,0.2)] flex items-center justify-center">
+                      <Lock className="w-5 h-5 text-[#676000]" />
                     </div>
-                    <h2 className="text-lg font-black text-neutral-900 font-sans">
+                    <h2 className="text-xl font-medium text-[#1B1C1C] font-sans">
                       Security
                     </h2>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {/* Change Password Row */}
                     <button
                       onClick={() => alert('Password Change Dialog: Check your email for password reset link.')}
-                      className="w-full p-3.5 bg-neutral-50/80 hover:bg-neutral-100/80 border border-neutral-200/80 rounded-xl flex items-center justify-between text-left transition-all cursor-pointer group"
+                      className="w-full p-3.5 bg-white border border-[#CCC7AA] rounded-lg flex items-center justify-between text-left transition-all cursor-pointer group hover:border-[#F2BA03]"
                     >
                       <div>
-                        <p className="text-xs font-bold text-neutral-900">Change Password</p>
-                        <p className="text-[10px] text-neutral-400 font-medium">Last changed 42 days ago</p>
+                        <p className="text-sm font-bold text-[#1B1C1C]">Change Password</p>
+                        <p className="text-xs text-[#5D5F5F] font-normal">Last changed 42 days ago</p>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-4 h-4 text-[#1B1C1C] group-hover:translate-x-0.5 transition-transform" />
                     </button>
 
                     {/* Two-Factor Auth Toggle Row */}
-                    <div className="p-3.5 bg-neutral-50/80 border border-neutral-200/80 rounded-xl flex items-center justify-between">
+                    <div className="p-3.5 bg-white border border-[#CCC7AA] rounded-lg flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-bold text-neutral-900">Two-Factor Auth</p>
-                        <p className="text-[10px] text-neutral-400 font-medium">SMS and Authenticator app</p>
+                        <p className="text-sm font-bold text-[#1B1C1C]">Two-Factor Auth</p>
+                        <p className="text-xs text-[#5D5F5F] font-normal">SMS and Authenticator app</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => setTwoFactorAuth(!twoFactorAuth)}
-                        className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors cursor-pointer ${
-                          twoFactorAuth ? 'bg-[#f5b800]' : 'bg-neutral-300'
+                        className={`w-10 h-5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer ${
+                          twoFactorAuth ? 'bg-[#F2BA03]' : 'bg-[#DBDAD9]'
                         }`}
                       >
                         <div
-                          className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
-                            twoFactorAuth ? 'translate-x-5' : 'translate-x-0'
+                          className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${
+                            twoFactorAuth ? 'translate-x-[20px]' : 'translate-x-0'
                           }`}
                         />
                       </button>
@@ -315,12 +317,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 </div>
 
                 {/* Active Sessions Card */}
-                <div className="bg-white rounded-2xl p-6 shadow-2xs border border-neutral-100/80 space-y-5">
+                <div className="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(15,15,15,0.05)] border border-[#EEEEEE] space-y-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#f5b800]/20 text-neutral-900 flex items-center justify-center">
-                      <Laptop className="w-5 h-5 text-amber-600 stroke-[2.2]" />
+                    <div className="w-10 h-10 rounded-lg bg-[rgba(255,239,0,0.2)] flex items-center justify-center">
+                      <Laptop className="w-5 h-5 text-[#676000]" />
                     </div>
-                    <h2 className="text-lg font-black text-neutral-900 font-sans">
+                    <h2 className="text-xl font-medium text-[#1B1C1C] font-sans">
                       Active Sessions
                     </h2>
                   </div>
@@ -329,24 +331,26 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     {sessions.map((sess) => (
                       <div
                         key={sess.id}
-                        className="p-3.5 bg-neutral-50/80 border border-neutral-200/80 rounded-xl flex items-center justify-between"
+                        className={`p-3 bg-white border border-[#CCC7AA] rounded-lg flex items-center justify-between ${
+                          !sess.isCurrent ? 'opacity-60' : ''
+                        }`}
                       >
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-neutral-900">{sess.device}</span>
+                            <span className="text-xs font-bold text-[#1B1C1C]">{sess.device}</span>
                             {sess.isCurrent && (
-                              <span className="px-2 py-0.5 bg-[#f5b800] text-neutral-950 font-black text-[9px] uppercase tracking-wider rounded-md font-mono">
+                              <span className="px-2 py-0.5 bg-[#F2BA03] text-white font-bold text-[10px] tracking-wider rounded-full uppercase">
                                 CURRENT
                               </span>
                             )}
                           </div>
-                          <p className="text-[10px] text-neutral-400 font-medium">{sess.details}</p>
+                          <p className="text-[10px] text-[#5D5F5F] font-normal">{sess.details}</p>
                         </div>
 
                         {!sess.isCurrent && (
                           <button
                             onClick={() => handleRevokeSession(sess.id, sess.device)}
-                            className="text-[11px] font-bold text-neutral-500 hover:text-red-600 cursor-pointer underline"
+                            className="text-xs font-bold text-[#1B1C1C] hover:text-red-600 cursor-pointer"
                           >
                             Revoke
                           </button>
@@ -360,22 +364,22 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
 
               {/* 3. EMERGENCY CONTACTS CARD */}
-              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xs border border-neutral-100/80 space-y-6">
+              <div className="bg-white rounded-xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(15,15,15,0.05)] border border-[#EEEEEE] space-y-8">
                 
                 {/* Header Row */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h2 className="text-xl font-black text-neutral-900 font-sans">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                  <div className="space-y-1">
+                    <h2 className="text-2xl font-semibold text-[#1B1C1C] font-sans">
                       Emergency Contacts
                     </h2>
-                    <p className="text-xs text-neutral-500 font-normal">
+                    <p className="text-base text-[#5D5F5F] font-normal leading-normal">
                       Automated protocols will use these in case of fleet safety alerts.
                     </p>
                   </div>
 
                   <button
                     onClick={() => setIsAddContactOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-extrabold rounded-full transition-all cursor-pointer shadow-2xs"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#000000] hover:bg-neutral-800 text-white text-sm font-bold rounded-lg transition-all cursor-pointer shadow-sm shrink-0"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Add New</span>
@@ -387,41 +391,41 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   {contacts.map((contact) => (
                     <div
                       key={contact.id}
-                      className="bg-white rounded-2xl p-5 border border-neutral-200/90 shadow-2xs relative space-y-4"
+                      className="bg-white rounded-xl p-6 border border-[#CCC7AA] shadow-sm relative space-y-4"
                     >
                       {/* Top Pill Tag */}
                       <div className="flex justify-start">
                         <span
-                          className={`px-3 py-0.5 rounded-full text-[9px] font-black tracking-wider uppercase font-mono ${
+                          className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-tight uppercase ${
                             contact.isPrimary
-                              ? 'bg-[#f5b800] text-neutral-950'
-                              : 'bg-neutral-200/80 text-neutral-700'
+                              ? 'bg-[#F2BA03] text-white'
+                              : 'bg-[#EFEDED] text-[#5D5F5F]'
                           }`}
                         >
-                          {contact.tag}
+                          {contact.isPrimary ? 'PRIMARY RESPONDER' : contact.tag}
                         </span>
                       </div>
 
                       {/* Initials Circle & Name */}
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center font-bold text-neutral-800 text-sm font-mono shrink-0">
+                      <div className="flex items-center gap-3 pt-2">
+                        <div className="w-12 h-12 rounded-full bg-[#EFEDED] flex items-center justify-center font-bold text-[#1B1C1C] text-lg shrink-0">
                           {contact.initials}
                         </div>
                         <div>
-                          <h3 className="text-sm font-black text-neutral-900">{contact.name}</h3>
-                          <p className="text-[11px] text-neutral-500 font-medium">{contact.role}</p>
+                          <h3 className="text-base font-bold text-[#1B1C1C]">{contact.name}</h3>
+                          <p className="text-xs text-[#5D5F5F] font-normal">{contact.role}</p>
                         </div>
                       </div>
 
                       {/* Phone & Email Info */}
-                      <div className="pt-3 border-t border-neutral-100 space-y-1.5 text-xs text-neutral-600 font-medium">
+                      <div className="pt-4 border-t border-[#CCC7AA] space-y-2 text-sm text-[#1B1C1C] font-normal">
                         <div className="flex items-center gap-2">
-                          <Phone className="w-3.5 h-3.5 text-neutral-400" />
-                          <span className="font-mono text-neutral-800">{contact.phone}</span>
+                          <Phone className="w-4 h-4 text-[#676000]" />
+                          <span className="text-[#1B1C1C]">{contact.phone}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Mail className="w-3.5 h-3.5 text-neutral-400" />
-                          <span className="truncate">{contact.email}</span>
+                          <Mail className="w-4 h-4 text-[#676000]" />
+                          <span className="truncate text-[#1B1C1C]">{contact.email}</span>
                         </div>
                       </div>
                     </div>
@@ -434,30 +438,30 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
 
             {/* RIGHT COLUMN (PREFERENCES & ENTERPRISE ADMIN CARD) */}
-            <div className="lg:col-span-4 space-y-6">
+            <div className="lg:col-span-4 space-y-8">
               
               {/* 1. PREFERENCES CARD */}
-              <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-2xs border border-neutral-100/80 space-y-6">
+              <div className="bg-white rounded-xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(15,15,15,0.05)] border border-[#EEEEEE] space-y-8">
                 
                 {/* Title */}
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#f5b800]/20 text-neutral-900 flex items-center justify-center">
-                    <Sliders className="w-5 h-5 text-amber-600 stroke-[2.2]" />
+                  <div className="w-10 h-10 rounded-lg bg-[rgba(255,239,0,0.2)] flex items-center justify-center">
+                    <Sliders className="w-5 h-5 text-[#676000]" />
                   </div>
-                  <h2 className="text-lg font-black text-neutral-900 font-sans">
+                  <h2 className="text-xl font-medium text-[#1B1C1C] font-sans">
                     Preferences
                   </h2>
                 </div>
 
                 {/* System Language Dropdown */}
-                <div className="space-y-2">
-                  <label className="block text-[11px] font-extrabold tracking-wider text-neutral-400 uppercase font-mono">
+                <div className="space-y-3">
+                  <label className="block text-xs font-bold tracking-[1.2px] text-[#5D5F5F] uppercase">
                     SYSTEM LANGUAGE
                   </label>
                   <select
                     value={systemLanguage}
                     onChange={(e) => setSystemLanguage(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-neutral-900 font-medium text-xs focus:ring-2 focus:ring-[#f5b800] outline-none cursor-pointer"
+                    className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 focus:ring-[#F2BA03] outline-none cursor-pointer"
                   >
                     <option value="English (United Kingdom)">English (United Kingdom)</option>
                     <option value="English (United States)">English (United States)</option>
@@ -467,69 +471,69 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 </div>
 
                 {/* Global Notifications Toggles */}
-                <div className="space-y-3 pt-2 border-t border-neutral-100">
-                  <label className="block text-[11px] font-extrabold tracking-wider text-neutral-400 uppercase font-mono">
+                <div className="space-y-4 pt-4 border-t border-[#CCC7AA]">
+                  <label className="block text-xs font-bold tracking-[1.2px] text-[#5D5F5F] uppercase">
                     GLOBAL NOTIFICATIONS
                   </label>
 
                   {/* Email Digests */}
-                  <div className="flex items-center justify-between text-xs font-semibold text-neutral-800">
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-neutral-500" />
+                  <div className="flex items-center justify-between text-base font-normal text-[#1B1C1C]">
+                    <div className="flex items-center gap-3">
+                      <Mail className="w-5 h-5 text-[#5D5F5F]" />
                       <span>Email Digests</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setEmailDigests(!emailDigests)}
-                      className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors cursor-pointer ${
-                        emailDigests ? 'bg-[#f5b800]' : 'bg-neutral-300'
+                      className={`w-10 h-5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer ${
+                        emailDigests ? 'bg-[#F2BA03]' : 'bg-[#DBDAD9]'
                       }`}
                     >
                       <div
-                        className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
-                          emailDigests ? 'translate-x-5' : 'translate-x-0'
+                        className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${
+                          emailDigests ? 'translate-x-[20px]' : 'translate-x-0'
                         }`}
                       />
                     </button>
                   </div>
 
                   {/* SMS Critical Alerts */}
-                  <div className="flex items-center justify-between text-xs font-semibold text-neutral-800">
-                    <div className="flex items-center gap-2">
-                      <MessageSquare className="w-4 h-4 text-neutral-500" />
+                  <div className="flex items-center justify-between text-base font-normal text-[#1B1C1C]">
+                    <div className="flex items-center gap-3">
+                      <MessageSquare className="w-5 h-5 text-[#5D5F5F]" />
                       <span>SMS Critical Alerts</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setSmsCriticalAlerts(!smsCriticalAlerts)}
-                      className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors cursor-pointer ${
-                        smsCriticalAlerts ? 'bg-[#f5b800]' : 'bg-neutral-300'
+                      className={`w-10 h-5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer ${
+                        smsCriticalAlerts ? 'bg-[#F2BA03]' : 'bg-[#DBDAD9]'
                       }`}
                     >
                       <div
-                        className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
-                          smsCriticalAlerts ? 'translate-x-5' : 'translate-x-0'
+                        className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${
+                          smsCriticalAlerts ? 'translate-x-[20px]' : 'translate-x-0'
                         }`}
                       />
                     </button>
                   </div>
 
                   {/* In-App Push */}
-                  <div className="flex items-center justify-between text-xs font-semibold text-neutral-800">
-                    <div className="flex items-center gap-2">
-                      <Bell className="w-4 h-4 text-neutral-500" />
+                  <div className="flex items-center justify-between text-base font-normal text-[#1B1C1C]">
+                    <div className="flex items-center gap-3">
+                      <Bell className="w-5 h-5 text-[#5D5F5F]" />
                       <span>In-App Push</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setInAppPush(!inAppPush)}
-                      className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors cursor-pointer ${
-                        inAppPush ? 'bg-[#f5b800]' : 'bg-neutral-300'
+                      className={`w-10 h-5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer ${
+                        inAppPush ? 'bg-[#F2BA03]' : 'bg-[#DBDAD9]'
                       }`}
                     >
                       <div
-                        className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
-                          inAppPush ? 'translate-x-5' : 'translate-x-0'
+                        className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${
+                          inAppPush ? 'translate-x-[20px]' : 'translate-x-0'
                         }`}
                       />
                     </button>
@@ -537,19 +541,19 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 </div>
 
                 {/* Regional Format (24-Hour Time vs 12-Hour AM/PM) */}
-                <div className="space-y-2 pt-2 border-t border-neutral-100">
-                  <label className="block text-[11px] font-extrabold tracking-wider text-neutral-400 uppercase font-mono">
+                <div className="space-y-3 pt-4 border-t border-[#CCC7AA]">
+                  <label className="block text-xs font-bold tracking-[1.2px] text-[#5D5F5F] uppercase">
                     REGIONAL FORMAT
                   </label>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     <button
                       type="button"
                       onClick={() => setTimeFormat('24')}
-                      className={`py-3 px-2 text-center rounded-xl text-[11px] font-extrabold transition-all cursor-pointer ${
+                      className={`h-[52px] px-2 text-center rounded-lg text-xs font-bold transition-all cursor-pointer ${
                         timeFormat === '24'
-                          ? 'bg-white border-2 border-[#f5b800] text-neutral-950 shadow-xs'
-                          : 'bg-neutral-50 border border-neutral-200 text-neutral-500'
+                          ? 'bg-[rgba(255,239,0,0.1)] border-2 border-[#F2BA03] text-[#1B1C1C]'
+                          : 'bg-white border border-[#CCC7AA] text-[#5D5F5F]'
                       }`}
                     >
                       24-Hour <br /> Time
@@ -558,10 +562,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     <button
                       type="button"
                       onClick={() => setTimeFormat('12')}
-                      className={`py-3 px-2 text-center rounded-xl text-[11px] font-extrabold transition-all cursor-pointer ${
+                      className={`h-[52px] px-2 text-center rounded-lg text-xs font-bold transition-all cursor-pointer ${
                         timeFormat === '12'
-                          ? 'bg-white border-2 border-[#f5b800] text-neutral-950 shadow-xs'
-                          : 'bg-neutral-50 border border-neutral-200 text-neutral-500'
+                          ? 'bg-[rgba(255,239,0,0.1)] border-2 border-[#F2BA03] text-[#1B1C1C]'
+                          : 'bg-white border border-[#CCC7AA] text-[#5D5F5F]'
                       }`}
                     >
                       12-Hour <br /> AM/PM
@@ -573,22 +577,22 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
 
               {/* 2. ENTERPRISE ADMIN PRO CARD */}
-              <div className="bg-neutral-950 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden space-y-6 border border-neutral-800">
+              <div className="bg-[#000000] text-white rounded-xl p-8 shadow-xl relative overflow-hidden space-y-6">
                 
                 {/* Dot Badge */}
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#f5b800] animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-widest font-mono text-neutral-300">
+                  <span className="w-2 h-2 rounded-full bg-[#F2BA03]" />
+                  <span className="text-xs font-bold uppercase tracking-[1.2px] text-white">
                     ENTERPRISE ADMIN
                   </span>
                 </div>
 
                 {/* Title & Desc */}
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-black text-white font-sans tracking-tight">
+                  <h3 className="text-2xl font-normal text-white font-sans">
                     SCAN ME Pro
                   </h3>
-                  <p className="text-xs text-neutral-400 leading-relaxed font-normal">
+                  <p className="text-sm text-[#DBDAD9] leading-relaxed font-normal">
                     Unlimited vehicle monitoring and priority emergency response active.
                   </p>
                 </div>
@@ -596,7 +600,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 {/* Manage Subscription Button */}
                 <button
                   onClick={() => alert('Manage Subscription: Redirecting to Enterprise Billing Portal...')}
-                  className="w-full py-3 bg-white hover:bg-neutral-100 text-neutral-950 font-black text-xs rounded-full transition-all cursor-pointer shadow-md text-center"
+                  className="w-full h-10 bg-white hover:bg-neutral-100 text-[#000000] font-bold text-sm rounded-lg transition-all cursor-pointer shadow-md text-center"
                 >
                   Manage Subscription
                 </button>
@@ -628,48 +632,48 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
             <form onSubmit={handleAddContactSubmit} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-neutral-600">Full Name</label>
+                <label className="text-xs font-bold text-[#5D5F5F]">Full Name</label>
                 <input
                   type="text"
                   required
                   value={newContactName}
                   onChange={(e) => setNewContactName(e.target.value)}
                   placeholder="e.g. Alex Morgan"
-                  className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-[#f5b800]"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-neutral-600">Role / Relationship</label>
+                <label className="text-xs font-bold text-[#5D5F5F]">Role / Relationship</label>
                 <input
                   type="text"
                   value={newContactRole}
                   onChange={(e) => setNewContactRole(e.target.value)}
                   placeholder="e.g. Security Supervisor"
-                  className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-[#f5b800]"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-neutral-600">Phone Number</label>
+                <label className="text-xs font-bold text-[#5D5F5F]">Phone Number</label>
                 <input
                   type="text"
                   required
                   value={newContactPhone}
                   onChange={(e) => setNewContactPhone(e.target.value)}
                   placeholder="e.g. +44 7700 900888"
-                  className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-[#f5b800]"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-neutral-600">Email Address</label>
+                <label className="text-xs font-bold text-[#5D5F5F]">Email Address</label>
                 <input
                   type="email"
                   value={newContactEmail}
                   onChange={(e) => setNewContactEmail(e.target.value)}
                   placeholder="e.g. alex@scanme.fleet"
-                  className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-[#f5b800]"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
                 />
               </div>
 
@@ -677,13 +681,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsAddContactOpen(false)}
-                  className="flex-1 py-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs rounded-xl"
+                  className="flex-1 py-3 bg-[#EFEDED] hover:bg-neutral-200 text-[#5D5F5F] font-bold text-xs rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 bg-[#f5b800] hover:bg-amber-400 text-neutral-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-xs"
+                  className="flex-1 py-3 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-xs"
                 >
                   Save Contact
                 </button>
