@@ -139,74 +139,73 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
         </div>
 
         {/* SECTION 1: TOP PRODUCT DETAIL */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           
-          {/* Left Column: Product Gallery */}
-          <div className="lg:col-span-6 space-y-4">
-            {/* Main Preview Box */}
-            <div className="bg-[#F2BA03] rounded-3xl p-8 sm:p-12 relative overflow-hidden aspect-square border border-[#F2BA03] shadow-sm flex flex-col items-center justify-center">
+          {/* Left Column: Product Gallery & Visuals */}
+          <div className="lg:col-span-6 space-y-6">
+            
+            {/* Main Preview Container */}
+            <div className="bg-[#FFFFFF] rounded-[16px] p-6 sm:p-10 relative overflow-hidden aspect-square border border-[#E4E2E2] shadow-xs flex flex-col items-center justify-center">
               
               {/* BEST SELLER Tag */}
-              <div className="absolute top-5 left-5 bg-[#0F0F0F] text-[#F2BA03] text-[10px] font-black uppercase font-mono tracking-widest px-3.5 py-1 rounded-full shadow-xs">
+              <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-[#FFEF00] text-[#736B00] text-[12px] font-['Hanken_Grotesk'] font-bold uppercase tracking-[1.2px] px-[12px] py-[4px] rounded-full shadow-xs">
                 BEST SELLER
               </div>
 
-              {/* Tag Sticker Card */}
-              <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-white w-full max-w-[320px] flex flex-col items-center space-y-4">
-                {/* Big QR Code */}
-                <div className="w-44 h-44 sm:w-48 sm:h-48 bg-[#0F0F0F] p-3 rounded-2xl flex items-center justify-center shadow-inner">
-                  <svg className="w-full h-full text-[#F2BA03]" viewBox="0 0 100 100" fill="currentColor">
-                    <path d="M0 0h30v30H0zM10 10h10v10H10zM70 0h30v30H70zM80 10h10v10H80zM0 70h30v30H0zM10 80h10v10H10zM40 0h10v20H40zM50 30h20v10H50zM30 40h10v30H30zM50 50h30v10H50zM80 60h20v40H80zM40 80h20v20H40z"/>
-                  </svg>
+              {/* Tag Sticker Card (The QR Sticker Visual) */}
+              <div className="bg-[#F2BA03] rounded-[24px] p-6 sm:p-8 shadow-xl border-4 border-white w-full max-w-[340px] flex flex-col items-center space-y-4">
+                {/* Big QR Code Box */}
+                <div className="w-44 h-44 sm:w-48 sm:h-48 bg-[#FFFFFF] p-3 rounded-[16px] flex items-center justify-center shadow-inner">
+                  <QrCode className="w-full h-full text-[#1B1C1C]" />
                 </div>
 
                 {/* Tag ID Badge */}
-                <span className="text-xs font-black tracking-widest uppercase font-mono text-[#0F0F0F]">
-                  SCAN CONNECT
+                <span className="text-[12px] font-['Hanken_Grotesk'] font-bold tracking-[1.2px] uppercase text-[#1B1C1C]">
+                  NGF132 &bull; SCAN CONNECT
                 </span>
 
                 {/* Icon Bar */}
-                <div className="w-full border-t border-neutral-200 pt-3 flex items-center justify-around text-[#0F0F0F]">
-                  <div className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold" title="Wrong Parking">
-                    🏠
+                <div className="w-full border-t border-[#1B1C1C]/10 pt-3 flex items-center justify-around text-[#1B1C1C]">
+                  <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-sm font-bold" title="Wrong Parking">
+                    🚨
                   </div>
-                  <div className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold" title="No Parking">
+                  <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-sm font-bold" title="No Parking">
                     🚫
                   </div>
-                  <div className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold" title="Emergency Contact">
+                  <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-sm font-bold" title="Emergency Contact">
                     ⚠️
                   </div>
-                  <div className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold" title="Scan QR">
+                  <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-sm font-bold" title="Scan QR">
                     📞
                   </div>
                 </div>
 
-                <p className="text-[10px] text-center font-bold text-[#5D5F5F] leading-tight max-w-[240px]">
-                  Wrong Parking, Emergency Contact, Scan to Call Owner.
+                <p className="text-[11px] text-center font-['Hanken_Grotesk'] font-bold text-[#1B1C1C] leading-tight max-w-[250px]">
+                  Wrong Parking, Emergency Contact, any issue with the vehicle, Scan the QR.
                 </p>
               </div>
             </div>
 
             {/* Thumbnail Row */}
-            <div className="grid grid-cols-4 gap-3 pt-2">
+            <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-1">
               {thumbnails.map((thumb, idx) => (
                 <button
                   key={thumb.id}
                   onClick={() => setActiveThumbnail(idx)}
-                  className={`aspect-square rounded-2xl border-2 flex items-center justify-center p-2 transition-all cursor-pointer ${
+                  className={`aspect-square rounded-[8px] border-2 flex items-center justify-center p-2 transition-all cursor-pointer ${
                     activeThumbnail === idx
-                      ? 'border-[#0F0F0F] bg-neutral-50 shadow-md ring-2 ring-[#F2BA03]'
-                      : 'border-neutral-200 hover:border-neutral-300'
+                      ? 'border-[#676000] bg-white opacity-100 shadow-xs'
+                      : 'border-[#CCC7AA] bg-[#FAFAFA] opacity-70 hover:opacity-100'
                   }`}
                 >
                   {thumb.type === 'sc-logo' ? (
-                    <div className="w-10 h-10 rounded-full border-2 border-[#0F0F0F] flex items-center justify-center text-[#0F0F0F] font-black text-xs font-mono">
+                    <div className="w-10 h-10 rounded-full border-2 border-[#676000] flex items-center justify-center text-[#676000] font-black text-xs font-mono">
                       SC
                     </div>
                   ) : (
-                    <div className="w-full h-full bg-[#F2BA03] rounded-lg p-1.5 flex flex-col items-center justify-between text-[#0F0F0F]">
-                      <QrCode className="w-6 h-6" />
-                      <div className="w-full h-0.5 bg-[#0F0F0F]/30 rounded" />
+                    <div className="w-full h-full bg-[#F2BA03] rounded-[6px] p-1.5 flex flex-col items-center justify-between text-[#1B1C1C]">
+                      <QrCode className="w-6 h-6 text-[#1B1C1C]" />
+                      <div className="w-full h-0.5 bg-[#1B1C1C]/20 rounded" />
                     </div>
                   )}
                 </button>
@@ -214,106 +213,108 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             </div>
           </div>
 
-          {/* Right Column: Product Meta & Purchase Info */}
+          {/* Right Column: Product Details */}
           <div className="lg:col-span-6 space-y-6 pt-1">
             
             {/* Rating Row */}
-            <div className="flex items-center gap-2 text-xs font-bold text-[#0F0F0F]">
-              <div className="flex text-[#F2BA03]">
+            <div className="flex items-center gap-2 text-[16px] font-['Hanken_Grotesk']">
+              <div className="flex text-[#FFD700]">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-[#F2BA03] text-[#F2BA03]" />
+                  <Star key={i} className="w-[20px] h-[19px] fill-[#FFD700] text-[#FFD700]" />
                 ))}
               </div>
-              <span>4.8/5 Rating</span>
-              <span className="text-neutral-300">•</span>
-              <span className="text-[#0F0F0F] font-semibold">950,000+ Tags Active</span>
+              <span className="text-[#5F5E5E] font-normal">4.8/5 Rating</span>
+              <span className="w-1 h-1 bg-[#CCC7AA] rounded-full mx-1 inline-block" />
+              <span className="text-[#676000] font-bold">950,000+ Tags Active</span>
             </div>
 
-            {/* Title */}
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#0F0F0F] tracking-tight font-sans leading-tight">
+            {/* Heading 1 Title */}
+            <h1 className="font-['Rubik'] font-bold text-[28px] sm:text-[36px] leading-[36px] sm:leading-[44px] text-[#1B1C1C] tracking-[-0.4px]">
               {productTitle}
             </h1>
 
             {/* Description */}
-            <p className="text-[#5D5F5F] text-base leading-relaxed">
+            <p className="font-['Hanken_Grotesk'] font-normal text-[18px] leading-[29px] text-[#5F5E5E]">
               Secure your vehicle with digital-physical bridges. Masked calls, SMS, and WhatsApp alerts without revealing your phone number to strangers.
             </p>
 
             {/* Price Row */}
             <div className="flex items-baseline gap-3 pt-1">
-              <span className="text-3xl sm:text-4xl font-bold text-[#0F0F0F] font-sans tracking-tight">
+              <span className="font-['Plus_Jakarta_Sans'] font-extrabold text-[44px] sm:text-[56px] leading-[50px] sm:leading-[64px] text-[#1B1C1C] tracking-[-1.28px]">
                 {productPrice}
               </span>
-              <span className="text-lg text-neutral-400 line-through font-medium">
+              <span className="font-['Hanken_Grotesk'] font-normal text-[18px] text-[#5F5E5E] line-through">
                 ₹799
               </span>
-              <span className="px-2.5 py-1 bg-[#0F0F0F] text-[#F2BA03] font-black text-xs font-mono rounded uppercase tracking-wider">
+              <span className="bg-[#BA1A1A] text-white font-['Hanken_Grotesk'] font-bold text-[12px] leading-[12px] tracking-[1.2px] px-[8px] py-[4px] rounded-[4px] uppercase">
                 37% OFF
               </span>
             </div>
 
-            {/* Delivery Alert Card */}
-            <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4 flex items-center gap-3 text-xs font-bold text-[#0F0F0F]">
-              <Truck className="w-5 h-5 text-[#F2BA03] shrink-0" />
-              <span>Free delivery across India • Arrives in 2-4 days</span>
+            {/* Delivery Alert Banner Box */}
+            <div className="bg-[#EFEDED] border border-dashed border-[#CCC7AA] rounded-[8px] p-[16px] flex items-center gap-[12px]">
+              <Truck className="w-[22px] h-[16px] text-[#676000] shrink-0" />
+              <span className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
+                Free delivery across India &bull; Arrives in 2-4 days
+              </span>
             </div>
 
             {/* PRODUCT SPECS 2x2 Grid */}
-            <div className="space-y-2 pt-2">
-              <span className="text-[10px] font-black tracking-widest text-[#5D5F5F] uppercase font-mono block">
+            <div className="space-y-[12px] pt-1">
+              <span className="font-['Hanken_Grotesk'] font-bold text-[12px] leading-[12px] tracking-[1.2px] text-[#5F5E5E] uppercase block">
                 PRODUCT SPECS
               </span>
-              <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-xs font-bold text-[#0F0F0F]">
-                <div className="flex items-center gap-2">
-                  <Droplets className="w-4 h-4 text-[#F2BA03]" />
+              <div className="grid grid-cols-2 gap-y-[12px] gap-x-[16px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
+                <div className="flex items-center gap-[8px]">
+                  <Droplets className="w-[16px] h-[16px] text-[#676000] shrink-0" />
                   <span>Weatherproof</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Sun className="w-4 h-4 text-[#F2BA03]" />
+                <div className="flex items-center gap-[8px]">
+                  <Sun className="w-[18px] h-[18px] text-[#676000] shrink-0" />
                   <span>UV Resistant</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-[#F2BA03]" />
+                <div className="flex items-center gap-[8px]">
+                  <CheckCircle className="w-[16px] h-[16px] text-[#676000] shrink-0" />
                   <span>Easy to Apply</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4 text-[#F2BA03]" />
+                <div className="flex items-center gap-[8px]">
+                  <Award className="w-[18px] h-[18px] text-[#676000] shrink-0" />
                   <span>1-Year Warranty</span>
                 </div>
               </div>
             </div>
 
             {/* Action Buttons Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[16px] pt-2">
               <button
                 onClick={handleBuyNow}
-                className="h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                className="h-[59px] bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-['Rubik'] font-semibold text-[18px] leading-[27px] rounded-[8px] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-all cursor-pointer flex items-center justify-center gap-[8px] active:scale-95"
               >
                 <span>Buy Now</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-[16px] h-[16px] text-white" />
               </button>
 
               <button
                 onClick={handleAddToCart}
-                className="h-[52px] px-8 bg-white border border-[#0F0F0F] hover:bg-neutral-50 text-[#0F0F0F] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                className="h-[59px] bg-[#1B1C1C] hover:bg-neutral-800 text-white font-['Plus_Jakarta_Sans'] font-normal text-[18px] leading-[27px] rounded-[8px] transition-all cursor-pointer flex items-center justify-center gap-[8px] active:scale-95"
               >
-                <ShoppingCart className="w-4 h-4" />
+                <ShoppingCart className="w-[20px] h-[21px] text-white" />
                 <span>Add to Cart</span>
               </button>
             </div>
 
-            {/* Bottom Value Props Row */}
-            <div className="grid grid-cols-3 gap-2 pt-4 border-t border-neutral-100 text-center text-[10px] font-bold text-[#5D5F5F]">
-              <div className="flex flex-col items-center gap-1">
-                <Lock className="w-4 h-4 text-[#0F0F0F]" />
+            {/* Bottom Trust Badges Row */}
+            <div className="grid grid-cols-3 gap-2 pt-[16px] border-t border-[#E4E2E2] text-center font-['Hanken_Grotesk'] font-normal text-[11px] leading-[16px] text-[#5F5E5E]">
+              <div className="flex flex-col items-center gap-[4px]">
+                <Lock className="w-[16px] h-[21px] text-[#5F5E5E]" />
                 <span>SECURE PAYMENT</span>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <ShieldCheck className="w-4 h-4 text-[#0F0F0F]" />
+              <div className="flex flex-col items-center gap-[4px]">
+                <ShieldCheck className="w-[16px] h-[20px] text-[#5F5E5E]" />
                 <span>DATA MASKING</span>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <RefreshCw className="w-4 h-4 text-[#0F0F0F]" />
+              <div className="flex flex-col items-center gap-[4px]">
+                <RefreshCw className="w-[16px] h-[16px] text-[#5F5E5E]" />
                 <span>7 DAY RETURNS</span>
               </div>
             </div>
@@ -324,74 +325,74 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
 
         {/* SECTION 2: BUILT FOR THE OPEN ROAD */}
-        <section className="py-12 border-t border-neutral-100">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+        <section className="py-10 border-t border-[#E4E2E2]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
             
             {/* Left Photo */}
             <div className="lg:col-span-5 flex justify-center">
-              <div className="relative w-full rounded-3xl overflow-hidden shadow-xl border border-neutral-200 group bg-[#0F0F0F]">
+              <div className="relative w-full rounded-[16px] overflow-hidden shadow-lg border border-[#E4E2E2] group bg-[#1B1C1C]">
                 <img
                   src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1000&q=80"
                   alt="SCAN CONNECT Tag on Car Windshield"
-                  className="w-full h-[320px] sm:h-[380px] object-cover group-hover:scale-105 transition-transform duration-700 opacity-90"
+                  className="w-full h-[320px] sm:h-[420px] object-cover group-hover:scale-105 transition-transform duration-700 opacity-90"
                 />
                 
                 {/* Oval Tag Sticker Graphic Overlay on Windshield */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#F2BA03] border-4 border-white text-[#0F0F0F] w-36 h-28 rounded-[50%] shadow-2xl flex flex-col items-center justify-center text-center p-2 transform -rotate-12">
-                  <span className="text-[8px] font-black uppercase font-mono tracking-tight">SCAN CONNECT</span>
-                  <QrCode className="w-10 h-10 text-[#0F0F0F] my-0.5" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#F2BA03] border-4 border-white text-[#1B1C1C] w-36 h-28 rounded-[50%] shadow-2xl flex flex-col items-center justify-center text-center p-2 transform -rotate-12">
+                  <span className="text-[8px] font-bold uppercase font-mono tracking-tight">SCAN CONNECT</span>
+                  <QrCode className="w-10 h-10 text-[#1B1C1C] my-0.5" />
                   <span className="text-[7px] font-extrabold uppercase">SECURE VEHICLE ID</span>
                 </div>
               </div>
             </div>
 
             {/* Right Content */}
-            <div className="lg:col-span-7 space-y-8">
-              <h2 className="text-3xl sm:text-4xl font-black text-[#0F0F0F] tracking-tight font-sans">
+            <div className="lg:col-span-7 space-y-[32px]">
+              <h2 className="font-['Rubik'] font-semibold text-[32px] sm:text-[36px] leading-[40px] sm:leading-[48px] text-[#1B1C1C] tracking-[-0.4px]">
                 Built for the Open Road
               </h2>
 
-              <div className="space-y-6">
+              <div className="space-y-[24px]">
                 {/* Item 1 */}
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#F2BA03]/10 border border-[#F2BA03]/30 text-[#F2BA03] flex items-center justify-center shrink-0 mt-0.5">
-                    <Layers className="w-5 h-5 stroke-[2.2]" />
+                <div className="flex items-start gap-[16px]">
+                  <div className="w-[20px] h-[20px] text-[#F2BA03] shrink-0 mt-[4px]">
+                    <Layers className="w-[18px] h-[19px] fill-[#F2BA03] text-[#F2BA03]" />
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-base font-bold text-[#0F0F0F]">
+                  <div className="space-y-[4px]">
+                    <h3 className="font-['Hanken_Grotesk'] font-bold text-[18px] leading-[29px] text-[#1B1C1C]">
                       Triple-Layer Lamination
                     </h3>
-                    <p className="text-[#5D5F5F] text-xs sm:text-sm leading-relaxed">
+                    <p className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
                       PET base, high-contrast ink, and an anti-scratch UV protective shield that lasts years.
                     </p>
                   </div>
                 </div>
 
                 {/* Item 2 */}
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#F2BA03]/10 border border-[#F2BA03]/30 text-[#F2BA03] flex items-center justify-center shrink-0 mt-0.5">
-                    <Thermometer className="w-5 h-5 stroke-[2.2]" />
+                <div className="flex items-start gap-[16px]">
+                  <div className="w-[20px] h-[20px] text-[#F2BA03] shrink-0 mt-[4px]">
+                    <Thermometer className="w-[18px] h-[18px] fill-[#F2BA03] text-[#F2BA03]" />
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-base font-bold text-[#0F0F0F]">
+                  <div className="space-y-[4px]">
+                    <h3 className="font-['Hanken_Grotesk'] font-bold text-[18px] leading-[29px] text-[#1B1C1C]">
                       Thermal Endurance
                     </h3>
-                    <p className="text-[#5D5F5F] text-xs sm:text-sm leading-relaxed">
+                    <p className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
                       Withstands extreme dashboard temperatures ranging from -10°C to 75°C without peeling.
                     </p>
                   </div>
                 </div>
 
                 {/* Item 3 */}
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#F2BA03]/10 border border-[#F2BA03]/30 text-[#F2BA03] flex items-center justify-center shrink-0 mt-0.5">
-                    <Sparkles className="w-5 h-5 stroke-[2.2]" />
+                <div className="flex items-start gap-[16px]">
+                  <div className="w-[20px] h-[20px] text-[#F2BA03] shrink-0 mt-[4px]">
+                    <Sparkles className="w-[18px] h-[18px] fill-[#F2BA03] text-[#F2BA03]" />
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-base font-bold text-[#0F0F0F]">
+                  <div className="space-y-[4px]">
+                    <h3 className="font-['Hanken_Grotesk'] font-bold text-[18px] leading-[29px] text-[#1B1C1C]">
                       Residue-Free Adhesive
                     </h3>
-                    <p className="text-[#5D5F5F] text-xs sm:text-sm leading-relaxed">
+                    <p className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
                       Automotive-grade 3M adhesive that stays firm but leaves no mark when removed.
                     </p>
                   </div>
@@ -404,17 +405,17 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
         </section>
 
 
-        {/* SECTION 3: TABS & INTERACTIVE CARDS */}
-        <section className="pt-6 pb-12 border-t border-neutral-100">
+        {/* SECTION 3: TABS & INTERACTIVE BENTO GRID */}
+        <section className="pt-4 pb-12 border-t border-[#E4E2E2]">
           
-          {/* Tab Navigation Header */}
-          <div className="border-b border-neutral-200 flex items-center gap-8 text-sm font-bold mb-8">
+          {/* Sticky Tab Navigation Header */}
+          <div className="border-b border-[#E4E2E2] flex items-center gap-[16px] sm:gap-[32px] mb-[32px] overflow-x-auto">
             <button
               onClick={() => setActiveTab('how')}
-              className={`pb-3 cursor-pointer transition-colors relative ${
+              className={`pb-[16px] px-[8px] cursor-pointer transition-colors relative whitespace-nowrap font-['Hanken_Grotesk'] font-bold text-[18px] sm:text-[20px] leading-[24px] ${
                 activeTab === 'how'
-                  ? 'text-[#0F0F0F] border-b-2 border-[#F2BA03] font-extrabold'
-                  : 'text-[#5D5F5F] hover:text-[#0F0F0F]'
+                  ? 'text-[#676000] border-b-2 border-[#676000]'
+                  : 'text-[#5F5E5E] hover:text-[#1B1C1C]'
               }`}
             >
               How It Works
@@ -422,10 +423,10 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
             <button
               onClick={() => setActiveTab('security')}
-              className={`pb-3 cursor-pointer transition-colors relative ${
+              className={`pb-[16px] px-[8px] cursor-pointer transition-colors relative whitespace-nowrap font-['Hanken_Grotesk'] font-bold text-[18px] sm:text-[20px] leading-[24px] ${
                 activeTab === 'security'
-                  ? 'text-[#0F0F0F] border-b-2 border-[#F2BA03] font-extrabold'
-                  : 'text-[#5D5F5F] hover:text-[#0F0F0F]'
+                  ? 'text-[#676000] border-b-2 border-[#676000]'
+                  : 'text-[#5F5E5E] hover:text-[#1B1C1C]'
               }`}
             >
               Security Features
@@ -433,80 +434,80 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
             <button
               onClick={() => setActiveTab('reviews')}
-              className={`pb-3 cursor-pointer transition-colors relative ${
+              className={`pb-[16px] px-[8px] cursor-pointer transition-colors relative whitespace-nowrap font-['Hanken_Grotesk'] font-bold text-[18px] sm:text-[20px] leading-[24px] ${
                 activeTab === 'reviews'
-                  ? 'text-[#0F0F0F] border-b-2 border-[#F2BA03] font-extrabold'
-                  : 'text-[#5D5F5F] hover:text-[#0F0F0F]'
+                  ? 'text-[#676000] border-b-2 border-[#676000]'
+                  : 'text-[#5F5E5E] hover:text-[#1B1C1C]'
               }`}
             >
               Customer Reviews
             </button>
           </div>
 
-          {/* TAB 1: HOW IT WORKS */}
+          {/* TAB 1: HOW IT WORKS BENTO GRID */}
           {activeTab === 'how' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch animate-fade-in">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-[24px] items-stretch animate-fade-in">
               
-              {/* Left Large Dark Card */}
-              <div className="lg:col-span-8 bg-[#2D2F31] text-white rounded-3xl p-8 sm:p-10 flex flex-col justify-between space-y-8 relative overflow-hidden shadow-xl">
+              {/* Left Large Dark Feature Card */}
+              <div className="lg:col-span-7 bg-[#1B1C1C] text-white rounded-[12px] p-[32px] sm:p-[40px] flex flex-col justify-between min-h-[440px] relative overflow-hidden shadow-lg">
                 
-                <div className="space-y-6 relative z-10 max-w-xl">
-                  {/* Yellow Phone Icon Circle */}
-                  <div className="w-12 h-12 bg-[#F2BA03] rounded-full text-[#0F0F0F] flex items-center justify-center shadow-lg">
-                    <Phone className="w-6 h-6 stroke-[2.2]" />
+                <div className="space-y-[20px] relative z-10 max-w-xl">
+                  {/* Yellow Circle Badge with Phone Icon */}
+                  <div className="w-[48px] h-[48px] bg-[#F2BA03] rounded-full text-[#1F1C00] flex items-center justify-center">
+                    <Phone className="w-[20px] h-[20px] fill-[#1F1C00]" />
                   </div>
 
-                  <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                  <h3 className="font-['Rubik'] font-bold text-[28px] sm:text-[36px] leading-[36px] sm:leading-[44px] text-white tracking-[-0.4px]">
                     Zero Exposure Privacy
                   </h3>
 
-                  <p className="text-neutral-300 text-sm sm:text-base leading-relaxed font-normal">
+                  <p className="font-['Hanken_Grotesk'] font-normal text-[16px] sm:text-[18px] leading-[26px] sm:leading-[29px] text-[#E4E2E2]">
                     Our cloud-bridge technology ensures that anyone trying to reach you regarding your vehicle never sees your actual phone number. All communication is routed through our secure virtual switch.
                   </p>
                 </div>
 
                 {/* Inset Live Simulation Box */}
-                <div className="bg-[#0F0F0F]/80 border border-neutral-700/80 rounded-2xl p-4 sm:p-5 max-w-sm relative z-10 space-y-2">
-                  <span className="text-[9px] font-black tracking-widest text-[#F2BA03] uppercase font-mono block">
+                <div className="bg-[rgba(228,226,226,0.1)] border border-[rgba(255,255,255,0.1)] backdrop-blur-[6px] rounded-[8px] p-[16px] max-w-[320px] relative z-10 space-y-[8px] mt-[24px]">
+                  <span className="font-['Hanken_Grotesk'] font-normal text-[12px] leading-[18px] text-[#F2BA03] block uppercase">
                     LIVE SIMULATION
                   </span>
-                  <div className="flex items-center justify-between font-mono text-sm sm:text-base text-white">
+                  <div className="flex items-center justify-between font-mono text-[16px] leading-[24px] text-white tracking-[1.6px]">
                     <span>+91 &bull;&bull;&bull;&bull;&bull; &bull;&bull;492</span>
-                    <span className="bg-[#F2BA03] text-[#0F0F0F] font-black text-[10px] uppercase px-2 py-0.5 rounded">
+                    <span className="bg-[#F2BA03] text-[#1F1C00] font-['Hanken_Grotesk'] font-normal text-[10px] uppercase px-[8px] py-[2px] rounded-[4px]">
                       CONNECTED
                     </span>
                   </div>
                 </div>
 
-                {/* Soft ambient glow overlay */}
-                <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-[#F2BA03]/10 rounded-full blur-3xl pointer-events-none" />
+                {/* Yellow Radial Glow Background Accent */}
+                <div className="absolute -bottom-[80px] -right-[80px] w-[320px] h-[320px] bg-[rgba(255,239,0,0.1)] rounded-full blur-[32px] pointer-events-none" />
               </div>
 
-              {/* Right Column 2 Cards */}
-              <div className="lg:col-span-4 flex flex-col gap-6">
+              {/* Right Column Secondary Cards */}
+              <div className="lg:col-span-5 flex flex-col gap-[24px]">
                 
                 {/* Card 1: Instant Setup */}
-                <div className="bg-white border border-neutral-200 rounded-3xl p-6 sm:p-8 flex-1 flex flex-col items-center justify-center text-center space-y-3 shadow-xs hover:shadow-md transition-shadow">
-                  <div className="w-10 h-10 rounded-full bg-[#F2BA03]/10 text-[#F2BA03] flex items-center justify-center">
-                    <Zap className="w-5 h-5 stroke-[2.2]" />
+                <div className="bg-[#FAFAFA] border border-[#CCC7AA] rounded-[12px] p-[32px] flex-1 flex flex-col items-center justify-center text-center space-y-[12px] shadow-xs">
+                  <div className="w-[24px] h-[40px] flex items-center justify-center text-[#F2BA03]">
+                    <Zap className="w-[28px] h-[28px] fill-[#F2BA03] text-[#F2BA03]" />
                   </div>
-                  <h4 className="text-lg font-black text-[#0F0F0F]">
+                  <h4 className="font-['Rubik'] font-semibold text-[22px] sm:text-[24px] leading-[31px] text-[#1B1C1C]">
                     Instant Setup
                   </h4>
-                  <p className="text-[#5D5F5F] text-xs sm:text-sm leading-relaxed max-w-xs">
+                  <p className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E] max-w-xs">
                     Scan, link your number in 30 seconds, and you&apos;re protected. No app download required.
                   </p>
                 </div>
 
                 {/* Card 2: Smart Alerts */}
-                <div className="bg-white border border-neutral-200 rounded-3xl p-6 sm:p-8 flex-1 flex flex-col items-center justify-center text-center space-y-3 shadow-xs hover:shadow-md transition-shadow">
-                  <div className="w-10 h-10 rounded-full bg-[#F2BA03]/10 text-[#F2BA03] flex items-center justify-center">
-                    <RefreshCw className="w-5 h-5 stroke-[2.2]" />
+                <div className="bg-[#FFFFFF] border border-[#CCC7AA] rounded-[12px] p-[32px] flex-1 flex flex-col items-center justify-center text-center space-y-[12px] shadow-xs">
+                  <div className="w-[40px] h-[32px] flex items-center justify-center text-[#F2BA03]">
+                    <RefreshCw className="w-[28px] h-[28px] text-[#F2BA03]" />
                   </div>
-                  <h4 className="text-lg font-black text-[#0F0F0F]">
+                  <h4 className="font-['Rubik'] font-semibold text-[22px] sm:text-[24px] leading-[31px] text-[#1B1C1C]">
                     Smart Alerts
                   </h4>
-                  <p className="text-[#5D5F5F] text-xs sm:text-sm leading-relaxed max-w-xs">
+                  <p className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E] max-w-xs">
                     Get categorized alerts for parking issues, emergencies, or document renewals.
                   </p>
                 </div>
@@ -518,25 +519,25 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
           {/* TAB 2: SECURITY FEATURES */}
           {activeTab === 'security' && (
-            <div className="bg-neutral-50 border border-neutral-200 rounded-3xl p-8 sm:p-10 space-y-6 animate-fade-in">
-              <h3 className="text-2xl font-black text-[#0F0F0F]">
+            <div className="bg-[#FAFAFA] border border-[#E4E2E2] rounded-[12px] p-[24px] sm:p-[40px] space-y-[24px] animate-fade-in">
+              <h3 className="font-['Rubik'] font-semibold text-[24px] sm:text-[28px] text-[#1B1C1C]">
                 Bank-Grade Privacy & Encryption
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs sm:text-sm">
-                <div className="bg-white p-5 rounded-2xl border border-neutral-200 space-y-2">
-                  <ShieldCheck className="w-6 h-6 text-[#F2BA03]" />
-                  <h4 className="font-bold text-[#0F0F0F]">256-Bit Masking</h4>
-                  <p className="text-[#5D5F5F]">Every call routed through intermediate proxy nodes so phone numbers stay 100% confidential.</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-[20px] font-['Hanken_Grotesk']">
+                <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
+                  <ShieldCheck className="w-[24px] h-[24px] text-[#F2BA03]" />
+                  <h4 className="font-bold text-[16px] text-[#1B1C1C]">256-Bit Masking</h4>
+                  <p className="text-[#5F5E5E] text-[14px]">Every call routed through intermediate proxy nodes so phone numbers stay 100% confidential.</p>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-neutral-200 space-y-2">
-                  <Lock className="w-6 h-6 text-[#F2BA03]" />
-                  <h4 className="font-bold text-[#0F0F0F]">Spam Protection</h4>
-                  <p className="text-[#5D5F5F]">AI-powered filtering prevents nuisance calls and telemarketers from reaching your vehicle line.</p>
+                <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
+                  <Lock className="w-[24px] h-[24px] text-[#F2BA03]" />
+                  <h4 className="font-bold text-[16px] text-[#1B1C1C]">Spam Protection</h4>
+                  <p className="text-[#5F5E5E] text-[14px]">AI-powered filtering prevents nuisance calls and telemarketers from reaching your vehicle line.</p>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-neutral-200 space-y-2">
-                  <Zap className="w-6 h-6 text-[#F2BA03]" />
-                  <h4 className="font-bold text-[#0F0F0F]">Instant Kill Switch</h4>
-                  <p className="text-[#5D5F5F]">Temporarily disable calls or mute alerts anytime directly from your ScanConnect dashboard.</p>
+                <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
+                  <Zap className="w-[24px] h-[24px] text-[#F2BA03]" />
+                  <h4 className="font-bold text-[16px] text-[#1B1C1C]">Instant Kill Switch</h4>
+                  <p className="text-[#5F5E5E] text-[14px]">Temporarily disable calls or mute alerts anytime directly from your ScanConnect dashboard.</p>
                 </div>
               </div>
             </div>
@@ -544,25 +545,25 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
           {/* TAB 3: REVIEWS */}
           {activeTab === 'reviews' && (
-            <div className="bg-neutral-50 border border-neutral-200 rounded-3xl p-8 sm:p-10 space-y-6 animate-fade-in">
-              <div className="flex items-center justify-between border-b border-neutral-200 pb-4">
-                <h3 className="text-2xl font-black text-[#0F0F0F]">
+            <div className="bg-[#FAFAFA] border border-[#E4E2E2] rounded-[12px] p-[24px] sm:p-[40px] space-y-[24px] animate-fade-in">
+              <div className="flex items-center justify-between border-b border-[#E4E2E2] pb-[16px]">
+                <h3 className="font-['Rubik'] font-semibold text-[24px] sm:text-[28px] text-[#1B1C1C]">
                   Customer Reviews (4.8 / 5.0)
                 </h3>
-                <span className="text-xs font-bold font-mono text-[#0F0F0F] bg-[#F2BA03] px-3 py-1 rounded-full uppercase">
+                <span className="font-['Hanken_Grotesk'] font-bold text-[12px] text-[#1B1C1C] bg-[#F2BA03] px-[12px] py-[4px] rounded-full uppercase">
                   Verified Owners
                 </span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm">
-                <div className="bg-white p-5 rounded-2xl border border-neutral-200 space-y-2">
-                  <div className="flex text-[#F2BA03]">★★★★★</div>
-                  <p className="text-[#5D5F5F] italic">&ldquo;Saved my car from towing in Pune city! A shopkeeper scanned the tag and called me privately.&rdquo;</p>
-                  <span className="font-bold text-[#0F0F0F] block pt-1">— Rajesh Sharma, MH-12</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-[20px] font-['Hanken_Grotesk']">
+                <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
+                  <div className="flex text-[#FFD700]">★★★★★</div>
+                  <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;Saved my car from towing in Pune city! A shopkeeper scanned the tag and called me privately.&rdquo;</p>
+                  <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— Rajesh Sharma, MH-12</span>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-neutral-200 space-y-2">
-                  <div className="flex text-[#F2BA03]">★★★★★</div>
-                  <p className="text-[#5D5F5F] italic">&ldquo;Super simple sticker to apply. Nobody gets my personal WhatsApp or phone number now.&rdquo;</p>
-                  <span className="font-bold text-[#0F0F0F] block pt-1">— Ananya Deshmukh, MH-14</span>
+                <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
+                  <div className="flex text-[#FFD700]">★★★★★</div>
+                  <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;Super simple sticker to apply. Nobody gets my personal WhatsApp or phone number now.&rdquo;</p>
+                  <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— Ananya Deshmukh, MH-14</span>
                 </div>
               </div>
             </div>
