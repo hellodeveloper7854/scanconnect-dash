@@ -12,15 +12,10 @@ export const BackgroundCockpit: React.FC<{ children: React.ReactNode }> = ({ chi
           src={cockpitBg}
           alt="Luxury Vehicle Interior Cockpit"
           referrerPolicy="no-referrer"
-          className="w-full h-full object-cover object-center scale-105 filter brightness-[0.7] contrast-[1.15] blur-[0.5px] transform transition-transform duration-1000"
+          className="w-full h-full object-cover object-center"
         />
-        {/* Dark vignette and yellow glowing ambient lighting accents */}
-        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/60 to-neutral-950/40" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-black/80" />
-        
-        {/* Subtle dashboard glow simulation */}
-        <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-amber-400/5 rounded-full blur-[100px] pointer-events-none" />
+        {/* Subtle dark overlay for text legibility */}
+        <div className="absolute inset-0 bg-black/20" />
       </div>
 
       {/* Main Content Overlay */}

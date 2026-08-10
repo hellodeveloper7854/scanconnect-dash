@@ -74,7 +74,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
           <div className="w-full max-w-[480px] bg-white/[0.08] backdrop-blur-[6px] border border-white/10 rounded-xl p-8 sm:p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] relative overflow-hidden">
             
             {/* Top Right Secure Hub Badge (Skewed per Figma spec) */}
-            <div className="absolute top-4 right-4 bg-[#F2BA03] text-black text-xs sm:text-[14px] font-black uppercase tracking-wider px-3.5 py-1.5 shadow-md -skew-x-12">
+            <div className="absolute top-0 right-0 bg-[#F2BA03] text-black text-base font-black px-4 py-2 shadow-md -skew-x-12">
               <span className="skew-x-12 block">SECURE HUB</span>
             </div>
 
@@ -154,7 +154,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-[57px] mt-2 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-base uppercase tracking-[1.6px] rounded-none shadow-md active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full h-[57px] mt-2 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-medium text-base uppercase tracking-[1.6px] rounded-none shadow-md active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isSubmitting ? (
                   <span>AUTHENTICATING...</span>

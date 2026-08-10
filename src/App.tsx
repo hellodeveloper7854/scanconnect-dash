@@ -20,7 +20,7 @@ const getInitialScreenFromUrl = (): ScreenType => {
   if (path === 'contact') return 'contact';
   if (path === 'qr-scan' || path === 'qrscan' || path === 'scan') return 'qr-scan';
   if (path === 'profile') return 'profile';
-  if (path === 'login') return 'login';
+  if (path === 'login') return 'login-options';
   if (path === 'register') return 'register';
   return 'dashboard';
 };
@@ -66,11 +66,13 @@ export default function App() {
     } else if (normalized === 'qr scan' || normalized === 'qr-scan' || normalized === 'qrscan') {
       targetScreen = 'qr-scan';
     } else if (normalized === 'profile') {
-      targetScreen = isLoggedIn ? 'profile' : 'login';
+      targetScreen = isLoggedIn ? 'profile' : 'login-options';
     } else if (normalized === 'login') {
-      targetScreen = 'login';
+      targetScreen = 'login-options';
     } else if (normalized === 'register') {
       targetScreen = 'register';
+    } else if (normalized === 'send-otp') {
+      targetScreen = 'send-otp';
     } else {
       targetScreen = 'dashboard';
     }
@@ -78,7 +80,8 @@ export default function App() {
     setActiveScreen(targetScreen);
 
     // Update window URL location path
-    const targetPath = targetScreen === 'dashboard' ? '/' : `/${targetScreen}`;
+    const pathByScreen: Partial<Record<ScreenType, string>> = { dashboard: '/', 'login-options': '/login' };
+    const targetPath = pathByScreen[targetScreen] ?? `/${targetScreen}`;
     if (window.location.pathname !== targetPath) {
       window.history.pushState(null, '', targetPath);
     }
@@ -104,15 +107,20 @@ export default function App() {
     setActiveScreen('dashboard');
   };
 
-  const handleSendOtpTrigger = (mobile: string) => {
-    setOtpMobileNumber(mobile);
-    setIsOtpModalOpen(true);
-  };
-
   const handleOtpVerifiedSuccess = () => {
     setIsOtpModalOpen(false);
     setIsLoggedIn(true);
     setActiveScreen('profile');
+  };
+
+  const navigateToScreen = (screen: ScreenType) => {
+    setActiveScreen(screen);
+    const pathByScreen: Partial<Record<ScreenType, string>> = { dashboard: '/', 'login-options': '/login' };
+    const targetPath = pathByScreen[screen] ?? `/${screen}`;
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState(null, '', targetPath);
+    }
+    window.scrollTo(0, 0);
   };
 
   if (activeScreen === 'dashboard') {
@@ -241,32 +249,28 @@ export default function App() {
       <main className="flex-1 flex flex-col justify-center">
         {activeScreen === 'register' && (
           <RegistrationScreen
-            onNavigate={handleGlobalNavigate}
+            onNavigate={navigateToScreen}
             onSubmitSuccess={handleRegisterSuccess}
           />
         )}
 
         {activeScreen === 'login' && (
           <LoginScreen
-            onNavigate={handleGlobalNavigate}
+            onNavigate={navigateToScreen}
             onSubmitSuccess={handleLoginSuccess}
           />
         )}
 
         {activeScreen === 'send-otp' && (
           <SendOtpScreen
-            onSendOtp={handleSendOtpTrigger}
-            onNavigate={handleGlobalNavigate}
+            onVerifySuccess={handleOtpVerifiedSuccess}
+            onNavigate={navigateToScreen}
           />
         )}
 
         {activeScreen === 'login-options' && (
           <LoginWithOtpScreen
-            onNavigate={handleGlobalNavigate}
-            onSelectOtpLogin={() => {
-              setOtpMobileNumber(userData.mobileNumber || '9881860335');
-              setIsOtpModalOpen(true);
-            }}
+            onNavigate={navigateToScreen}
           />
         )}
       </main>
