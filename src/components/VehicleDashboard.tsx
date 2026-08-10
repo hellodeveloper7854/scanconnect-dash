@@ -185,50 +185,48 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
         {/* 2. FEATURES OF ECOSYSTEM SECTION */}
         <section className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            
-            <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl lg:text-[64px] tracking-[-3.2px] text-[#1B1C1C] leading-none">
+          <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+
+            <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
                 Features Of <span className="text-[#F2BA03]">Ecosystem</span>
               </h2>
-              <p className="font-['Hanken_Grotesk'] font-medium text-base sm:text-lg text-[#5F5E5E] leading-[29px]">
+              <p className="font-['Hanken_Grotesk'] font-medium text-base sm:text-lg text-[#6B7280] leading-[28px]">
                 Intelligent parking solutions tailored for every stakeholder. From urban municipalities to private retail giants, SCAN ME streamlines the digital physical transition.
               </p>
             </div>
 
             {/* 4 Ecosystem Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
               {ecosystemFeatures.map((feat) => {
                 const IconComp = feat.icon;
                 return (
                   <div
                     key={feat.id}
-                    className="bg-white border border-[#CCC7AA] rounded-xl p-8 shadow-xs hover:shadow-md transition-shadow flex flex-col items-center text-center space-y-5 relative group"
+                    className="bg-white border border-[#E5E7EB] rounded-xl p-7 hover:shadow-md transition-shadow space-y-4"
                   >
-                    {/* Icon Circle */}
-                    <div className="w-16 h-16 rounded-full border border-[#F2BA03] bg-white flex items-center justify-center text-[#F2BA03] shadow-xs">
-                      <IconComp className="w-7 h-7 stroke-[2]" />
+                    {/* Icon + Title Row */}
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 shrink-0 rounded-full border border-[#F2BA03] bg-white flex items-center justify-center text-[#F2BA03]">
+                        <IconComp className="w-5 h-5 stroke-[2]" />
+                      </div>
+                      <h3 className="font-['Plus_Jakarta_Sans'] font-semibold text-lg text-[#1B1C1C] leading-snug whitespace-pre-line">
+                        {feat.title}
+                      </h3>
                     </div>
 
-                    {/* Title */}
-                    <h3 className="font-['Plus_Jakarta_Sans'] font-semibold text-2xl text-[#1B1C1C] leading-[31px] whitespace-pre-line">
-                      {feat.title}
-                    </h3>
-
                     {/* Desc */}
-                    <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] leading-[26px] max-w-sm">
+                    <p className="font-['Hanken_Grotesk'] font-normal text-sm text-[#6B7280] leading-[22px]">
                       {feat.desc}
                     </p>
 
                     {/* Learn More */}
-                    <div className="pt-2">
-                      <button
-                        onClick={() => alert(`Detailed insights for ${feat.title.replace('\n', ' ')}`)}
-                        className="font-['Hanken_Grotesk'] font-bold text-xs text-[#F2BA03] hover:text-[#d19d00] tracking-[1.2px] uppercase inline-flex items-center gap-2 cursor-pointer"
-                      >
-                        LEARN MORE <span className="text-sm">→</span>
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => alert(`Detailed insights for ${feat.title.replace('\n', ' ')}`)}
+                      className="font-['Hanken_Grotesk'] font-bold text-xs text-[#F2BA03] hover:text-[#d19d00] tracking-[1.2px] uppercase inline-flex items-center gap-2 cursor-pointer"
+                    >
+                      LEARN MORE <span className="text-sm">→</span>
+                    </button>
                   </div>
                 );
               })}
