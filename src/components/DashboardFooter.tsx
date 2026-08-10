@@ -58,7 +58,7 @@ export const DashboardFooter: React.FC = () => {
               SHOP
             </h4>
             <ul className="space-y-3 text-sm font-medium text-white/90">
-              {['Car & Bike tag', 'Car SCAN ME tag', 'How it works', 'Free eTag'].map((link) => (
+              {['Car & Bike tag', 'Car SCAN ME tag', 'How it works', 'eTag'].map((link) => (
                 <li key={link}>
                   <button onClick={() => alert(`Shop item: ${link}`)} className="hover:underline cursor-pointer text-left">
                     {link}
@@ -74,7 +74,7 @@ export const DashboardFooter: React.FC = () => {
               ABOUT
             </h4>
             <ul className="space-y-3 text-sm font-medium text-white/90">
-              {['Contact', 'Become a reseller', 'Franchise login', 'Investors', 'Blog'].map((link) => (
+              {['Contact', 'Become a reseller', 'Investors', 'Blog'].map((link) => (
                 <li key={link}>
                   <button onClick={() => alert(`About: ${link}`)} className="hover:underline cursor-pointer text-left">
                     {link}
@@ -94,7 +94,6 @@ export const DashboardFooter: React.FC = () => {
                 'Car loan calculator',
                 'Fuel prices',
                 'Contact parked car owner',
-                'Car games',
                 'Auto FAQ',
               ].map((link) => (
                 <li key={link}>

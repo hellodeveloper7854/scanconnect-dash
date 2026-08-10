@@ -400,13 +400,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                       </div>
                     </div>
 
-                    {/* Learn More Link */}
-                    <button
-                      onClick={() => alert(`Details for: ${svc.title}`)}
-                      className="text-xs font-bold text-[#F2BA03] hover:text-[#d19d00] tracking-wider uppercase inline-flex items-center gap-1.5 cursor-pointer pt-2 transition-colors"
-                    >
-                      <span>LEARN MORE</span> <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
+                    
                   </div>
                 );
               })}

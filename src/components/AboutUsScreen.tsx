@@ -198,12 +198,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                   </p>
                 </div>
 
-                <button
-                  onClick={() => alert('Housing Societies Partnership Inquiry sent!')}
-                  className="text-sm font-bold text-[#F2BA03] hover:text-[#d19d00] tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors"
-                >
-                  <span>LEARN MORE</span> <ArrowRight className="w-4 h-4" />
-                </button>
+                
               </div>
 
               {/* Solution 2: Garages & Workshops */}

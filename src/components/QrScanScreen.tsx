@@ -120,7 +120,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <button
                     onClick={() => setIsQrScannerOpen(true)}
-                    className="h-[58px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-bold text-base rounded-lg transition-all cursor-pointer flex items-center gap-2 shadow-sm active:scale-95"
+                    className="sm:hidden h-[58px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-bold text-base rounded-lg transition-all cursor-pointer flex items-center gap-2 shadow-sm active:scale-95"
                   >
                     <QrCode className="w-5 h-5 text-white" />
                     <span>Scan a QR Tag</span>
