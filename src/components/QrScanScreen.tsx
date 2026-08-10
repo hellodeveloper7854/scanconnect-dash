@@ -64,14 +64,14 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
               <div className="lg:col-span-6 space-y-8">
                 {/* Privacy Guaranteed Badge */}
                 <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white">
-                  <ShieldCheck className="w-3.5 h-4 text-black fill-black" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-black" />
                   <span className="font-sans font-normal text-xs uppercase tracking-[1px] text-black">
                     PRIVACY GUARANTEED
                   </span>
                 </div>
 
                 {/* Headline */}
-                <h1 className="text-3xl sm:text-4xl lg:text-[24px] lg:leading-[29px] font-medium text-black font-sans tracking-normal">
+                <h1 className="text-3xl sm:text-4xl lg:text-[40px] lg:leading-[1.15] font-bold text-black font-sans tracking-normal">
                   Instant Vehicle Connection. Zero Privacy Compromise.
                 </h1>
 
@@ -84,15 +84,15 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <button
                     onClick={() => setIsQrScannerOpen(true)}
-                    className="h-[58px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-medium text-base rounded-lg transition-all cursor-pointer flex items-center gap-2 shadow-sm active:scale-95"
+                    className="h-[58px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-bold text-base rounded-lg transition-all cursor-pointer flex items-center gap-2 shadow-sm active:scale-95"
                   >
-                    <Scan className="w-5 h-5 text-white" />
+                    <QrCode className="w-5 h-5 text-white" />
                     <span>Scan a Tag Now</span>
                   </button>
 
                   <button
                     onClick={() => onNavigate('shop')}
-                    className="h-[58px] px-8 bg-white hover:bg-neutral-50 text-[#0F0F0F] border border-[#0F0F0F] font-medium text-base rounded-lg transition-all cursor-pointer active:scale-95"
+                    className="h-[58px] px-8 bg-white hover:bg-neutral-50 text-[#0F0F0F] border border-[#0F0F0F] font-bold text-base rounded-lg transition-all cursor-pointer active:scale-95"
                   >
                     Get Your Own Tag
                   </button>
@@ -117,7 +117,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
         {/* SECTION 2: HOW IT WORKS HEADER (FRAME 39) */}
         <section className="pt-16 pb-8 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-            <h2 className="text-3xl sm:text-[40px] leading-[24px] font-medium text-black font-sans">
+            <h2 className="text-3xl sm:text-[40px] leading-[1.2] font-bold text-black font-sans">
               How it Works
             </h2>
             <p className="text-[#5F5E5E] text-lg sm:text-[20px] leading-[24px] font-normal max-w-4xl mx-auto">
@@ -178,7 +178,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
         <section className="py-16 sm:py-20 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
             <div className="space-y-4">
-              <h2 className="text-3xl sm:text-[40px] leading-[24px] font-medium text-black font-sans">
+              <h2 className="text-3xl sm:text-[40px] leading-[1.2] font-bold text-black font-sans">
                 Ready to secure your vehicle?
               </h2>
               <p className="text-black/80 text-lg sm:text-[20px] leading-[24px] font-normal max-w-3xl mx-auto">
@@ -189,13 +189,13 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <button
                 onClick={() => onNavigate('shop')}
-                className="h-[66px] px-10 bg-[#0F0F0F] hover:bg-black text-white font-medium text-lg sm:text-[20px] rounded-[12px] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] transition-all cursor-pointer active:scale-95"
+                className="h-[66px] px-10 bg-[#0F0F0F] hover:bg-black text-white font-bold text-lg sm:text-[20px] rounded-[12px] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] transition-all cursor-pointer active:scale-95"
               >
                 Get Started Now
               </button>
               <button
                 onClick={() => onNavigate('shop')}
-                className="h-[66px] px-10 bg-white/40 backdrop-blur-md hover:bg-white/60 text-black border border-[#5F5E5E] font-medium text-lg sm:text-[20px] rounded-[12px] transition-all cursor-pointer active:scale-95"
+                className="h-[66px] px-10 bg-white hover:bg-neutral-50 text-black border border-[#5F5E5E] font-bold text-lg sm:text-[20px] rounded-[12px] transition-all cursor-pointer active:scale-95"
               >
                 View Pricing
               </button>
