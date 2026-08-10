@@ -32,8 +32,10 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
 
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
-    if (navItem === 'How it works' || navItem === 'QR Scan') {
+    if (navItem === 'How it works') {
       onNavigate('dashboard');
+    } else if (navItem === 'QR Scan') {
+      onNavigate('qr-scan');
     } else if (navItem === 'About' || navItem === 'about') {
       onNavigate('about');
     } else if (navItem === 'Shop' || navItem === 'shop') {
