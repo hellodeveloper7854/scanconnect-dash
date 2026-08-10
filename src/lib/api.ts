@@ -42,3 +42,27 @@ export const api = {
     request<T>(path, { method: 'PATCH', body: body ? JSON.stringify(body) : undefined }),
   delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
 };
+
+/**
+ * Downloads a file from an authenticated endpoint. A plain <a href> can't
+ * carry the Firebase bearer token, so this fetches with auth and saves the
+ * response as a blob instead.
+ */
+export async function downloadFile(path: string, filename: string): Promise<void> {
+  const idToken = await auth.currentUser?.getIdToken();
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    headers: idToken ? { Authorization: `Bearer ${idToken}` } : {},
+  });
+  if (!res.ok) {
+    throw new ApiError('Failed to download file', res.status);
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}

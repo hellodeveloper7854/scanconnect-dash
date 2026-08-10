@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { randomBytes } from 'node:crypto';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
+import { toCsv } from '../lib/csv.js';
 
 export const adminRouter = Router();
 adminRouter.use(requireAuth, requireAdmin);
@@ -139,6 +141,127 @@ adminRouter.patch('/orders/:id/status', async (req, res) => {
   res.json({ order });
 });
 
+adminRouter.post('/orders/:id/generate-qr', async (req, res) => {
+  const existing = await prisma.order.findUnique({ where: { id: req.params.id } });
+  if (!existing) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+  if (existing.qrToken) {
+    return res.json({ order: existing });
+  }
+
+  const qrToken = randomBytes(16).toString('hex');
+  const order = await prisma.order.update({
+    where: { id: req.params.id },
+    data: { qrToken },
+  });
+
+  res.json({ order });
+});
+
+const suspendSchema = z.object({ isSuspended: z.boolean() });
+
+adminRouter.patch('/users/:id/suspend', async (req, res) => {
+  const parsed = suspendSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const target = await prisma.user.findUnique({ where: { id: req.params.id } });
+  if (!target || target.role === 'ADMIN') {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  const user = await prisma.user.update({
+    where: { id: req.params.id },
+    data: { isSuspended: parsed.data.isSuspended },
+  });
+
+  res.json({ user });
+});
+
+adminRouter.get('/vehicles', async (req, res) => {
+  const page = Math.max(1, Number(req.query.page ?? 1));
+  const pageSize = Math.min(100, Number(req.query.pageSize ?? 25));
+  const search = typeof req.query.search === 'string' ? req.query.search : undefined;
+
+  const where = search
+    ? {
+        OR: [
+          { registration: { contains: search, mode: 'insensitive' as const } },
+          { qrCode: { contains: search, mode: 'insensitive' as const } },
+        ],
+      }
+    : {};
+
+  const [vehicles, total] = await Promise.all([
+    prisma.vehicle.findMany({
+      where,
+      include: { user: { select: { fullName: true, email: true, mobileNumber: true } } },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.vehicle.count({ where }),
+  ]);
+
+  res.json({ vehicles, total, page, pageSize });
+});
+
+adminRouter.delete('/vehicles/:id', async (req, res) => {
+  await prisma.vehicle.delete({ where: { id: req.params.id } });
+  res.json({ ok: true });
+});
+
+adminRouter.get('/payments', async (req, res) => {
+  const page = Math.max(1, Number(req.query.page ?? 1));
+  const pageSize = Math.min(100, Number(req.query.pageSize ?? 25));
+  const status = typeof req.query.status === 'string' ? req.query.status : undefined;
+
+  const where = status ? { status: status as never } : {};
+
+  const [payments, total, revenueAgg, refundedAgg] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      include: { user: { select: { fullName: true, email: true } } },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.order.count({ where }),
+    prisma.order.aggregate({ where: { status: 'PAID' }, _sum: { totalInPaise: true } }),
+    prisma.order.aggregate({ where: { status: 'REFUNDED' }, _sum: { totalInPaise: true } }),
+  ]);
+
+  res.json({
+    payments,
+    total,
+    page,
+    pageSize,
+    summary: {
+      totalRevenueInPaise: revenueAgg._sum.totalInPaise ?? 0,
+      totalRefundedInPaise: refundedAgg._sum.totalInPaise ?? 0,
+    },
+  });
+});
+
+adminRouter.get('/emergency-contacts', async (req, res) => {
+  const page = Math.max(1, Number(req.query.page ?? 1));
+  const pageSize = Math.min(100, Number(req.query.pageSize ?? 25));
+
+  const [contacts, total] = await Promise.all([
+    prisma.emergencyContact.findMany({
+      include: { user: { select: { fullName: true, email: true } } },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.emergencyContact.count(),
+  ]);
+
+  res.json({ contacts, total, page, pageSize });
+});
+
 adminRouter.get('/reviews', async (req, res) => {
   const page = Math.max(1, Number(req.query.page ?? 1));
   const pageSize = Math.min(100, Number(req.query.pageSize ?? 25));
@@ -199,4 +322,60 @@ adminRouter.patch('/sos-alerts/:id/status', async (req, res) => {
   });
 
   res.json({ alert });
+});
+
+function sendCsv(res: import('express').Response, filename: string, csv: string) {
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(csv);
+}
+
+adminRouter.get('/reports/users.csv', async (_req, res) => {
+  const users = await prisma.user.findMany({ where: NON_ADMIN, orderBy: { createdAt: 'desc' } });
+  const csv = toCsv(users, [
+    'id',
+    'fullName',
+    'email',
+    'emailVerified',
+    'mobileNumber',
+    'mobileVerified',
+    'isSuspended',
+    'createdAt',
+  ]);
+  sendCsv(res, 'users.csv', csv);
+});
+
+adminRouter.get('/reports/orders.csv', async (_req, res) => {
+  const orders = await prisma.order.findMany({
+    include: { user: { select: { email: true } } },
+    orderBy: { createdAt: 'desc' },
+  });
+  const rows = orders.map((o) => ({
+    id: o.id,
+    userEmail: o.user.email,
+    status: o.status,
+    totalInPaise: o.totalInPaise,
+    razorpayOrderId: o.razorpayOrderId,
+    razorpayPaymentId: o.razorpayPaymentId,
+    createdAt: o.createdAt.toISOString(),
+  }));
+  const csv = toCsv(rows, ['id', 'userEmail', 'status', 'totalInPaise', 'razorpayOrderId', 'razorpayPaymentId', 'createdAt']);
+  sendCsv(res, 'orders.csv', csv);
+});
+
+adminRouter.get('/reports/reviews.csv', async (_req, res) => {
+  const reviews = await prisma.review.findMany({
+    include: { user: { select: { email: true } } },
+    orderBy: { createdAt: 'desc' },
+  });
+  const rows = reviews.map((r) => ({
+    id: r.id,
+    userEmail: r.user.email,
+    orderId: r.orderId,
+    rating: r.rating,
+    comment: r.comment,
+    createdAt: r.createdAt.toISOString(),
+  }));
+  const csv = toCsv(rows, ['id', 'userEmail', 'orderId', 'rating', 'comment', 'createdAt']);
+  sendCsv(res, 'reviews.csv', csv);
 });

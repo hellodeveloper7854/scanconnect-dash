@@ -28,6 +28,9 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     if (!user) {
       return res.status(404).json({ error: 'No account found for this token. Complete registration first.' });
     }
+    if (user.isSuspended) {
+      return res.status(403).json({ error: 'This account has been suspended. Contact support.' });
+    }
 
     req.user = user;
     next();

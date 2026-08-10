@@ -29,6 +29,7 @@ model User {
   mobileNumber  String?  @unique
   mobileVerified Boolean @default(false)
   role          UserRole @default(USER)
+  isSuspended   Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -100,6 +101,7 @@ model Order {
   razorpayOrderId   String?     @unique
   razorpayPaymentId String?
   razorpaySignature String?
+  qrToken           String?     @unique
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
@@ -152,4 +154,153 @@ model SosAlert {
 
   @@index([userId])
   @@index([status])
+}
+
+/**
+ * The models below back the "Demo Sections" of the admin panel: full CRUD is
+ * available so admins can manage the records, but none of it drives live app
+ * behavior yet (no real QR generation, IVR provider, coupon engine, or CMS
+ * rendering) — the admin UI keeps a "Demo Data" banner on these pages.
+ */
+
+enum DemoQrStatus {
+  ACTIVE
+  DEACTIVATED
+}
+
+model DemoQrCode {
+  id              String       @id @default(uuid())
+  vehicleNickname String
+  status          DemoQrStatus @default(ACTIVE)
+  scans           Int          @default(0)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+enum DemoStickerStatus {
+  ORDERED
+  SHIPPED
+  DELIVERED
+}
+
+model DemoStickerOrder {
+  id              String            @id @default(uuid())
+  vehicleNickname String
+  status          DemoStickerStatus @default(ORDERED)
+  trackingId      String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+enum DemoIvrStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model DemoIvrNumber {
+  id            String        @id @default(uuid())
+  virtualNumber String
+  assignedTo    String?
+  status        DemoIvrStatus @default(ACTIVE)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model DemoSubscriptionPlan {
+  id            String   @id @default(uuid())
+  name          String
+  priceInPaise  Int
+  durationDays  Int
+  features      String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum DemoCouponType {
+  PERCENTAGE
+  FIXED
+}
+
+model DemoCoupon {
+  id         String         @id @default(uuid())
+  code       String         @unique
+  type       DemoCouponType
+  value      Int
+  usageLimit Int
+  usedCount  Int            @default(0)
+  expiresAt  DateTime?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+}
+
+enum DemoNotificationStatus {
+  DRAFT
+  SCHEDULED
+  SENT
+}
+
+model DemoNotificationCampaign {
+  id        String                  @id @default(uuid())
+  title     String
+  audience  String
+  status    DemoNotificationStatus  @default(DRAFT)
+  sentAt    DateTime?
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
+}
+
+model DemoCmsPage {
+  id        String   @id @default(uuid())
+  title     String
+  slug      String   @unique
+  content   String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DemoBanner {
+  id        String   @id @default(uuid())
+  title     String
+  placement String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DemoFaq {
+  id        String   @id @default(uuid())
+  category  String
+  question  String
+  answer    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DemoAuditLog {
+  id        String   @id @default(uuid())
+  actor     String
+  action    String
+  target    String
+  createdAt DateTime @default(now())
+}
+
+model DemoCallLog {
+  id        String   @id @default(uuid())
+  fromLabel String
+  toLabel   String
+  duration  Int
+  status    String
+  createdAt DateTime @default(now())
+}
+
+model DemoSystemConfig {
+  id                        String  @id @default("singleton")
+  smtpConfigured            Boolean @default(false)
+  smsGatewayConfigured      Boolean @default(false)
+  pushNotificationsConfigured Boolean @default(true)
+  paymentGatewayConfigured  Boolean @default(true)
+  cloudIvrConfigured        Boolean @default(false)
+  maintenanceMode           Boolean @default(false)
+  appVersion                String  @default("1.0.0")
+  updatedAt                 DateTime @updatedAt
 }

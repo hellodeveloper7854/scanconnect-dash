@@ -5,8 +5,27 @@ import { AdminLayout } from './AdminLayout';
 import { AdminDashboard } from './AdminDashboard';
 import { AdminOrders } from './AdminOrders';
 import { AdminUsers } from './AdminUsers';
+import { AdminVehicles } from './AdminVehicles';
+import { AdminPayments } from './AdminPayments';
+import { AdminEmergencyContacts } from './AdminEmergencyContacts';
+import { AdminReports } from './AdminReports';
 import { AdminReviews } from './AdminReviews';
 import { AdminSosAlerts } from './AdminSosAlerts';
+import {
+  AdminQrCodes,
+  AdminQrAnalytics,
+  AdminStickers,
+  AdminIvr,
+  AdminCallLogs,
+  AdminSubscriptionPlans,
+  AdminCoupons,
+  AdminNotifications,
+  AdminCms,
+  AdminBanners,
+  AdminFaqs,
+  AdminAuditLogs,
+  AdminSystemConfig,
+} from './AdminDemoSections';
 import { AdminLogin } from './AdminLogin';
 
 export const AdminApp: React.FC = () => (
@@ -18,8 +37,25 @@ export const AdminApp: React.FC = () => (
           <Route index element={<AdminDashboard />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="vehicles" element={<AdminVehicles />} />
+          <Route path="payments" element={<AdminPayments />} />
+          <Route path="emergency-contacts" element={<AdminEmergencyContacts />} />
+          <Route path="reports" element={<AdminReports />} />
           <Route path="reviews" element={<AdminReviews />} />
           <Route path="sos-alerts" element={<AdminSosAlerts />} />
+          <Route path="qr-codes" element={<AdminQrCodes />} />
+          <Route path="qr-analytics" element={<AdminQrAnalytics />} />
+          <Route path="stickers" element={<AdminStickers />} />
+          <Route path="ivr" element={<AdminIvr />} />
+          <Route path="call-logs" element={<AdminCallLogs />} />
+          <Route path="subscription-plans" element={<AdminSubscriptionPlans />} />
+          <Route path="coupons" element={<AdminCoupons />} />
+          <Route path="notifications" element={<AdminNotifications />} />
+          <Route path="cms" element={<AdminCms />} />
+          <Route path="banners" element={<AdminBanners />} />
+          <Route path="faqs" element={<AdminFaqs />} />
+          <Route path="audit-logs" element={<AdminAuditLogs />} />
+          <Route path="system-config" element={<AdminSystemConfig />} />
         </Route>
       </Routes>
     </BrowserRouter>

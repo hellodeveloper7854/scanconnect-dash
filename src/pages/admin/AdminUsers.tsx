@@ -10,6 +10,7 @@ interface UserRow {
   mobileNumber: string | null;
   mobileVerified: boolean;
   role: 'USER' | 'ADMIN';
+  isSuspended: boolean;
   createdAt: string;
 }
 
@@ -18,16 +19,23 @@ export const AdminUsers: React.FC = () => {
   const [search, setSearch] = useState('');
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const load = () => {
     const query = search ? `?search=${encodeURIComponent(search)}` : '';
-    const handle = setTimeout(() => {
-      api
-        .get<{ users: UserRow[] }>(`/api/admin/users${query}`)
-        .then((res) => setUsers(res.users))
-        .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load users'));
-    }, 300);
+    api
+      .get<{ users: UserRow[] }>(`/api/admin/users${query}`)
+      .then((res) => setUsers(res.users))
+      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load users'));
+  };
+
+  useEffect(() => {
+    const handle = setTimeout(load, 300);
     return () => clearTimeout(handle);
   }, [search]);
+
+  const toggleSuspend = async (user: UserRow) => {
+    await api.patch(`/api/admin/users/${user.id}/suspend`, { isSuspended: !user.isSuspended });
+    load();
+  };
 
   if (error) return <div className="p-8 text-rose-400">{error}</div>;
 
@@ -59,7 +67,9 @@ export const AdminUsers: React.FC = () => {
                 <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Mobile</th>
                 <th className="px-4 py-3">Role</th>
+                <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Joined</th>
+                <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody>
@@ -83,7 +93,26 @@ export const AdminUsers: React.FC = () => {
                       {u.role}
                     </span>
                   </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`text-xs font-bold uppercase px-2 py-1 rounded ${
+                        u.isSuspended ? 'text-rose-400 bg-rose-400/10' : 'text-emerald-400 bg-emerald-400/10'
+                      }`}
+                    >
+                      {u.isSuspended ? 'Suspended' : 'Active'}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-white/50 text-xs">{new Date(u.createdAt).toLocaleDateString()}</td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      onClick={() => toggleSuspend(u)}
+                      className={`text-xs font-bold hover:underline cursor-pointer ${
+                        u.isSuspended ? 'text-emerald-400' : 'text-rose-400'
+                      }`}
+                    >
+                      {u.isSuspended ? 'Reactivate' : 'Suspend'}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -16,6 +16,7 @@ import { ContactUsScreen } from './components/ContactUsScreen';
 import { ProfileScreen } from './components/ProfileScreen';
 import { QrScanScreen } from './components/QrScanScreen';
 import { MyOrdersScreen } from './components/MyOrdersScreen';
+import { OrderContactPage } from './pages/OrderContactPage';
 import { AdminApp } from './pages/admin/AdminApp';
 
 const getInitialScreenFromUrl = (): ScreenType => {
@@ -32,8 +33,15 @@ const getInitialScreenFromUrl = (): ScreenType => {
 };
 
 export default function App() {
-  if (window.location.pathname.toLowerCase().startsWith('/admin')) {
+  const path = window.location.pathname.toLowerCase();
+
+  if (path.startsWith('/admin')) {
     return <AdminApp />;
+  }
+
+  if (path.startsWith('/order-contact/')) {
+    const token = window.location.pathname.split('/').pop() ?? '';
+    return <OrderContactPage token={token} />;
   }
 
   return <MainApp />;

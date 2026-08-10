@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { QrCode } from 'lucide-react';
 import { api } from '../../lib/api';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
 interface OrderRow {
   id: string;
   status: 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED' | 'REFUNDED';
   totalInPaise: number;
   createdAt: string;
+  qrToken: string | null;
   user: { fullName: string; email: string; mobileNumber: string | null };
   items: { quantity: number; product: { name: string } }[];
 }
@@ -38,6 +42,20 @@ export const AdminOrders: React.FC = () => {
   const updateStatus = async (id: string, status: OrderRow['status']) => {
     await api.patch(`/api/admin/orders/${id}/status`, { status });
     load();
+  };
+
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [previewToken, setPreviewToken] = useState<string | null>(null);
+
+  const generateQr = async (id: string) => {
+    setGeneratingId(id);
+    try {
+      const res = await api.post<{ order: OrderRow }>(`/api/admin/orders/${id}/generate-qr`);
+      setPreviewToken(res.order.qrToken);
+      load();
+    } finally {
+      setGeneratingId(null);
+    }
   };
 
   if (error) return <div className="p-8 text-rose-400">{error}</div>;
@@ -75,6 +93,7 @@ export const AdminOrders: React.FC = () => {
                 <th className="px-4 py-3">Total</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Date</th>
+                <th className="px-4 py-3">QR</th>
               </tr>
             </thead>
             <tbody>
@@ -107,10 +126,58 @@ export const AdminOrders: React.FC = () => {
                   <td className="px-4 py-3 text-white/50 text-xs">
                     {new Date(order.createdAt).toLocaleDateString()}
                   </td>
+                  <td className="px-4 py-3">
+                    {order.qrToken ? (
+                      <button
+                        onClick={() => setPreviewToken(order.qrToken)}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:underline cursor-pointer"
+                      >
+                        <QrCode className="w-3.5 h-3.5" />
+                        View QR
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => generateQr(order.id)}
+                        disabled={generatingId === order.id}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-white/70 hover:text-white cursor-pointer disabled:opacity-50"
+                      >
+                        <QrCode className="w-3.5 h-3.5" />
+                        {generatingId === order.id ? 'Generating...' : 'Generate QR'}
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {previewToken && (
+        <div
+          className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
+          onClick={() => setPreviewToken(null)}
+        >
+          <div
+            className="bg-white rounded-xl p-6 max-w-xs w-full text-center space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-neutral-900 font-bold text-sm">Scan to view customer contact details</p>
+            <img
+              src={`${API_BASE_URL}/api/order-contact/${previewToken}/qr.png`}
+              alt="Order QR code"
+              className="w-full h-auto"
+            />
+            <p className="text-neutral-500 text-xs font-mono break-all">
+              {window.location.origin}/order-contact/{previewToken}
+            </p>
+            <button
+              onClick={() => setPreviewToken(null)}
+              className="w-full h-9 bg-neutral-900 hover:bg-neutral-800 text-white text-sm font-bold rounded-md cursor-pointer"
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
     </div>
