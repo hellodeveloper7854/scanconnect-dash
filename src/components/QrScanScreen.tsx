@@ -335,10 +335,17 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
             </div>
 
             <div className="aspect-square bg-neutral-950 rounded-2xl relative flex flex-col items-center justify-center overflow-hidden border-2 border-dashed border-[#f5b800]/50">
+              {/* Always mounted so the ref exists before getUserMedia resolves; hidden until actively scanning. */}
+              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+              <video
+                ref={videoRef}
+                muted
+                playsInline
+                className={`w-full h-full object-cover ${scannerStatus === 'scanning' ? '' : 'hidden'}`}
+              />
+
               {scannerStatus === 'scanning' && (
                 <>
-                  {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-                  <video ref={videoRef} muted playsInline className="w-full h-full object-cover" />
                   <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[#f5b800]" />
                   <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[#f5b800]" />
                   <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[#f5b800]" />
@@ -371,6 +378,14 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                   <p className="text-xs text-neutral-400">
                     This browser or device doesn&apos;t support camera access, so QR scanning isn&apos;t possible here.
                   </p>
+                </div>
+              )}
+
+              {scannerStatus === 'error' && (
+                <div className="flex flex-col items-center gap-3 text-center p-6">
+                  <CameraOff className="w-10 h-10 text-rose-400" />
+                  <p className="text-sm text-white font-bold">Something went wrong</p>
+                  <p className="text-xs text-neutral-400">Close this and try scanning again.</p>
                 </div>
               )}
             </div>

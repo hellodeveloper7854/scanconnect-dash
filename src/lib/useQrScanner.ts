@@ -47,7 +47,12 @@ export function useQrScanner(active: boolean, onDetect: (data: string) => void) 
         }
         streamRef.current = stream;
         const video = videoRef.current;
-        if (!video) return;
+        if (!video) {
+          stream.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+          setStatus('error');
+          return;
+        }
         video.srcObject = stream;
         video.play().catch(() => {});
         setStatus('scanning');
