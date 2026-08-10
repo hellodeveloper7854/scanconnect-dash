@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Phone, ArrowRight, Check, RefreshCw, Zap } from 'lucide-react';
-import { ScreenType } from '../types';
+import { Phone, ArrowRight, Check, RefreshCw } from 'lucide-react';
+import { signInWithPhoneNumber, type ConfirmationResult } from 'firebase/auth';
+import { auth, getRecaptchaVerifier } from '../lib/firebase';
+import { api, ApiError } from '../lib/api';
+import { ScreenType, UserFormData } from '../types';
 
 interface SendOtpScreenProps {
-  onVerifySuccess: () => void;
+  onVerifySuccess: (data: Partial<UserFormData>) => void;
   onNavigate: (screen: ScreenType) => void;
 }
+
+const RECAPTCHA_CONTAINER_ID = 'send-otp-recaptcha';
 
 export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, onNavigate }) => {
   const [mobileNumber, setMobileNumber] = useState('');
@@ -15,6 +20,7 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
   const [timer, setTimer] = useState(30);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -25,17 +31,26 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
     return () => clearInterval(interval);
   }, [isOtpSent, timer]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+  const sendOtp = async () => {
+    setErrorMsg('');
+    try {
+      const verifier = getRecaptchaVerifier(RECAPTCHA_CONTAINER_ID);
+      const result = await signInWithPhoneNumber(auth, mobileNumber, verifier);
+      setConfirmation(result);
       setIsOtpSent(true);
       setOtpDigits(['', '', '', '', '', '']);
       setTimer(30);
-      setErrorMsg('');
       setTimeout(() => inputRefs.current[0]?.focus(), 100);
-    }, 500);
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message.replace('Firebase: ', '') : 'Failed to send OTP.');
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    await sendOtp();
+    setIsSubmitting(false);
   };
 
   const handleOtpChange = (index: number, value: string) => {
@@ -56,23 +71,38 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
     }
   };
 
-  const handleAutofillDemo = () => {
-    setOtpDigits(['4', '8', '2', '9', '1', '0']);
-    setErrorMsg('');
-    inputRefs.current[5]?.focus();
-  };
-
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const code = otpDigits.join('');
     if (code.length < 6) {
       setErrorMsg('Please enter all 6 digits of the OTP code.');
       return;
     }
+    if (!confirmation) {
+      setErrorMsg('OTP session expired. Please resend the code.');
+      return;
+    }
+
     setIsVerifying(true);
-    setTimeout(() => {
+    setErrorMsg('');
+    try {
+      const credential = await confirmation.confirm(code);
+      const idToken = await credential.user.getIdToken();
+      const { user } = await api.post<{ user: { fullName: string; email: string; mobileNumber: string | null } }>(
+        '/api/auth/session',
+        { idToken },
+      );
+      onVerifySuccess({ email: user.email, fullName: user.fullName, mobileNumber: user.mobileNumber ?? '' });
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setErrorMsg(err.message);
+      } else if (err instanceof Error) {
+        setErrorMsg(err.message.replace('Firebase: ', ''));
+      } else {
+        setErrorMsg('Verification failed. Please try again.');
+      }
+    } finally {
       setIsVerifying(false);
-      onVerifySuccess();
-    }, 800);
+    }
   };
 
   return (
@@ -219,14 +249,6 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
                         />
                       ))}
                     </div>
-                    <button
-                      type="button"
-                      onClick={handleAutofillDemo}
-                      className="text-[10px] font-bold text-[#F2BA03] hover:underline cursor-pointer inline-flex items-center gap-1"
-                    >
-                      <Zap className="w-3 h-3" />
-                      Click here to auto-fill demo OTP: 482910
-                    </button>
                   </div>
 
                   {errorMsg && (
@@ -260,10 +282,7 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
                     ) : (
                       <button
                         type="button"
-                        onClick={() => {
-                          setTimer(30);
-                          alert('A new OTP has been sent via SMS.');
-                        }}
+                        onClick={sendOtp}
                         className="flex items-center gap-1 text-[#F2BA03] font-bold hover:underline cursor-pointer"
                       >
                         <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
@@ -272,6 +291,8 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
                   </div>
                 </div>
               )}
+
+              <div id={RECAPTCHA_CONTAINER_ID} />
 
               {/* Contact Support */}
               <div className="text-center text-sm text-white/50 font-normal">

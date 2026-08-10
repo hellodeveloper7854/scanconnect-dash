@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Shield, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, Shield, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../lib/firebase';
+import { api, ApiError } from '../lib/api';
 import { ScreenType, UserFormData } from '../types';
 
 interface LoginScreenProps {
@@ -10,16 +13,53 @@ interface LoginScreenProps {
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSuccess }) => {
   const [vehicleEmail, setVehicleEmail] = useState('');
   const [accessKey, setAccessKey] = useState('');
+  const [showAccessKey, setShowAccessKey] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg('');
     setIsSubmitting(true);
-    setTimeout(() => {
+
+    try {
+      const credential = await signInWithEmailAndPassword(auth, vehicleEmail, accessKey);
+      const idToken = await credential.user.getIdToken();
+      const { user } = await api.post<{ user: { fullName: string; email: string; mobileNumber: string | null } }>(
+        '/api/auth/session',
+        { idToken },
+      );
+      onSubmitSuccess({
+        email: user.email,
+        fullName: user.fullName,
+        mobileNumber: user.mobileNumber ?? '',
+        rememberMe,
+      });
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setErrorMsg(err.message);
+      } else if (err instanceof Error) {
+        setErrorMsg(err.message.replace('Firebase: ', ''));
+      } else {
+        setErrorMsg('Login failed. Please try again.');
+      }
+    } finally {
       setIsSubmitting(false);
-      onSubmitSuccess({ email: vehicleEmail, accessKey, rememberMe });
-    }, 600);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!vehicleEmail) {
+      setErrorMsg('Enter your email above first, then tap "Forgot key?".');
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, vehicleEmail);
+      alert('Password reset instructions sent to your registered email.');
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message.replace('Firebase: ', '') : 'Could not send reset email.');
+    }
   };
 
   return (
@@ -120,13 +160,21 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
                     <Lock className="w-5 h-5" />
                   </div>
                   <input
-                    type="password"
+                    type={showAccessKey ? 'text' : 'password'}
                     required
                     value={accessKey}
                     onChange={(e) => setAccessKey(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full h-[59px] pl-12 pr-4 bg-white/90 text-[#1B1C1C] font-normal placeholder-[#6B7280] rounded-none text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] transition-all"
+                    className="w-full h-[59px] pl-12 pr-12 bg-white/90 text-[#1B1C1C] font-normal placeholder-[#6B7280] rounded-none text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] transition-all"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowAccessKey((prev) => !prev)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#5E5E5E] hover:text-[#1B1C1C] cursor-pointer"
+                    aria-label={showAccessKey ? 'Hide access key' : 'Show access key'}
+                  >
+                    {showAccessKey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
               </div>
 
@@ -143,12 +191,16 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
                 </label>
                 <button
                   type="button"
-                  onClick={() => alert('Password reset instructions sent to your registered email.')}
+                  onClick={handleForgotPassword}
                   className="text-[#F2BA03] font-bold hover:underline tracking-[0.6px] text-xs uppercase cursor-pointer"
                 >
                   FORGOT KEY?
                 </button>
               </div>
+
+              {errorMsg && (
+                <p className="text-xs font-semibold text-rose-400">{errorMsg}</p>
+              )}
 
               {/* Login Button */}
               <button

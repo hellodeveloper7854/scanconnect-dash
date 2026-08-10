@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
 import { ScreenType, UserFormData } from './types';
+import { auth } from './lib/firebase';
+import { api, ApiError } from './lib/api';
 import { BackgroundCockpit } from './components/BackgroundCockpit';
 import { RegistrationScreen } from './components/RegistrationScreen';
 import { LoginScreen } from './components/LoginScreen';
@@ -12,6 +15,7 @@ import { ShopScreen } from './components/ShopScreen';
 import { ContactUsScreen } from './components/ContactUsScreen';
 import { ProfileScreen } from './components/ProfileScreen';
 import { QrScanScreen } from './components/QrScanScreen';
+import { AdminApp } from './pages/admin/AdminApp';
 
 const getInitialScreenFromUrl = (): ScreenType => {
   const path = window.location.pathname.replace(/^\//, '').toLowerCase();
@@ -26,8 +30,17 @@ const getInitialScreenFromUrl = (): ScreenType => {
 };
 
 export default function App() {
+  if (window.location.pathname.toLowerCase().startsWith('/admin')) {
+    return <AdminApp />;
+  }
+
+  return <MainApp />;
+}
+
+function MainApp() {
   const [activeScreen, setActiveScreen] = useState<ScreenType>(getInitialScreenFromUrl);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const [otpMobileNumber, setOtpMobileNumber] = useState('+91 98765 43210');
   const [userData, setUserData] = useState<UserFormData>({
@@ -35,6 +48,50 @@ export default function App() {
     mobileNumber: '',
     email: '',
   });
+
+  // Restore session from Firebase's persisted auth state on page load,
+  // so a reload doesn't silently drop the user back to a logged-out view.
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        setIsLoggedIn(false);
+        setIsSessionLoading(false);
+        return;
+      }
+
+      try {
+        const idToken = await firebaseUser.getIdToken();
+        const { user } = await api.post<{ user: { fullName: string; email: string; mobileNumber: string | null } }>(
+          '/api/auth/session',
+          { idToken },
+        );
+        setUserData((prev) => ({
+          ...prev,
+          fullName: user.fullName,
+          email: user.email,
+          mobileNumber: user.mobileNumber ?? '',
+        }));
+        setIsLoggedIn(true);
+
+        // If a logged-in user reloads while sitting on an auth screen (e.g. they
+        // bookmarked /login), send them to their profile instead of re-showing it.
+        const authOnlyScreens: ScreenType[] = ['login', 'login-options', 'register', 'send-otp'];
+        if (authOnlyScreens.includes(getInitialScreenFromUrl())) {
+          setActiveScreen('profile');
+          if (window.location.pathname !== '/profile') {
+            window.history.replaceState(null, '', '/profile');
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        setIsLoggedIn(false);
+      } finally {
+        setIsSessionLoading(false);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   // Sync state with popstate browser back/forward buttons
   useEffect(() => {
@@ -103,11 +160,13 @@ export default function App() {
   };
 
   const handleLogout = () => {
+    auth.signOut();
     setIsLoggedIn(false);
     setActiveScreen('dashboard');
   };
 
-  const handleOtpVerifiedSuccess = () => {
+  const handleOtpVerifiedSuccess = (data?: Partial<UserFormData>) => {
+    if (data) setUserData((prev) => ({ ...prev, ...data }));
     setIsOtpModalOpen(false);
     setIsLoggedIn(true);
     setActiveScreen('profile');
@@ -122,6 +181,15 @@ export default function App() {
     }
     window.scrollTo(0, 0);
   };
+
+  const authOnlyScreens: ScreenType[] = ['login', 'login-options', 'register', 'send-otp'];
+  if (isSessionLoading && (activeScreen === 'profile' || authOnlyScreens.includes(activeScreen))) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-white">
+        Loading...
+      </div>
+    );
+  }
 
   if (activeScreen === 'dashboard') {
     return (

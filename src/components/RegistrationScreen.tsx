@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { User, Phone, Mail, ArrowRight } from 'lucide-react';
+import { User, Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../lib/firebase';
+import { api, ApiError } from '../lib/api';
 import { ScreenType, UserFormData } from '../types';
 
 interface RegistrationScreenProps {
@@ -8,20 +11,43 @@ interface RegistrationScreenProps {
 }
 
 export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNavigate, onSubmitSuccess }) => {
-  const [formData, setFormData] = useState<UserFormData>({
+  const [formData, setFormData] = useState<UserFormData & { password: string }>({
     fullName: '',
     mobileNumber: '',
     email: '',
+    password: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg('');
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+
+    try {
+      const credential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const idToken = await credential.user.getIdToken();
+
+      await api.post('/api/auth/register', {
+        idToken,
+        fullName: formData.fullName,
+        email: formData.email,
+      });
+
       onSubmitSuccess(formData);
-    }, 600);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setErrorMsg(err.message);
+      } else if (err instanceof Error) {
+        setErrorMsg(err.message.replace('Firebase: ', ''));
+      } else {
+        setErrorMsg('Registration failed. Please try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -123,26 +149,6 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNaviga
                 </div>
               </div>
 
-              {/* Mobile Number */}
-              <div className="space-y-2">
-                <label className="block text-[10px] font-medium tracking-[1px] text-white uppercase">
-                  MOBILE NUMBER
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#6B7280]">
-                    <Phone className="w-5 h-5" />
-                  </div>
-                  <input
-                    type="tel"
-                    required
-                    value={formData.mobileNumber}
-                    onChange={(e) => setFormData({ ...formData, mobileNumber: e.target.value })}
-                    placeholder="+91 98765 43210"
-                    className="w-full h-[59px] pl-12 pr-4 bg-white/90 text-[#6B7280] font-normal rounded-none text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] transition-all"
-                  />
-                </div>
-              </div>
-
               {/* Email Address */}
               <div className="space-y-2">
                 <label className="block text-[10px] font-medium tracking-[1px] text-white uppercase">
@@ -162,6 +168,43 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNaviga
                   />
                 </div>
               </div>
+
+              {/* Password */}
+              <div className="space-y-2">
+                <label className="block text-[10px] font-medium tracking-[1px] text-white uppercase">
+                  PASSWORD
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#6B7280]">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    placeholder="At least 6 characters"
+                    className="w-full h-[59px] pl-12 pr-12 bg-white/90 text-[#6B7280] font-normal rounded-none text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#6B7280] hover:text-white cursor-pointer"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-[10px] font-normal text-white/40 uppercase -mt-2">
+                YOU&apos;LL LINK YOUR MOBILE NUMBER VIA OTP RIGHT AFTER THIS STEP
+              </p>
+
+              {errorMsg && (
+                <p className="text-xs font-semibold text-rose-400">{errorMsg}</p>
+              )}
 
               {/* Submit Button */}
               <button

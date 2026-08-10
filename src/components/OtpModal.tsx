@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ShieldCheck, X, Check, RefreshCw, Smartphone, Zap } from 'lucide-react';
+import { X, Check, RefreshCw, Smartphone, Phone, ArrowRight } from 'lucide-react';
+import {
+  PhoneAuthProvider,
+  linkWithCredential,
+  signInWithPhoneNumber,
+  type ConfirmationResult,
+} from 'firebase/auth';
+import { auth, getRecaptchaVerifier } from '../lib/firebase';
+import { api, ApiError } from '../lib/api';
 
 interface OtpModalProps {
   isOpen: boolean;
@@ -8,37 +16,56 @@ interface OtpModalProps {
   onVerifySuccess: () => void;
 }
 
-export const OtpModal: React.FC<OtpModalProps> = ({
-  isOpen,
-  mobileNumber,
-  onClose,
-  onVerifySuccess,
-}) => {
+const RECAPTCHA_CONTAINER_ID = 'otp-modal-recaptcha';
+
+export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuccess }) => {
+  const [phone, setPhone] = useState('');
   const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(30);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
     if (!isOpen) return;
+    setPhone('');
     setOtpDigits(['', '', '', '', '', '']);
-    setTimer(30);
     setErrorMsg('');
-    setTimeout(() => {
-      inputRefs.current[0]?.focus();
-    }, 100);
+    setConfirmation(null);
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen || timer <= 0) return;
+    if (!confirmation || timer <= 0) return;
     const interval = setInterval(() => {
       setTimer((prev) => prev - 1);
     }, 1000);
     return () => clearInterval(interval);
-  }, [isOpen, timer]);
+  }, [confirmation, timer]);
 
   if (!isOpen) return null;
+
+  const sendOtp = async () => {
+    if (!phone.trim()) {
+      setErrorMsg('Please enter your mobile number.');
+      return;
+    }
+    setIsSending(true);
+    setErrorMsg('');
+    try {
+      const verifier = getRecaptchaVerifier(RECAPTCHA_CONTAINER_ID);
+      const result = await signInWithPhoneNumber(auth, phone.trim(), verifier);
+      setConfirmation(result);
+      setOtpDigits(['', '', '', '', '', '']);
+      setTimer(30);
+      setTimeout(() => inputRefs.current[0]?.focus(), 100);
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message.replace('Firebase: ', '') : 'Failed to send OTP.');
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -47,7 +74,6 @@ export const OtpModal: React.FC<OtpModalProps> = ({
     setOtpDigits(newDigits);
     setErrorMsg('');
 
-    // Auto move to next input
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -59,29 +85,48 @@ export const OtpModal: React.FC<OtpModalProps> = ({
     }
   };
 
-  const handleAutofillDemo = () => {
-    setOtpDigits(['4', '8', '2', '9', '1', '0']);
-    setErrorMsg('');
-    inputRefs.current[5]?.focus();
-  };
-
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const code = otpDigits.join('');
     if (code.length < 6) {
       setErrorMsg('Please enter all 6 digits of the OTP code.');
       return;
     }
+    if (!confirmation) {
+      setErrorMsg('OTP session expired. Please resend the code.');
+      return;
+    }
+
     setIsVerifying(true);
-    setTimeout(() => {
-      setIsVerifying(false);
+    setErrorMsg('');
+    try {
+      const phoneCredential = PhoneAuthProvider.credential(confirmation.verificationId, code);
+
+      if (auth.currentUser) {
+        // Already signed in (post-registration): link the phone number to the
+        // same Firebase account that owns the email, so both resolve to one user.
+        await linkWithCredential(auth.currentUser, phoneCredential);
+        const idToken = await auth.currentUser.getIdToken(true);
+        await api.post('/api/auth/link-mobile', { idToken });
+      }
+
       onVerifySuccess();
-    }, 800);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setErrorMsg(err.message);
+      } else if (err instanceof Error) {
+        setErrorMsg(err.message.replace('Firebase: ', ''));
+      } else {
+        setErrorMsg('Verification failed. Please try again.');
+      }
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
       <div className="relative w-full max-w-md bg-neutral-900/90 border border-white/15 rounded-2xl p-6 sm:p-8 shadow-2xl overflow-hidden text-white">
-        
+
         {/* Top Glow Accent */}
         <div className="absolute top-0 inset-x-0 h-1 bg-amber-400 shadow-[0_0_10px_#f5b800]" />
 
@@ -93,92 +138,122 @@ export const OtpModal: React.FC<OtpModalProps> = ({
           <X className="w-5 h-5" />
         </button>
 
-        {/* Modal Header */}
-        <div className="text-center space-y-2 mb-6 pt-2">
-          <div className="mx-auto w-12 h-12 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-2">
-            <Smartphone className="w-6 h-6" />
-          </div>
-          <h3 className="text-2xl font-black text-white tracking-tight uppercase">
-            ENTER OTP CODE
-          </h3>
-          <p className="text-neutral-400 text-xs">
-            We sent a 6-digit verification code to{' '}
-            <span className="text-amber-400 font-mono font-bold">{mobileNumber || '+91 98765 43210'}</span>
-          </p>
-        </div>
+        {!confirmation ? (
+          <>
+            {/* Modal Header - collect mobile number */}
+            <div className="text-center space-y-2 mb-6 pt-2">
+              <div className="mx-auto w-12 h-12 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-2">
+                <Phone className="w-6 h-6" />
+              </div>
+              <h3 className="text-2xl font-black text-white tracking-tight uppercase">Link Your Mobile</h3>
+              <p className="text-neutral-400 text-xs">
+                Enter your mobile number to link it to your account via OTP.
+              </p>
+            </div>
 
-        {/* OTP Input Fields */}
-        <div className="space-y-6">
-          <div className="flex justify-between gap-2 sm:gap-3">
-            {otpDigits.map((digit, index) => (
+            <div className="space-y-4">
               <input
-                key={index}
-                type="text"
-                maxLength={1}
-                value={digit}
-                ref={(el) => (inputRefs.current[index] = el)}
-                onChange={(e) => handleChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                className="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold font-mono bg-neutral-200 text-neutral-950 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+91 98765 43210"
+                className="w-full h-14 px-4 text-center text-base font-bold bg-neutral-200 text-neutral-950 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all"
               />
-            ))}
-          </div>
 
-          {/* Quick Autofill Helper */}
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={handleAutofillDemo}
-              className="text-[11px] font-bold text-amber-400 hover:underline underline-offset-4 cursor-pointer font-mono inline-flex items-center gap-1"
-            >
-              <Zap className="w-3 h-3" />
-              Click here to auto-fill demo OTP: 482910
-            </button>
-          </div>
+              <div id={RECAPTCHA_CONTAINER_ID} />
 
-          {errorMsg && (
-            <p className="text-xs font-semibold text-rose-400 text-center">
-              {errorMsg}
-            </p>
-          )}
+              {errorMsg && <p className="text-xs font-semibold text-rose-400 text-center">{errorMsg}</p>}
 
-          {/* Verify Button */}
-          <button
-            onClick={handleVerify}
-            disabled={isVerifying}
-            className="w-full py-3.5 px-4 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs sm:text-sm uppercase tracking-widest rounded-lg shadow-lg shadow-amber-400/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
-          >
-            {isVerifying ? (
-              <span>VERIFYING CODE...</span>
-            ) : (
-              <>
-                <Check className="w-4 h-4 stroke-[3]" />
-                <span>VERIFY & PROCEED</span>
-              </>
-            )}
-          </button>
-
-          {/* Resend Timer */}
-          <div className="flex items-center justify-between text-xs text-neutral-400 pt-3 border-t border-white/10">
-            <span>Didn&apos;t receive code?</span>
-            {timer > 0 ? (
-              <span className="font-mono text-amber-400 font-bold">
-                Resend in {timer}s
-              </span>
-            ) : (
               <button
-                onClick={() => {
-                  setTimer(30);
-                  alert('A new OTP has been sent via SMS.');
-                }}
-                className="flex items-center gap-1 text-amber-400 font-bold hover:underline cursor-pointer"
+                onClick={sendOtp}
+                disabled={isSending}
+                className="w-full py-3.5 px-4 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs sm:text-sm uppercase tracking-widest rounded-lg shadow-lg shadow-amber-400/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
-                <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
+                {isSending ? (
+                  <span>SENDING CODE...</span>
+                ) : (
+                  <>
+                    <span>SEND OTP</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
-            )}
-          </div>
-        </div>
 
+              <button
+                onClick={onClose}
+                className="w-full text-center text-xs text-neutral-400 hover:text-white cursor-pointer"
+              >
+                Skip for now
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Modal Header - verify OTP */}
+            <div className="text-center space-y-2 mb-6 pt-2">
+              <div className="mx-auto w-12 h-12 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-2">
+                <Smartphone className="w-6 h-6" />
+              </div>
+              <h3 className="text-2xl font-black text-white tracking-tight uppercase">ENTER OTP CODE</h3>
+              <p className="text-neutral-400 text-xs">
+                We sent a 6-digit verification code to{' '}
+                <span className="text-amber-400 font-mono font-bold">{phone}</span>
+              </p>
+            </div>
+
+            {/* OTP Input Fields */}
+            <div className="space-y-6">
+              <div className="flex justify-between gap-2 sm:gap-3">
+                {otpDigits.map((digit, index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    maxLength={1}
+                    value={digit}
+                    ref={(el) => (inputRefs.current[index] = el)}
+                    onChange={(e) => handleChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    className="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold font-mono bg-neutral-200 text-neutral-950 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all"
+                  />
+                ))}
+              </div>
+
+              {errorMsg && <p className="text-xs font-semibold text-rose-400 text-center">{errorMsg}</p>}
+
+              {/* Verify Button */}
+              <button
+                onClick={handleVerify}
+                disabled={isVerifying}
+                className="w-full py-3.5 px-4 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs sm:text-sm uppercase tracking-widest rounded-lg shadow-lg shadow-amber-400/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isVerifying ? (
+                  <span>VERIFYING CODE...</span>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4 stroke-[3]" />
+                    <span>VERIFY & PROCEED</span>
+                  </>
+                )}
+              </button>
+
+              {/* Resend Timer */}
+              <div className="flex items-center justify-between text-xs text-neutral-400 pt-3 border-t border-white/10">
+                <span>Didn&apos;t receive code?</span>
+                {timer > 0 ? (
+                  <span className="font-mono text-amber-400 font-bold">Resend in {timer}s</span>
+                ) : (
+                  <button
+                    onClick={sendOtp}
+                    disabled={isSending}
+                    className="flex items-center gap-1 text-amber-400 font-bold hover:underline cursor-pointer"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
+                  </button>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

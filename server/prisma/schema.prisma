@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+model User {
+  id            String   @id @default(uuid())
+  firebaseUid   String   @unique
+  fullName      String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  mobileNumber  String?  @unique
+  mobileVerified Boolean @default(false)
+  role          UserRole @default(USER)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  vehicles          Vehicle[]
+  orders            Order[]
+  emergencyContacts EmergencyContact[]
+  preferences       UserPreferences?
+
+  @@index([email])
+  @@index([mobileNumber])
+}
+
+model UserPreferences {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  systemLanguage    String   @default("English (United Kingdom)")
+  emailDigests      Boolean  @default(true)
+  smsCriticalAlerts Boolean  @default(true)
+  inAppPush         Boolean  @default(false)
+  timeFormat        String   @default("24")
+  updatedAt         DateTime @updatedAt
+}
+
+model EmergencyContact {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  role      String?
+  phone     String
+  email     String?
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Vehicle {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  registration String
+  qrCode       String   @unique
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  priceInPaise Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  orderItems OrderItem[]
+}
+
+model Order {
+  id                String      @id @default(uuid())
+  userId            String
+  user              User        @relation(fields: [userId], references: [id])
+  status            OrderStatus @default(PENDING)
+  totalInPaise      Int
+  razorpayOrderId   String?     @unique
+  razorpayPaymentId String?
+  razorpaySignature String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  items OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  priceInPaise Int
+
+  @@index([orderId])
+}
