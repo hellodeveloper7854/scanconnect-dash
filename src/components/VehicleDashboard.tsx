@@ -253,7 +253,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <button
-                  onClick={() => onNavigate && onNavigate('shop')}
+                  onClick={() => { window.location.href = '/shop#products'; }}
                   className="h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
                 >
                   <span>Buy Now</span>
@@ -767,7 +767,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <button
-                onClick={() => onNavigate && onNavigate('shop')}
+                onClick={() => { window.location.href = '/shop#products'; }}
                 className="h-[56px] px-9 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
               >
                 <span>Buy Now</span>
