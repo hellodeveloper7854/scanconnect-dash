@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
+import qrImage from '../assets/images/qrimage.png';
 import {
   ShieldCheck,
   Lock,
   Check,
-  QrCode,
   CreditCard,
   Building,
   Smartphone,
@@ -16,7 +16,7 @@ import {
   ArrowLeft,
   LayoutDashboard,
   ShoppingBag,
-  MapPin,
+  Radio,
   Truck
 } from 'lucide-react';
 
@@ -192,7 +192,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 
                 {/* Heading 2 */}
                 <div className="flex items-center justify-between">
-                  <h2 className="font-['Rubik'] font-medium text-[20px] sm:text-[22px] leading-[28px] text-[#1B1C1C]">
+                  <h2 className="font-['Rubik'] font-bold text-[26px] sm:text-[30px] leading-[36px] text-[#1B1C1C]">
                     Shipping Information
                   </h2>
                   {onBackToProduct && (
@@ -296,17 +296,15 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               <div className="lg:col-span-5 bg-[#FFFFFF] border border-[#CCC7AA] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] rounded-[12px] p-[31px_32px_32px] flex flex-col gap-[24px]">
                 
                 {/* Heading 3 */}
-                <h3 className="font-['Rubik'] font-medium text-[18px] sm:text-[20px] leading-[26px] text-[#1B1C1C]">
+                <h3 className="font-['Rubik'] font-bold text-[26px] sm:text-[30px] leading-[36px] text-[#1B1C1C]">
                   Order Summary
                 </h3>
 
                 {/* Item Card Container */}
                 <div className="flex flex-row items-center gap-[16px] w-full">
                   {/* Thumbnail */}
-                  <div className="w-[80px] h-[80px] bg-[#EFEDED] border border-[#CCC7AA] rounded-[8px] flex items-center justify-center shrink-0 p-2">
-                    <div className="w-12 h-12 bg-[#0F0F0F] rounded-lg p-1.5 flex items-center justify-center">
-                      <QrCode className="w-full h-full text-[#F2BA03]" />
-                    </div>
+                  <div className="w-[80px] h-[80px] bg-[#F5F3F3] rounded-[8px] overflow-hidden shrink-0">
+                    <img src={qrImage} alt={productTitle} className="w-full h-full object-cover" />
                   </div>
 
                   {/* Title & Price Details */}
@@ -315,7 +313,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       {productTitle}
                     </h4>
                     <p className="font-['Hanken_Grotesk'] font-normal text-[14px] leading-[20px] text-[#5F5E5E]">
-                      Premium Protection Tag x1
+                      Premium Protection Plan x1
                     </p>
                     <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#F2BA03] block">
                       {productPrice}
@@ -397,7 +395,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
         {step === 2 && (
           <div className="space-y-8 animate-fade-in">
             <div className="space-y-1">
-              <h2 className="font-['Plus_Jakarta_Sans'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
+              <h2 className="font-['Plus_Jakarta_Sans'] font-normal text-[24px] sm:text-[28px] leading-[32px] text-[#1B1C1C]">
                 Choose Payment Method
               </h2>
               <p className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
@@ -426,7 +424,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       <div className="w-[40px] h-[40px] rounded-full bg-[#F2BA03] flex items-center justify-center shrink-0">
                         <CreditCard className="w-[20px] h-[16px] text-[#FFFFFF]" />
                       </div>
-                      <span className="font-['Rubik'] font-medium text-[20px] leading-[24px] text-[#1B1C1C]">
+                      <span className="font-['Rubik'] font-bold text-[20px] leading-[24px] text-[#1B1C1C]">
                         Credit / Debit Card
                       </span>
                     </div>
@@ -448,7 +446,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       <div className="md:col-span-5 bg-gradient-to-br from-[#303031] to-[#1E1E1E] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] text-white rounded-[16px] p-[24px] flex flex-col justify-between aspect-[1.51] relative overflow-hidden">
                         <div className="flex items-center justify-between">
                           <span className="font-['Hanken_Grotesk'] font-normal text-[10px] leading-[15px] text-white opacity-70 uppercase">
-                            SCAN CONNECT KEY
+                            DIGITAL ASSET KEY
                           </span>
                           <div className="w-5 h-5 opacity-50 flex items-center justify-center text-[10px]">
                             📶
@@ -624,7 +622,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               <div className="lg:col-span-5 bg-[#FFFFFF] border border-[#CCC7AA] shadow-[0px_4px_20px_-2px_rgba(0,0,0,0.05)] rounded-[16px] p-[33px] flex flex-col gap-[24px] relative">
                 
                 {/* Heading 2 */}
-                <h3 className="font-['Rubik'] font-medium text-[16px] leading-[24px] text-[#1B1C1C]">
+                <h3 className="font-['Rubik'] font-bold text-[26px] sm:text-[28px] leading-[36px] text-[#1B1C1C]">
                   Payment Summary
                 </h3>
 
@@ -731,8 +729,8 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               {/* Product item row */}
               <div className="flex flex-row items-center gap-[24px] pb-[24px] border-b border-[#EFEDED]">
                 {/* Thumbnail Background */}
-                <div className="w-[80px] h-[80px] bg-[#F5F3F3] rounded-[8px] flex items-center justify-center p-[8px] shrink-0">
-                  <QrCode className="w-[48px] h-[48px] text-[#1B1C1C]" />
+                <div className="w-[80px] h-[80px] bg-[#F5F3F3] rounded-[8px] overflow-hidden shrink-0">
+                  <img src={qrImage} alt={productTitle} className="w-full h-full object-cover" />
                 </div>
 
                 {/* Details Container */}
@@ -758,7 +756,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                   <span className="text-[#5F5E5E]">{productPrice}</span>
                 </div>
                 <div className="flex justify-between text-[#5F5E5E]">
-                  <span>Shipping</span>
+                  <span>Standard Shipping</span>
                   <span className="font-bold text-[#D7CA00]">FREE</span>
                 </div>
                 <div className="flex justify-between text-[#1B1C1C] pt-[8px] border-t border-[#EFEDED] font-bold text-[18px] leading-[28px]">
@@ -767,15 +765,15 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 </div>
               </div>
 
-              {/* Delivery Address Container */}
+              {/* Estimated Delivery Container */}
               <div className="bg-[#F5F3F3] rounded-[8px] p-[16px] flex items-center gap-[16px]">
-                <MapPin className="w-[22px] h-[20px] text-[#676000] shrink-0" />
+                <Truck className="w-[22px] h-[20px] text-[#676000] shrink-0" />
                 <div className="space-y-[2px]">
                   <span className="font-['Hanken_Grotesk'] font-bold text-[14px] leading-[20px] text-[#1B1C1C] block">
-                    Delivery Address
+                    Estimated Delivery
                   </span>
                   <p className="font-['Hanken_Grotesk'] font-normal text-[14px] leading-[20px] text-[#5F5E5E]">
-                    {address || userData.address || 'House No 123, Street Name, Mumbai 400001'}
+                    Tuesday, Oct 24th &mdash; Thursday, Oct 26th
                   </p>
                 </div>
               </div>
@@ -790,7 +788,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
 
               {/* Heading & Subtitle */}
               <div className="space-y-[8px]">
-                <h2 className="font-['Plus_Jakarta_Sans'] font-semibold text-[18px] sm:text-[20px] leading-[26px] text-[#1B1C1C]">
+                <h2 className="font-['Plus_Jakarta_Sans'] font-bold text-[24px] sm:text-[28px] leading-[34px] text-[#1B1C1C]">
                   How was your experience?
                 </h2>
                 <p className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
@@ -843,7 +841,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     onClick={() => setReviewSubmitted(true)}
                     className="w-full sm:w-[170px] h-[48px] bg-[#1B1C1C] hover:bg-neutral-800 text-white font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] rounded-[8px] transition-colors cursor-pointer active:scale-95 flex items-center justify-center"
                   >
-                    Submit Feedback
+                    Submit Review
                   </button>
                 </div>
               ) : (
@@ -880,19 +878,19 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 <div className="flex flex-col items-center gap-[4px]">
                   <Lock className="w-[20px] h-[26px] text-[#1B1C1C]" />
                   <span className="font-['Hanken_Grotesk'] font-bold text-[10px] leading-[15px] tracking-[1px] text-[#1B1C1C] uppercase">
-                    SSL SECURED
+                    256-BIT SSL
                   </span>
                 </div>
                 <div className="flex flex-col items-center gap-[4px]">
-                  <Truck className="w-[25px] h-[25px] text-[#1B1C1C]" />
+                  <Radio className="w-[25px] h-[25px] text-[#1B1C1C]" />
                   <span className="font-['Hanken_Grotesk'] font-bold text-[10px] leading-[15px] tracking-[1px] text-[#1B1C1C] uppercase">
-                    EXPRESS SHIPPING
+                    PCI COMPLIANT
                   </span>
                 </div>
                 <div className="flex flex-col items-center gap-[4px]">
                   <ShieldCheck className="w-[27px] h-[26px] text-[#1B1C1C]" />
                   <span className="font-['Hanken_Grotesk'] font-bold text-[10px] leading-[15px] tracking-[1px] text-[#1B1C1C] uppercase">
-                    24/7 SUPPORT
+                    SECURE CHECKOUT
                   </span>
                 </div>
               </div>
