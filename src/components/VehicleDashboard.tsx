@@ -10,99 +10,27 @@ import {
   Play,
   ChevronLeft,
   ChevronRight,
-  Fuel,
-  Shield,
-  Hospital,
-  Wrench,
-  Zap,
-  FileText,
-  Car,
-  CreditCard,
   X,
   QrCode,
-  Smartphone,
   CheckCircle,
   Scan,
   PhoneCall,
   MessageCircle,
   Sparkles
 } from 'lucide-react';
-
-// Custom Yellow Line Art Icons for Vehicle Services matching Image 2
-const FuelStationIcon = () => (
-  <svg className="w-12 h-12 text-[#F2BA03]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 22V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v17" />
-    <path d="M13 11h2a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9l-3-3" />
-    <path d="M7 10h2" />
-    <circle cx="8" cy="6" r="1" fill="currentColor" />
-  </svg>
-);
-
-const PoliceStationIcon = () => (
-  <svg className="w-12 h-12 text-[#F2BA03]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 21h18" />
-    <path d="M5 21V10l7-5 7 5v11" />
-    <path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4" />
-    <path d="M12 7.5l1 2h2l-1.5 1.5.5 2-2-1.2-2 1.2.5-2L9 9.5h2z" fill="currentColor" />
-  </svg>
-);
-
-const HospitalCareIcon = () => (
-  <svg className="w-12 h-12 text-[#F2BA03]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 21h18" />
-    <path d="M5 21V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v14" />
-    <path d="M10 12h4" />
-    <path d="M12 10v4" />
-    <path d="M9 21v-3h6v3" />
-  </svg>
-);
-
-const PunctureShopIcon = () => (
-  <svg className="w-12 h-12 text-[#F2BA03]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="9" />
-    <circle cx="12" cy="12" r="4" />
-    <circle cx="12" cy="12" r="1.2" fill="currentColor" />
-    <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4" />
-  </svg>
-);
-
-const FastagIcon = () => (
-  <svg className="w-14 h-12 text-[#F2BA03]" viewBox="0 0 32 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 4a6 6 0 0 1 6 6" />
-    <path d="M20 8a3 3 0 0 1 3 3" />
-    <text x="1" y="20" fontSize="18" fontWeight="900" fill="currentColor" fontFamily="sans-serif">FT</text>
-  </svg>
-);
-
-const TrafficChallanIcon = () => (
-  <svg className="w-12 h-12 text-[#F2BA03]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
-    <path d="M18 12v9" />
-    <path d="M15 15h6" />
-    <path d="M3 17h8l1-3H5l-1 3z" />
-    <path d="M4 17v3h2v-3M9 17v3h2v-3" />
-    <circle cx="5" cy="19" r="1" fill="currentColor" />
-    <circle cx="10" cy="19" r="1" fill="currentColor" />
-  </svg>
-);
-
-const VehicleDetailsIcon = () => (
-  <svg className="w-12 h-12 text-[#F2BA03]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 12h14l-1.5-4.5a2 2 0 0 0-1.9-1.5H8.4a2 2 0 0 0-1.9 1.5L5 12z" />
-    <rect x="3" y="12" width="18" height="6" rx="2" />
-    <circle cx="7" cy="15" r="1" fill="currentColor" />
-    <circle cx="17" cy="15" r="1" fill="currentColor" />
-    <path d="M12 2a4 4 0 0 1 4 4c0 3-4 6-4 6s-4-3-4-6a4 4 0 0 1 4-4z" />
-  </svg>
-);
-
-const LicenceDetailsIcon = () => (
-  <svg className="w-12 h-12 text-[#F2BA03]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="4" width="20" height="16" rx="3" />
-    <rect x="5" y="8" width="6" height="7" rx="1" />
-    <path d="M14 8h5M14 12h5M14 16h3" />
-  </svg>
-);
+import banner from '../assets/images/howitworksbanner.png'
+import videoWalkImg from '../assets/images/howitworks/videowalkimg.png'
+import tutorialVideoPreviewImg from '../assets/images/howitworks/tutorialvideopreview.png'
+import appStoreImg from '../assets/images/howitworks/appstore.png'
+import playStoreImg from '../assets/images/howitworks/playstore.png'
+import fuelStationImg from '../assets/images/howitworks/services/Fuel Station.png'
+import policeStationImg from '../assets/images/howitworks/services/Police Station.png'
+import hospitalCareImg from '../assets/images/howitworks/services/Hospital Care.png'
+import punctureShopImg from '../assets/images/howitworks/services/Puncture Shop.png'
+import rechargeFastagImg from '../assets/images/howitworks/services/Recharge FASTag.png'
+import trafficChallanImg from '../assets/images/howitworks/services/Traffic Challan.png'
+import vehicleDetailsImg from '../assets/images/howitworks/services/Vehicle Details.png'
+import licenceDetailsImg from '../assets/images/howitworks/services/Licence Details.png'
 
 interface VehicleDashboardProps {
   userData: UserFormData;
@@ -179,14 +107,14 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
   // Vehicle Services with Custom SVG Icons
   const vehicleServices = [
-    { id: 'fuel', title: 'Fuel Station', renderIcon: FuelStationIcon, detail: 'Find nearest petrol, diesel & EV charging pumps near your vehicle location.' },
-    { id: 'police', title: 'Police Station', renderIcon: PoliceStationIcon, detail: 'Instant contact numbers & directions for nearest traffic and city police stations.' },
-    { id: 'hospital', title: 'Hospital Care', renderIcon: HospitalCareIcon, detail: 'Emergency trauma centers & ambulance contacts available 24/7.' },
-    { id: 'puncture', title: 'Puncture Shop', renderIcon: PunctureShopIcon, detail: '24x7 roadside tyre repair, puncture fix & battery jumpstart services.' },
-    { id: 'fastag', title: 'Recharge FASTag', renderIcon: FastagIcon, detail: 'Instant FASTag balance check & toll recharge via UPI/Netbanking.' },
-    { id: 'challan', title: 'Traffic Challan', renderIcon: TrafficChallanIcon, detail: 'Check pending traffic fines & pay challans online instantly by VIN.' },
-    { id: 'vehicle', title: 'Vehicle Details', renderIcon: VehicleDetailsIcon, detail: 'Verify RTO RC status, insurance expiry & vehicle ownership details.' },
-    { id: 'licence', title: 'Licence Details', renderIcon: LicenceDetailsIcon, detail: 'Check DL validity, endorsement records & renewal timelines.' },
+    { id: 'fuel', title: 'Fuel Station', image: fuelStationImg, detail: 'Find nearest petrol, diesel & EV charging pumps near your vehicle location.' },
+    { id: 'police', title: 'Police Station', image: policeStationImg, detail: 'Instant contact numbers & directions for nearest traffic and city police stations.' },
+    { id: 'hospital', title: 'Hospital Care', image: hospitalCareImg, detail: 'Emergency trauma centers & ambulance contacts available 24/7.' },
+    { id: 'puncture', title: 'Puncture Shop', image: punctureShopImg, detail: '24x7 roadside tyre repair, puncture fix & battery jumpstart services.' },
+    { id: 'fastag', title: 'Recharge FASTag', image: rechargeFastagImg, detail: 'Instant FASTag balance check & toll recharge via UPI/Netbanking.' },
+    { id: 'challan', title: 'Traffic Challan', image: trafficChallanImg, detail: 'Check pending traffic fines & pay challans online instantly by VIN.' },
+    { id: 'vehicle', title: 'Vehicle Details', image: vehicleDetailsImg, detail: 'Verify RTO RC status, insurance expiry & vehicle ownership details.' },
+    { id: 'licence', title: 'Licence Details', image: licenceDetailsImg, detail: 'Check DL validity, endorsement records & renewal timelines.' },
   ];
 
   const handleSimulateScan = () => {
@@ -225,28 +153,29 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
       <main className="flex-1">
         
         {/* 1. HOW IT WORKS HERO BANNER SECTION */}
-        <section className="relative bg-[#1B1C1C] text-white min-h-[480px] lg:min-h-[553px] flex items-center overflow-hidden">
-          {/* Background Image with Dark Vignette Gradient */}
+        <section className="relative bg-[#1B1C1C] text-white flex items-center overflow-hidden">
+          {/* Background Image with Dark Gradient Overlay on the left for text legibility */}
           <div className="absolute inset-0 z-0">
             <img
-              src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1920&q=80"
+              src={banner}
               alt="ScanConnect Vehicle Protection"
-              className="w-full h-full object-cover object-center opacity-30 mix-blend-luminosity"
+              className="w-full h-full object-cover object-[85%_15%]"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#1B1C1C]/95 via-[#1B1C1C]/80 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#1B1C1C] via-[#1B1C1C]/85 to-transparent" />
           </div>
 
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 sm:py-20 relative z-10 w-full">
-            <div className="max-w-2xl space-y-6">
-              <span className="font-['Inter'] font-bold text-sm tracking-[1px] uppercase text-[#9CA3AF] block">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-20 sm:py-24 lg:py-28 relative z-10 w-full">
+            <div className="max-w-xl space-y-5">
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#9CA3AF] block">
                 HOW IT WORKS
               </span>
 
-              <h1 className="font-['Rubik'] font-bold text-4xl sm:text-5xl lg:text-[60px] tracking-[-1.2px] leading-none text-white">
-                Someone scans. You stay private. It&apos;s that simple.
+              <h1 className="font-['Rubik'] font-bold text-3xl sm:text-4xl lg:text-[46px] tracking-[-1px] leading-[1.15] text-white">
+                Someone <span className="text-[#F2BA03]">scans.</span>{' '}
+                <span className="text-[#F2BA03]">You stay</span> private. It&apos;s that simple.
               </h1>
 
-              <p className="font-['Rubik'] font-medium text-base sm:text-lg text-[#CCC7AA] leading-[28px] max-w-xl pt-1">
+              <p className="font-['Rubik'] font-medium text-sm sm:text-base text-[#D1D5DB] leading-[26px] max-w-md pt-1">
                 No app to install for the person reaching you, and no number ever revealed for you. Here&apos;s exactly what happens.
               </p>
             </div>
@@ -310,50 +239,25 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
 
         {/* 3. TUTORIAL VIDEO SECTION */}
-        <section className="py-20 bg-[#111215] text-white relative overflow-hidden">
-          {/* Subtle Ambient Glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-[#F2BA03]/10 blur-[120px] rounded-full pointer-events-none" />
-
+        <section className="py-20 bg-white relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
-            <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-              <span className="font-['Inter'] font-bold text-xs sm:text-sm tracking-[2px] text-[#F2BA03] uppercase block">
-                TUTORIAL VIDEO
-              </span>
-              <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-5xl text-white tracking-tight">
-                How Scan Connect Works in 60 Seconds
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-5xl text-[#1B1C1C] tracking-tight">
+                Tutorial video
               </h2>
-              <p className="font-['Inter'] font-normal text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto">
-                Watch how simple it is to activate your tag, stick it to your vehicle, and receive encrypted calls without revealing your number.
-              </p>
             </div>
 
             {/* Video Player Box */}
-            <div className="max-w-4xl mx-auto relative rounded-3xl overflow-hidden border border-neutral-800 shadow-2xl group bg-neutral-900 aspect-video flex items-center justify-center">
+            <button
+              onClick={() => setIsVideoModalOpen(true)}
+              className="max-w-4xl mx-auto relative rounded-3xl overflow-hidden border border-neutral-200 shadow-2xl group bg-white block w-full cursor-pointer"
+            >
               <img
-                src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1600&q=80"
+                src={tutorialVideoPreviewImg}
                 alt="Tutorial Video Preview"
-                className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-transparent" />
-
-              {/* Play Button Trigger */}
-              <button
-                onClick={() => setIsVideoModalOpen(true)}
-                className="relative z-10 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#F2BA03] text-neutral-950 flex items-center justify-center shadow-xl group-hover:scale-110 active:scale-95 transition-all cursor-pointer ring-8 ring-[#F2BA03]/30"
-              >
-                <Play className="w-8 h-8 sm:w-10 sm:h-10 fill-current translate-x-1" />
-              </button>
-
-              {/* Video Info Overlay */}
-              <div className="absolute bottom-6 left-6 right-6 z-10 flex flex-wrap items-center justify-between text-xs sm:text-sm font-medium text-neutral-300 gap-4">
-                <div className="flex items-center gap-2 bg-neutral-900/80 backdrop-blur-md px-4 py-2 rounded-full border border-neutral-700">
-                  <Play className="w-4 h-4 text-[#F2BA03]" /> <span>Official Step-by-Step Tutorial</span>
-                </div>
-                <div className="bg-neutral-900/80 backdrop-blur-md px-4 py-2 rounded-full border border-neutral-700 font-mono text-[#F2BA03]">
-                  Duration: 1:45 min
-                </div>
-              </div>
-            </div>
+            </button>
           </div>
         </section>
 
@@ -441,7 +345,6 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             {/* 8 Service Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {vehicleServices.map((svc) => {
-                const IconComponent = svc.renderIcon;
                 return (
                   <button
                     key={svc.id}
@@ -449,7 +352,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     className="bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-10 shadow-xs hover:shadow-md hover:border-[#F2BA03] transition-all flex flex-col items-center justify-center text-center space-y-4 group cursor-pointer"
                   >
                     <div className="group-hover:scale-110 transition-transform flex items-center justify-center h-16">
-                      <IconComponent />
+                      <img src={svc.image} alt={svc.title} className="h-16 w-auto object-contain" />
                     </div>
 
                     <h3 className="font-['Plus_Jakarta_Sans','Rubik',sans-serif] font-bold text-xl sm:text-2xl text-[#111827] leading-snug">
@@ -470,47 +373,11 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               
               {/* Left Graphic Banner Poster */}
               <div className="lg:col-span-6 flex justify-center">
-                <div 
-                  onClick={() => setIsVideoModalOpen(true)}
-                  className="w-full max-w-md bg-[#1B1C1C] text-white rounded-3xl p-6 shadow-2xl relative overflow-hidden border border-neutral-800 cursor-pointer group"
-                >
-                  <div className="bg-[#F2BA03] p-6 rounded-2xl space-y-3 text-[#1B1C1C] mb-6">
-                    <div className="flex items-center justify-between">
-                      <span className="font-['Hanken_Grotesk'] font-black text-xl tracking-tight">SCAN CONNECT</span>
-                      <span className="text-[10px] font-bold bg-[#1B1C1C] text-white px-2 py-0.5 rounded uppercase tracking-wider">CONNECTING SOLUTION</span>
-                    </div>
-                    <h3 className="font-['Plus_Jakarta_Sans'] font-black text-2xl uppercase leading-none">
-                      SCAN CONNECT. <br />
-                      <span className="text-white">GET STARTED!</span>
-                    </h3>
-                  </div>
-
-                  <div className="flex items-center gap-6">
-                    {/* QR Code */}
-                    <div className="p-3 bg-neutral-900 rounded-2xl border border-neutral-800 flex flex-col items-center">
-                      <div className="w-28 h-28 bg-[#1B1C1C] p-2 rounded-xl flex items-center justify-center">
-                        <QrCode className="w-full h-full text-[#F2BA03]" />
-                      </div>
-                      <span className="text-[9px] font-bold uppercase mt-2 text-white/80 tracking-wider">
-                        SCAN & DOWNLOAD
-                      </span>
-                    </div>
-
-                    {/* Features list */}
-                    <div className="flex-1 bg-neutral-900 text-white rounded-2xl p-4 space-y-2 border border-neutral-800">
-                      <div className="w-8 h-1 bg-neutral-700 rounded-full mx-auto mb-2" />
-                      <div className="p-2 bg-neutral-800/80 rounded-lg text-[10px] font-bold text-[#F2BA03] flex items-center gap-1.5">
-                        <CheckCircle className="w-3.5 h-3.5 text-[#F2BA03]" /> Masked Calls
-                      </div>
-                      <div className="p-2 bg-neutral-800/80 rounded-lg text-[10px] font-bold text-white flex items-center gap-1.5">
-                        <CheckCircle className="w-3.5 h-3.5 text-[#F2BA03]" /> Instant Alerts
-                      </div>
-                      <div className="p-2 bg-neutral-800/80 rounded-lg text-[10px] font-bold text-white flex items-center gap-1.5">
-                        <CheckCircle className="w-3.5 h-3.5 text-[#F2BA03]" /> Emergency Contact
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <img
+                  src={videoWalkImg}
+                  alt="Scan Connect - Get Started"
+                  className="w-full max-w-md "
+                />
               </div>
 
               {/* Right Content */}
@@ -529,26 +396,18 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
                 {/* App Store / Google Play Buttons */}
                 <div className="flex flex-wrap items-center gap-4 pt-2">
-                  <button 
+                  <button
                     onClick={() => alert('Download ScanConnect for iOS on App Store')}
-                    className="px-6 py-3.5 bg-black hover:bg-neutral-800 text-white rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-3 shadow-md transition-all cursor-pointer hover:scale-105"
+                    className="cursor-pointer transition-transform hover:scale-105"
                   >
-                    <Smartphone className="w-5 h-5 text-[#F2BA03]" />
-                    <div className="text-left">
-                      <div className="text-[9px] font-normal text-neutral-400">Download on the</div>
-                      <div className="text-sm font-bold">App Store</div>
-                    </div>
+                    <img src={appStoreImg} alt="Download on the App Store" className="h-11 sm:h-12" />
                   </button>
 
-                  <button 
+                  <button
                     onClick={() => alert('Download ScanConnect for Android on Google Play')}
-                    className="px-6 py-3.5 bg-black hover:bg-neutral-800 text-white rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-3 shadow-md transition-all cursor-pointer hover:scale-105"
+                    className="cursor-pointer transition-transform hover:scale-105"
                   >
-                    <Play className="w-5 h-5 text-[#F2BA03] fill-[#F2BA03]" />
-                    <div className="text-left">
-                      <div className="text-[9px] font-normal text-neutral-400">GET IT ON</div>
-                      <div className="text-sm font-bold">Google Play</div>
-                    </div>
+                    <img src={playStoreImg} alt="Get it on Google Play" className="h-11 sm:h-12" />
                   </button>
                 </div>
               </div>
@@ -701,11 +560,10 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             {(() => {
               const svc = vehicleServices.find((s) => s.id === selectedService);
               if (!svc) return null;
-              const IconComponent = svc.renderIcon;
               return (
                 <>
                   <div className="flex items-center justify-center p-3 rounded-xl bg-amber-50/80 border border-[#F2BA03]/40 w-fit">
-                    <IconComponent />
+                    <img src={svc.image} alt={svc.title} className="h-14 w-auto object-contain" />
                   </div>
                   <h3 className="text-2xl font-black text-neutral-900 tracking-tight">
                     {svc.title}
