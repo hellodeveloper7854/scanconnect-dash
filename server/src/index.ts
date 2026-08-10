@@ -13,7 +13,10 @@ import { orderContactRouter } from './routes/orderContact.js';
 
 const app = express();
 
-app.use(helmet());
+// Helmet's default Cross-Origin-Resource-Policy (same-origin) blocks the
+// frontend (a different origin/port) from loading images like the QR PNGs
+// via <img src>, so relax it to allow cross-origin reads of our own assets.
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(cors({ origin: env.corsOrigin, credentials: true }));
 
 // Razorpay webhook needs the raw request body for HMAC signature verification,
