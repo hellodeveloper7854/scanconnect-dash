@@ -166,7 +166,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                   Made in India
                 </h3>
                 <p className="text-[#5D5F5F] text-base leading-relaxed">
-                  Designed, manufactured, and supported locally by create works Pvt Ltd. Built to solve the real everyday parking challenges in fast-growing cities.
+                  Designed, manufactured, and supported locally by Creative Frame Works Pvt Ltd. Built to solve the real everyday parking challenges in fast-growing cities.
                 </p>
               </div>
             </div>

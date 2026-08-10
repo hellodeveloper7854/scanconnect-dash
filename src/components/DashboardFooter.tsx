@@ -22,7 +22,7 @@ export const DashboardFooter: React.FC = () => {
         {/* Top Tagline & Social Icons */}
         <div className="mb-14 space-y-6">
           <p className="text-base sm:text-lg font-semibold text-white/95 max-w-xl leading-snug">
-            Privacy-first contact tags for vehicles. Made in India by create works Pvt Ltd.
+            Privacy-first contact tags for vehicles. Made in India by Creative Frame Works Pvt Ltd.
           </p>
 
           {/* Social Icons - Dark Olive Circles with White Icons */}
@@ -171,7 +171,7 @@ export const DashboardFooter: React.FC = () => {
           </div>
 
           <p className="text-white/90">
-            © 2026 SCAN CONNECT - create works Pvt Ltd
+            © 2026 SCAN CONNECT - Creative Frame Works Pvt Ltd
           </p>
         </div>
 
