@@ -8,8 +8,8 @@ interface LoginScreenProps {
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSuccess }) => {
-  const [vehicleEmail, setVehicleEmail] = useState('driver@scanme.com');
-  const [accessKey, setAccessKey] = useState('password123');
+  const [vehicleEmail, setVehicleEmail] = useState('');
+  const [accessKey, setAccessKey] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

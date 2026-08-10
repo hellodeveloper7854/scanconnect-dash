@@ -103,7 +103,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({
           </h3>
           <p className="text-neutral-400 text-xs">
             We sent a 6-digit verification code to{' '}
-            <span className="text-amber-400 font-mono font-bold">{mobileNumber || '9881860335'}</span>
+            <span className="text-amber-400 font-mono font-bold">{mobileNumber || '+91 98765 43210'}</span>
           </p>
         </div>
 

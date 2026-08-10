@@ -140,7 +140,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                       className="px-4 py-2 border-b border-neutral-100 hover:bg-amber-50/60 cursor-pointer transition-colors"
                     >
                       <p className="text-xs font-bold text-neutral-900 uppercase truncate">
-                        {userData.fullName || 'Kartik Ghodake'}
+                        {userData.fullName || 'Rahul Sharma'}
                       </p>
                       <p className="text-[11px] text-neutral-500 font-mono truncate">
                         {userData.email || 'driver@scanme.com'}

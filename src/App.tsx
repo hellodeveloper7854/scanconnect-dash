@@ -29,11 +29,11 @@ export default function App() {
   const [activeScreen, setActiveScreen] = useState<ScreenType>(getInitialScreenFromUrl);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
-  const [otpMobileNumber, setOtpMobileNumber] = useState('9881860335');
+  const [otpMobileNumber, setOtpMobileNumber] = useState('+91 98765 43210');
   const [userData, setUserData] = useState<UserFormData>({
-    fullName: 'Kartik Ghodake',
-    mobileNumber: '9881860335',
-    email: 'driver@scanme.com',
+    fullName: '',
+    mobileNumber: '',
+    email: '',
   });
 
   // Sync state with popstate browser back/forward buttons
@@ -92,7 +92,7 @@ export default function App() {
 
   const handleRegisterSuccess = (data: UserFormData) => {
     setUserData(data);
-    setOtpMobileNumber(data.mobileNumber || '9881860335');
+    setOtpMobileNumber(data.mobileNumber || '+91 98765 43210');
     setIsOtpModalOpen(true);
   };
 

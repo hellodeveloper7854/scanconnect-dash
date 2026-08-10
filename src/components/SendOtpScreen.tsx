@@ -8,7 +8,7 @@ interface SendOtpScreenProps {
 }
 
 export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, onNavigate }) => {
-  const [mobileNumber, setMobileNumber] = useState('9881860335');
+  const [mobileNumber, setMobileNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
@@ -171,7 +171,7 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
                     disabled={isOtpSent}
                     value={mobileNumber}
                     onChange={(e) => setMobileNumber(e.target.value)}
-                    placeholder="9881860335"
+                    placeholder="+91 98765 43210"
                     className="w-full h-[59px] pl-12 pr-4 bg-white/90 text-[#1B1C1C] font-normal placeholder-[#6B7280] rounded-none text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] transition-all disabled:opacity-70"
                   />
                 </div>

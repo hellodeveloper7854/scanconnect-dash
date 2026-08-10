@@ -50,11 +50,11 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   }, [step]);
 
   // Form states for Shipping (Step 1)
-  const [fullName, setFullName] = useState(userData.fullName || 'John Doe');
-  const [phone, setPhone] = useState(userData.mobileNumber || '+91 98765 43210');
-  const [city, setCity] = useState(userData.city || 'Mumbai');
-  const [pincode, setPincode] = useState(userData.pincode || '400001');
-  const [address, setAddress] = useState(userData.address || 'House No, Street, Landmark...');
+  const [fullName, setFullName] = useState(userData.fullName || '');
+  const [phone, setPhone] = useState(userData.mobileNumber || '');
+  const [city, setCity] = useState(userData.city || '');
+  const [pincode, setPincode] = useState(userData.pincode || '');
+  const [address, setAddress] = useState(userData.address || '');
 
   // Form states for Payment (Step 2)
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'upi' | 'netbanking'>('card');

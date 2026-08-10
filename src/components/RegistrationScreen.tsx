@@ -9,9 +9,9 @@ interface RegistrationScreenProps {
 
 export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNavigate, onSubmitSuccess }) => {
   const [formData, setFormData] = useState<UserFormData>({
-    fullName: 'Kartik Ghodake',
-    mobileNumber: '9881860335',
-    email: 'driver@scanme.com',
+    fullName: '',
+    mobileNumber: '',
+    email: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -117,7 +117,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNaviga
                     required
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    placeholder="Kartik Ghodake"
+                    placeholder="Rahul Sharma"
                     className="w-full h-[59px] pl-12 pr-4 bg-white/90 text-[#6B7280] font-normal rounded-none text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] transition-all"
                   />
                 </div>
@@ -137,7 +137,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNaviga
                     required
                     value={formData.mobileNumber}
                     onChange={(e) => setFormData({ ...formData, mobileNumber: e.target.value })}
-                    placeholder="9881860335"
+                    placeholder="+91 98765 43210"
                     className="w-full h-[59px] pl-12 pr-4 bg-white/90 text-[#6B7280] font-normal rounded-none text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] transition-all"
                   />
                 </div>

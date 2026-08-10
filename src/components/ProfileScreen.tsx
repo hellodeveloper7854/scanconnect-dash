@@ -36,9 +36,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [activeNav, setActiveNav] = useState('Profile');
 
   // Identity State
-  const [fullName, setFullName] = useState(userData.fullName || 'Marcus Thorne');
-  const [idNumber, setIdNumber] = useState('SCN-ADM-0982');
-  const [email, setEmail] = useState(userData.email || 'm.thorne@scanme-portal.com');
+  const [fullName, setFullName] = useState(userData.fullName || '');
+  const [idNumber, setIdNumber] = useState('');
+  const [email, setEmail] = useState(userData.email || '');
   const [avatarUrl, setAvatarUrl] = useState(
     'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80'
   );
@@ -233,6 +233,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                           type="text"
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
+                          placeholder="Rahul Sharma"
                           className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all"
                         />
                       </div>
@@ -245,6 +246,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                           type="text"
                           value={idNumber}
                           onChange={(e) => setIdNumber(e.target.value)}
+                          placeholder="SCN-ADM-0982"
                           className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#5D5F5F] font-normal text-base focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all font-mono"
                         />
                       </div>
@@ -259,6 +261,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        placeholder="rahul.sharma@scanme-portal.com"
                         className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all"
                       />
                     </div>
