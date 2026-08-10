@@ -3,6 +3,7 @@ import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { CheckoutFlowScreen } from './CheckoutFlowScreen';
+import qrImage from '../assets/images/qrimage.png';
 import {
   Star,
   Truck,
@@ -17,7 +18,6 @@ import {
   Phone,
   Zap,
   RefreshCw,
-  QrCode,
   CheckCircle,
   Layers,
   Thermometer,
@@ -80,12 +80,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   const productTitle = product?.title || 'SCAN CONNECT Pro Tag - Digital Vehicle Protection';
   const productPrice = product?.price || '₹499';
 
-  const thumbnails = [
-    { type: 'qr-yellow', id: 0 },
-    { type: 'qr-[#F2BA03]', id: 1 },
-    { type: 'qr-amber', id: 2 },
-    { type: 'sc-logo', id: 3 },
-  ];
+  const thumbnails = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
 
   const handleBuyNow = () => {
     setIsCheckoutOpen(true);
@@ -145,45 +140,18 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
           <div className="lg:col-span-6 space-y-6">
             
             {/* Main Preview Container */}
-            <div className="bg-[#FFFFFF] rounded-[16px] p-6 sm:p-10 relative overflow-hidden aspect-square border border-[#E4E2E2] shadow-xs flex flex-col items-center justify-center">
-              
+            <div className="rounded-[16px] relative overflow-hidden aspect-square flex items-center justify-center">
+
               {/* BEST SELLER Tag */}
-              <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-[#FFEF00] text-[#736B00] text-[12px] font-['Hanken_Grotesk'] font-bold uppercase tracking-[1.2px] px-[12px] py-[4px] rounded-full shadow-xs">
+              <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-[#FFEF00] text-[#736B00] text-[12px] font-['Hanken_Grotesk'] font-bold uppercase tracking-[1.2px] px-[12px] py-[4px] rounded-full shadow-xs z-10">
                 BEST SELLER
               </div>
 
-              {/* Tag Sticker Card (The QR Sticker Visual) */}
-              <div className="bg-[#F2BA03] rounded-[24px] p-6 sm:p-8 shadow-xl border-4 border-white w-full max-w-[340px] flex flex-col items-center space-y-4">
-                {/* Big QR Code Box */}
-                <div className="w-44 h-44 sm:w-48 sm:h-48 bg-[#FFFFFF] p-3 rounded-[16px] flex items-center justify-center shadow-inner">
-                  <QrCode className="w-full h-full text-[#1B1C1C]" />
-                </div>
-
-                {/* Tag ID Badge */}
-                <span className="text-[12px] font-['Hanken_Grotesk'] font-bold tracking-[1.2px] uppercase text-[#1B1C1C]">
-                  NGF132 &bull; SCAN CONNECT
-                </span>
-
-                {/* Icon Bar */}
-                <div className="w-full border-t border-[#1B1C1C]/10 pt-3 flex items-center justify-around text-[#1B1C1C]">
-                  <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-sm font-bold" title="Wrong Parking">
-                    🚨
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-sm font-bold" title="No Parking">
-                    🚫
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-sm font-bold" title="Emergency Contact">
-                    ⚠️
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-sm font-bold" title="Scan QR">
-                    📞
-                  </div>
-                </div>
-
-                <p className="text-[11px] text-center font-['Hanken_Grotesk'] font-bold text-[#1B1C1C] leading-tight max-w-[250px]">
-                  Wrong Parking, Emergency Contact, any issue with the vehicle, Scan the QR.
-                </p>
-              </div>
+              <img
+                src={qrImage}
+                alt={productTitle}
+                className="h-full w-auto object-cover"
+              />
             </div>
 
             {/* Thumbnail Row */}
@@ -192,22 +160,13 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
                 <button
                   key={thumb.id}
                   onClick={() => setActiveThumbnail(idx)}
-                  className={`aspect-square rounded-[8px] border-2 flex items-center justify-center p-2 transition-all cursor-pointer ${
+                  className={`aspect-square rounded-[8px] border-2 overflow-hidden transition-all cursor-pointer ${
                     activeThumbnail === idx
-                      ? 'border-[#676000] bg-white opacity-100 shadow-xs'
-                      : 'border-[#CCC7AA] bg-[#FAFAFA] opacity-70 hover:opacity-100'
+                      ? 'border-[#676000] opacity-100 shadow-xs'
+                      : 'border-[#CCC7AA] opacity-70 hover:opacity-100'
                   }`}
                 >
-                  {thumb.type === 'sc-logo' ? (
-                    <div className="w-10 h-10 rounded-full border-2 border-[#676000] flex items-center justify-center text-[#676000] font-black text-xs font-mono">
-                      SC
-                    </div>
-                  ) : (
-                    <div className="w-full h-full bg-[#F2BA03] rounded-[6px] p-1.5 flex flex-col items-center justify-between text-[#1B1C1C]">
-                      <QrCode className="w-6 h-6 text-[#1B1C1C]" />
-                      <div className="w-full h-0.5 bg-[#1B1C1C]/20 rounded" />
-                    </div>
-                  )}
+                  <img src={qrImage} alt={productTitle} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -330,19 +289,12 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             
             {/* Left Photo */}
             <div className="lg:col-span-5 flex justify-center">
-              <div className="relative w-full rounded-[16px] overflow-hidden shadow-lg border border-[#E4E2E2] group bg-[#1B1C1C]">
+              <div className="relative w-full rounded-[16px] overflow-hidden flex items-center justify-center">
                 <img
-                  src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1000&q=80"
-                  alt="SCAN CONNECT Tag on Car Windshield"
-                  className="w-full h-[320px] sm:h-[420px] object-cover group-hover:scale-105 transition-transform duration-700 opacity-90"
+                  src={qrImage}
+                  alt="SCAN CONNECT Tag"
+                  className="h-[320px] sm:h-[420px] w-auto object-cover"
                 />
-                
-                {/* Oval Tag Sticker Graphic Overlay on Windshield */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#F2BA03] border-4 border-white text-[#1B1C1C] w-36 h-28 rounded-[50%] shadow-2xl flex flex-col items-center justify-center text-center p-2 transform -rotate-12">
-                  <span className="text-[8px] font-bold uppercase font-mono tracking-tight">SCAN CONNECT</span>
-                  <QrCode className="w-10 h-10 text-[#1B1C1C] my-0.5" />
-                  <span className="text-[7px] font-extrabold uppercase">SECURE VEHICLE ID</span>
-                </div>
               </div>
             </div>
 
