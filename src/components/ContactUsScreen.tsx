@@ -124,10 +124,10 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
           
           {/* SECTION 1: TITLE & SUBTITLE (Frame 31 matching Image 1) */}
           <div className="space-y-4">
-            <h1 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-semibold text-5xl sm:text-6xl text-[#F2BA03] tracking-tight">
+            <h1 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-black text-4xl sm:text-5xl text-[#F2BA03] tracking-tight">
               Contact Us
             </h1>
-            <p className="font-['Inter',sans-serif] font-medium text-xl sm:text-2xl text-[#6B7280] leading-relaxed max-w-4xl">
+            <p className="font-['Inter',sans-serif] font-normal text-lg sm:text-xl text-[#6B7280] leading-relaxed max-w-4xl">
               Connect with the SCAN ME support team for assistance with your parking management or subscription inquiries.
             </p>
           </div>
@@ -137,7 +137,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
             
             {/* Card 1: Email Module */}
             <div className="bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 flex flex-col space-y-6">
-              <div className="w-10 h-10 bg-[#F2BA03] rounded-[2px] text-white flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 bg-[#F2BA03] rounded-lg text-white flex items-center justify-center shrink-0">
                 <Mail className="w-5 h-5 text-white stroke-[2.2]" />
               </div>
 
@@ -162,7 +162,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
             {/* Card 2: Call Module */}
             <div className="bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 flex flex-col space-y-6">
-              <div className="w-10 h-10 bg-[#F2BA03] rounded-[2px] text-white flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 bg-[#F2BA03] rounded-lg text-white flex items-center justify-center shrink-0">
                 <Phone className="w-5 h-5 text-white stroke-[2.2]" />
               </div>
 
@@ -184,7 +184,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
             {/* Card 3: Connect Module (Aligns on right column in top row or bottom row) */}
             <div className="bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 flex flex-col justify-center items-center lg:items-start space-y-6 lg:row-start-2 lg:col-start-3">
-              <div className="w-10 h-10 bg-[#F2BA03] rounded-[2px] text-white flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 bg-[#F2BA03] rounded-lg text-white flex items-center justify-center shrink-0">
                 <Share2 className="w-5 h-5 text-white stroke-[2.2]" />
               </div>
 
@@ -236,7 +236,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
             {/* Card 4: Our Offices Module (Spans 2 columns on desktop matching Image 4 & CSS) */}
             <div className="lg:col-span-2 bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 flex flex-col space-y-6">
-              <div className="w-10 h-10 bg-[#F2BA03] rounded-[2px] text-white flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 bg-[#F2BA03] rounded-lg text-white flex items-center justify-center shrink-0">
                 <MapPin className="w-5 h-5 text-white stroke-[2.2]" />
               </div>
 
@@ -291,7 +291,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
           <div className="max-w-[768px] mx-auto bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 sm:p-12 space-y-8">
             
             {/* Form Title */}
-            <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-medium text-3xl sm:text-[32px] text-[#1B1C1C] text-center">
+            <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-[32px] text-[#1B1C1C] text-center">
               Send us a direct inquiry
             </h2>
 
