@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bell, HelpCircle, LogOut, ShieldAlert, User, Menu, X, Car, ChevronDown } from 'lucide-react';
 import { UserFormData } from '../types';
+import logoImg from '../assets/images/logo.png';
 
 interface DashboardHeaderProps {
   userData: UserFormData;
@@ -42,9 +43,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           
           {/* Left Brand Logo */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNav('How it works')}>
-            <div className="text-white text-2xl sm:text-[28px] font-extrabold tracking-tight font-['Rubik','Plus_Jakarta_Sans',sans-serif] drop-shadow-xs flex items-center gap-1.5">
-              <span>SCAN CONNECT</span>
-            </div>
+            <img src={logoImg} alt="Scan Connect" className="h-12 md:h-14 w-auto object-contain" />
           </div>
 
           {/* Desktop Navigation Links */}
