@@ -17,7 +17,15 @@ import {
   ShieldCheck,
   Star,
   Package,
-  Check
+  Check,
+  Truck,
+  Lock,
+  Zap,
+  PhoneCall,
+  Car,
+  Bike,
+  Home,
+  MapPin
 } from 'lucide-react';
 
 interface ShopScreenProps {
@@ -62,11 +70,11 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
   // Trusted Across India trust bar
   const trustBar = [
-    { emoji: '🚚', label: 'Free Delivery Across India' },
-    { emoji: '🔒', label: 'Privacy Protected' },
-    { emoji: '⚡', label: 'Instant Activation' },
-    { emoji: '📞', label: 'Secure Call Routing' },
-    { emoji: '🇮🇳', label: 'Made for Indian Roads' },
+    { icon: Truck, label: 'Free Delivery Across India' },
+    { icon: Lock, label: 'Privacy Protected' },
+    { icon: Zap, label: 'Instant Activation' },
+    { icon: PhoneCall, label: 'Secure Call Routing' },
+    { icon: MapPin, label: 'Made for Indian Roads' },
   ];
 
   // SCAN CONNECT TAG — Perfect For list
@@ -129,7 +137,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
   const products = [
     {
       id: 1,
-      emoji: '🚗',
+      icon: Car,
       badge: 'Best Seller',
       rating: '4.8/5 Customer Rating',
       title: 'Scan Connect Car Tag (Pack of 2)',
@@ -150,7 +158,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
     },
     {
       id: 2,
-      emoji: '🏍',
+      icon: Bike,
       title: 'Scan Connect Bike Tag',
       desc: 'Designed specifically for motorcycles and scooters with a compact, durable design that withstands all weather conditions.',
       idealFor: ['Motorcycles', 'Scooters', 'Electric Two-Wheelers'],
@@ -159,7 +167,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
     },
     {
       id: 3,
-      emoji: '🚛',
+      icon: Truck,
       title: 'Fleet & Commercial Tags',
       desc: 'Designed for logistics companies, delivery fleets, taxis, corporate vehicles, and commercial transportation.',
       idealFor: ['Delivery Vehicles', 'Taxi Operators', 'Logistics Companies', 'Corporate Fleets'],
@@ -168,7 +176,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
     },
     {
       id: 4,
-      emoji: '🏠',
+      icon: Home,
       title: 'Home & Society QR Tags',
       desc: 'Enable visitors, security personnel, and neighbors to contact residents securely without exposing private phone numbers.',
       idealFor: ['Apartments', 'Villas', 'Gated Communities', 'Residential Complexes'],
@@ -285,15 +293,18 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                 Helping vehicle owners, businesses, and organizations stay connected with secure, privacy-first communication.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                {trustBar.map((item) => (
-                  <div
-                    key={item.label}
-                    className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-neutral-200 rounded-full text-xs font-bold text-[#0F0F0F] shadow-xs"
-                  >
-                    <span>{item.emoji}</span>
-                    <span>{item.label}</span>
-                  </div>
-                ))}
+                {trustBar.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div
+                      key={item.label}
+                      className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-neutral-200 rounded-full text-xs font-bold text-[#0F0F0F] shadow-xs"
+                    >
+                      <Icon className="w-3.5 h-3.5 text-[#F2BA03]" />
+                      <span>{item.label}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -429,7 +440,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
             {/* Product Cards Grid (2 cards per row) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-8">
-              {products.map((prod) => (
+              {products.map((prod) => {
+                const ProductIcon = prod.icon;
+                return (
                 <div
                   key={prod.id}
                   className="bg-white border border-neutral-200 rounded-3xl p-6 sm:p-8 shadow-xs hover:shadow-xl transition-all flex flex-col justify-between space-y-5"
@@ -439,7 +452,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                       {prod.id === 1 ? (
                         <img src={qrImage} alt={prod.title} className="w-14 h-14 rounded-lg object-cover" />
                       ) : (
-                        <span className="text-4xl">{prod.emoji}</span>
+                        <div className="w-14 h-14 rounded-lg bg-amber-50 flex items-center justify-center">
+                          <ProductIcon className="w-7 h-7 text-[#F2BA03]" />
+                        </div>
                       )}
                       {prod.badge && (
                         <span className="px-3 py-1 bg-[#F2BA03] text-[#1B1C1C] font-bold rounded-full text-[10px] uppercase tracking-wider">
@@ -528,7 +543,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     </button>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
           </div>

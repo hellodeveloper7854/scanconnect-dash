@@ -511,12 +511,20 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-[20px] font-['Hanken_Grotesk']">
                 <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
-                  <div className="flex text-[#FFD700]">★★★★★</div>
+                  <div className="flex text-[#FFD700]">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
+                    ))}
+                  </div>
                   <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;Saved my car from towing in Pune city! A shopkeeper scanned the tag and called me privately.&rdquo;</p>
                   <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— Rajesh Sharma, MH-12</span>
                 </div>
                 <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
-                  <div className="flex text-[#FFD700]">★★★★★</div>
+                  <div className="flex text-[#FFD700]">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
+                    ))}
+                  </div>
                   <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;Super simple sticker to apply. Nobody gets my personal WhatsApp or phone number now.&rdquo;</p>
                   <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— Ananya Deshmukh, MH-14</span>
                 </div>

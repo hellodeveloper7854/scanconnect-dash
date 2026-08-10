@@ -535,9 +535,13 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
             <p className="text-[#5F5E5E] text-base sm:text-lg leading-relaxed">
               Whether you&apos;re looking to secure a single vehicle or implement intelligent parking solutions for your organization, Scan Connect is here to help.
             </p>
-            <p className="font-['Hanken_Grotesk'] font-bold text-lg text-[#F2BA03]">
-              📞 Call Us &bull; 📧 Email Us &bull; 💬 Send a Message
-            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-['Hanken_Grotesk'] font-bold text-lg text-[#F2BA03]">
+              <span className="inline-flex items-center gap-1.5"><Phone className="w-4 h-4" /> Call Us</span>
+              <span className="text-[#5F5E5E]">&bull;</span>
+              <span className="inline-flex items-center gap-1.5"><Mail className="w-4 h-4" /> Email Us</span>
+              <span className="text-[#5F5E5E]">&bull;</span>
+              <span className="inline-flex items-center gap-1.5"><MessageSquare className="w-4 h-4" /> Send a Message</span>
+            </div>
             <p className="text-[#6B7280] text-sm">
               We&apos;re committed to delivering fast, friendly, and reliable support every step of the way.
             </p>

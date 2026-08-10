@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Phone, ArrowRight, Check, RefreshCw } from 'lucide-react';
+import { Phone, ArrowRight, Check, RefreshCw, Zap } from 'lucide-react';
 import { ScreenType } from '../types';
 
 interface SendOtpScreenProps {
@@ -222,9 +222,10 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
                     <button
                       type="button"
                       onClick={handleAutofillDemo}
-                      className="text-[10px] font-bold text-[#F2BA03] hover:underline cursor-pointer"
+                      className="text-[10px] font-bold text-[#F2BA03] hover:underline cursor-pointer inline-flex items-center gap-1"
                     >
-                      ⚡ Click here to auto-fill demo OTP: 482910
+                      <Zap className="w-3 h-3" />
+                      Click here to auto-fill demo OTP: 482910
                     </button>
                   </div>
 

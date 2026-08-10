@@ -448,8 +448,8 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                           <span className="font-['Hanken_Grotesk'] font-normal text-[10px] leading-[15px] text-white opacity-70 uppercase">
                             DIGITAL ASSET KEY
                           </span>
-                          <div className="w-5 h-5 opacity-50 flex items-center justify-center text-[10px]">
-                            📶
+                          <div className="w-5 h-5 opacity-50 flex items-center justify-center">
+                            <Radio className="w-4 h-4 rotate-90" />
                           </div>
                         </div>
 

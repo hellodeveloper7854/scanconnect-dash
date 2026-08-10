@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ShieldCheck, X, Check, RefreshCw, Smartphone } from 'lucide-react';
+import { ShieldCheck, X, Check, RefreshCw, Smartphone, Zap } from 'lucide-react';
 
 interface OtpModalProps {
   isOpen: boolean;
@@ -129,9 +129,10 @@ export const OtpModal: React.FC<OtpModalProps> = ({
             <button
               type="button"
               onClick={handleAutofillDemo}
-              className="text-[11px] font-bold text-amber-400 hover:underline underline-offset-4 cursor-pointer font-mono"
+              className="text-[11px] font-bold text-amber-400 hover:underline underline-offset-4 cursor-pointer font-mono inline-flex items-center gap-1"
             >
-              ⚡ Click here to auto-fill demo OTP: 482910
+              <Zap className="w-3 h-3" />
+              Click here to auto-fill demo OTP: 482910
             </button>
           </div>
 

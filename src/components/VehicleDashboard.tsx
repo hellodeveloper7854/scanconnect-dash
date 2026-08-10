@@ -403,8 +403,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               <p className="font-['Hanken_Grotesk'] font-normal text-base text-neutral-300 leading-[28px] max-w-2xl mx-auto">
                 Whether you&apos;re driving through a busy city, travelling on highways, or parking in unfamiliar locations, the Scan Connect SOS feature ensures that help is always just a tap away.
               </p>
-              <p className="font-['Hanken_Grotesk'] font-bold text-lg text-[#F2BA03] pt-2">
-                Your Safety. Your Family&apos;s Peace of Mind. Always Connected. 🚨
+              <p className="font-['Hanken_Grotesk'] font-bold text-lg text-[#F2BA03] pt-2 inline-flex items-center gap-2">
+                <ShieldAlert className="w-5 h-5" />
+                Your Safety. Your Family&apos;s Peace of Mind. Always Connected.
               </p>
             </div>
           </div>

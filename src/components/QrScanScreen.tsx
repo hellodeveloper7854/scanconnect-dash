@@ -17,7 +17,8 @@ import {
   Wrench,
   KeyRound,
   Eye,
-  ParkingSquare
+  ParkingSquare,
+  IndianRupee
 } from 'lucide-react';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
@@ -293,15 +294,17 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <button
                 onClick={() => onNavigate('shop')}
-                className="h-[66px] px-10 bg-[#0F0F0F] hover:bg-black text-white font-bold text-lg sm:text-[20px] rounded-[12px] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] transition-all cursor-pointer active:scale-95"
+                className="h-[66px] px-10 bg-[#0F0F0F] hover:bg-black text-white font-bold text-lg sm:text-[20px] rounded-[12px] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] transition-all cursor-pointer active:scale-95 inline-flex items-center justify-center gap-2"
               >
-                🚗 Get Your Scan Connect Tag
+                <Car className="w-5 h-5" />
+                Get Your Scan Connect Tag
               </button>
               <button
                 onClick={() => onNavigate('shop')}
-                className="h-[66px] px-10 bg-white hover:bg-neutral-50 text-black border border-[#5F5E5E] font-bold text-lg sm:text-[20px] rounded-[12px] transition-all cursor-pointer active:scale-95"
+                className="h-[66px] px-10 bg-white hover:bg-neutral-50 text-black border border-[#5F5E5E] font-bold text-lg sm:text-[20px] rounded-[12px] transition-all cursor-pointer active:scale-95 inline-flex items-center justify-center gap-2"
               >
-                💰 View Plans & Pricing
+                <IndianRupee className="w-5 h-5" />
+                View Plans & Pricing
               </button>
             </div>
           </div>
