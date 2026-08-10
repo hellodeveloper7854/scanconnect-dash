@@ -334,7 +334,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
         {/* 4. HOW IT WORKS SECTION */}
         <section id="how-it-works" className="py-20 bg-white">
-          <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
               <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
                 HOW IT WORKS
@@ -701,25 +701,25 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
 
         {/* 13. CTA SECTION */}
-        <section className="py-20 bg-[#F2BA03]">
+        <section className="py-20 bg-white border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
               Ready to Protect Your Privacy?
             </h2>
-            <p className="font-['Hanken_Grotesk'] font-medium text-base sm:text-lg text-[#1B1C1C]/80 leading-[28px] max-w-2xl mx-auto">
+            <p className="font-['Hanken_Grotesk'] font-medium text-base sm:text-lg text-[#5F5E5E] leading-[28px] max-w-2xl mx-auto">
               Join thousands of vehicle owners who trust Scan Connect every day. Secure your vehicle with a smart QR contact tag today.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <button
                 onClick={() => onNavigate && onNavigate('shop')}
-                className="h-[56px] px-9 bg-[#1B1C1C] hover:bg-neutral-800 text-white font-bold text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                className="h-[56px] px-9 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
               >
                 <span>Buy Now</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-                className="h-[56px] px-9 bg-white hover:bg-neutral-50 text-[#1B1C1C] font-bold text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
+                className="h-[56px] px-9 bg-white border border-[#1B1C1C] hover:bg-neutral-50 text-[#1B1C1C] font-bold text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
               >
                 Learn More
               </button>
