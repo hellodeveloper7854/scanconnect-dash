@@ -306,7 +306,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                         Corporate Head Office
                       </h4>
                       <p className="font-['Manrope',sans-serif] font-normal text-base text-[#1B1C1C] leading-relaxed">
-                        Scan Connect (NGF132 Pvt. Ltd.) <br />
+                        Scan Connect (create works Pvt. Ltd.) <br />
                         Plot No. 11, Tech Zone IV, <br />
                         Greater Noida, Uttar Pradesh &ndash; 201308
                       </p>

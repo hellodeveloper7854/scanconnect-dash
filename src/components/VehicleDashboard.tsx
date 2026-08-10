@@ -694,7 +694,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               Made in India. Built for Smarter Mobility.
             </h2>
             <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-neutral-300 leading-[28px]">
-              Scan Connect is developed by NGF132 Pvt. Ltd. with one mission: to make vehicle communication secure, simple, and privacy-first.
+              Scan Connect is developed by create works Pvt. Ltd. with one mission: to make vehicle communication secure, simple, and privacy-first.
             </p>
             <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-neutral-300 leading-[28px]">
               We&apos;re committed to helping millions of vehicle owners stay connected without compromising personal information.
