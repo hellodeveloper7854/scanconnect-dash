@@ -129,15 +129,19 @@ function MainApp() {
     const handlePopState = () => {
       const screen = getInitialScreenFromUrl();
       setActiveScreen(screen);
-      window.scrollTo(0, 0);
+      if (!window.location.hash) {
+        window.scrollTo(0, 0);
+      }
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Scroll to top whenever activeScreen changes
+  // Scroll to top whenever activeScreen changes, unless the URL has a hash
+  // target (e.g. /shop#products) that a screen wants to scroll to instead.
   useEffect(() => {
+    if (window.location.hash) return;
     window.scrollTo(0, 0);
   }, [activeScreen]);
 
