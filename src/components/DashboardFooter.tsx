@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { Youtube, Instagram, Facebook, Twitter, Linkedin, ChevronDown } from 'lucide-react';
+import React from 'react';
+import { Youtube, Instagram, Facebook, Twitter, Linkedin } from 'lucide-react';
 
 export const DashboardFooter: React.FC = () => {
-  const [guidesOpen, setGuidesOpen] = useState(false);
-
   return (
     <footer className="relative bg-[#F2BA03] text-white pt-20 pb-12 overflow-hidden">
       {/* Top Slanted Diagonal Border */}
@@ -167,31 +165,7 @@ export const DashboardFooter: React.FC = () => {
         <div className="border-t border-white/60 my-6" />
 
         {/* Bottom Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold text-white/95">
-          <div className="relative">
-            <button
-              onClick={() => setGuidesOpen(!guidesOpen)}
-              className="flex items-center gap-2 hover:underline cursor-pointer"
-            >
-              <span>Guides & articles</span>
-              <span className="text-[10px]">▼</span>
-            </button>
-            {guidesOpen && (
-              <div className="absolute left-0 bottom-full mb-2 w-56 bg-neutral-900 text-white rounded-xl p-3.5 shadow-2xl text-xs space-y-2 z-50">
-                <p className="font-bold border-b border-neutral-700 pb-1 text-[#f5b800]">Popular Guides:</p>
-                <p className="hover:text-[#f5b800] cursor-pointer" onClick={() => alert('Guide 1: How ScanConnect Masks Calls')}>
-                  • How Masked Calls Work
-                </p>
-                <p className="hover:text-[#f5b800] cursor-pointer" onClick={() => alert('Guide 2: Parking Ethics in High Density Cities')}>
-                  • Parking Ethics in Cities
-                </p>
-                <p className="hover:text-[#f5b800] cursor-pointer" onClick={() => alert('Guide 3: FASTag and Challan Integration')}>
-                  • FASTag & Challan Setup
-                </p>
-              </div>
-            )}
-          </div>
-
+        <div className="flex items-center justify-center text-xs font-semibold text-white/95">
           <p className="text-white/90">
             © 2026 SCAN CONNECT - Creative Frame Works Pvt Ltd
           </p>

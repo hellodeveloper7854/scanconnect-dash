@@ -26,6 +26,7 @@ import {
   Globe2,
   ArrowRight
 } from 'lucide-react';
+import { BLOG_POSTS } from '../lib/blogPosts';
 import banner from '../assets/images/howitworksbanner.png'
 import videoWalkImg from '../assets/images/howitworks/videowalkimg.png'
 import tutorialVideoPreviewImg from '../assets/images/howitworks/tutorialvideopreview.png'
@@ -366,6 +367,58 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+
+        {/* GUIDES & ARTICLES SECTION */}
+        <section className="py-16 sm:py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <div className="flex items-center justify-between">
+              <h2 className="font-['Plus_Jakarta_Sans'] font-black text-3xl sm:text-4xl text-neutral-900 tracking-tight">
+                Guides & articles
+              </h2>
+              <a
+                href="/blog"
+                className="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4"
+              >
+                View more
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {BLOG_POSTS.slice(0, 3).map((post) => (
+                <a
+                  key={post.slug}
+                  href={`/blog/${post.slug}`}
+                  className="group bg-white rounded-2xl border border-neutral-200/60 overflow-hidden hover:shadow-lg transition-shadow"
+                >
+                  <div className="h-[180px] bg-neutral-100 flex items-center justify-center text-neutral-400 text-xs font-semibold px-4 text-center">
+                    {post.title}
+                  </div>
+                  <div className="p-6 space-y-3">
+                    <p className="text-xs font-bold uppercase tracking-wide text-neutral-400">{post.date}</p>
+                    <h3 className="text-xl font-black text-neutral-900 leading-snug group-hover:text-[#F2BA03] transition-colors">
+                      {post.title}
+                    </h3>
+                    <p className="text-sm text-neutral-500 line-clamp-2">{post.excerpt}</p>
+                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4">
+                      Read article
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </div>
+                </a>
+              ))}
+            </div>
+
+            <a
+              href="/blog"
+              className="sm:hidden inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4"
+            >
+              View more
+              <ArrowRight className="w-4 h-4" />
+            </a>
           </div>
         </section>
 
