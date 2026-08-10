@@ -78,11 +78,11 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-[42px] lg:leading-[1.15] font-black text-[#0F0F0F] tracking-tight font-sans">
-                  Privacy shouldn&apos;t cost you a phonecall.
+                  Privacy shouldn&apos;t cost you a phone call.
                 </h1>
 
                 <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal max-w-xl">
-                  Sampark started with a simple frustration: leaving your number on the dashboard meant spam calls, scams and zero privacy. We built a tag that lets anyone reach you — without ever seeing your number.
+                  Sampark started with a simple frustration: leaving your phone number on your dashboard meant spam calls, harassment, and zero privacy. We built a smart QR tag that lets anyone reach you instantly — without ever seeing your actual phone number.
                 </p>
 
                 {/* CTA Buttons */}
@@ -189,10 +189,13 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
         {/* 3. WHAT WE STAND FOR SECTION */}
         <section className="py-16 sm:py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-14">
+            <div className="mb-14 space-y-2">
               <h2 className="text-3xl sm:text-4xl font-black text-[#0F0F0F] tracking-tight font-sans">
-                What we stand for
+                What We Stand For
               </h2>
+              <p className="text-[#5D5F5F] text-base sm:text-lg max-w-2xl">
+                Building reliable, human-centric security products that empower everyday vehicle owners.
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
@@ -202,10 +205,10 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                   <Lock className="w-5 h-5 text-[#F2BA03] fill-[#F2BA03]" />
                 </div>
                 <h3 className="text-xl font-bold text-[#0F0F0F]">
-                  Privacy by default
+                  Privacy by Default
                 </h3>
                 <p className="text-[#5D5F5F] text-base leading-relaxed">
-                  Your number is never the product. Everything we build keeps it hidden, ensuring your personal security remains uncompromised.
+                  Your phone number is never shared or stored in plaintext. Everything we design ensures absolute privacy, keeping unwanted calls and scams at zero.
                 </p>
               </div>
 
@@ -215,10 +218,10 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                   <Zap className="w-5 h-5 text-[#F2BA03] fill-[#F2BA03]" />
                 </div>
                 <h3 className="text-xl font-bold text-[#0F0F0F]">
-                  Useful, not flashy
+                  Instant &amp; Frictionless
                 </h3>
                 <p className="text-[#5D5F5F] text-base leading-relaxed">
-                  A tag that just works. Designed for the critical moment when someone needs to reach you without friction or delay.
+                  No mobile app downloads required for scanners. Anyone with a smartphone camera can scan the tag and alert you instantly in urgent situations.
                 </p>
               </div>
 
@@ -231,7 +234,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                   Made in India
                 </h3>
                 <p className="text-[#5D5F5F] text-base leading-relaxed">
-                  Designed, built, and supported locally. We understand the unique challenges of urban parking in Indian cities.
+                  Designed, manufactured, and supported locally by NGF132 Pvt Ltd. Built to solve the real everyday parking challenges in fast-growing cities.
                 </p>
               </div>
             </div>
@@ -243,8 +246,11 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-12">
               <h2 className="text-3xl sm:text-4xl font-black text-[#0F0F0F] tracking-tight font-sans">
-                Custom solutions
+                Custom Solutions
               </h2>
+              <p className="text-[#5D5F5F] text-base sm:text-lg max-w-2xl">
+                Tailored vehicle tagging and access management for organizations and commercial hubs.
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -256,7 +262,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                     Housing Societies
                   </h3>
                   <p className="text-[#5D5F5F] text-base leading-relaxed">
-                    Streamline resident parking and maintain secure vehicle logs effortlessly through our integrated QR ecosystem.
+                    Streamline resident vehicle entry, resolve blocked parking disputes instantly, and maintain verified resident logs without public numbers.
                   </p>
                 </div>
 
@@ -268,15 +274,15 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                 </button>
               </div>
 
-              {/* Solution 2: Garages */}
+              {/* Solution 2: Garages & Workshops */}
               <div className="p-8 flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
                   <Home className="w-6 h-6 text-[#F2BA03]" />
                   <h3 className="text-xl font-bold text-[#0F0F0F]">
-                    Garages
+                    Garages &amp; Workshops
                   </h3>
                   <p className="text-[#5D5F5F] text-base leading-relaxed">
-                    Boost customer loyalty with co-branded service tags that keep your contact info just one scan away for your clients.
+                    Boost repeat service requests with co-branded vehicle tags that keep your service helpline accessible on every customer vehicle.
                   </p>
                 </div>
 
@@ -288,15 +294,15 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                 </button>
               </div>
 
-              {/* Solution 3: Parking Hubs */}
+              {/* Solution 3: Commercial Parking Hubs */}
               <div className="p-8 flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
                   <ParkingSquare className="w-6 h-6 text-[#F2BA03]" />
                   <h3 className="text-xl font-bold text-[#0F0F0F]">
-                    Parking Hubs
+                    Commercial Parking Hubs
                   </h3>
                   <p className="text-[#5D5F5F] text-base leading-relaxed">
-                    Manage commercial parking lots with real-time analytics and frictionless payment integrations for all tag users.
+                    Manage valet queues and parking lot overflow with real-time driver notifications, instant emergency moves, and automated logs.
                   </p>
                 </div>
 

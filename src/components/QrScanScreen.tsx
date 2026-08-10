@@ -3,13 +3,21 @@ import {
   QrCode,
   ShieldCheck,
   Scan,
-  Camera,
-  MessageSquare,
   PhoneCall,
   MessageCircle,
+  MessageSquare,
+  Mail,
   X,
   CheckCircle,
-  Sparkles
+  Sparkles,
+  Check,
+  Car,
+  Lightbulb,
+  AlertTriangle,
+  Wrench,
+  KeyRound,
+  Eye,
+  ParkingSquare
 } from 'lucide-react';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
@@ -43,6 +51,29 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
     setIsScanSuccess(true);
   };
 
+  // Why Millions Trust Scan Connect
+  const trustPoints = [
+    'Personal Phone Numbers Stay Hidden',
+    'Instant Communication During Emergencies',
+    'No App Required for the Scanner',
+    'Secure Call, SMS & WhatsApp Routing',
+    'Fast & Easy QR Scanning',
+    'End-to-End Privacy Protection',
+    'Works Anywhere, Anytime',
+  ];
+
+  // When Can You Use Scan Connect?
+  const useCases = [
+    { icon: Car, label: 'Vehicle Blocking Your Way' },
+    { icon: Lightbulb, label: 'Headlights or Hazard Lights Left On' },
+    { icon: AlertTriangle, label: 'Roadside Emergency' },
+    { icon: Car, label: 'Accident or Damage Notification' },
+    { icon: Wrench, label: 'Flat Tyre or Mechanical Issue' },
+    { icon: KeyRound, label: 'Keys Left Inside Vehicle' },
+    { icon: Eye, label: 'Suspicious Activity Around the Vehicle' },
+    { icon: ParkingSquare, label: 'Wrong Parking Alert' },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-neutral-900 font-sans antialiased">
       {/* Header */}
@@ -55,12 +86,12 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
       />
 
       <main className="flex-1">
-        {/* SECTION 1: HERO BANNER (FRAME 38) */}
+        {/* SECTION 1: HERO BANNER */}
         <section className="py-12 sm:py-16 lg:py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-              
-              {/* Left Content Column (Frame 37) */}
+
+              {/* Left Content Column */}
               <div className="lg:col-span-6 space-y-8">
                 {/* Privacy Guaranteed Badge */}
                 <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white">
@@ -72,12 +103,16 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
 
                 {/* Headline */}
                 <h1 className="text-3xl sm:text-4xl lg:text-[40px] lg:leading-[1.15] font-bold text-black font-sans tracking-normal">
-                  Instant Vehicle Connection. Zero Privacy Compromise.
+                  Instantly Connect with Vehicle Owners. Completely Private.
                 </h1>
 
                 {/* Body paragraph */}
                 <p className="text-[#6B7280] font-normal text-lg sm:text-[20px] leading-[24px] max-w-xl">
-                  Found a vehicle that needs attention? Scan the QR tag to contact the owner securely without revealing any personal phone numbers.
+                  Need to notify a vehicle owner about wrong parking, headlights left on, an accident, or any emergency? Simply scan the Scan Connect QR Tag and reach them instantly&mdash;without revealing your phone number or accessing theirs.
+                </p>
+
+                <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#F2BA03]">
+                  Fast &bull; Secure &bull; Privacy-First &bull; No App Required
                 </p>
 
                 {/* Action Buttons Row */}
@@ -87,14 +122,14 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                     className="h-[58px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-bold text-base rounded-lg transition-all cursor-pointer flex items-center gap-2 shadow-sm active:scale-95"
                   >
                     <QrCode className="w-5 h-5 text-white" />
-                    <span>Scan a Tag Now</span>
+                    <span>Scan a QR Tag</span>
                   </button>
 
                   <button
                     onClick={() => onNavigate('shop')}
                     className="h-[58px] px-8 bg-white hover:bg-neutral-50 text-[#0F0F0F] border border-[#0F0F0F] font-bold text-base rounded-lg transition-all cursor-pointer active:scale-95"
                   >
-                    Get Your Own Tag
+                    Buy Your Scan Connect Tag
                   </button>
                 </div>
               </div>
@@ -114,59 +149,77 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
           </div>
         </section>
 
-        {/* SECTION 2: HOW IT WORKS HEADER (FRAME 39) */}
+        {/* SECTION 2: HOW SCAN CONNECT WORKS HEADER */}
         <section className="pt-16 pb-8 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
             <h2 className="text-3xl sm:text-[40px] leading-[1.2] font-bold text-black font-sans">
-              How it Works
+              How Scan Connect Works
             </h2>
+            <p className="font-['Hanken_Grotesk'] font-semibold text-lg text-[#1B1C1C]">
+              Three Simple Steps. One Secure Connection.
+            </p>
             <p className="text-[#5F5E5E] text-lg sm:text-[20px] leading-[24px] font-normal max-w-4xl mx-auto">
-              Connecting people through physical-to-digital bridges while keeping everyone&apos;s personal data under lock and key.
+              Scan Connect creates a secure digital bridge between people and vehicles, enabling instant communication while keeping personal information completely private.
             </p>
           </div>
         </section>
 
-        {/* SECTION 3: 3 STEP CARDS (FRAME 21) */}
+        {/* SECTION 3: 3 STEP CARDS */}
         <section className="py-8 bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              
-              {/* Step 1 Card (Frame 17) */}
+
+              {/* Step 1 Card */}
               <div className="bg-white rounded-[15px] p-7 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.09)] border border-neutral-100 flex flex-col items-start text-left min-h-[266px]">
                 <div className="w-[60px] h-[60px] bg-[#F2BA03] rounded-[12px] flex items-center justify-center text-white mb-5 shrink-0">
-                  <Camera className="w-5 h-5 text-white" />
+                  <Scan className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-[#111827] mb-3 font-sans">
-                  Step 1: Scan
+                  Step 1 &mdash; Scan the QR Tag
                 </h3>
                 <p className="text-[#6B7280] text-lg sm:text-[18px] leading-[27px] font-normal">
-                  Simply use your phone camera on any SCAN ME tag found on a vehicle. No app download required.
+                  Use your smartphone camera to scan the Scan Connect QR Tag displayed on the vehicle. No app downloads, registrations, or complicated setup required.
                 </p>
+                <div className="flex items-center gap-2 pt-4">
+                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3]" />
+                  <span className="text-sm font-semibold text-[#1B1C1C]">Works with any smartphone</span>
+                </div>
               </div>
 
-              {/* Step 2 Card (Frame 18) */}
+              {/* Step 2 Card */}
               <div className="bg-white rounded-[15px] p-7 sm:p-8 shadow-[0_4px_4px_rgba(0,0,0,0.09)] border border-neutral-100 flex flex-col items-start text-left min-h-[266px]">
                 <div className="w-[60px] h-[60px] bg-[#F2BA03] rounded-[12px] flex items-center justify-center text-white mb-5 shrink-0">
                   <MessageSquare className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-[#111827] mb-3 font-sans">
-                  Step 2: Connect
+                  Step 2 &mdash; Choose How to Contact
                 </h3>
                 <p className="text-[#6B7280] text-lg sm:text-[18px] leading-[27px] font-normal">
-                  Choose your preferred communication method: Call, SMS, or WhatsApp message to the owner.
+                  Once the QR page opens, select your preferred way to reach the vehicle owner.
                 </p>
+                <div className="space-y-2 pt-3">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
+                    <PhoneCall className="w-4 h-4 text-[#F2BA03]" /> Secure Call
+                  </div>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
+                    <MessageCircle className="w-4 h-4 text-[#F2BA03]" /> WhatsApp Message
+                  </div>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
+                    <Mail className="w-4 h-4 text-[#F2BA03]" /> SMS
+                  </div>
+                </div>
               </div>
 
-              {/* Step 3 Card (Frame 19) */}
+              {/* Step 3 Card */}
               <div className="bg-white rounded-[15px] p-7 sm:p-8 shadow-[0_4px_4px_rgba(0,0,0,0.09)] border border-neutral-100 flex flex-col items-start text-left min-h-[266px]">
                 <div className="w-[60px] h-[60px] bg-[#F2BA03] rounded-[12px] flex items-center justify-center text-white mb-5 shrink-0">
                   <ShieldCheck className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-[#111827] mb-3 font-sans">
-                  Step 3: Secure
+                  Step 3 &mdash; Privacy Protected
                 </h3>
                 <p className="text-[#6B7280] text-lg sm:text-[18px] leading-[27px] font-normal">
-                  Our system creates an encrypted bridge. Neither party sees the other&apos;s real phone number.
+                  Scan Connect securely routes every call and message through its privacy network. The scanner never sees the owner&apos;s phone number. The owner never sees the scanner&apos;s phone number. Both parties stay protected while communicating seamlessly.
                 </p>
               </div>
 
@@ -174,15 +227,66 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
           </div>
         </section>
 
-        {/* SECTION 4: READY TO SECURE CTA (FRAME 40) */}
+        {/* SECTION 4: WHY MILLIONS TRUST SCAN CONNECT */}
+        <section className="py-16 sm:py-20 bg-[#FAFAFA] border-t border-neutral-100">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl sm:text-[38px] font-black text-[#0F0F0F] font-sans">
+                Why Millions Trust Scan Connect
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {trustPoints.map((point) => (
+                <div key={point} className="flex items-center gap-3 bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs">
+                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] shrink-0" />
+                  <span className="font-['Hanken_Grotesk'] font-medium text-sm sm:text-base text-[#1B1C1C]">{point}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 5: WHEN CAN YOU USE SCAN CONNECT? */}
         <section className="py-16 sm:py-20 bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
+              <h2 className="text-3xl sm:text-[38px] font-black text-[#0F0F0F] font-sans">
+                When Can You Use Scan Connect?
+              </h2>
+              <p className="text-[#5F5E5E] text-base sm:text-lg leading-relaxed">
+                Whether it&apos;s a minor inconvenience or a critical situation, Scan Connect helps you connect with the vehicle owner instantly.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {useCases.map(({ icon: Icon, label }) => (
+                <div
+                  key={label}
+                  className="bg-white border border-[#E5E7EB] rounded-xl p-6 flex flex-col items-center text-center gap-3 shadow-xs hover:shadow-md hover:border-[#F2BA03] transition-all"
+                >
+                  <Icon className="w-7 h-7 text-[#F2BA03]" />
+                  <span className="font-['Hanken_Grotesk'] font-semibold text-sm text-[#1B1C1C]">{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 6: READY TO SECURE CTA */}
+        <section className="py-16 sm:py-20 bg-white border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
             <div className="space-y-4">
               <h2 className="text-3xl sm:text-[40px] leading-[1.2] font-bold text-black font-sans">
-                Ready to secure your vehicle?
+                Ready to Protect Your Privacy?
               </h2>
               <p className="text-black/80 text-lg sm:text-[20px] leading-[24px] font-normal max-w-3xl mx-auto">
-                Join thousands of smart vehicle owners who value their privacy as much as their property.
+                Join thousands of smart vehicle owners who rely on Scan Connect for secure, hassle-free communication every day.
+              </p>
+              <p className="text-[#5F5E5E] text-base sm:text-lg leading-[26px] max-w-3xl mx-auto">
+                Stay reachable when it matters&mdash;without ever exposing your personal phone number.
+              </p>
+              <p className="font-['Hanken_Grotesk'] font-bold text-lg text-[#1B1C1C]">
+                Your Vehicle. Your Privacy. Your Peace of Mind.
               </p>
             </div>
 
@@ -191,13 +295,13 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                 onClick={() => onNavigate('shop')}
                 className="h-[66px] px-10 bg-[#0F0F0F] hover:bg-black text-white font-bold text-lg sm:text-[20px] rounded-[12px] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] transition-all cursor-pointer active:scale-95"
               >
-                Get Started Now
+                🚗 Get Your Scan Connect Tag
               </button>
               <button
                 onClick={() => onNavigate('shop')}
                 className="h-[66px] px-10 bg-white hover:bg-neutral-50 text-black border border-[#5F5E5E] font-bold text-lg sm:text-[20px] rounded-[12px] transition-all cursor-pointer active:scale-95"
               >
-                View Pricing
+                💰 View Plans & Pricing
               </button>
             </div>
           </div>

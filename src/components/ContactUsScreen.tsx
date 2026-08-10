@@ -13,7 +13,9 @@ import {
   Globe,
   AtSign,
   FileText,
-  ExternalLink
+  ExternalLink,
+  Check,
+  ShieldCheck
 } from 'lucide-react';
 
 interface ContactUsScreenProps {
@@ -69,7 +71,8 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
   // Form State
   const [fullName, setFullName] = useState(userData.fullName || '');
   const [email, setEmail] = useState(userData.email || '');
-  const [subject, setSubject] = useState('Technical Support');
+  const [phone, setPhone] = useState(userData.mobileNumber || '');
+  const [subject, setSubject] = useState('General Enquiry');
   const [message, setMessage] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -101,11 +104,25 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
     }
     setIsSubmitted(true);
     setTimeout(() => {
-      alert(`Thank you, ${fullName}! Your inquiry regarding "${subject}" has been submitted successfully to SCAN ME support.`);
+      alert(`Thank you, ${fullName}! Your inquiry regarding "${subject}" has been submitted successfully to Scan Connect support.`);
       setMessage('');
       setIsSubmitted(false);
     }, 800);
   };
+
+  // Why Contact Scan Connect?
+  const whyContact = [
+    'Product Information',
+    'QR Tag Activation',
+    'Order Tracking',
+    'Technical Support',
+    'Bulk & Corporate Orders',
+    'Fleet Solutions',
+    'Reseller & Franchise Opportunities',
+    'Enterprise Parking Solutions',
+    'Returns & Warranty Assistance',
+    'General Questions',
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#1B1C1C] font-sans antialiased">
@@ -122,13 +139,19 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
       <main className="flex-1 py-12 sm:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
           
-          {/* SECTION 1: TITLE & SUBTITLE (Frame 31 matching Image 1) */}
+          {/* SECTION 1: TITLE & SUBTITLE */}
           <div className="space-y-4">
             <h1 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-black text-4xl sm:text-5xl text-[#F2BA03] tracking-tight">
               Contact Us
             </h1>
+            <p className="font-['Hanken_Grotesk'] font-bold text-xl sm:text-2xl text-[#1B1C1C]">
+              We&apos;re Here to Help
+            </p>
             <p className="font-['Inter',sans-serif] font-normal text-lg sm:text-xl text-[#6B7280] leading-relaxed max-w-4xl">
-              Connect with the SCAN ME support team for assistance with your parking management or subscription inquiries.
+              Have a question about Scan Connect, your QR tag, an order, or our business solutions? Our support team is ready to assist you with quick, reliable, and personalized service.
+            </p>
+            <p className="font-['Inter',sans-serif] font-normal text-lg sm:text-xl text-[#6B7280] leading-relaxed max-w-4xl">
+              Whether you&apos;re an individual customer, reseller, fleet operator, or enterprise partner, we&apos;re just a call or message away.
             </p>
           </div>
 
@@ -143,19 +166,37 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
               <div className="space-y-4">
                 <h3 className="font-['Noto_Serif',serif] font-semibold text-2xl text-[#1B1C1C]">
-                  Email
+                  Email Us
                 </h3>
+                <p className="font-['Manrope',sans-serif] text-sm text-[#5F5E5E]">
+                  For faster assistance, contact the appropriate team:
+                </p>
 
-                <div className="space-y-2 font-['Manrope',sans-serif] text-base text-[#1B1C1C]">
-                  <a href="mailto:info@scanme.com" className="block hover:text-[#F2BA03] transition-colors">
-                    info@scanme.com
-                  </a>
-                  <a href="mailto:support@scanme.com" className="block hover:text-[#F2BA03] transition-colors">
-                    support@scanme.com
-                  </a>
-                  <a href="mailto:sales@scanme.com" className="block hover:text-[#F2BA03] transition-colors">
-                    sales@scanme.com
-                  </a>
+                <div className="space-y-3 font-['Manrope',sans-serif] text-sm text-[#1B1C1C]">
+                  <div>
+                    <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#735C00] uppercase block">
+                      General Enquiries
+                    </span>
+                    <a href="mailto:info@scanconnect.com" className="block hover:text-[#F2BA03] transition-colors text-base">
+                      info@scanconnect.com
+                    </a>
+                  </div>
+                  <div>
+                    <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#735C00] uppercase block">
+                      Customer Support
+                    </span>
+                    <a href="mailto:support@scanconnect.com" className="block hover:text-[#F2BA03] transition-colors text-base">
+                      support@scanconnect.com
+                    </a>
+                  </div>
+                  <div>
+                    <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#735C00] uppercase block">
+                      Sales &amp; Business Partnerships
+                    </span>
+                    <a href="mailto:sales@scanconnect.com" className="block hover:text-[#F2BA03] transition-colors text-base">
+                      sales@scanconnect.com
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -168,15 +209,24 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
               <div className="space-y-4">
                 <h3 className="font-['Noto_Serif',serif] font-semibold text-2xl text-[#1B1C1C]">
-                  Call
+                  Call Our Support Team
                 </h3>
 
                 <div className="space-y-2 font-['Manrope',sans-serif]">
-                  <a href="tel:+919990961299" className="text-base font-normal text-[#1B1C1C] block hover:text-[#F2BA03] transition-colors">
-                    +91 9990961299
+                  <a href="tel:+919990961299" className="text-lg font-semibold text-[#1B1C1C] block hover:text-[#F2BA03] transition-colors">
+                    +91 99909 61299
                   </a>
-                  <p className="text-xs font-medium text-[#5F5E5E]">
-                    Available 09:00 - 18:00 IST
+                  <div className="pt-1">
+                    <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#735C00] uppercase block">
+                      Support Hours
+                    </span>
+                    <p className="text-sm font-normal text-[#5F5E5E]">
+                      Monday &ndash; Saturday <br />
+                      09:00 AM &ndash; 06:00 PM (IST)
+                    </p>
+                  </div>
+                  <p className="text-xs font-medium text-[#5F5E5E] pt-1">
+                    Need immediate assistance? Our team is happy to help with product information, activation support, order tracking, and technical queries.
                   </p>
                 </div>
               </div>
@@ -197,7 +247,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 <div className="flex items-center justify-center lg:justify-start gap-4 pt-1">
                   <button
                     type="button"
-                    onClick={() => alert('Launching SCAN ME WhatsApp Live Assistant...')}
+                    onClick={() => alert('Launching Scan Connect WhatsApp Live Assistant...')}
                     title="Live Support Chat"
                     className="w-10 h-10 border border-[#E3E2E2] rounded-none bg-white hover:bg-[#FAF9F6] hover:border-[#1B1C1C] text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
@@ -206,7 +256,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
                   <button
                     type="button"
-                    onClick={() => alert('Redirecting to official web portal https://sampark.me')}
+                    onClick={() => alert('Redirecting to official web portal https://scanconnect.com')}
                     title="Web Portal"
                     className="w-10 h-10 border border-[#E3E2E2] rounded-none bg-white hover:bg-[#FAF9F6] hover:border-[#1B1C1C] text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
@@ -215,7 +265,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
                   <button
                     type="button"
-                    onClick={() => alert('Social Handles: @scanconnect / @scanme')}
+                    onClick={() => alert('Social Handles: @scanconnect')}
                     title="Email & Social Tag"
                     className="w-10 h-10 border border-[#E3E2E2] rounded-none bg-white hover:bg-[#FAF9F6] hover:border-[#1B1C1C] text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
@@ -224,7 +274,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
                   <button
                     type="button"
-                    onClick={() => alert('Downloading SCAN CONNECT Official Brochure...')}
+                    onClick={() => alert('Downloading Scan Connect Official Brochure...')}
                     title="Brochure PDF"
                     className="w-10 h-10 border border-[#E3E2E2] rounded-none bg-white hover:bg-[#FAF9F6] hover:border-[#1B1C1C] text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
@@ -244,34 +294,46 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 {/* Left Side Office Addresses */}
                 <div className="space-y-6 flex flex-col justify-between">
                   <h3 className="font-['Noto_Serif',serif] font-semibold text-2xl text-[#1B1C1C]">
-                    Our Offices
+                    Visit Our Offices
                   </h3>
 
                   <div className="space-y-6">
-                    {/* Head Office Noida */}
+                    {/* Corporate Head Office */}
                     <div className="space-y-1.5">
                       <h4 className="font-['Manrope',sans-serif] font-semibold text-sm tracking-[0.7px] text-[#735C00] uppercase">
-                        GREATER NOIDA HEAD OFFICE
+                        Corporate Head Office
                       </h4>
                       <p className="font-['Manrope',sans-serif] font-normal text-base text-[#1B1C1C] leading-relaxed">
-                        Plot No.11, Sector - Tech Zone 4, <br />
-                        Greater Noida, U.P. - 201308
+                        Scan Connect (NGF132 Pvt. Ltd.) <br />
+                        Plot No. 11, Tech Zone IV, <br />
+                        Greater Noida, Uttar Pradesh &ndash; 201308
                       </p>
                     </div>
 
                     {/* Horizontal Divider */}
                     <div className="h-[1px] bg-[#E3E2E2] opacity-50 my-2" />
 
-                    {/* Kolkata Branch */}
+                    {/* Kolkata Branch Office */}
                     <div className="space-y-1.5">
                       <h4 className="font-['Manrope',sans-serif] font-semibold text-sm tracking-[0.7px] text-[#735C00] uppercase">
-                        KOLKATA BRANCH
+                        Kolkata Branch Office
                       </h4>
                       <p className="font-['Manrope',sans-serif] font-normal text-base text-[#1B1C1C] leading-relaxed">
-                        RDB Boulevard, Block EP&amp;GP <br />
-                        Sector V Salt Lake, Kolkata - 700091
+                        RDB Boulevard, Block EP &amp; GP, <br />
+                        Sector V, Salt Lake, <br />
+                        Kolkata, West Bengal &ndash; 700091
                       </p>
                     </div>
+
+                    <a
+                      href="https://maps.google.com/?q=Tech+Zone+4+Greater+Noida+U.P.+201308"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-sm font-bold text-[#F2BA03] hover:text-[#d19d00] transition-colors"
+                    >
+                      <MapPin className="w-3.5 h-3.5" />
+                      <span>View on Google Maps</span>
+                    </a>
                   </div>
                 </div>
 
@@ -291,13 +353,18 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
           <div className="max-w-[768px] mx-auto bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 sm:p-12 space-y-8">
             
             {/* Form Title */}
-            <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-[32px] text-[#1B1C1C] text-center">
-              Send us a direct inquiry
-            </h2>
+            <div className="text-center space-y-2">
+              <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-[32px] text-[#1B1C1C]">
+                Send Us a Message
+              </h2>
+              <p className="font-['Inter',sans-serif] text-base text-[#6B7280] max-w-xl mx-auto">
+                Have a specific question or need assistance? Fill out the form below, and our team will get back to you as soon as possible.
+              </p>
+            </div>
 
             {/* Form Inputs */}
             <form onSubmit={handleSubmitInquiry} className="space-y-6">
-              
+
               {/* 2-Column Name & Email */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Full Name */}
@@ -310,6 +377,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Enter your full name"
                     className="w-full h-[51px] bg-[#F5F3F3] px-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all rounded-none"
                   />
                 </div>
@@ -323,10 +391,25 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     type="email"
                     required
                     value={email}
+                    placeholder="Enter your email address"
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full h-[51px] bg-[#F5F3F3] px-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all rounded-none"
                   />
                 </div>
+              </div>
+
+              {/* Phone Number (Optional) */}
+              <div className="space-y-2">
+                <label className="block font-['Manrope',sans-serif] font-medium text-xs text-[#4D4635] uppercase">
+                  PHONE NUMBER (OPTIONAL)
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Enter your contact number"
+                  className="w-full h-[51px] bg-[#F5F3F3] px-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all rounded-none"
+                />
               </div>
 
               {/* Subject Dropdown */}
@@ -339,19 +422,28 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                   onChange={(e) => setSubject(e.target.value)}
                   className="w-full h-[51px] bg-[#F5F3F3] px-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none cursor-pointer transition-all rounded-none"
                 >
+                  <option value="General Enquiry">General Enquiry</option>
+                  <option value="Product Information">Product Information</option>
                   <option value="Technical Support">Technical Support</option>
-                  <option value="Sales & Subscription">Sales &amp; Subscription</option>
-                  <option value="Reseller & Franchise">Reseller &amp; Franchise Partnership</option>
-                  <option value="Bulk Order for Society">Bulk Order for Housing Society / Garage</option>
-                  <option value="General Inquiry">General Inquiry</option>
+                  <option value="Order & Delivery">Order &amp; Delivery</option>
+                  <option value="Activation Support">Activation Support</option>
+                  <option value="Bulk Orders">Bulk Orders</option>
+                  <option value="Business Partnership">Business Partnership</option>
+                  <option value="Reseller Program">Reseller Program</option>
+                  <option value="Franchise Enquiry">Franchise Enquiry</option>
+                  <option value="Feedback">Feedback</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 
               {/* Message Textarea */}
               <div className="space-y-2">
                 <label className="block font-['Manrope',sans-serif] font-medium text-xs text-[#4D4635] uppercase">
-                  YOUR MESSAGE
+                  MESSAGE
                 </label>
+                <p className="font-['Manrope',sans-serif] text-xs text-[#5F5E5E]">
+                  Tell us how we can help you. Please provide as much detail as possible so our team can assist you efficiently.
+                </p>
                 <textarea
                   rows={5}
                   required
@@ -371,7 +463,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                   className="w-4 h-4 bg-white border border-[#E3E2E2] rounded-xs accent-[#F2BA03] cursor-pointer"
                 />
                 <label htmlFor="consent-check" className="font-['Manrope',sans-serif] font-medium text-xs text-[#5F5E5E] cursor-pointer select-none">
-                  I agree to receive communications from SCAN ME regarding my request.
+                  I agree to receive communications from Scan Connect regarding my request.
                 </label>
               </div>
 
@@ -394,6 +486,63 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
             </form>
           </div>
         </div>
+
+
+        {/* SECTION 4: WHY CONTACT SCAN CONNECT? */}
+        <section className="py-16 sm:py-20 bg-white border-t border-[#E3E2E2]">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-10 space-y-2">
+              <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-black text-3xl sm:text-4xl text-[#1B1C1C]">
+                Why Contact Scan Connect?
+              </h2>
+              <p className="text-[#6B7280] text-base sm:text-lg">
+                Our dedicated support team can help you with:
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {whyContact.map((item) => (
+                <div key={item} className="flex items-center gap-3 bg-neutral-50/70 border border-[#E3E2E2] rounded-xl p-4">
+                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] shrink-0" />
+                  <span className="font-['Hanken_Grotesk'] font-medium text-sm text-[#1B1C1C]">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+        {/* SECTION 5: YOUR PRIVACY MATTERS */}
+        <section className="py-12 bg-[#FAFAFA] border-t border-[#E3E2E2]">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-3">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200">
+              <ShieldCheck className="w-4 h-4 text-[#F2BA03]" />
+              <span className="font-bold text-xs tracking-wider uppercase text-[#1B1C1C]">Your Privacy Matters</span>
+            </div>
+            <p className="text-[#6B7280] text-sm sm:text-base leading-relaxed">
+              Every inquiry is handled with the highest level of confidentiality. Your personal information is securely protected and used only to respond to your request&mdash;we never share your data with third parties.
+            </p>
+          </div>
+        </section>
+
+
+        {/* SECTION 6: CLOSING CTA */}
+        <section className="py-16 sm:py-20 bg-[#1B1C1C] text-white text-center">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-4xl tracking-tight">
+              Let&apos;s Build Smarter &amp; Safer Mobility Together
+            </h2>
+            <p className="text-neutral-300 text-base sm:text-lg leading-relaxed">
+              Whether you&apos;re looking to secure a single vehicle or implement intelligent parking solutions for your organization, Scan Connect is here to help.
+            </p>
+            <p className="font-['Hanken_Grotesk'] font-bold text-lg text-[#F2BA03]">
+              📞 Call Us &bull; 📧 Email Us &bull; 💬 Send a Message
+            </p>
+            <p className="text-neutral-400 text-sm">
+              We&apos;re committed to delivering fast, friendly, and reliable support every step of the way.
+            </p>
+          </div>
+        </section>
 
       </main>
 
