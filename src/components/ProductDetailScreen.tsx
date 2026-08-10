@@ -4,6 +4,7 @@ import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { CheckoutFlowScreen } from './CheckoutFlowScreen';
 import qrImage from '../assets/images/qrimage.png';
+import builtForOpenRoadImg from '../assets/images/builtforopenroad.jpg';
 import {
   Star,
   Truck,
@@ -289,11 +290,11 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             
             {/* Left Photo */}
             <div className="lg:col-span-5 flex justify-center">
-              <div className="relative w-full rounded-[16px] overflow-hidden flex items-center justify-center">
+              <div className="relative w-full rounded-[16px] overflow-hidden">
                 <img
-                  src={qrImage}
-                  alt="SCAN CONNECT Tag"
-                  className="h-[320px] sm:h-[420px] w-auto object-cover"
+                  src={builtForOpenRoadImg}
+                  alt="SCAN CONNECT Tag on Car Windshield"
+                  className="w-full h-[320px] sm:h-[420px] object-cover"
                 />
               </div>
             </div>
