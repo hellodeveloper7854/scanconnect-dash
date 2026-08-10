@@ -10,7 +10,6 @@ import {
   Building2,
   Home,
   ParkingSquare,
-  Star,
   ArrowRight,
   ShieldCheck,
 } from 'lucide-react';
@@ -106,79 +105,12 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
 
               {/* Right Column Image */}
               <div className="lg:col-span-6 flex justify-center lg:justify-end">
-                <div className="relative overflow-hidden rounded-2xl shadow-lg max-w-lg w-full">
+                <div className="relative overflow-hidden  max-w-lg w-full">
                   <img
                     src={aboutBannerImg}
                     alt="ScanConnect Tag on Car"
                     className="w-full h-[360px] sm:h-[420px] object-cover"
                   />
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </section>
-
-        {/* 2. SHARK TANK INDIA & STATS CARD SECTION */}
-        <section className="py-10 sm:py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-[#2D2F31] text-white rounded-3xl p-8 sm:p-12 lg:p-14 shadow-2xl space-y-8 relative overflow-hidden">
-              
-              {/* Background Accent Glow */}
-              <div className="absolute top-0 right-0 w-96 h-96 bg-[#F2BA03]/10 rounded-full blur-3xl pointer-events-none" />
-
-              {/* Shark Tank Badge Header */}
-              <div className="flex items-center gap-2 text-white font-bold text-xs uppercase tracking-widest bg-[#0F0F0F]/60 w-fit px-3 py-1.5 rounded-full">
-                <Star className="w-3.5 h-3.5 fill-[#F2BA03] text-[#F2BA03]" />
-                <span>SHARK TANK INDIA &bull; SEASON 5</span>
-              </div>
-
-              {/* Title & Subtitle */}
-              <div className="space-y-4 max-w-3xl relative z-10">
-                <h2 className="font-['Comic_Relief','Comic_Sans_MS',cursive] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
-                  From a parking problem to 9.5 lakh tags.
-                </h2>
-                <p className="text-neutral-300 text-base leading-relaxed font-normal">
-                  We pitched SCAN ME on Shark Tank India and walked away with the conviction that privacy-first contact belongs on every vehicle. Since then we&apos;ve grown 4x and crossed 950,000 active tags across the country.
-                </p>
-              </div>
-
-              {/* 4 Grid Stats Boxes */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-4 relative z-10">
-                <div className="bg-white/10 rounded-2xl p-6 space-y-1">
-                  <div className="text-3xl sm:text-4xl font-black text-[#F2BA03] font-sans">
-                    950k+
-                  </div>
-                  <div className="text-xs font-bold tracking-widest text-neutral-300 uppercase">
-                    ACTIVE TAGS
-                  </div>
-                </div>
-
-                <div className="bg-white/10 rounded-2xl p-6 space-y-1">
-                  <div className="text-3xl sm:text-4xl font-black text-[#F2BA03] font-sans">
-                    4x
-                  </div>
-                  <div className="text-xs font-bold tracking-widest text-neutral-300 uppercase">
-                    REVENUE GROWTH
-                  </div>
-                </div>
-
-                <div className="bg-white/10 rounded-2xl p-6 space-y-1">
-                  <div className="text-3xl sm:text-4xl font-black text-[#F2BA03] font-sans">
-                    98.7%
-                  </div>
-                  <div className="text-xs font-bold tracking-widest text-neutral-300 uppercase">
-                    SATISFACTION
-                  </div>
-                </div>
-
-                <div className="bg-white/10 rounded-2xl p-6 space-y-1">
-                  <div className="text-3xl sm:text-4xl font-black text-[#F2BA03] font-sans">
-                    28
-                  </div>
-                  <div className="text-xs font-bold tracking-widest text-neutral-300 uppercase">
-                    STATES SERVED
-                  </div>
                 </div>
               </div>
 
