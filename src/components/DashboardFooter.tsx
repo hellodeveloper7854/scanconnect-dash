@@ -107,15 +107,21 @@ export const DashboardFooter: React.FC = () => {
             </h4>
             <ul className="space-y-3 text-sm font-medium text-white/90">
               {[
-                'Car loan calculator',
-                'Fuel prices',
-                'Contact parked car owner',
-                'Auto FAQ',
-              ].map((link) => (
-                <li key={link}>
-                  <button onClick={() => alert(`Tool: ${link}`)} className="hover:underline cursor-pointer text-left">
-                    {link}
-                  </button>
+                { label: 'Car loan calculator', href: null },
+                { label: 'Fuel prices', href: null },
+                { label: 'Contact parked car owner', href: null },
+                { label: 'FAQ', href: '/faq' },
+              ].map(({ label, href }) => (
+                <li key={label}>
+                  {href ? (
+                    <a href={href} className="hover:underline cursor-pointer text-left">
+                      {label}
+                    </a>
+                  ) : (
+                    <button onClick={() => alert(`Tool: ${label}`)} className="hover:underline cursor-pointer text-left">
+                      {label}
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

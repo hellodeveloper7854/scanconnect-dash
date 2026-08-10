@@ -20,6 +20,7 @@ import { OrderContactPage } from './pages/OrderContactPage';
 import { BlogListPage } from './pages/BlogListPage';
 import { BlogPostPage } from './pages/BlogPostPage';
 import { InvestorsPage } from './pages/InvestorsPage';
+import { FaqPage } from './pages/FaqPage';
 import { AdminApp } from './pages/admin/AdminApp';
 
 const getInitialScreenFromUrl = (): ScreenType => {
@@ -58,6 +59,10 @@ export default function App() {
 
   if (path === '/investors') {
     return <InvestorsPage />;
+  }
+
+  if (path === '/faq') {
+    return <FaqPage />;
   }
 
   return <MainApp />;
