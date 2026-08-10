@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Car, ShoppingCart, IndianRupee, UserCheck, UserPlus } from 'lucide-react';
+import { Users, Car, ShoppingCart, IndianRupee, UserCheck, UserPlus, Star, Siren } from 'lucide-react';
 import { api } from '../../lib/api';
 
 interface AdminStats {
   users: { total: number; emailVerified: number; mobileLinked: number; newLast30Days: number };
   vehicles: { total: number };
   orders: { total: number; paid: number; pending: number; failed: number; revenueInPaise: number };
+  reviews: { total: number; averageRating: number };
+  sosAlerts: { total: number; active: number };
 }
 
 const StatCard: React.FC<{ label: string; value: string; icon: React.ElementType }> = ({ label, value, icon: Icon }) => (
@@ -72,6 +74,16 @@ export const AdminDashboard: React.FC = () => {
           <StatCard label="Pending" value={String(stats.orders.pending)} icon={ShoppingCart} />
           <StatCard label="Failed" value={String(stats.orders.failed)} icon={ShoppingCart} />
           <StatCard label="Revenue (paid)" value={revenue} icon={IndianRupee} />
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-sm font-bold uppercase tracking-wide text-white/50 mb-3">Reviews & SOS</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard label="Total Reviews" value={String(stats.reviews.total)} icon={Star} />
+          <StatCard label="Average Rating" value={stats.reviews.averageRating.toFixed(1)} icon={Star} />
+          <StatCard label="Total SOS Alerts" value={String(stats.sosAlerts.total)} icon={Siren} />
+          <StatCard label="Active SOS Alerts" value={String(stats.sosAlerts.active)} icon={Siren} />
         </div>
       </div>
     </div>

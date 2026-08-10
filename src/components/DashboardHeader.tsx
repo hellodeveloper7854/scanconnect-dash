@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Bell, HelpCircle, LogOut, ShieldAlert, User, Menu, X, Car, ChevronDown } from 'lucide-react';
+import { Bell, HelpCircle, LogOut, ShieldAlert, User, Menu, X, ChevronDown, Package } from 'lucide-react';
 import { UserFormData } from '../types';
+import { api, ApiError } from '../lib/api';
 import logoImg from '../assets/images/logo.png';
 
 interface DashboardHeaderProps {
@@ -31,9 +32,32 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   };
 
   const triggerSosAlert = () => {
-    setSosActive(true);
-    alert('🚨 EMERGENCY SOS DISPATCHED: Alert sent to emergency contacts & nearby ScanConnect response team!');
-    setTimeout(() => setSosActive(false), 5000);
+    if (!isLoggedIn) {
+      alert('Please sign in to use the SOS emergency alert.');
+      return;
+    }
+
+    const sendAlert = async (coords?: { latitude: number; longitude: number }) => {
+      setSosActive(true);
+      try {
+        await api.post('/api/sos', coords);
+        alert('🚨 EMERGENCY SOS DISPATCHED: Alert sent to emergency contacts & nearby ScanConnect response team!');
+      } catch (err) {
+        alert(err instanceof ApiError ? err.message : 'Failed to dispatch SOS alert. Please try again.');
+      } finally {
+        setTimeout(() => setSosActive(false), 5000);
+      }
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => sendAlert({ latitude: position.coords.latitude, longitude: position.coords.longitude }),
+        () => sendAlert(),
+        { timeout: 3000 },
+      );
+    } else {
+      sendAlert();
+    }
   };
 
   return (
@@ -159,11 +183,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                       <button
                         onClick={() => {
                           setUserDropdownOpen(false);
-                          alert(`Vehicle ID: SC-MH12-9881\nStatus: Active Privacy Shield`);
+                          handleNav('My Orders');
                         }}
                         className="w-full text-left px-4 py-2 text-xs font-semibold hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
                       >
-                        <Car className="w-4 h-4 text-[#f5b800]" /> Vehicle Details
+                        <Package className="w-4 h-4 text-[#f5b800]" /> My Orders
                       </button>
                       <button
                         onClick={() => {

@@ -5,6 +5,8 @@ import { AdminLayout } from './AdminLayout';
 import { AdminDashboard } from './AdminDashboard';
 import { AdminOrders } from './AdminOrders';
 import { AdminUsers } from './AdminUsers';
+import { AdminReviews } from './AdminReviews';
+import { AdminSosAlerts } from './AdminSosAlerts';
 import { AdminLogin } from './AdminLogin';
 
 export const AdminApp: React.FC = () => (
@@ -16,6 +18,8 @@ export const AdminApp: React.FC = () => (
           <Route index element={<AdminDashboard />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="reviews" element={<AdminReviews />} />
+          <Route path="sos-alerts" element={<AdminSosAlerts />} />
         </Route>
       </Routes>
     </BrowserRouter>

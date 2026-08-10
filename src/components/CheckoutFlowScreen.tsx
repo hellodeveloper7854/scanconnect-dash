@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
+import { api, ApiError } from '../lib/api';
 import qrImage from '../assets/images/qrimage.png';
 import {
   ShieldCheck,
   Lock,
   Check,
-  CreditCard,
-  Building,
-  Smartphone,
   Star,
   Info,
   ArrowRight,
@@ -19,6 +17,23 @@ import {
   Radio,
   Truck
 } from 'lucide-react';
+
+// Temporary: checkout always charges this seeded product until the Shop
+// catalog is wired up to real backend products with matching UUIDs.
+const CHECKOUT_PRODUCT_ID = '5ab6e299-8795-4cfa-8293-d315bb75e98a';
+
+declare global {
+  interface Window {
+    Razorpay: new (options: Record<string, unknown>) => { open: () => void };
+  }
+}
+
+interface OrderRecord {
+  id: string;
+  totalInPaise: number;
+  status: string;
+  items: { quantity: number; product: { name: string; priceInPaise: number } }[];
+}
 
 interface CheckoutFlowScreenProps {
   userData: UserFormData;
@@ -56,17 +71,35 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   const [pincode, setPincode] = useState(userData.pincode || '');
   const [address, setAddress] = useState(userData.address || '');
 
-  // Form states for Payment (Step 2)
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'upi' | 'netbanking'>('card');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardHolder, setCardHolder] = useState('YOUR NAME');
-  const [cardExpiry, setCardExpiry] = useState('MM/YY');
-  const [cardCvv, setCardCvv] = useState('');
+  // Payment (Step 2) — Razorpay handles the actual payment method selection
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
+  const [completedOrder, setCompletedOrder] = useState<OrderRecord | null>(null);
 
   // Form states for Review (Step 3)
   const [rating, setRating] = useState(5);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewError, setReviewError] = useState('');
+
+  const handleSubmitReview = async () => {
+    if (!completedOrder) return;
+    setIsSubmittingReview(true);
+    setReviewError('');
+    try {
+      await api.post('/api/reviews', {
+        orderId: completedOrder.id,
+        rating,
+        comment: reviewComment.trim() || undefined,
+      });
+      setReviewSubmitted(true);
+    } catch (err) {
+      setReviewError(err instanceof ApiError ? err.message : 'Failed to submit review');
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
@@ -82,11 +115,68 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
       onNavigate('contact');
     } else if (navItem === 'Profile' || navItem === 'profile') {
       onNavigate('profile');
+    } else if (navItem === 'My Orders') {
+      onNavigate('orders');
+    }
+  };
+
+  const handlePayNow = async () => {
+    setPaymentError('');
+    setIsProcessingPayment(true);
+    try {
+      const created = await api.post<{
+        order: OrderRecord;
+        razorpayOrderId: string;
+        razorpayKeyId: string;
+        amount: number;
+        currency: string;
+      }>('/api/orders', { items: [{ productId: CHECKOUT_PRODUCT_ID, quantity: 1 }] });
+
+      const razorpay = new window.Razorpay({
+        key: created.razorpayKeyId,
+        order_id: created.razorpayOrderId,
+        amount: created.amount,
+        currency: created.currency,
+        name: 'ScanConnect',
+        description: 'QR Sticker Order',
+        prefill: {
+          name: fullName || userData.fullName,
+          contact: phone || userData.mobileNumber,
+          email: userData.email,
+        },
+        handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+          try {
+            const verified = await api.post<{ order: OrderRecord }>('/api/orders/verify', {
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            });
+            setCompletedOrder(verified.order);
+            setStep(3);
+          } catch (err) {
+            setPaymentError(err instanceof ApiError ? err.message : 'Payment verification failed. Please contact support.');
+          } finally {
+            setIsProcessingPayment(false);
+          }
+        },
+        modal: {
+          ondismiss: () => setIsProcessingPayment(false),
+        },
+        theme: { color: '#F2BA03' },
+      });
+
+      razorpay.open();
+    } catch (err) {
+      setPaymentError(err instanceof ApiError ? err.message : 'Failed to start payment. Please try again.');
+      setIsProcessingPayment(false);
     }
   };
 
   const productTitle = product?.title || 'SCAN CONNECT Tag';
   const productPrice = product?.price || '₹499';
+  const orderTotalDisplay = completedOrder
+    ? (completedOrder.totalInPaise / 100).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })
+    : productPrice;
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#1B1C1C] font-['Hanken_Grotesk'] antialiased">
@@ -396,249 +486,30 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
           <div className="space-y-8 animate-fade-in">
             <div className="space-y-1">
               <h2 className="font-['Plus_Jakarta_Sans'] font-normal text-[24px] sm:text-[28px] leading-[32px] text-[#1B1C1C]">
-                Choose Payment Method
+                Complete Your Payment
               </h2>
               <p className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
-                All transactions are encrypted and secure.
+                All transactions are encrypted and secure. You&apos;ll choose your payment method on the next screen.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-[24px] items-start">
-              
-              {/* Left Column: Payment Accordion Options */}
-              <div className="lg:col-span-7 space-y-[16px]">
-                
-                {/* Option 1: Credit / Debit Card */}
-                <div
-                  className={`bg-[#FFFFFF] border rounded-[12px] p-[24px] transition-all shadow-[0px_4px_20px_-2px_rgba(0,0,0,0.05)] ${
-                    paymentMethod === 'card'
-                      ? 'border-[#CCC7AA] ring-1 ring-[#F2BA03]'
-                      : 'border-[#CCC7AA]'
-                  }`}
-                >
-                  <div
-                    onClick={() => setPaymentMethod('card')}
-                    className="flex items-center justify-between cursor-pointer"
-                  >
-                    <div className="flex items-center gap-[12px]">
-                      <div className="w-[40px] h-[40px] rounded-full bg-[#F2BA03] flex items-center justify-center shrink-0">
-                        <CreditCard className="w-[20px] h-[16px] text-[#FFFFFF]" />
-                      </div>
-                      <span className="font-['Rubik'] font-bold text-[20px] leading-[24px] text-[#1B1C1C]">
-                        Credit / Debit Card
-                      </span>
-                    </div>
+            <div className="max-w-[480px] mx-auto w-full">
+              <div className="bg-[#FFFFFF] border border-[#CCC7AA] shadow-[0px_4px_20px_-2px_rgba(0,0,0,0.05)] rounded-[16px] p-[33px] flex flex-col gap-[24px] relative">
 
-                    <div className="flex items-center gap-[8px]">
-                      <span className="w-[40px] h-[24px] bg-[#E9E8E7] rounded-[4px] flex items-center justify-center font-['Hanken_Grotesk'] font-bold text-[10px] leading-[15px] text-[#5F5E5E]">
-                        VISA
-                      </span>
-                      <span className="w-[40px] h-[24px] bg-[#E9E8E7] rounded-[4px] flex items-center justify-center font-['Hanken_Grotesk'] font-bold text-[10px] leading-[15px] text-[#5F5E5E]">
-                        MC
-                      </span>
-                    </div>
-                  </div>
-
-                  {paymentMethod === 'card' && (
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-[24px] pt-[24px] mt-[24px] border-t border-[#CCC7AA]">
-                      
-                      {/* Dark Credit Card Graphic Preview */}
-                      <div className="md:col-span-5 bg-gradient-to-br from-[#303031] to-[#1E1E1E] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] text-white rounded-[16px] p-[24px] flex flex-col justify-between aspect-[1.51] relative overflow-hidden">
-                        <div className="flex items-center justify-between">
-                          <span className="font-['Hanken_Grotesk'] font-normal text-[10px] leading-[15px] text-white opacity-70 uppercase">
-                            DIGITAL ASSET KEY
-                          </span>
-                          <div className="w-5 h-5 opacity-50 flex items-center justify-center">
-                            <Radio className="w-4 h-4 rotate-90" />
-                          </div>
-                        </div>
-
-                        {/* Gold Chip */}
-                        <div className="w-[48px] h-[32px] bg-[rgba(255,239,0,0.2)] rounded-[6px] my-2" />
-
-                        <div className="space-y-2">
-                          <div className="font-['Liberation_Mono',monospace] font-normal text-[18px] sm:text-[20px] leading-[28px] tracking-[4px] text-white">
-                            {cardNumber || '•••• •••• •••• ••••'}
-                          </div>
-                          <div className="flex justify-between items-end text-white">
-                            <div>
-                              <span className="block font-['Hanken_Grotesk'] font-normal text-[8px] leading-[12px] uppercase opacity-50">
-                                CARD HOLDER
-                              </span>
-                              <span className="font-['Hanken_Grotesk'] font-semibold text-[12px] leading-[16px] tracking-[0.6px] block">
-                                {cardHolder || 'FULL NAME'}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="block font-['Hanken_Grotesk'] font-normal text-[8px] leading-[12px] uppercase opacity-50">
-                                EXPIRES
-                              </span>
-                              <span className="font-['Hanken_Grotesk'] font-semibold text-[12px] leading-[16px] block">
-                                {cardExpiry || 'MM/YY'}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Card Input Fields */}
-                      <div className="md:col-span-7 space-y-[16px]">
-                        <div className="flex flex-col gap-[4px]">
-                          <label className="font-['Hanken_Grotesk'] font-normal text-[10px] leading-[15px] text-[#5F5E5E]">
-                            CARD NUMBER
-                          </label>
-                          <input
-                            type="text"
-                            maxLength={19}
-                            value={cardNumber}
-                            onChange={(e) => setCardNumber(e.target.value)}
-                            placeholder="0000 0000 0000 0000"
-                            className="w-full h-[50px] bg-[#FFFFFF] border border-[#CCC7AA] rounded-[8px] px-[16px] font-['Liberation_Mono',monospace] font-normal text-[16px] leading-[18px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#F2BA03]"
-                          />
-                        </div>
-
-                        <div className="flex flex-col gap-[4px]">
-                          <label className="font-['Hanken_Grotesk'] font-normal text-[10px] leading-[15px] text-[#5F5E5E]">
-                            CARD HOLDER NAME
-                          </label>
-                          <input
-                            type="text"
-                            value={cardHolder}
-                            onChange={(e) => setCardHolder(e.target.value)}
-                            placeholder="FULL NAME"
-                            className="w-full h-[50px] bg-[#FFFFFF] border border-[#CCC7AA] rounded-[8px] px-[16px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] uppercase text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#F2BA03]"
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-[16px]">
-                          <div className="flex flex-col gap-[4px]">
-                            <label className="font-['Hanken_Grotesk'] font-normal text-[10px] leading-[15px] text-[#5F5E5E]">
-                              EXPIRY
-                            </label>
-                            <input
-                              type="text"
-                              maxLength={5}
-                              value={cardExpiry}
-                              onChange={(e) => setCardExpiry(e.target.value)}
-                              placeholder="MM/YY"
-                              className="w-full h-[50px] bg-[#FFFFFF] border border-[#CCC7AA] rounded-[8px] px-[16px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#F2BA03]"
-                            />
-                          </div>
-
-                          <div className="flex flex-col gap-[4px]">
-                            <label className="font-['Hanken_Grotesk'] font-normal text-[10px] leading-[15px] text-[#5F5E5E]">
-                              CVV
-                            </label>
-                            <input
-                              type="password"
-                              maxLength={4}
-                              value={cardCvv}
-                              onChange={(e) => setCardCvv(e.target.value)}
-                              placeholder="•••"
-                              className="w-full h-[50px] bg-[#FFFFFF] border border-[#CCC7AA] rounded-[8px] px-[16px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#F2BA03]"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-                  )}
-                </div>
-
-                {/* Option 2: UPI / Wallets */}
-                <div
-                  onClick={() => setPaymentMethod('upi')}
-                  className={`bg-[#FFFFFF] border rounded-[12px] p-[24px] transition-all shadow-[0px_4px_20px_-2px_rgba(0,0,0,0.05)] cursor-pointer ${
-                    paymentMethod === 'upi'
-                      ? 'border-[#CCC7AA] ring-1 ring-[#F2BA03]'
-                      : 'border-[#CCC7AA]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-[12px]">
-                      <div className="w-[40px] h-[40px] rounded-full bg-[#E9E8E7] flex items-center justify-center shrink-0">
-                        <Smartphone className="w-[19px] h-[18px] text-[#5F5E5E]" />
-                      </div>
-                      <span className="font-['Plus_Jakarta_Sans'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
-                        UPI / Wallets
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-[16px]">
-                      <span className="px-[8px] py-[4px] bg-[#E9E8E7] rounded-[4px] font-['Hanken_Grotesk'] font-bold text-[10px] leading-[15px] text-[#5F5E5E]">
-                        GPay
-                      </span>
-                      <span className="px-[8px] py-[4px] bg-[#E9E8E7] rounded-[4px] font-['Hanken_Grotesk'] font-bold text-[10px] leading-[15px] text-[#5F5E5E]">
-                        PhonePe
-                      </span>
-                      <span className="px-[8px] py-[4px] bg-[#E9E8E7] rounded-[4px] font-['Hanken_Grotesk'] font-bold text-[10px] leading-[15px] text-[#5F5E5E]">
-                        Paytm
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Option 3: Net Banking */}
-                <div
-                  onClick={() => setPaymentMethod('netbanking')}
-                  className={`bg-[#FFFFFF] border rounded-[12px] p-[24px] transition-all shadow-[0px_4px_20px_-2px_rgba(0,0,0,0.05)] cursor-pointer ${
-                    paymentMethod === 'netbanking'
-                      ? 'border-[#CCC7AA] ring-1 ring-[#F2BA03]'
-                      : 'border-[#CCC7AA]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-[12px]">
-                      <div className="w-[40px] h-[40px] rounded-full bg-[#E9E8E7] flex items-center justify-center shrink-0">
-                        <Building className="w-[20px] h-[20px] text-[#5F5E5E]" />
-                      </div>
-                      <span className="font-['Plus_Jakarta_Sans'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
-                        Net Banking
-                      </span>
-                    </div>
-                  </div>
-
-                  {paymentMethod === 'netbanking' && (
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-[16px] pt-[24px] mt-[24px] border-t border-[#CCC7AA]">
-                      {['HDFC', 'SBI', 'ICICI', 'AXIS'].map((bank) => (
-                        <button
-                          key={bank}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            alert(`Selected ${bank} Net Banking`);
-                          }}
-                          className="h-[48px] border border-[#CCC7AA] rounded-[8px] flex items-center justify-center font-['Hanken_Grotesk'] font-bold text-[10px] leading-[15px] text-[#5F5E5E] hover:border-[#F2BA03] hover:bg-[#F2BA03]/10 cursor-pointer transition-colors"
-                        >
-                          {bank}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-              </div>
-
-              {/* Right Column: Payment Summary Sidebar */}
-              <div className="lg:col-span-5 bg-[#FFFFFF] border border-[#CCC7AA] shadow-[0px_4px_20px_-2px_rgba(0,0,0,0.05)] rounded-[16px] p-[33px] flex flex-col gap-[24px] relative">
-                
                 {/* Heading 2 */}
                 <h3 className="font-['Rubik'] font-bold text-[26px] sm:text-[28px] leading-[36px] text-[#1B1C1C]">
                   Payment Summary
                 </h3>
 
-                {/* Subtotal, Shipping, Tax Breakdown */}
+                {/* Subtotal, Shipping Breakdown */}
                 <div className="space-y-[16px] font-['Hanken_Grotesk'] text-[16px] leading-[24px]">
                   <div className="flex justify-between text-[#5F5E5E]">
                     <span>Subtotal</span>
-                    <span>₹499.00</span>
+                    <span>{productPrice}</span>
                   </div>
                   <div className="flex justify-between text-[#5F5E5E]">
                     <span>Shipping</span>
                     <span className="font-bold text-[#676000]">FREE</span>
-                  </div>
-                  <div className="flex justify-between text-[#5F5E5E]">
-                    <span>Tax</span>
-                    <span>₹0.00</span>
                   </div>
 
                   <div className="border-t border-[#CCC7AA] pt-[16px] flex justify-between items-end text-[#1B1C1C]">
@@ -659,34 +530,33 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       Secure Transaction
                     </span>
                     <p className="font-['Hanken_Grotesk'] font-normal text-[11px] leading-[14px] text-[#5F5E5E]">
-                      Your data is fully encrypted with bank-grade security protocols.
+                      Handled by Razorpay with bank-grade encryption. Card details never touch our servers.
                     </p>
                   </div>
                 </div>
 
+                {paymentError && (
+                  <p className="text-sm font-semibold text-red-600">{paymentError}</p>
+                )}
+
                 {/* Pay Now Button */}
                 <button
-                  onClick={() => setStep(3)}
-                  className="w-full h-[68px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-[12px] flex items-center justify-center gap-[8px] font-['Hanken_Grotesk'] font-bold text-[18px] leading-[28px] text-[#736B00] shadow-xs transition-colors cursor-pointer active:scale-95"
+                  onClick={handlePayNow}
+                  disabled={isProcessingPayment}
+                  className="w-full h-[68px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-[12px] flex items-center justify-center gap-[8px] font-['Hanken_Grotesk'] font-bold text-[18px] leading-[28px] text-[#736B00] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
                 >
-                  <span>Pay Now</span>
-                  <ArrowRight className="w-[16px] h-[16px] text-[#736B00]" />
+                  <span>{isProcessingPayment ? 'Processing...' : 'Pay Now'}</span>
+                  {!isProcessingPayment && <ArrowRight className="w-[16px] h-[16px] text-[#736B00]" />}
                 </button>
 
                 {/* Footer Badges Info */}
                 <div className="space-y-[12px] text-center pt-[8px]">
                   <span className="font-['Hanken_Grotesk'] font-normal text-[10px] leading-[15px] tracking-[1px] text-[#5F5E5E] uppercase block">
-                    GUARANTEED SAFE CHECKOUT
+                    GUARANTEED SAFE CHECKOUT VIA RAZORPAY
                   </span>
-                  <div className="flex items-center justify-center gap-[16px]">
-                    <div className="w-[32px] h-[16px] bg-[#E9E8E7] rounded-[4px]" />
-                    <div className="w-[32px] h-[16px] bg-[#E9E8E7] rounded-[4px]" />
-                    <div className="w-[32px] h-[16px] bg-[#E9E8E7] rounded-[4px]" />
-                  </div>
                 </div>
 
               </div>
-
             </div>
           </div>
         )}
@@ -713,7 +583,11 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               {/* Subtext Container */}
               <div>
                 <p className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
-                  Your order <span className="font-bold text-[#1B1C1C]">#SN-082194</span> has been confirmed and is being prepared for shipment.
+                  Your order{' '}
+                  <span className="font-bold text-[#1B1C1C]">
+                    #{completedOrder ? completedOrder.id.slice(0, 8).toUpperCase() : '—'}
+                  </span>{' '}
+                  has been confirmed and is being prepared for shipment.
                 </p>
               </div>
             </div>
@@ -753,7 +627,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               <div className="space-y-[12px] pt-[8px] font-['Hanken_Grotesk'] text-[16px] leading-[24px]">
                 <div className="flex justify-between text-[#5F5E5E]">
                   <span>Subtotal</span>
-                  <span className="text-[#5F5E5E]">{productPrice}</span>
+                  <span className="text-[#5F5E5E]">{orderTotalDisplay}</span>
                 </div>
                 <div className="flex justify-between text-[#5F5E5E]">
                   <span>Standard Shipping</span>
@@ -761,7 +635,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 </div>
                 <div className="flex justify-between text-[#1B1C1C] pt-[8px] border-t border-[#EFEDED] font-bold text-[18px] leading-[28px]">
                   <span>Total</span>
-                  <span>{productPrice}</span>
+                  <span>{orderTotalDisplay}</span>
                 </div>
               </div>
 
@@ -836,12 +710,17 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     />
                   </div>
 
+                  {reviewError && (
+                    <p className="text-sm font-semibold text-red-600">{reviewError}</p>
+                  )}
+
                   {/* Submit Feedback Button */}
                   <button
-                    onClick={() => setReviewSubmitted(true)}
-                    className="w-full sm:w-[170px] h-[48px] bg-[#1B1C1C] hover:bg-neutral-800 text-white font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] rounded-[8px] transition-colors cursor-pointer active:scale-95 flex items-center justify-center"
+                    onClick={handleSubmitReview}
+                    disabled={isSubmittingReview || !completedOrder}
+                    className="w-full sm:w-[170px] h-[48px] bg-[#1B1C1C] hover:bg-neutral-800 text-white font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] rounded-[8px] transition-colors cursor-pointer active:scale-95 flex items-center justify-center disabled:opacity-60"
                   >
-                    Submit Review
+                    {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
                   </button>
                 </div>
               ) : (

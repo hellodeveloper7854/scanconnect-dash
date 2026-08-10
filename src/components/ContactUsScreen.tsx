@@ -91,6 +91,8 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
       onNavigate('contact');
     } else if (navItem === 'Profile' || navItem === 'profile') {
       onNavigate('profile');
+    } else if (navItem === 'My Orders') {
+      onNavigate('orders');
     } else {
       alert(`Navigating to ${navItem}`);
     }

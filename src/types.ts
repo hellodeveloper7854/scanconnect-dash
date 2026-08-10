@@ -1,4 +1,4 @@
-export type ScreenType = 'register' | 'login' | 'send-otp' | 'login-options' | 'verify-otp' | 'dashboard' | 'about' | 'shop' | 'contact' | 'profile' | 'qr-scan';
+export type ScreenType = 'register' | 'login' | 'send-otp' | 'login-options' | 'verify-otp' | 'dashboard' | 'about' | 'shop' | 'contact' | 'profile' | 'qr-scan' | 'orders';
 
 export interface UserFormData {
   fullName: string;

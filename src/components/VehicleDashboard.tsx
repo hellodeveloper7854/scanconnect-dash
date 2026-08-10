@@ -207,6 +207,8 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             onNavigate('contact');
           } else if ((nav === 'Profile' || nav === 'profile') && onNavigate) {
             onNavigate('profile');
+          } else if (nav === 'My Orders' && onNavigate) {
+            onNavigate('orders');
           } else if (nav === 'QR Scan') {
             if (onNavigate) {
               onNavigate('qr-scan');

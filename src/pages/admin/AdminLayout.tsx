@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Navigate, Outlet } from 'react-router-dom';
-import { LayoutDashboard, ShoppingCart, Users, LogOut } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Users, LogOut, Star, Siren } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const AdminLayout: React.FC = () => {
@@ -22,6 +22,8 @@ export const AdminLayout: React.FC = () => {
     { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
     { to: '/admin/orders', label: 'Orders', icon: ShoppingCart },
     { to: '/admin/users', label: 'Users', icon: Users },
+    { to: '/admin/reviews', label: 'Reviews', icon: Star },
+    { to: '/admin/sos-alerts', label: 'SOS Alerts', icon: Siren },
   ];
 
   return (

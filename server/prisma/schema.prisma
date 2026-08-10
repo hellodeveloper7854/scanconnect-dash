@@ -36,6 +36,8 @@ model User {
   orders            Order[]
   emergencyContacts EmergencyContact[]
   preferences       UserPreferences?
+  reviews           Review[]
+  sosAlerts         SosAlert[]
 
   @@index([email])
   @@index([mobileNumber])
@@ -101,10 +103,24 @@ model Order {
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
-  items OrderItem[]
+  items  OrderItem[]
+  review Review?
 
   @@index([userId])
   @@index([status])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model OrderItem {
@@ -117,4 +133,23 @@ model OrderItem {
   priceInPaise Int
 
   @@index([orderId])
+}
+
+enum SosAlertStatus {
+  ACTIVE
+  RESOLVED
+}
+
+model SosAlert {
+  id        String         @id @default(uuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    SosAlertStatus @default(ACTIVE)
+  latitude  Float?
+  longitude Float?
+  createdAt DateTime       @default(now())
+  resolvedAt DateTime?
+
+  @@index([userId])
+  @@index([status])
 }

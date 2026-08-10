@@ -77,6 +77,8 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
       onNavigate('contact');
     } else if (navItem === 'Profile' || navItem === 'profile') {
       onNavigate('profile');
+    } else if (navItem === 'My Orders') {
+      onNavigate('orders');
     }
   };
 

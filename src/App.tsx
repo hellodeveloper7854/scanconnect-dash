@@ -15,6 +15,7 @@ import { ShopScreen } from './components/ShopScreen';
 import { ContactUsScreen } from './components/ContactUsScreen';
 import { ProfileScreen } from './components/ProfileScreen';
 import { QrScanScreen } from './components/QrScanScreen';
+import { MyOrdersScreen } from './components/MyOrdersScreen';
 import { AdminApp } from './pages/admin/AdminApp';
 
 const getInitialScreenFromUrl = (): ScreenType => {
@@ -24,6 +25,7 @@ const getInitialScreenFromUrl = (): ScreenType => {
   if (path === 'contact') return 'contact';
   if (path === 'qr-scan' || path === 'qrscan' || path === 'scan') return 'qr-scan';
   if (path === 'profile') return 'profile';
+  if (path === 'orders') return 'orders';
   if (path === 'login') return 'login-options';
   if (path === 'register') return 'register';
   return 'dashboard';
@@ -124,6 +126,8 @@ function MainApp() {
       targetScreen = 'qr-scan';
     } else if (normalized === 'profile') {
       targetScreen = isLoggedIn ? 'profile' : 'login-options';
+    } else if (normalized === 'orders' || normalized === 'my orders' || normalized === 'my-orders') {
+      targetScreen = isLoggedIn ? 'orders' : 'login-options';
     } else if (normalized === 'login') {
       targetScreen = 'login-options';
     } else if (normalized === 'register') {
@@ -183,7 +187,10 @@ function MainApp() {
   };
 
   const authOnlyScreens: ScreenType[] = ['login', 'login-options', 'register', 'send-otp'];
-  if (isSessionLoading && (activeScreen === 'profile' || authOnlyScreens.includes(activeScreen))) {
+  if (
+    isSessionLoading &&
+    (activeScreen === 'profile' || activeScreen === 'orders' || authOnlyScreens.includes(activeScreen))
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-white">
         Loading...
@@ -295,6 +302,26 @@ function MainApp() {
     return (
       <>
         <ProfileScreen
+          userData={userData}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogout}
+          onNavigate={handleGlobalNavigate}
+        />
+        {/* Interactive OTP Modal */}
+        <OtpModal
+          isOpen={isOtpModalOpen}
+          mobileNumber={otpMobileNumber}
+          onClose={() => setIsOtpModalOpen(false)}
+          onVerifySuccess={handleOtpVerifiedSuccess}
+        />
+      </>
+    );
+  }
+
+  if (activeScreen === 'orders') {
+    return (
+      <>
+        <MyOrdersScreen
           userData={userData}
           isLoggedIn={isLoggedIn}
           onLogout={handleLogout}
