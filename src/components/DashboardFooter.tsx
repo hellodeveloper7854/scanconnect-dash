@@ -107,7 +107,7 @@ export const DashboardFooter: React.FC = () => {
               {[
                 { label: 'Car loan calculator', href: null },
                 { label: 'Fuel prices', href: null },
-                { label: 'Contact parked car owner', href: null },
+                // { label: 'Contact parked car owner', href: null },
                 { label: 'FAQ', href: '/faq' },
               ].map(({ label, href }) => (
                 <li key={label}>

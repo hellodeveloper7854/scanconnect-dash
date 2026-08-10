@@ -3,14 +3,7 @@ import {
   QrCode,
   ShieldCheck,
   Scan,
-  PhoneCall,
-  MessageCircle,
-  MessageSquare,
-  Mail,
   X,
-  CheckCircle,
-  Sparkles,
-  Check,
   Car,
   Lightbulb,
   AlertTriangle,
@@ -18,12 +11,20 @@ import {
   KeyRound,
   Eye,
   ParkingSquare,
-  IndianRupee
+  IndianRupee,
+  CameraOff,
+  Loader2,
+  Check,
+  MessageSquare,
+  PhoneCall,
+  MessageCircle,
+  Mail
 } from 'lucide-react';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { UserFormData } from '../types';
 import scanBannerImg from '../assets/images/scanbanner.png';
+import { useQrScanner } from '../lib/useQrScanner';
 
 interface QrScanScreenProps {
   userData: UserFormData;
@@ -40,17 +41,18 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
 }) => {
   const [activeNav, setActiveNav] = useState('QR Scan');
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
-  const [scannedTagId, setScannedTagId] = useState('');
-  const [isScanSuccess, setIsScanSuccess] = useState(false);
 
   const handleHeaderNav = (nav: string) => {
     setActiveNav(nav);
     onNavigate(nav);
   };
 
-  const handleSimulateScan = () => {
-    setIsScanSuccess(true);
+  const handleDetect = (data: string) => {
+    const looksLikeUrl = /^https?:\/\//i.test(data);
+    window.location.href = looksLikeUrl ? data : `https://${data}`;
   };
+
+  const { videoRef, status: scannerStatus } = useQrScanner(isQrScannerOpen, handleDetect);
 
   // Why Millions Trust Scan Connect
   const trustPoints = [
@@ -325,115 +327,58 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                 </h3>
               </div>
               <button
-                onClick={() => {
-                  setIsQrScannerOpen(false);
-                  setIsScanSuccess(false);
-                }}
+                onClick={() => setIsQrScannerOpen(false)}
                 className="p-1.5 text-neutral-400 hover:text-white rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {!isScanSuccess ? (
-              <div className="space-y-4">
-                {/* Simulated Camera Scanner Viewfinder */}
-                <div className="aspect-square bg-neutral-950 rounded-2xl relative flex flex-col items-center justify-center overflow-hidden border-2 border-dashed border-[#f5b800]/50 p-6 text-center">
-                  {/* Animated Corner Reticles */}
+            <div className="aspect-square bg-neutral-950 rounded-2xl relative flex flex-col items-center justify-center overflow-hidden border-2 border-dashed border-[#f5b800]/50">
+              {scannerStatus === 'scanning' && (
+                <>
+                  {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+                  <video ref={videoRef} muted playsInline className="w-full h-full object-cover" />
                   <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[#f5b800]" />
                   <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[#f5b800]" />
                   <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[#f5b800]" />
                   <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-[#f5b800]" />
-
-                  {/* Laser Scanning Line */}
                   <div className="absolute inset-x-0 h-1 bg-[#f5b800] shadow-[0_0_15px_#f5b800] animate-pulse top-1/3" />
+                </>
+              )}
 
-                  <QrCode className="w-24 h-24 text-[#f5b800]/80 mb-3 animate-pulse" />
-                  <p className="text-xs text-neutral-300 font-mono">
-                    Point camera at vehicle SCAN ME sticker tag...
-                  </p>
-
-                  <button
-                    onClick={handleSimulateScan}
-                    className="mt-4 px-5 py-2.5 bg-[#f5b800] text-neutral-950 rounded-xl font-extrabold text-xs uppercase tracking-wider hover:bg-amber-400 cursor-pointer shadow-lg transition-transform active:scale-95 flex items-center gap-2"
-                  >
-                    <Sparkles className="w-4 h-4" /> Simulate QR Tag Detect
-                  </button>
+              {scannerStatus === 'requesting' && (
+                <div className="flex flex-col items-center gap-3 text-center p-6">
+                  <Loader2 className="w-10 h-10 text-[#f5b800] animate-spin" />
+                  <p className="text-xs text-neutral-300 font-mono">Requesting camera access...</p>
                 </div>
+              )}
 
-                <div className="pt-2">
-                  <label className="block text-xs font-bold text-neutral-400 uppercase mb-1">
-                    Or Enter Tag ID Manually:
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="e.g. SC-MH12-9881"
-                      value={scannedTagId}
-                      onChange={(e) => setScannedTagId(e.target.value)}
-                      className="flex-1 bg-neutral-950 border border-neutral-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#f5b800]"
-                    />
-                    <button
-                      onClick={handleSimulateScan}
-                      className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-bold text-xs rounded-xl cursor-pointer"
-                    >
-                      Connect
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* Success Masked Connection Screen */
-              <div className="space-y-4 animate-fade-in text-center py-2">
-                <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto">
-                  <CheckCircle className="w-8 h-8" />
-                </div>
-
-                <div>
-                  <span className="text-[10px] font-bold tracking-widest text-emerald-400 uppercase font-mono">
-                    VEHICLE TAG DETECTED
-                  </span>
-                  <h4 className="text-xl font-black text-white mt-1">
-                    Vehicle: MH-12-SC-9881
-                  </h4>
-                  <p className="text-xs text-neutral-400 mt-1">
-                    Privacy Shield Active • Owner Phone Masked
+              {scannerStatus === 'denied' && (
+                <div className="flex flex-col items-center gap-3 text-center p-6">
+                  <CameraOff className="w-10 h-10 text-rose-400" />
+                  <p className="text-sm text-white font-bold">Camera access denied</p>
+                  <p className="text-xs text-neutral-400">
+                    Scanning a QR tag needs camera permission. Enable it for this site in your browser settings and try again.
                   </p>
                 </div>
+              )}
 
-                <div className="bg-neutral-950 p-4 rounded-2xl border border-neutral-800 space-y-3 text-left">
-                  <div className="flex items-center justify-between text-xs text-neutral-300">
-                    <span className="font-bold">Contact Channel:</span>
-                    <span className="text-amber-400 font-mono">Private Proxy Bridge</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-neutral-300">
-                    <span className="font-bold">Your Number Exposed:</span>
-                    <span className="text-emerald-400 font-bold">NEVER (0%)</span>
-                  </div>
+              {scannerStatus === 'unsupported' && (
+                <div className="flex flex-col items-center gap-3 text-center p-6">
+                  <CameraOff className="w-10 h-10 text-rose-400" />
+                  <p className="text-sm text-white font-bold">Camera not available</p>
+                  <p className="text-xs text-neutral-400">
+                    This browser or device doesn&apos;t support camera access, so QR scanning isn&apos;t possible here.
+                  </p>
                 </div>
+              )}
+            </div>
 
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <button
-                    onClick={() => alert('📞 Initiating Privacy-Masked Voice Call to Vehicle Owner...')}
-                    className="py-3 bg-amber-400 text-neutral-950 font-black text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 cursor-pointer hover:bg-amber-300"
-                  >
-                    <PhoneCall className="w-4 h-4" /> Masked Call
-                  </button>
-                  <button
-                    onClick={() => alert('💬 Opening Anonymous WhatsApp Proxy Chat with Vehicle Owner...')}
-                    className="py-3 bg-emerald-500 text-neutral-950 font-black text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 cursor-pointer hover:bg-emerald-400"
-                  >
-                    <MessageCircle className="w-4 h-4" /> WhatsApp
-                  </button>
-                </div>
-
-                <button
-                  onClick={() => setIsScanSuccess(false)}
-                  className="text-xs text-neutral-400 hover:text-white underline cursor-pointer pt-2"
-                >
-                  Scan Another Vehicle Tag
-                </button>
-              </div>
+            {scannerStatus === 'scanning' && (
+              <p className="text-xs text-neutral-400 font-mono text-center">
+                Point the camera at a Scan Connect QR tag...
+              </p>
             )}
           </div>
         </div>
