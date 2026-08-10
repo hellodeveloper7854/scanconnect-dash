@@ -89,6 +89,16 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   const [city, setCity] = useState(userData.city || '');
   const [pincode, setPincode] = useState(userData.pincode || '');
   const [address, setAddress] = useState(userData.address || '');
+  const [shippingError, setShippingError] = useState('');
+
+  const handleContinueToPayment = () => {
+    if (!fullName.trim() || !phone.trim() || !city.trim() || !pincode.trim() || !address.trim()) {
+      setShippingError('Please fill in your phone number, city, pincode, and delivery address before continuing.');
+      return;
+    }
+    setShippingError('');
+    setStep(2);
+  };
 
   // Payment (Step 2) — Razorpay handles the actual payment method selection
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -424,10 +434,11 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     {/* Frame 49: Full Name */}
                     <div className="flex flex-col gap-[10px]">
                       <label className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
-                        Full Name
+                        Full Name <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
+                        required
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="John Doe"
@@ -438,10 +449,11 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     {/* Frame 50: Phone Number */}
                     <div className="flex flex-col gap-[10px]">
                       <label className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
-                        Phone Number
+                        Phone Number <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
+                        required
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="+91 98765 43210"
@@ -452,10 +464,11 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     {/* Frame 51: City */}
                     <div className="flex flex-col gap-[10px]">
                       <label className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
-                        City
+                        City <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
+                        required
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         placeholder="Mumbai"
@@ -466,10 +479,11 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     {/* Frame 52: Pincode */}
                     <div className="flex flex-col gap-[10px]">
                       <label className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
-                        Pincode
+                        Pincode <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
+                        required
                         value={pincode}
                         onChange={(e) => setPincode(e.target.value)}
                         placeholder="400001"
@@ -481,9 +495,10 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                   {/* Frame 53: Delivery Address */}
                   <div className="flex flex-col gap-[10px] w-full pt-1">
                     <label className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
-                      Delivery Address
+                      Delivery Address <span className="text-red-500">*</span>
                     </label>
                     <textarea
+                      required
                       rows={2}
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
@@ -494,9 +509,12 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 </div>
 
                 {/* Continue to Payment Button */}
-                <div className="pt-2">
+                <div className="pt-2 space-y-3">
+                  {shippingError && (
+                    <p className="text-sm font-semibold text-red-600">{shippingError}</p>
+                  )}
                   <button
-                    onClick={() => setStep(2)}
+                    onClick={handleContinueToPayment}
                     className="w-full sm:w-[232.2px] h-[56px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-[8px] flex items-center justify-center font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#FFFFFF] shadow-xs transition-colors cursor-pointer active:scale-95"
                   >
                     Continue to Payment
