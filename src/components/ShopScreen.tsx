@@ -4,6 +4,7 @@ import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { ProductDetailScreen } from './ProductDetailScreen';
 import shopBannerImg from '../assets/images/shopbanner.png';
+import qrImage from '../assets/images/qrimage.png';
 import {
   Building2,
   ShoppingBag,
@@ -348,33 +349,13 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   {/* Top Product Image Graphic Box */}
                   <div
                     onClick={() => setSelectedProduct(prod)}
-                    className="bg-[#F2BA03] rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden aspect-square border border-[#F2BA03] shadow-inner cursor-pointer"
+                    className="rounded-2xl flex items-center justify-center relative overflow-hidden aspect-square cursor-pointer"
                   >
-                    {/* Simulated Tag Decal */}
-                    <div className="bg-white text-[#0F0F0F] rounded-2xl p-4 shadow-xl border-2 border-[#0F0F0F] w-full max-w-[220px] flex flex-col items-center space-y-3 group-hover:scale-105 transition-transform duration-300">
-                      {/* Big QR Code */}
-                      <div className="w-32 h-32 bg-[#0F0F0F] p-2.5 rounded-xl flex items-center justify-center shadow-inner">
-                        <svg className="w-full h-full text-[#F2BA03]" viewBox="0 0 100 100" fill="currentColor">
-                          <path d="M0 0h30v30H0zM10 10h10v10H10zM70 0h30v30H70zM80 10h10v10H80zM0 70h30v30H0zM10 80h10v10H10zM40 0h10v20H40zM50 30h20v10H50zM30 40h10v30H30zM50 50h30v10H50zM80 60h20v40H80zM40 80h20v20H40z"/>
-                        </svg>
-                      </div>
-
-                      {/* SCAN CONNECT Logo */}
-                      <span className="text-[10px] font-black tracking-wider uppercase font-mono text-[#0F0F0F]">
-                        SCAN CONNECT
-                      </span>
-
-                      {/* Icon Strip */}
-                      <div className="w-full border-t border-neutral-200 pt-2 flex items-center justify-around text-[#0F0F0F] text-[10px] font-bold">
-                        <span title="Parking Alert">🏠</span>
-                        <span title="No Parking">🚫</span>
-                        <span title="Emergency">⚠️</span>
-                        <span title="Call Owner">📞</span>
-                      </div>
-                      <p className="text-[8px] text-center font-semibold text-[#5D5F5F] leading-tight">
-                        Wrong Parking, Emergency Contact, Scan to Call Owner.
-                      </p>
-                    </div>
+                    <img
+                      src={qrImage}
+                      alt={prod.title}
+                      className="h-full w-auto object-cover rounded-2xl group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
 
                   {/* Badge & Rating Row */}

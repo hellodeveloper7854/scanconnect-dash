@@ -264,7 +264,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
               {/* Solution 1: Housing Societies */}
               <div className="bg-white border border-neutral-200 rounded-2xl p-8 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#0F0F0F] text-[#F2BA03] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl  text-[#F2BA03] flex items-center justify-center">
                     <Building2 className="w-6 h-6" />
                   </div>
                   <h3 className="text-xl font-bold text-[#0F0F0F]">
@@ -286,7 +286,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
               {/* Solution 2: Garages & Workshops */}
               <div className="bg-white border border-neutral-200 rounded-2xl p-8 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#0F0F0F] text-[#F2BA03] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl  text-[#F2BA03] flex items-center justify-center">
                     <Home className="w-6 h-6" />
                   </div>
                   <h3 className="text-xl font-bold text-[#0F0F0F]">
@@ -308,7 +308,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
               {/* Solution 3: Commercial Parking Hubs */}
               <div className="bg-white border border-neutral-200 rounded-2xl p-8 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#0F0F0F] text-[#F2BA03] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl  text-[#F2BA03] flex items-center justify-center">
                     <ParkingSquare className="w-6 h-6" />
                   </div>
                   <h3 className="text-xl font-bold text-[#0F0F0F]">
