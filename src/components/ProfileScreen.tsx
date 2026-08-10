@@ -21,7 +21,9 @@ import {
   X,
   Pencil,
   Trash2,
-  Link2
+  Link2,
+  Car,
+  Search
 } from 'lucide-react';
 
 interface BackendUser {
@@ -47,6 +49,21 @@ interface EmergencyContact {
   email: string | null;
   isPrimary: boolean;
 }
+
+interface Vehicle {
+  id: string;
+  registration: string;
+  nickname: string | null;
+  vehicleType: string | null;
+  brand: string | null;
+  model: string | null;
+  fuelType: string | null;
+  color: string | null;
+  isPrimary: boolean;
+  qrCode: string | null;
+}
+
+const VEHICLE_TYPES = ['Car', 'Bike', 'Scooter', 'Truck', 'Bus', 'Other'];
 
 const DEFAULT_PREFERENCES: Preferences = {
   systemLanguage: 'English (United Kingdom)',
@@ -167,13 +184,131 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     }
   };
 
-  // Add Contact Modal State
-  const [isAddContactOpen, setIsAddContactOpen] = useState(false);
+  // Vehicles — fetched from backend, full CRUD with search + type filter
+  const [vehicles, setVehicles] = useState<Vehicle[] | null>(null);
+  const [vehicleSearch, setVehicleSearch] = useState('');
+  const [vehicleTypeFilter, setVehicleTypeFilter] = useState('');
+
+  const loadVehicles = () => {
+    const params = new URLSearchParams();
+    if (vehicleSearch) params.set('search', vehicleSearch);
+    if (vehicleTypeFilter) params.set('vehicleType', vehicleTypeFilter);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    api
+      .get<{ vehicles: Vehicle[] }>(`/api/profile/vehicles${query}`)
+      .then((res) => setVehicles(res.vehicles))
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    const handle = setTimeout(loadVehicles, 250);
+    return () => clearTimeout(handle);
+  }, [vehicleSearch, vehicleTypeFilter]);
+
+  const handleDeleteVehicle = async (id: string) => {
+    if (!confirm('Remove this vehicle?')) return;
+    try {
+      await api.delete(`/api/profile/vehicles/${id}`);
+      setVehicles((prev) => prev?.filter((v) => v.id !== id) ?? null);
+    } catch (err) {
+      setProfileError(err instanceof ApiError ? err.message : 'Failed to remove vehicle');
+    }
+  };
+
+  // Add/Edit Vehicle Modal State
+  const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
+  const [editingVehicleId, setEditingVehicleId] = useState<string | null>(null);
+  const [vehicleRegistration, setVehicleRegistration] = useState('');
+  const [vehicleNickname, setVehicleNickname] = useState('');
+  const [vehicleType, setVehicleType] = useState('');
+  const [vehicleBrand, setVehicleBrand] = useState('');
+  const [vehicleModel, setVehicleModel] = useState('');
+  const [vehicleFuelType, setVehicleFuelType] = useState('');
+  const [vehicleColor, setVehicleColor] = useState('');
+  const [isSavingVehicle, setIsSavingVehicle] = useState(false);
+
+  const openAddVehicle = () => {
+    setEditingVehicleId(null);
+    setVehicleRegistration('');
+    setVehicleNickname('');
+    setVehicleType('');
+    setVehicleBrand('');
+    setVehicleModel('');
+    setVehicleFuelType('');
+    setVehicleColor('');
+    setIsVehicleModalOpen(true);
+  };
+
+  const openEditVehicle = (vehicle: Vehicle) => {
+    setEditingVehicleId(vehicle.id);
+    setVehicleRegistration(vehicle.registration);
+    setVehicleNickname(vehicle.nickname ?? '');
+    setVehicleType(vehicle.vehicleType ?? '');
+    setVehicleBrand(vehicle.brand ?? '');
+    setVehicleModel(vehicle.model ?? '');
+    setVehicleFuelType(vehicle.fuelType ?? '');
+    setVehicleColor(vehicle.color ?? '');
+    setIsVehicleModalOpen(true);
+  };
+
+  const handleVehicleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!vehicleRegistration.trim()) {
+      alert('Please enter a vehicle registration number.');
+      return;
+    }
+
+    setIsSavingVehicle(true);
+    try {
+      const payload = {
+        registration: vehicleRegistration.trim(),
+        nickname: vehicleNickname || undefined,
+        vehicleType: vehicleType || undefined,
+        brand: vehicleBrand || undefined,
+        model: vehicleModel || undefined,
+        fuelType: vehicleFuelType || undefined,
+        color: vehicleColor || undefined,
+      };
+      if (editingVehicleId) {
+        await api.patch(`/api/profile/vehicles/${editingVehicleId}`, payload);
+      } else {
+        await api.post('/api/profile/vehicles', payload);
+      }
+      loadVehicles();
+      setIsVehicleModalOpen(false);
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : 'Failed to save vehicle');
+    } finally {
+      setIsSavingVehicle(false);
+    }
+  };
+
+  // Add/Edit Contact Modal State
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [editingContactId, setEditingContactId] = useState<string | null>(null);
   const [newContactName, setNewContactName] = useState('');
   const [newContactRole, setNewContactRole] = useState('');
   const [newContactPhone, setNewContactPhone] = useState('');
   const [newContactEmail, setNewContactEmail] = useState('');
   const [isSavingContact, setIsSavingContact] = useState(false);
+
+  const openAddContact = () => {
+    setEditingContactId(null);
+    setNewContactName('');
+    setNewContactRole('');
+    setNewContactPhone('');
+    setNewContactEmail('');
+    setIsContactModalOpen(true);
+  };
+
+  const openEditContact = (contact: EmergencyContact) => {
+    setEditingContactId(contact.id);
+    setNewContactName(contact.name);
+    setNewContactRole(contact.role ?? '');
+    setNewContactPhone(contact.phone);
+    setNewContactEmail(contact.email ?? '');
+    setIsContactModalOpen(true);
+  };
 
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
@@ -219,7 +354,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     }
   };
 
-  const handleAddContactSubmit = async (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newContactName || !newContactPhone) {
       alert('Please enter at least a name and phone number.');
@@ -228,20 +363,21 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
     setIsSavingContact(true);
     try {
-      await api.post('/api/profile/emergency-contacts', {
+      const payload = {
         name: newContactName,
         role: newContactRole || undefined,
         phone: newContactPhone,
         email: newContactEmail || undefined,
-      });
+      };
+      if (editingContactId) {
+        await api.patch(`/api/profile/emergency-contacts/${editingContactId}`, payload);
+      } else {
+        await api.post('/api/profile/emergency-contacts', payload);
+      }
       loadContacts();
-      setIsAddContactOpen(false);
-      setNewContactName('');
-      setNewContactRole('');
-      setNewContactPhone('');
-      setNewContactEmail('');
+      setIsContactModalOpen(false);
     } catch (err) {
-      alert(err instanceof ApiError ? err.message : 'Failed to add contact');
+      alert(err instanceof ApiError ? err.message : 'Failed to save contact');
     } finally {
       setIsSavingContact(false);
     }
@@ -484,7 +620,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   </div>
 
                   <button
-                    onClick={() => setIsAddContactOpen(true)}
+                    onClick={openAddContact}
                     className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#000000] hover:bg-neutral-800 text-white text-sm font-bold rounded-lg transition-all cursor-pointer shadow-sm shrink-0"
                   >
                     <Plus className="w-4 h-4" />
@@ -519,13 +655,22 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                             >
                               {contact.isPrimary ? 'PRIMARY RESPONDER' : 'SECONDARY'}
                             </span>
-                            <button
-                              onClick={() => handleDeleteContact(contact.id)}
-                              title="Remove contact"
-                              className="p-1 text-[#5D5F5F] hover:text-red-600 cursor-pointer"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => openEditContact(contact)}
+                                title="Edit contact"
+                                className="p-1 text-[#5D5F5F] hover:text-[#1B1C1C] cursor-pointer"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteContact(contact.id)}
+                                title="Remove contact"
+                                className="p-1 text-[#5D5F5F] hover:text-red-600 cursor-pointer"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </div>
 
                           {/* Initials Circle & Name */}
@@ -558,6 +703,134 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   </div>
                 )}
 
+              </div>
+
+              {/* 4. VEHICLE MANAGEMENT CARD */}
+              <div className="bg-white rounded-xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(15,15,15,0.05)] border border-[#EEEEEE] space-y-6">
+
+                {/* Header Row */}
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                  <div className="space-y-1">
+                    <h2 className="text-2xl font-semibold text-[#1B1C1C] font-sans">Vehicles</h2>
+                    <p className="text-base text-[#5D5F5F] font-normal leading-normal">
+                      Manage the vehicles linked to your Scan Connect account.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={openAddVehicle}
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#000000] hover:bg-neutral-800 text-white text-sm font-bold rounded-lg transition-all cursor-pointer shadow-sm shrink-0"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add Vehicle</span>
+                  </button>
+                </div>
+
+                {/* Search + Filter Row */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5D5F5F]" />
+                    <input
+                      value={vehicleSearch}
+                      onChange={(e) => setVehicleSearch(e.target.value)}
+                      placeholder="Search registration, nickname, brand, model"
+                      className="w-full h-[46px] pl-10 pr-4 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                    />
+                  </div>
+                  <select
+                    value={vehicleTypeFilter}
+                    onChange={(e) => setVehicleTypeFilter(e.target.value)}
+                    className="h-[46px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03] cursor-pointer"
+                  >
+                    <option value="">All types</option>
+                    {VEHICLE_TYPES.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Vehicles 2-Column Grid */}
+                {!vehicles ? (
+                  <p className="text-sm text-[#5D5F5F]">Loading vehicles...</p>
+                ) : vehicles.length === 0 ? (
+                  <p className="text-sm text-[#5D5F5F]">No vehicles found.</p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {vehicles.map((vehicle) => (
+                      <div
+                        key={vehicle.id}
+                        className="bg-white rounded-xl p-6 border border-[#CCC7AA] shadow-sm relative space-y-4"
+                      >
+                        <div className="flex justify-between items-start">
+                          <span
+                            className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-tight uppercase ${
+                              vehicle.isPrimary ? 'bg-[#F2BA03] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'
+                            }`}
+                          >
+                            {vehicle.isPrimary ? 'PRIMARY VEHICLE' : vehicle.vehicleType || 'VEHICLE'}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => openEditVehicle(vehicle)}
+                              title="Edit vehicle"
+                              className="p-1 text-[#5D5F5F] hover:text-[#1B1C1C] cursor-pointer"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteVehicle(vehicle.id)}
+                              title="Remove vehicle"
+                              className="p-1 text-[#5D5F5F] hover:text-red-600 cursor-pointer"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 pt-2">
+                          <div className="w-12 h-12 rounded-full bg-[#EFEDED] flex items-center justify-center shrink-0">
+                            <Car className="w-5 h-5 text-[#676000]" />
+                          </div>
+                          <div>
+                            <h3 className="text-base font-bold text-[#1B1C1C]">
+                              {vehicle.nickname || vehicle.registration}
+                            </h3>
+                            <p className="text-xs text-[#5D5F5F] font-normal font-mono">{vehicle.registration}</p>
+                          </div>
+                        </div>
+
+                        <div className="pt-4 border-t border-[#CCC7AA] text-sm text-[#1B1C1C] font-normal grid grid-cols-2 gap-2">
+                          {vehicle.brand && (
+                            <div>
+                              <span className="text-[10px] text-[#5D5F5F] uppercase block">Brand</span>
+                              {vehicle.brand}
+                            </div>
+                          )}
+                          {vehicle.model && (
+                            <div>
+                              <span className="text-[10px] text-[#5D5F5F] uppercase block">Model</span>
+                              {vehicle.model}
+                            </div>
+                          )}
+                          {vehicle.fuelType && (
+                            <div>
+                              <span className="text-[10px] text-[#5D5F5F] uppercase block">Fuel</span>
+                              {vehicle.fuelType}
+                            </div>
+                          )}
+                          {vehicle.color && (
+                            <div>
+                              <span className="text-[10px] text-[#5D5F5F] uppercase block">Color</span>
+                              {vehicle.color}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
             </div>
@@ -741,23 +1014,23 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         </div>
       </main>
 
-      {/* Add New Contact Modal */}
-      {isAddContactOpen && (
+      {/* Add/Edit Contact Modal */}
+      {isContactModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5 animate-scale-up">
             <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
               <h3 className="text-lg font-black text-neutral-900 font-sans">
-                Add Emergency Contact
+                {editingContactId ? 'Edit Emergency Contact' : 'Add Emergency Contact'}
               </h3>
               <button
-                onClick={() => setIsAddContactOpen(false)}
+                onClick={() => setIsContactModalOpen(false)}
                 className="p-1 text-neutral-400 hover:text-neutral-900 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleAddContactSubmit} className="space-y-4">
+            <form onSubmit={handleContactSubmit} className="space-y-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-[#5D5F5F]">Full Name</label>
                 <input
@@ -807,7 +1080,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <div className="flex gap-3 pt-3">
                 <button
                   type="button"
-                  onClick={() => setIsAddContactOpen(false)}
+                  onClick={() => setIsContactModalOpen(false)}
                   className="flex-1 py-3 bg-[#EFEDED] hover:bg-neutral-200 text-[#5D5F5F] font-bold text-xs rounded-lg"
                 >
                   Cancel
@@ -817,7 +1090,130 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   disabled={isSavingContact}
                   className="flex-1 py-3 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-xs disabled:opacity-60"
                 >
-                  {isSavingContact ? 'Saving...' : 'Save Contact'}
+                  {isSavingContact ? 'Saving...' : editingContactId ? 'Save Changes' : 'Save Contact'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add/Edit Vehicle Modal */}
+      {isVehicleModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5 animate-scale-up max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+              <h3 className="text-lg font-black text-neutral-900 font-sans">
+                {editingVehicleId ? 'Edit Vehicle' : 'Add Vehicle'}
+              </h3>
+              <button
+                onClick={() => setIsVehicleModalOpen(false)}
+                className="p-1 text-neutral-400 hover:text-neutral-900 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleVehicleSubmit} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#5D5F5F]">Registration Number</label>
+                <input
+                  type="text"
+                  required
+                  value={vehicleRegistration}
+                  onChange={(e) => setVehicleRegistration(e.target.value)}
+                  placeholder="e.g. MH12AB1234"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#5D5F5F]">Nickname</label>
+                <input
+                  type="text"
+                  value={vehicleNickname}
+                  onChange={(e) => setVehicleNickname(e.target.value)}
+                  placeholder="e.g. My Sedan"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#5D5F5F]">Vehicle Type</label>
+                  <select
+                    value={vehicleType}
+                    onChange={(e) => setVehicleType(e.target.value)}
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03] cursor-pointer"
+                  >
+                    <option value="">Select type</option>
+                    {VEHICLE_TYPES.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#5D5F5F]">Fuel Type</label>
+                  <input
+                    type="text"
+                    value={vehicleFuelType}
+                    onChange={(e) => setVehicleFuelType(e.target.value)}
+                    placeholder="e.g. Petrol"
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#5D5F5F]">Brand</label>
+                  <input
+                    type="text"
+                    value={vehicleBrand}
+                    onChange={(e) => setVehicleBrand(e.target.value)}
+                    placeholder="e.g. Maruti Suzuki"
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#5D5F5F]">Model</label>
+                  <input
+                    type="text"
+                    value={vehicleModel}
+                    onChange={(e) => setVehicleModel(e.target.value)}
+                    placeholder="e.g. Swift"
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#5D5F5F]">Color</label>
+                <input
+                  type="text"
+                  value={vehicleColor}
+                  onChange={(e) => setVehicleColor(e.target.value)}
+                  placeholder="e.g. White"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setIsVehicleModalOpen(false)}
+                  className="flex-1 py-3 bg-[#EFEDED] hover:bg-neutral-200 text-[#5D5F5F] font-bold text-xs rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingVehicle}
+                  className="flex-1 py-3 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-xs disabled:opacity-60"
+                >
+                  {isSavingVehicle ? 'Saving...' : editingVehicleId ? 'Save Changes' : 'Save Vehicle'}
                 </button>
               </div>
             </form>

@@ -75,8 +75,16 @@ model Vehicle {
   userId       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   registration String
-  qrCode       String   @unique
+  nickname     String?
+  vehicleType  String?
+  brand        String?
+  model        String?
+  fuelType     String?
+  color        String?
+  isPrimary    Boolean  @default(false)
+  qrCode       String?  @unique
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([userId])
 }
