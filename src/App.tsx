@@ -17,6 +17,9 @@ import { ProfileScreen } from './components/ProfileScreen';
 import { QrScanScreen } from './components/QrScanScreen';
 import { MyOrdersScreen } from './components/MyOrdersScreen';
 import { OrderContactPage } from './pages/OrderContactPage';
+import { BlogListPage } from './pages/BlogListPage';
+import { BlogPostPage } from './pages/BlogPostPage';
+import { InvestorsPage } from './pages/InvestorsPage';
 import { AdminApp } from './pages/admin/AdminApp';
 
 const getInitialScreenFromUrl = (): ScreenType => {
@@ -42,6 +45,19 @@ export default function App() {
   if (path.startsWith('/order-contact/')) {
     const token = window.location.pathname.split('/').pop() ?? '';
     return <OrderContactPage token={token} />;
+  }
+
+  if (path === '/blog') {
+    return <BlogListPage />;
+  }
+
+  if (path.startsWith('/blog/')) {
+    const slug = window.location.pathname.split('/').pop() ?? '';
+    return <BlogPostPage slug={slug} />;
+  }
+
+  if (path === '/investors') {
+    return <InvestorsPage />;
   }
 
   return <MainApp />;

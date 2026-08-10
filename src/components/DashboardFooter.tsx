@@ -58,11 +58,16 @@ export const DashboardFooter: React.FC = () => {
               SHOP
             </h4>
             <ul className="space-y-3 text-sm font-medium text-white/90">
-              {['Car & Bike tag', 'Car SCAN ME tag', 'How it works', 'eTag'].map((link) => (
-                <li key={link}>
-                  <button onClick={() => alert(`Shop item: ${link}`)} className="hover:underline cursor-pointer text-left">
-                    {link}
-                  </button>
+              {[
+                { label: 'Bike tag', href: '/shop?product=2' },
+                { label: 'Car SCAN ME tag', href: '/shop?product=1' },
+                { label: 'How it works', href: '/' },
+                { label: 'eTag', href: '/shop#products' },
+              ].map(({ label, href }) => (
+                <li key={label}>
+                  <a href={href} className="hover:underline cursor-pointer text-left">
+                    {label}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -74,11 +79,22 @@ export const DashboardFooter: React.FC = () => {
               ABOUT
             </h4>
             <ul className="space-y-3 text-sm font-medium text-white/90">
-              {['Contact', 'Become a reseller', 'Investors', 'Blog'].map((link) => (
-                <li key={link}>
-                  <button onClick={() => alert(`About: ${link}`)} className="hover:underline cursor-pointer text-left">
-                    {link}
-                  </button>
+              {[
+                { label: 'Contact', href: '/contact' },
+                { label: 'Become a reseller', href: null },
+                { label: 'Investors', href: '/investors' },
+                { label: 'Blog', href: '/blog' },
+              ].map(({ label, href }) => (
+                <li key={label}>
+                  {href ? (
+                    <a href={href} className="hover:underline cursor-pointer text-left">
+                      {label}
+                    </a>
+                  ) : (
+                    <button onClick={() => alert(`About: ${label}`)} className="hover:underline cursor-pointer text-left">
+                      {label}
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

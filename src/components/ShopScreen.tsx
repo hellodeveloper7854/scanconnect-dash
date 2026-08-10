@@ -46,8 +46,36 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
 
   React.useEffect(() => {
+    if (window.location.hash) return;
     window.scrollTo(0, 0);
   }, [selectedProduct]);
+
+  // Deep-link support: /shop#products (footer "eTag" link) scrolls straight
+  // to the product catalogue instead of landing at the top of the page.
+  React.useEffect(() => {
+    if (window.location.hash === '#products') {
+      document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
+  // Deep-link support: /shop?product=<id> (used by footer links) opens
+  // straight into that product's detail view instead of the listing.
+  React.useEffect(() => {
+    const productId = Number(new URLSearchParams(window.location.search).get('product'));
+    if (!productId) return;
+    const prod = products.find((p) => p.id === productId);
+    if (prod) {
+      setSelectedProduct({
+        id: prod.id,
+        tag: prod.badge || 'SCAN CONNECT',
+        rating: '4.8',
+        title: prod.title,
+        desc: prod.desc,
+        price: prod.price && prod.price.startsWith('₹') ? prod.price : '₹499',
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
@@ -411,7 +439,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
 
         {/* 4. OUR PRODUCTS SECTION */}
-        <section className="py-16 sm:py-20 bg-neutral-50/60 border-t border-neutral-100">
+        <section id="products" className="py-16 sm:py-20 bg-neutral-50/60 border-t border-neutral-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             {/* Section Header */}
