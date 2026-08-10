@@ -184,10 +184,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           
           {/* HEADER TITLE */}
           <div className="space-y-2">
-            <h1 className="text-4xl sm:text-[64px] sm:leading-[48px] font-semibold text-[#F2BA03] tracking-[-0.4px] font-sans">
+            <h1 className="text-4xl sm:text-5xl sm:leading-[48px] font-black text-[#F2BA03] tracking-[-0.4px] font-sans">
               Profile
             </h1>
-            <p className="text-[#5D5F5F] text-lg sm:text-[24px] sm:leading-[29px] max-w-4xl font-medium">
+            <p className="text-[#5D5F5F] text-base sm:text-lg sm:leading-[26px] max-w-4xl font-normal">
               Manage your administrative identity, security protocols, and safety contacts.
             </p>
           </div>
@@ -274,7 +274,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 {/* Security Card */}
                 <div className="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(15,15,15,0.05)] border border-[#EEEEEE] space-y-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[rgba(255,239,0,0.2)] flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
                       <Lock className="w-5 h-5 text-[#676000]" />
                     </div>
                     <h2 className="text-xl font-medium text-[#1B1C1C] font-sans">
@@ -321,7 +321,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 {/* Active Sessions Card */}
                 <div className="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(15,15,15,0.05)] border border-[#EEEEEE] space-y-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[rgba(255,239,0,0.2)] flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
                       <Laptop className="w-5 h-5 text-[#676000]" />
                     </div>
                     <h2 className="text-xl font-medium text-[#1B1C1C] font-sans">
@@ -447,7 +447,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 
                 {/* Title */}
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[rgba(255,239,0,0.2)] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
                     <Sliders className="w-5 h-5 text-[#676000]" />
                   </div>
                   <h2 className="text-xl font-medium text-[#1B1C1C] font-sans">
