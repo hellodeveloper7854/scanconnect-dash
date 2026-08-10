@@ -557,12 +557,12 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
 
         {/* 6. NEED MORE THAN ONE? CTA SECTION */}
-        <section className="py-16 sm:py-20 bg-[#1B1C1C] text-white">
+        <section className="py-16 sm:py-20 bg-white border-t border-neutral-100">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0F0F0F]">
               Need More Than One?
             </h2>
-            <p className="text-neutral-300 text-base sm:text-lg leading-relaxed">
+            <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed">
               Whether you&apos;re an individual, business, apartment association, dealership, or fleet operator, we offer bulk orders, reseller programs, franchise opportunities, and enterprise solutions tailored to your needs.
             </p>
             <button

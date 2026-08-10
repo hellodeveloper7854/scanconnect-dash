@@ -527,18 +527,18 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
 
         {/* SECTION 6: CLOSING CTA */}
-        <section className="py-16 sm:py-20 bg-[#1B1C1C] text-white text-center">
+        <section className="py-16 sm:py-20 bg-white border-t border-[#E3E2E2] text-center">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
-            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-4xl tracking-tight">
+            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-4xl tracking-tight text-[#1B1C1C]">
               Let&apos;s Build Smarter &amp; Safer Mobility Together
             </h2>
-            <p className="text-neutral-300 text-base sm:text-lg leading-relaxed">
+            <p className="text-[#5F5E5E] text-base sm:text-lg leading-relaxed">
               Whether you&apos;re looking to secure a single vehicle or implement intelligent parking solutions for your organization, Scan Connect is here to help.
             </p>
             <p className="font-['Hanken_Grotesk'] font-bold text-lg text-[#F2BA03]">
               📞 Call Us &bull; 📧 Email Us &bull; 💬 Send a Message
             </p>
-            <p className="text-neutral-400 text-sm">
+            <p className="text-[#6B7280] text-sm">
               We&apos;re committed to delivering fast, friendly, and reliable support every step of the way.
             </p>
           </div>

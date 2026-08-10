@@ -242,7 +242,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
         </section>
 
         {/* 4. CUSTOM SOLUTIONS SECTION */}
-        <section className="py-16 sm:py-20 bg-neutral-50/80 border-t border-neutral-200/60">
+        <section className="py-16 sm:py-20 bg-white border-t border-neutral-200/60">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-12">
               <h2 className="text-3xl sm:text-4xl font-black text-[#0F0F0F] tracking-tight font-sans">
