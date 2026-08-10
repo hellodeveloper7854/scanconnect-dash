@@ -3,6 +3,7 @@ import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { ProductDetailScreen } from './ProductDetailScreen';
+import shopBannerImg from '../assets/images/shopbanner.png';
 import {
   Building2,
   ShoppingBag,
@@ -235,37 +236,14 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                 </div>
               </div>
 
-              {/* Right Column Graphic Vector Illustration */}
+              {/* Right Column Image */}
               <div className="lg:col-span-6 flex justify-center lg:justify-end">
-                <div className="relative rounded-3xl overflow-hidden shadow-xl border border-neutral-200 max-w-lg w-full bg-[#0F0F0F] p-8 sm:p-10 flex flex-col items-center justify-center min-h-[360px] sm:min-h-[420px] group">
-                  
-                  {/* Subtle Background Radial Accent */}
-                  <div className="absolute inset-0 bg-radial from-[#F2BA03]/10 via-transparent to-transparent pointer-events-none" />
-
-                  {/* Simulated Tag Card Decal */}
-                  <div className="relative z-10 bg-white text-[#0F0F0F] rounded-2xl p-6 shadow-2xl border-2 border-[#F2BA03] max-w-xs w-full flex flex-col items-center space-y-4 group-hover:scale-105 transition-transform duration-300">
-                    <div className="w-36 h-36 bg-[#0F0F0F] p-3 rounded-xl flex items-center justify-center shadow-inner">
-                      <svg className="w-full h-full text-[#F2BA03]" viewBox="0 0 100 100" fill="currentColor">
-                        <path d="M0 0h30v30H0zM10 10h10v10H10zM70 0h30v30H70zM80 10h10v10H80zM0 70h30v30H0zM10 80h10v10H10zM40 0h10v20H40zM50 30h20v10H50zM30 40h10v30H30zM50 50h30v10H50zM80 60h20v40H80zM40 80h20v20H40z"/>
-                      </svg>
-                    </div>
-
-                    <div className="text-center space-y-1">
-                      <span className="bg-[#0F0F0F] text-[#F2BA03] text-[10px] font-black px-3 py-1 rounded font-mono uppercase tracking-widest inline-block">
-                        SCAN CONNECT TAG
-                      </span>
-                      <p className="text-[10px] font-semibold text-[#5D5F5F] pt-1">
-                        Wrong Parking &bull; Emergency Contact &bull; Instant Call Routing
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Bottom Trust Tag */}
-                  <div className="relative z-10 mt-6 flex items-center gap-2 text-neutral-300 text-xs font-medium">
-                    <ShieldCheck className="w-4 h-4 text-[#F2BA03]" />
-                    <span>Scan to Connect &bull; Zero Privacy Leak</span>
-                  </div>
-
+                <div className="relative  overflow-hidden  max-w-lg w-full">
+                  <img
+                    src={shopBannerImg}
+                    alt="ScanConnect Tag Product"
+                    className="w-full h-[360px] sm:h-[420px] object-cover"
+                  />
                 </div>
               </div>
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
+import aboutBannerImg from '../assets/images/aboutbanner.png';
 import {
   Lock,
   Zap,
@@ -104,27 +105,14 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                 </div>
               </div>
 
-              {/* Right Column Image & Tag Preview Card */}
+              {/* Right Column Image */}
               <div className="lg:col-span-6 flex justify-center lg:justify-end">
-                <div className="relative rounded-3xl overflow-hidden shadow-xl border border-neutral-200 max-w-lg w-full group bg-neutral-900">
+                <div className="relative  overflow-hidden  max-w-lg w-full">
                   <img
-                    src="https://images.unsplash.com/photo-1541348263662-e082662d82da?auto=format&fit=crop&w=1200&q=80"
+                    src={aboutBannerImg}
                     alt="ScanConnect Tag on Car"
-                    className="w-full h-[360px] sm:h-[420px] object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                    className="w-full h-[360px] sm:h-[420px] object-cover"
                   />
-                  
-                  {/* Overlay Simulated QR Decal Badge */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/95 p-4 rounded-2xl shadow-2xl border-2 border-[#F2BA03] flex flex-col items-center gap-2 backdrop-blur-xs">
-                    <div className="w-28 h-28 bg-[#0F0F0F] p-2.5 rounded-xl flex items-center justify-center shadow-inner">
-                      {/* Simulated QR decal SVG */}
-                      <svg className="w-full h-full text-[#F2BA03]" viewBox="0 0 100 100" fill="currentColor">
-                        <path d="M0 0h30v30H0zM10 10h10v10H10zM70 0h30v30H70zM80 10h10v10H80zM0 70h30v30H0zM10 80h10v10H10zM40 0h10v20H40zM50 30h20v10H50zM30 40h10v30H30zM50 50h30v10H50zM80 60h20v40H80zM40 80h20v20H40z"/>
-                      </svg>
-                    </div>
-                    <span className="bg-[#0F0F0F] text-[#F2BA03] text-[10px] font-black px-2.5 py-0.5 rounded font-mono uppercase tracking-widest">
-                      SCAN CONNECT TAG
-                    </span>
-                  </div>
                 </div>
               </div>
 

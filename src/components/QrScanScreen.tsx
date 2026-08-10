@@ -14,6 +14,7 @@ import {
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { UserFormData } from '../types';
+import scanBannerImg from '../assets/images/scanbanner.png';
 
 interface QrScanScreenProps {
   userData: UserFormData;
@@ -100,18 +101,12 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
 
               {/* Right Image Card Column */}
               <div className="lg:col-span-6 flex justify-center lg:justify-end">
-                <div className="relative w-full max-w-[510px] h-[383px] rounded-[16px] overflow-hidden border border-[#E5E7EB] shadow-md group bg-[#FFFFFF]">
+                <div className="relative w-full max-w-[510px] h-[383px] rounded-[16px] overflow-hidden border border-[#E5E7EB] shadow-md bg-[#FFFFFF]">
                   <img
-                    src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=80"
+                    src={scanBannerImg}
                     alt="Smartphone scanning ScanConnect vehicle QR tag on car window"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    className="w-full h-full object-cover"
                   />
-                  
-                  {/* Realistic Overlay representing the SCAN ME Yellow Tag on Car */}
-                  <div className="absolute top-1/2 right-12 -translate-y-1/2 bg-[#F2BA03] border-4 border-white text-neutral-950 w-24 h-24 sm:w-28 sm:h-28 rounded-full shadow-2xl flex flex-col items-center justify-center text-center p-2 transform rotate-12 hover:rotate-0 transition-transform">
-                    <QrCode className="w-10 h-10 sm:w-12 sm:h-12 text-black" />
-                    <span className="text-[8px] font-black uppercase tracking-tighter mt-0.5 text-black">SCAN ME</span>
-                  </div>
                 </div>
               </div>
 
