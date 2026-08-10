@@ -67,6 +67,8 @@ model EmergencyContact {
   isPrimary Boolean  @default(false)
   createdAt DateTime @default(now())
 
+  orders Order[]
+
   @@index([userId])
 }
 
@@ -86,6 +88,8 @@ model Vehicle {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  orders Order[]
+
   @@index([userId])
 }
 
@@ -101,17 +105,21 @@ model Product {
 }
 
 model Order {
-  id                String      @id @default(uuid())
-  userId            String
-  user              User        @relation(fields: [userId], references: [id])
-  status            OrderStatus @default(PENDING)
-  totalInPaise      Int
-  razorpayOrderId   String?     @unique
-  razorpayPaymentId String?
-  razorpaySignature String?
-  qrToken           String?     @unique
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
+  id                  String            @id @default(uuid())
+  userId              String
+  user                User              @relation(fields: [userId], references: [id])
+  status              OrderStatus       @default(PENDING)
+  totalInPaise        Int
+  razorpayOrderId     String?           @unique
+  razorpayPaymentId   String?
+  razorpaySignature   String?
+  qrToken             String?           @unique
+  vehicleId           String?
+  vehicle             Vehicle?          @relation(fields: [vehicleId], references: [id])
+  emergencyContactId  String?
+  emergencyContact    EmergencyContact? @relation(fields: [emergencyContactId], references: [id])
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
 
   items  OrderItem[]
   review Review?

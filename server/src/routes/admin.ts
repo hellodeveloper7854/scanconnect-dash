@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { randomBytes } from 'node:crypto';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
 import { toCsv } from '../lib/csv.js';
@@ -116,7 +115,12 @@ adminRouter.get('/orders', async (req, res) => {
   const [orders, total] = await Promise.all([
     prisma.order.findMany({
       where,
-      include: { user: { select: { fullName: true, email: true, mobileNumber: true } }, items: { include: { product: true } } },
+      include: {
+        user: { select: { fullName: true, email: true, mobileNumber: true } },
+        items: { include: { product: true } },
+        vehicle: true,
+        emergencyContact: true,
+      },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -136,24 +140,6 @@ adminRouter.patch('/orders/:id/status', async (req, res) => {
   const order = await prisma.order.update({
     where: { id: req.params.id },
     data: { status: parsed.data.status },
-  });
-
-  res.json({ order });
-});
-
-adminRouter.post('/orders/:id/generate-qr', async (req, res) => {
-  const existing = await prisma.order.findUnique({ where: { id: req.params.id } });
-  if (!existing) {
-    return res.status(404).json({ error: 'Order not found' });
-  }
-  if (existing.qrToken) {
-    return res.json({ order: existing });
-  }
-
-  const qrToken = randomBytes(16).toString('hex');
-  const order = await prisma.order.update({
-    where: { id: req.params.id },
-    data: { qrToken },
   });
 
   res.json({ order });

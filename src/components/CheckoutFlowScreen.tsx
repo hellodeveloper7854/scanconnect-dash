@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
-import { api, ApiError } from '../lib/api';
+import { api, ApiError, downloadFile } from '../lib/api';
 import qrImage from '../assets/images/qrimage.png';
 import {
   ShieldCheck,
@@ -15,8 +15,14 @@ import {
   LayoutDashboard,
   ShoppingBag,
   Radio,
-  Truck
+  Truck,
+  Car,
+  Phone,
+  Plus,
+  Download
 } from 'lucide-react';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
 // Temporary: checkout always charges this seeded product until the Shop
 // catalog is wired up to real backend products with matching UUIDs.
@@ -28,10 +34,23 @@ declare global {
   }
 }
 
+interface VehicleOption {
+  id: string;
+  registration: string;
+  nickname: string | null;
+}
+
+interface ContactOption {
+  id: string;
+  name: string;
+  phone: string;
+}
+
 interface OrderRecord {
   id: string;
   totalInPaise: number;
   status: string;
+  qrToken: string | null;
   items: { quantity: number; product: { name: string; priceInPaise: number } }[];
 }
 
@@ -75,6 +94,109 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState('');
   const [completedOrder, setCompletedOrder] = useState<OrderRecord | null>(null);
+
+  // Assign step — pick or add the vehicle + emergency contact this order's QR maps to
+  const [vehicles, setVehicles] = useState<VehicleOption[] | null>(null);
+  const [contacts, setContacts] = useState<ContactOption[] | null>(null);
+  const [selectedVehicleId, setSelectedVehicleId] = useState('');
+  const [selectedContactId, setSelectedContactId] = useState('');
+  const [assignError, setAssignError] = useState('');
+  const [isAssigning, setIsAssigning] = useState(false);
+
+  const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
+  const [newVehicleRegistration, setNewVehicleRegistration] = useState('');
+  const [newVehicleNickname, setNewVehicleNickname] = useState('');
+  const [isSavingVehicle, setIsSavingVehicle] = useState(false);
+
+  const [isAddContactOpen, setIsAddContactOpen] = useState(false);
+  const [newContactName, setNewContactName] = useState('');
+  const [newContactPhone, setNewContactPhone] = useState('');
+  const [isSavingContact, setIsSavingContact] = useState(false);
+
+  const loadAssignOptions = () => {
+    api
+      .get<{ vehicles: VehicleOption[] }>('/api/profile/vehicles')
+      .then((res) => {
+        setVehicles(res.vehicles);
+        if (res.vehicles.length === 1) setSelectedVehicleId(res.vehicles[0].id);
+      })
+      .catch(() => setVehicles([]));
+    api
+      .get<{ contacts: ContactOption[] }>('/api/profile/emergency-contacts')
+      .then((res) => {
+        setContacts(res.contacts);
+        if (res.contacts.length === 1) setSelectedContactId(res.contacts[0].id);
+      })
+      .catch(() => setContacts([]));
+  };
+
+  React.useEffect(() => {
+    if (step === 3 && completedOrder && !completedOrder.qrToken) loadAssignOptions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, completedOrder?.id]);
+
+  const handleAddVehicleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newVehicleRegistration.trim()) return;
+    setIsSavingVehicle(true);
+    try {
+      const res = await api.post<{ vehicle: VehicleOption }>('/api/profile/vehicles', {
+        registration: newVehicleRegistration.trim(),
+        nickname: newVehicleNickname || undefined,
+      });
+      loadAssignOptions();
+      setSelectedVehicleId(res.vehicle.id);
+      setIsAddVehicleOpen(false);
+      setNewVehicleRegistration('');
+      setNewVehicleNickname('');
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : 'Failed to add vehicle');
+    } finally {
+      setIsSavingVehicle(false);
+    }
+  };
+
+  const handleAddContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newContactName.trim() || !newContactPhone.trim()) return;
+    setIsSavingContact(true);
+    try {
+      const res = await api.post<{ contact: ContactOption }>('/api/profile/emergency-contacts', {
+        name: newContactName.trim(),
+        phone: newContactPhone.trim(),
+      });
+      loadAssignOptions();
+      setSelectedContactId(res.contact.id);
+      setIsAddContactOpen(false);
+      setNewContactName('');
+      setNewContactPhone('');
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : 'Failed to add contact');
+    } finally {
+      setIsSavingContact(false);
+    }
+  };
+
+  const handleConfirmAssign = async () => {
+    if (!completedOrder || !selectedVehicleId || !selectedContactId) {
+      setAssignError('Please select (or add) a vehicle and an emergency contact.');
+      return;
+    }
+    setIsAssigning(true);
+    setAssignError('');
+    try {
+      const res = await api.post<{ order: OrderRecord }>(`/api/orders/${completedOrder.id}/assign`, {
+        vehicleId: selectedVehicleId,
+        emergencyContactId: selectedContactId,
+      });
+      setCompletedOrder(res.order);
+      setStep(3);
+    } catch (err) {
+      setAssignError(err instanceof ApiError ? err.message : 'Failed to generate QR code');
+    } finally {
+      setIsAssigning(false);
+    }
+  };
 
   // Form states for Review (Step 3)
   const [rating, setRating] = useState(5);
@@ -561,10 +683,201 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
           </div>
         )}
 
-        {/* STEP 3: REVIEW / THANK YOU PAGE */}
-        {step === 3 && (
+        {/* STEP 3a: ASSIGN VEHICLE + EMERGENCY CONTACT (shown once, right after payment, before the QR is generated) */}
+        {step === 3 && completedOrder && !completedOrder.qrToken && (
+          <div className="max-w-[600px] mx-auto space-y-8 animate-fade-in px-2 sm:px-4 pt-2">
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 rounded-full bg-[#F2BA03] flex items-center justify-center mx-auto">
+                <Check className="w-8 h-8 text-white stroke-[3]" />
+              </div>
+              <h1 className="font-['Plus_Jakarta_Sans'] font-bold text-2xl sm:text-[28px] text-[#1B1C1C]">
+                Payment Successful
+              </h1>
+              <p className="font-['Hanken_Grotesk'] text-[#5F5E5E] text-base">
+                One last step — link this order&apos;s QR tag to a vehicle and an emergency contact.
+              </p>
+            </div>
+
+            <div className="bg-white border border-[#CCC7AA] rounded-xl p-6 sm:p-8 space-y-6">
+              {/* Vehicle picker */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-xs font-bold text-[#5F5E5E] uppercase tracking-wide">
+                  <Car className="w-4 h-4" /> Vehicle
+                </label>
+                {!vehicles ? (
+                  <p className="text-sm text-[#5F5E5E]">Loading your vehicles...</p>
+                ) : vehicles.length === 0 ? (
+                  <p className="text-sm text-[#5F5E5E]">No vehicles saved yet.</p>
+                ) : (
+                  <select
+                    value={selectedVehicleId}
+                    onChange={(e) => setSelectedVehicleId(e.target.value)}
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03] cursor-pointer"
+                  >
+                    <option value="">Select a vehicle</option>
+                    {vehicles.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.nickname ? `${v.nickname} — ${v.registration}` : v.registration}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsAddVehicleOpen(true)}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1B1C1C] hover:underline cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add a new vehicle
+                </button>
+              </div>
+
+              {/* Emergency contact picker */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-xs font-bold text-[#5F5E5E] uppercase tracking-wide">
+                  <Phone className="w-4 h-4" /> Emergency Contact
+                </label>
+                {!contacts ? (
+                  <p className="text-sm text-[#5F5E5E]">Loading your emergency contacts...</p>
+                ) : contacts.length === 0 ? (
+                  <p className="text-sm text-[#5F5E5E]">No emergency contacts saved yet.</p>
+                ) : (
+                  <select
+                    value={selectedContactId}
+                    onChange={(e) => setSelectedContactId(e.target.value)}
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03] cursor-pointer"
+                  >
+                    <option value="">Select a contact</option>
+                    {contacts.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} — {c.phone}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsAddContactOpen(true)}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1B1C1C] hover:underline cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add a new emergency contact
+                </button>
+              </div>
+
+              {assignError && <p className="text-sm font-semibold text-red-600">{assignError}</p>}
+
+              <button
+                onClick={handleConfirmAssign}
+                disabled={isAssigning || !selectedVehicleId || !selectedContactId}
+                className="w-full h-[56px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-lg font-['Hanken_Grotesk'] font-bold text-base text-white shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {isAssigning ? 'Generating QR...' : 'Generate My QR Tag'}
+                {!isAssigning && <ArrowRight className="w-4 h-4" />}
+              </button>
+            </div>
+
+            {/* Inline Add Vehicle Modal */}
+            {isAddVehicleOpen && (
+              <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+                  <h3 className="text-lg font-black text-neutral-900">Add Vehicle</h3>
+                  <form onSubmit={handleAddVehicleSubmit} className="space-y-3">
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-[#5D5F5F]">Registration Number</label>
+                      <input
+                        type="text"
+                        required
+                        value={newVehicleRegistration}
+                        onChange={(e) => setNewVehicleRegistration(e.target.value)}
+                        placeholder="e.g. MH12AB1234"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-[#5D5F5F]">Nickname (optional)</label>
+                      <input
+                        type="text"
+                        value={newVehicleNickname}
+                        onChange={(e) => setNewVehicleNickname(e.target.value)}
+                        placeholder="e.g. My Sedan"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                      />
+                    </div>
+                    <div className="flex gap-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsAddVehicleOpen(false)}
+                        className="flex-1 py-2.5 bg-[#EFEDED] hover:bg-neutral-200 text-[#5D5F5F] font-bold text-xs rounded-lg cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSavingVehicle}
+                        className="flex-1 py-2.5 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-extrabold text-xs uppercase rounded-lg cursor-pointer disabled:opacity-60"
+                      >
+                        {isSavingVehicle ? 'Saving...' : 'Save Vehicle'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* Inline Add Emergency Contact Modal */}
+            {isAddContactOpen && (
+              <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+                  <h3 className="text-lg font-black text-neutral-900">Add Emergency Contact</h3>
+                  <form onSubmit={handleAddContactSubmit} className="space-y-3">
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-[#5D5F5F]">Full Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={newContactName}
+                        onChange={(e) => setNewContactName(e.target.value)}
+                        placeholder="e.g. Alex Morgan"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-[#5D5F5F]">Phone Number</label>
+                      <input
+                        type="text"
+                        required
+                        value={newContactPhone}
+                        onChange={(e) => setNewContactPhone(e.target.value)}
+                        placeholder="e.g. +91 98765 43210"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                      />
+                    </div>
+                    <div className="flex gap-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsAddContactOpen(false)}
+                        className="flex-1 py-2.5 bg-[#EFEDED] hover:bg-neutral-200 text-[#5D5F5F] font-bold text-xs rounded-lg cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSavingContact}
+                        className="flex-1 py-2.5 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-extrabold text-xs uppercase rounded-lg cursor-pointer disabled:opacity-60"
+                      >
+                        {isSavingContact ? 'Saving...' : 'Save Contact'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* STEP 3: REVIEW / THANK YOU PAGE (shown once the QR has been generated) */}
+        {step === 3 && completedOrder?.qrToken && (
           <div className="max-w-[672px] mx-auto space-y-[32px] animate-fade-in px-2 sm:px-4 pt-2">
-            
+
             {/* SUCCESS CELEBRATION SECTION */}
             <div className="flex flex-col items-center text-center gap-[16px] w-full">
               {/* Background badge icon with orbit ring */}
@@ -653,6 +966,37 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               </div>
 
             </div>
+
+            {/* SECTION: YOUR QR TAG */}
+            {completedOrder?.qrToken && (
+              <div className="bg-white border border-[#E4E2E2] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] rounded-[12px] p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6">
+                <img
+                  src={`${API_BASE_URL}/api/order-contact/${completedOrder.qrToken}/qr.png`}
+                  alt="Your Scan Connect QR tag"
+                  className="w-40 h-40 shrink-0 border border-[#E4E2E2] rounded-lg"
+                />
+                <div className="flex-1 space-y-3 text-center sm:text-left">
+                  <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-xl text-[#1B1C1C]">
+                    Your QR Tag is Ready
+                  </h3>
+                  <p className="text-sm text-[#5F5E5E]">
+                    This is the QR code that will be printed on your sticker. Anyone who scans it can see your linked
+                    vehicle and emergency contact details.
+                  </p>
+                  <button
+                    onClick={() =>
+                      downloadFile(
+                        `/api/order-contact/${completedOrder.qrToken}/qr.png`,
+                        `scanconnect-qr-${completedOrder.id.slice(0, 8)}.png`,
+                      )
+                    }
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1B1C1C] hover:bg-neutral-800 text-white text-sm font-bold rounded-lg cursor-pointer"
+                  >
+                    <Download className="w-4 h-4" /> Download QR
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* SECTION: CUSTOMER FEEDBACK */}
             <div className="bg-[#FFFFFF] border border-[#E4E2E2] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] rounded-[12px] p-[24px] sm:p-[31px_32px_32px] relative overflow-hidden space-y-[24px]">

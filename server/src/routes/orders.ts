@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from 'express';
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { razorpay } from '../lib/razorpay.js';
@@ -97,10 +97,58 @@ ordersRouter.post('/verify', requireAuth, async (req, res) => {
 ordersRouter.get('/mine', requireAuth, async (req, res) => {
   const orders = await prisma.order.findMany({
     where: { userId: req.user!.id },
-    include: { items: { include: { product: true } } },
+    include: { items: { include: { product: true } }, vehicle: true, emergencyContact: true },
     orderBy: { createdAt: 'desc' },
   });
   res.json({ orders });
+});
+
+const assignSchema = z.object({
+  vehicleId: z.string().uuid(),
+  emergencyContactId: z.string().uuid(),
+});
+
+/**
+ * Called on the checkout "Assign" step, once payment has succeeded, to link
+ * the paid order to a specific vehicle + emergency contact and generate the
+ * QR token that will be printed on the sticker (and shown in My Orders).
+ */
+ordersRouter.post('/:id/assign', requireAuth, async (req, res) => {
+  const parsed = assignSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const order = await prisma.order.findUnique({ where: { id: req.params.id } });
+  if (!order || order.userId !== req.user!.id) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+  if (order.status !== 'PAID') {
+    return res.status(400).json({ error: 'Order must be paid before it can be assigned a QR code' });
+  }
+
+  const [vehicle, contact] = await Promise.all([
+    prisma.vehicle.findUnique({ where: { id: parsed.data.vehicleId } }),
+    prisma.emergencyContact.findUnique({ where: { id: parsed.data.emergencyContactId } }),
+  ]);
+  if (!vehicle || vehicle.userId !== req.user!.id) {
+    return res.status(404).json({ error: 'Vehicle not found' });
+  }
+  if (!contact || contact.userId !== req.user!.id) {
+    return res.status(404).json({ error: 'Emergency contact not found' });
+  }
+
+  const updated = await prisma.order.update({
+    where: { id: order.id },
+    data: {
+      vehicleId: vehicle.id,
+      emergencyContactId: contact.id,
+      qrToken: order.qrToken ?? randomBytes(16).toString('hex'),
+    },
+    include: { items: { include: { product: true } }, vehicle: true, emergencyContact: true },
+  });
+
+  res.json({ order: updated });
 });
 
 /**

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Mail, Phone, ShieldCheck } from 'lucide-react';
+import { Mail, Phone, ShieldCheck, Car, UserRound } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -8,6 +8,15 @@ interface OrderContact {
   createdAt: string;
   status: string;
   customer: { fullName: string; email: string; mobileNumber: string | null };
+  vehicle: {
+    registration: string;
+    nickname: string | null;
+    vehicleType: string | null;
+    brand: string | null;
+    model: string | null;
+    color: string | null;
+  } | null;
+  emergencyContact: { name: string; role: string | null; phone: string } | null;
 }
 
 export const OrderContactPage: React.FC<{ token: string }> = ({ token }) => {
@@ -57,6 +66,42 @@ export const OrderContactPage: React.FC<{ token: string }> = ({ token }) => {
                 <Phone className="w-4 h-4 text-amber-500" />
                 <a href={`tel:${data.customer.mobileNumber}`} className="hover:underline">
                   {data.customer.mobileNumber}
+                </a>
+              </div>
+            )}
+
+            {data.vehicle && (
+              <div className="pt-4 border-t border-neutral-100 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase text-neutral-400">
+                  <Car className="w-3.5 h-3.5" /> Vehicle
+                </div>
+                <p className="text-neutral-900 font-bold">
+                  {data.vehicle.nickname || data.vehicle.registration}
+                </p>
+                <p className="text-neutral-600 text-sm font-mono">{data.vehicle.registration}</p>
+                {(data.vehicle.brand || data.vehicle.model || data.vehicle.color) && (
+                  <p className="text-neutral-500 text-xs">
+                    {[data.vehicle.brand, data.vehicle.model, data.vehicle.color].filter(Boolean).join(' · ')}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {data.emergencyContact && (
+              <div className="pt-4 border-t border-neutral-100 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase text-neutral-400">
+                  <UserRound className="w-3.5 h-3.5" /> Emergency Contact
+                </div>
+                <p className="text-neutral-900 font-bold">{data.emergencyContact.name}</p>
+                {data.emergencyContact.role && (
+                  <p className="text-neutral-500 text-xs">{data.emergencyContact.role}</p>
+                )}
+                <a
+                  href={`tel:${data.emergencyContact.phone}`}
+                  className="flex items-center gap-2 text-neutral-700 hover:underline"
+                >
+                  <Phone className="w-4 h-4 text-amber-500" />
+                  {data.emergencyContact.phone}
                 </a>
               </div>
             )}

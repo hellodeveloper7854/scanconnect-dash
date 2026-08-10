@@ -13,7 +13,11 @@ export const orderContactRouter = Router();
 orderContactRouter.get('/:token', async (req, res) => {
   const order = await prisma.order.findUnique({
     where: { qrToken: req.params.token },
-    include: { user: { select: { fullName: true, email: true, mobileNumber: true } } },
+    include: {
+      user: { select: { fullName: true, email: true, mobileNumber: true } },
+      vehicle: true,
+      emergencyContact: true,
+    },
   });
 
   if (!order) {
@@ -29,6 +33,23 @@ orderContactRouter.get('/:token', async (req, res) => {
       email: order.user.email,
       mobileNumber: order.user.mobileNumber,
     },
+    vehicle: order.vehicle
+      ? {
+          registration: order.vehicle.registration,
+          nickname: order.vehicle.nickname,
+          vehicleType: order.vehicle.vehicleType,
+          brand: order.vehicle.brand,
+          model: order.vehicle.model,
+          color: order.vehicle.color,
+        }
+      : null,
+    emergencyContact: order.emergencyContact
+      ? {
+          name: order.emergencyContact.name,
+          role: order.emergencyContact.role,
+          phone: order.emergencyContact.phone,
+        }
+      : null,
   });
 });
 

@@ -2,14 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
-import { api, ApiError } from '../lib/api';
-import { Package, ShoppingBag } from 'lucide-react';
+import { api, ApiError, downloadFile } from '../lib/api';
+import { Package, ShoppingBag, Download } from 'lucide-react';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
 interface OrderRow {
   id: string;
   status: 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED' | 'REFUNDED';
   totalInPaise: number;
   createdAt: string;
+  qrToken: string | null;
   items: { quantity: number; product: { name: string } }[];
 }
 
@@ -99,9 +102,17 @@ export const MyOrdersScreen: React.FC<MyOrdersScreenProps> = ({ userData, onLogo
                   className="bg-white border border-[#EEEEEE] rounded-xl p-6 flex items-center justify-between gap-6 flex-wrap"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-11 h-11 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-                      <Package className="w-5 h-5 text-[#676000]" />
-                    </div>
+                    {order.qrToken ? (
+                      <img
+                        src={`${API_BASE_URL}/api/order-contact/${order.qrToken}/qr.png`}
+                        alt="Order QR tag"
+                        className="w-11 h-11 rounded-lg border border-[#EEEEEE] shrink-0"
+                      />
+                    ) : (
+                      <div className="w-11 h-11 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                        <Package className="w-5 h-5 text-[#676000]" />
+                      </div>
+                    )}
                     <div>
                       <div className="font-mono text-sm text-neutral-500">#{order.id.slice(0, 8).toUpperCase()}</div>
                       <div className="text-sm text-neutral-700">
@@ -124,6 +135,20 @@ export const MyOrdersScreen: React.FC<MyOrdersScreenProps> = ({ userData, onLogo
                     <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${statusColor[order.status]}`}>
                       {order.status}
                     </span>
+                    {order.qrToken && (
+                      <button
+                        onClick={() =>
+                          downloadFile(
+                            `/api/order-contact/${order.qrToken}/qr.png`,
+                            `scanconnect-qr-${order.id.slice(0, 8)}.png`,
+                          )
+                        }
+                        title="Download QR"
+                        className="p-2 text-neutral-500 hover:text-neutral-900 rounded-lg hover:bg-neutral-100 cursor-pointer"
+                      >
+                        <Download className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

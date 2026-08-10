@@ -12,6 +12,8 @@ interface OrderRow {
   qrToken: string | null;
   user: { fullName: string; email: string; mobileNumber: string | null };
   items: { quantity: number; product: { name: string } }[];
+  vehicle: { registration: string; nickname: string | null } | null;
+  emergencyContact: { name: string; phone: string } | null;
 }
 
 const STATUS_OPTIONS: OrderRow['status'][] = ['PENDING', 'PAID', 'FAILED', 'CANCELLED', 'REFUNDED'];
@@ -44,19 +46,7 @@ export const AdminOrders: React.FC = () => {
     load();
   };
 
-  const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [previewToken, setPreviewToken] = useState<string | null>(null);
-
-  const generateQr = async (id: string) => {
-    setGeneratingId(id);
-    try {
-      const res = await api.post<{ order: OrderRow }>(`/api/admin/orders/${id}/generate-qr`);
-      setPreviewToken(res.order.qrToken);
-      load();
-    } finally {
-      setGeneratingId(null);
-    }
-  };
 
   if (error) return <div className="p-8 text-rose-400">{error}</div>;
 
@@ -90,6 +80,8 @@ export const AdminOrders: React.FC = () => {
                 <th className="px-4 py-3">Order</th>
                 <th className="px-4 py-3">Customer</th>
                 <th className="px-4 py-3">Items</th>
+                <th className="px-4 py-3">Vehicle</th>
+                <th className="px-4 py-3">Emergency Contact</th>
                 <th className="px-4 py-3">Total</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Date</th>
@@ -106,6 +98,26 @@ export const AdminOrders: React.FC = () => {
                   </td>
                   <td className="px-4 py-3 text-white/70">
                     {order.items.map((i) => `${i.product.name} x${i.quantity}`).join(', ')}
+                  </td>
+                  <td className="px-4 py-3 text-white/70">
+                    {order.vehicle ? (
+                      <>
+                        <div className="text-white">{order.vehicle.nickname || order.vehicle.registration}</div>
+                        <div className="text-white/40 text-xs font-mono">{order.vehicle.registration}</div>
+                      </>
+                    ) : (
+                      <span className="text-white/30">Not assigned</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-white/70">
+                    {order.emergencyContact ? (
+                      <>
+                        <div className="text-white">{order.emergencyContact.name}</div>
+                        <div className="text-white/40 text-xs">{order.emergencyContact.phone}</div>
+                      </>
+                    ) : (
+                      <span className="text-white/30">Not assigned</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-white">
                     {(order.totalInPaise / 100).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
@@ -136,14 +148,7 @@ export const AdminOrders: React.FC = () => {
                         View QR
                       </button>
                     ) : (
-                      <button
-                        onClick={() => generateQr(order.id)}
-                        disabled={generatingId === order.id}
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-white/70 hover:text-white cursor-pointer disabled:opacity-50"
-                      >
-                        <QrCode className="w-3.5 h-3.5" />
-                        {generatingId === order.id ? 'Generating...' : 'Generate QR'}
-                      </button>
+                      <span className="text-xs text-white/30">Not generated yet</span>
                     )}
                   </td>
                 </tr>
