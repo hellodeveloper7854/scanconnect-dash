@@ -13,9 +13,9 @@ import {
   Train,
   GraduationCap,
   ArrowRight,
+  ChevronRight,
   Truck,
   ShieldCheck,
-  QrCode,
   Star,
   Package
 } from 'lucide-react';
@@ -200,18 +200,16 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       {/* Main Content */}
       <main className="flex-1">
         {/* 1. SHOP HERO BANNER SECTION */}
-        <section className="py-12 sm:py-16 lg:py-20 bg-white border-b border-neutral-100">
+        <section className="py-12 sm:py-16 lg:py-20 bg-[#F8F9FB]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-              
+
               {/* Left Column Text */}
               <div className="lg:col-span-6 space-y-6">
-                {/* Shop Badge */}
-                <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs">
-                  <Package className="w-3.5 h-3.5 text-[#F2BA03]" />
-                  <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
-                    OFFICIAL STORE
-                  </span>
+                {/* Breadcrumb */}
+                <div className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-[#0F0F0F] uppercase">
+                  <ChevronRight className="w-3.5 h-3.5" />
+                  <span>SHOP</span>
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-[42px] lg:leading-[1.15] font-black text-[#0F0F0F] tracking-tight font-sans">
@@ -226,24 +224,24 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                 {/* Badges Pill Row */}
                 <div className="flex flex-wrap items-center gap-3 pt-2">
                   <div className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-neutral-200 rounded-full text-xs font-bold text-[#0F0F0F] shadow-xs">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
                     <span>950,000+ Tags Active</span>
                   </div>
 
                   <div className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-neutral-200 rounded-full text-xs font-bold text-[#0F0F0F] shadow-xs">
-                    <Truck className="w-4 h-4 text-[#F2BA03]" />
-                    <span>Free Delivery Across India</span>
+                    <Truck className="w-4 h-4 text-[#0F0F0F]" />
+                    <span>Free Delivery</span>
                   </div>
                 </div>
               </div>
 
               {/* Right Column Image */}
               <div className="lg:col-span-6 flex justify-center lg:justify-end">
-                <div className="relative  overflow-hidden  max-w-lg w-full">
+                <div className="relative overflow-hidden max-w-lg w-full">
                   <img
                     src={shopBannerImg}
                     alt="ScanConnect Tag Product"
-                    className="w-full h-[360px] sm:h-[420px] object-cover"
+                    className="w-full h-[280px] sm:h-[340px] object-contain"
                   />
                 </div>
               </div>
@@ -282,21 +280,21 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                 return (
                   <div
                     key={svc.id}
-                    className="bg-white border border-neutral-200 rounded-2xl p-8 sm:p-10 shadow-xs hover:shadow-xl transition-all flex flex-col justify-between items-center text-center space-y-6 group"
+                    className="bg-white border border-[#CCC7AA] rounded-2xl p-8 sm:p-10 shadow-xs hover:shadow-xl transition-all flex flex-col justify-between items-center text-center space-y-6 group"
                   >
                     <div className="flex flex-col items-center space-y-4">
                       {/* Circle Icon */}
-                      <div className="w-16 h-16 rounded-full bg-[#F2BA03]/10 border border-[#F2BA03]/30 flex items-center justify-center text-[#F2BA03] group-hover:scale-110 transition-transform">
+                      <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center text-[#F2BA03] group-hover:scale-110 transition-transform">
                         <IconComp className="w-7 h-7 stroke-[2.2]" />
                       </div>
 
                       {/* Card Title */}
-                      <h3 className="text-xl font-bold text-[#0F0F0F] leading-tight whitespace-pre-line">
+                      <h3 className="text-2xl font-semibold text-[#0F0F0F] leading-tight whitespace-pre-line">
                         {svc.title}
                       </h3>
 
                       {/* Card Body */}
-                      <p className="text-[#5D5F5F] text-xs sm:text-sm leading-relaxed max-w-xs">
+                      <p className="text-[#5D5F5F] text-base leading-relaxed max-w-xs">
                         {svc.desc}
                       </p>
                     </div>
@@ -304,9 +302,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     {/* Learn More Link */}
                     <button
                       onClick={() => alert(`Details for ecosystem: ${svc.title.replace('\n', ' ')}`)}
-                      className="text-xs font-bold text-[#0F0F0F] hover:text-[#F2BA03] tracking-wider uppercase inline-flex items-center gap-1.5 cursor-pointer pt-2 transition-colors"
+                      className="text-xs font-bold text-[#F2BA03] hover:text-[#d19d00] tracking-wider uppercase inline-flex items-center gap-1.5 cursor-pointer pt-2 transition-colors"
                     >
-                      <span>LEARN MORE</span> <ArrowRight className="w-4 h-4" />
+                      <span>LEARN MORE</span> <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 );
@@ -380,9 +378,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   </div>
 
                   {/* Bottom Price & View Button */}
-                  <div className="flex items-center justify-between pt-3 border-t border-neutral-100">
+                  <div className="flex items-center justify-between pt-3">
                     <div>
-                      <span className="text-[10px] font-bold tracking-widest text-[#5D5F5F] uppercase font-mono block">
+                      <span className="text-[10px] font-bold tracking-widest text-[#5D5F5F] uppercase block">
                         PRICE
                       </span>
                       <span className="text-2xl font-black text-[#0F0F0F] font-sans">
@@ -392,10 +390,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
                     <button
                       onClick={() => setSelectedProduct(prod)}
-                      className="h-[44px] px-5 bg-[#0F0F0F] hover:bg-[#F2BA03] text-white hover:text-[#0F0F0F] font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs"
+                      className="w-11 h-11 rounded-full bg-[#0F0F0F] hover:bg-[#F2BA03] text-white hover:text-[#0F0F0F] transition-all cursor-pointer flex items-center justify-center active:scale-95"
                       title="View product details"
                     >
-                      <span>VIEW</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -408,10 +405,10 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               <div className="flex justify-center pt-4">
                 <button
                   onClick={() => setVisibleProductsCount(initialProducts.length)}
-                  className="h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                  className="h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-bold text-lg rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
                 >
-                  <span>SEE MORE PRODUCTS</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span>See More</span>
+                  <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
             )}
