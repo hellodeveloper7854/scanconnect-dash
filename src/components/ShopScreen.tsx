@@ -6,15 +6,8 @@ import { ProductDetailScreen } from './ProductDetailScreen';
 import shopBannerImg from '../assets/images/shopbanner.png';
 import qrImage from '../assets/images/qrimage.png';
 import {
-  Building2,
-  ShoppingBag,
-  Plane,
-  ShoppingCart,
-  Train,
-  GraduationCap,
   ArrowRight,
   ChevronRight,
-  ShieldCheck,
   Star,
   Package,
   Check,
@@ -113,52 +106,6 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
     'Lost Vehicle Assistance',
     'Society & Office Parking',
     'Commercial Fleets',
-  ];
-
-  // Our Reach — 6 industries with benefits sub-lists
-  const ourReach = [
-    {
-      id: 'municipal',
-      icon: Building2,
-      title: 'Municipal Corporations',
-      desc: 'Digitize urban parking with intelligent vehicle identification, real-time communication, and efficient parking management designed for high-density cities.',
-      benefits: ['Smart Parking Management', 'Digital Vehicle Communication', 'Reduced Traffic Congestion', 'Better Citizen Experience'],
-    },
-    {
-      id: 'retail',
-      icon: ShoppingBag,
-      title: 'Shopping Centres & Retail',
-      desc: 'Improve customer satisfaction with seamless parking communication while gaining valuable operational insights to enhance retail experiences.',
-      benefits: ['Better Customer Convenience', 'Improved Parking Flow', 'Increased Visitor Satisfaction', 'Enhanced Merchant Experience'],
-    },
-    {
-      id: 'airports',
-      icon: Plane,
-      title: 'Airports',
-      desc: 'Transform airport parking through digital vehicle communication, faster customer assistance, and intelligent parking operations.',
-      benefits: ['Efficient Parking Management', 'Improved Traveler Experience', 'Real-Time Communication', 'Smart Digital Infrastructure'],
-    },
-    {
-      id: 'supermarkets',
-      icon: ShoppingCart,
-      title: 'Supermarkets',
-      desc: 'Offer shoppers a hassle-free parking experience with quick owner notifications and improved vehicle safety.',
-      benefits: ['Faster Customer Assistance', 'Safer Parking Areas', 'Convenient Shopping Experience', 'Better Parking Utilization'],
-    },
-    {
-      id: 'railways',
-      icon: Train,
-      title: 'Railway Stations',
-      desc: 'Simplify commuter parking with secure vehicle identification, monthly pass integration, and seamless communication.',
-      benefits: ['Daily Commuter Convenience', 'Digital Permit Management', 'Smart Parking Solutions', 'Efficient Operations'],
-    },
-    {
-      id: 'universities',
-      icon: GraduationCap,
-      title: 'Universities & Educational Campuses',
-      desc: 'Create safer campuses with intelligent vehicle management for students, faculty, and visitors.',
-      benefits: ['Campus Parking Management', 'Student & Staff Convenience', 'Visitor Vehicle Communication', 'Data & Analytics Dashboard'],
-    },
   ];
 
   // Our Products — 4 distinct product cards
@@ -371,7 +318,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         </section>
 
 
-        {/* 4. OUR PRODUCTS SECTION */}
+        {/* 3. OUR PRODUCTS SECTION */}
         <section id="products" className="py-16 sm:py-20 bg-neutral-50/60 border-t border-neutral-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -506,7 +453,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         </section>
 
 
-        {/* 5. WHY CHOOSE SCAN CONNECT SECTION */}
+        {/* 4. WHY CHOOSE SCAN CONNECT SECTION */}
         <section className="py-16 sm:py-20 bg-white border-t border-neutral-100">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
@@ -527,7 +474,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         </section>
 
 
-        {/* 6. NEED MORE THAN ONE? CTA SECTION */}
+        {/* 5. NEED MORE THAN ONE? CTA SECTION */}
         <section className="py-16 sm:py-20 bg-white border-t border-neutral-100">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0F0F0F]">

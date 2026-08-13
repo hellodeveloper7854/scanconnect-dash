@@ -47,3 +47,16 @@
 .reveal-on-scroll.is-visible {
   animation: reveal-up 0.6s ease-out forwards;
 }
+
+@keyframes sos-glow {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-sos-glow {
+  animation: sos-glow 3.5s ease-in-out infinite;
+}

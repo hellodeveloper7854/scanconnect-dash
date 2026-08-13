@@ -32,6 +32,7 @@ import {
 import { BLOG_POSTS } from '../lib/blogPosts';
 import { useRevealOnScroll } from '../lib/useRevealOnScroll';
 import banner from '../assets/images/howitworksbanner.png'
+import sosEmergencyImg from '../assets/images/sosemmergencyimg.png'
 import videoWalkImg from '../assets/images/howitworks/videowalkimg.png'
 import tutorialVideoPreviewImg from '../assets/images/howitworks/tutorialvideopreview.png'
 import appStoreImg from '../assets/images/howitworks/appstore.png'
@@ -477,32 +478,83 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         {/* 5. SOS EMERGENCY ASSISTANCE SECTION */}
         <section className="py-20 bg-[#1B1C1C] text-white relative overflow-hidden">
           <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-[#F2BA03]/10 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" />
-          <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10 text-center space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-              <ShieldAlert className="w-4 h-4 text-[#F2BA03]" />
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
-                SOS EMERGENCY ASSISTANCE
-              </span>
-            </div>
+          <div className="absolute bottom-0 right-0 w-[28rem] h-[28rem] bg-red-500/10 rounded-full blur-[140px] pointer-events-none translate-x-1/3 translate-y-1/3" />
 
-            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-white leading-tight">
-              Help is Just One Tap Away
-            </h2>
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-            <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-neutral-300 leading-[28px] max-w-3xl mx-auto">
-              In an emergency, every second matters. The SOS button in the Scan Connect app gives you instant access to critical emergency services and your trusted contacts&mdash;without wasting time searching for phone numbers.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 pt-4 text-left">
-              {sosHighlights.map(({ icon: Icon, label }) => (
-                <div key={label} className="bg-white/5 border border-white/10 rounded-xl p-5 flex flex-col items-start gap-3">
-                  <Icon className="w-6 h-6 text-[#F2BA03]" />
-                  <span className="font-['Hanken_Grotesk'] font-semibold text-sm text-white leading-snug">{label}</span>
+              {/* Left column — copy + highlight cards */}
+              <RevealCard className="space-y-8 text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F2BA03] opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F2BA03]" />
+                  </span>
+                  <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                    SOS EMERGENCY ASSISTANCE
+                  </span>
                 </div>
-              ))}
+
+                <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-white leading-tight">
+                  Help is Just <span className="text-[#F2BA03]">One Tap</span> Away
+                </h2>
+
+                <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-neutral-300 leading-[28px]">
+                  In an emergency, every second matters. The SOS button in the Scan Connect app gives you instant access to critical emergency services and your trusted contacts&mdash;without wasting time searching for phone numbers.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+                  {sosHighlights.map(({ icon: Icon, label }) => (
+                    <div
+                      key={label}
+                      className="group bg-white/5 border border-white/10 rounded-xl p-5 flex flex-col items-start gap-3 hover:border-[#F2BA03]/60 hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-[#F2BA03]/15 flex items-center justify-center group-hover:bg-[#F2BA03]/25 group-hover:scale-110 transition-all">
+                        <Icon className="w-5 h-5 text-[#F2BA03]" />
+                      </div>
+                      <span className="font-['Hanken_Grotesk'] font-semibold text-sm text-white leading-snug">{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </RevealCard>
+
+              {/* Right column — SOS emergency image, framed to pop against the dark section */}
+              <RevealCard delayMs={150} className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-tr from-[#F2BA03]/25 via-red-500/15 to-transparent rounded-[28px] blur-2xl pointer-events-none animate-sos-glow" />
+                <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5)] group">
+                  <img
+                    src={sosEmergencyImg}
+                    alt="Scan Connect SOS emergency assistance"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1B1C1C]/80 via-[#1B1C1C]/5 to-transparent" />
+                  <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-3xl pointer-events-none" />
+
+                  {/* Floating SOS badge */}
+                  <div className="absolute top-5 right-5 flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-600 shadow-lg shadow-red-900/40">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+                    </span>
+                    <span className="font-['Inter'] font-extrabold text-xs tracking-[1.5px] text-white uppercase">
+                      Live SOS
+                    </span>
+                  </div>
+
+                  {/* Bottom caption overlay */}
+                  <div className="absolute bottom-0 inset-x-0 p-5 sm:p-6 flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-[#F2BA03] flex items-center justify-center shrink-0">
+                      <ShieldAlert className="w-4.5 h-4.5 text-[#1B1C1C]" />
+                    </div>
+                    <p className="font-['Hanken_Grotesk'] font-bold text-white text-sm sm:text-base">
+                      24&times;7 Emergency Response, Anywhere in India
+                    </p>
+                  </div>
+                </div>
+              </RevealCard>
             </div>
 
-            <div className="pt-6 space-y-2">
+            <RevealCard delayMs={250} className="mt-14 bg-gradient-to-r from-white/[0.06] to-white/[0.02] border border-white/10 rounded-2xl p-8 sm:p-10 text-center space-y-3 max-w-4xl mx-auto">
               <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-xl sm:text-2xl text-white">
                 Stay Safe Wherever You Go
               </h3>
@@ -513,7 +565,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 <ShieldAlert className="w-5 h-5" />
                 Your Safety. Your Family&apos;s Peace of Mind. Always Connected.
               </p>
-            </div>
+            </RevealCard>
           </div>
         </section>
 
