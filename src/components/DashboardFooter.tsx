@@ -148,8 +148,8 @@ export const DashboardFooter: React.FC = () => {
             </h4>
             <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
               <li>
-                <a href="mailto:rj@sampark.me" className="hover:underline block">
-                  rj@sampark.me
+                <a href="mailto:rj@Scan Connect.me" className="hover:underline block">
+                  rj@Scan Connect.me
                 </a>
               </li>
               <li>

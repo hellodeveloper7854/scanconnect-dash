@@ -7,14 +7,14 @@ const TEAM = [
   {
     name: 'Rahul Jain',
     role: 'Founder & CEO',
-    bio: 'Leads product and strategy at Sampark, focused on building privacy-first contact solutions for vehicle owners across India.',
+    bio: 'Leads product and strategy at Scan Connect, focused on building privacy-first contact solutions for vehicle owners across India.',
     linkedin: '#',
     twitter: '#',
   },
   {
     name: 'Ananya Verma',
     role: 'Co-Founder & Head of Operations',
-    bio: 'Oversees manufacturing, logistics, and partner relationships, scaling Sampark tags to cities across the country.',
+    bio: 'Oversees manufacturing, logistics, and partner relationships, scaling Scan Connect tags to cities across the country.',
     linkedin: '#',
     twitter: '#',
   },

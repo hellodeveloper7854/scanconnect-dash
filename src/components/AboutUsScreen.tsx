@@ -81,7 +81,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                 </h1>
 
                 <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal max-w-xl">
-                  Sampark started with a simple frustration: leaving your phone number on your dashboard meant spam calls, harassment, and zero privacy. We built a smart QR tag that lets anyone reach you instantly — without ever seeing your actual phone number.
+                  Scan Connect started with a simple frustration: leaving your phone number on your dashboard meant spam calls, harassment, and zero privacy. We built a smart QR tag that lets anyone reach you instantly — without ever seeing your actual phone number.
                 </p>
 
                 {/* CTA Buttons */}

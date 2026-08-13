@@ -20,12 +20,12 @@ const FAQS = [
       'Yes. FASTag is mandatory for all four-wheelers on national and state highways in India. Vehicles without a valid FASTag are charged double the toll fee at plazas.',
   },
   {
-    question: 'How does a Sampark Tag protect my privacy?',
+    question: 'How does a Scan Connect Tag protect my privacy?',
     answer:
       'When someone scans your tag, they can call, SMS, or WhatsApp you through a masked number. Your real phone number is never shown to the person scanning, and theirs is never shown to you.',
   },
   {
-    question: 'What happens if my Sampark Tag is lost or damaged?',
+    question: 'What happens if my Scan Connect Tag is lost or damaged?',
     answer:
       'You can report a lost or damaged tag from your Profile page and order a replacement. Your existing QR activation and contact settings carry over to the new tag.',
   },

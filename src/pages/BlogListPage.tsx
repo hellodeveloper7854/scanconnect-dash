@@ -23,7 +23,7 @@ export const BlogListPage: React.FC = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="space-y-2">
             <h1 className="text-4xl sm:text-5xl font-black text-neutral-900 tracking-tight">Blog</h1>
-            <p className="text-neutral-500 text-lg">Guides, tips, and stories from the Sampark team.</p>
+            <p className="text-neutral-500 text-lg">Guides, tips, and stories from the Scan Connect team.</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

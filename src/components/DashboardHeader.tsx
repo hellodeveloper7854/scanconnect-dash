@@ -125,7 +125,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
             {/* Help / FAQ Icon */}
             <button
-              onClick={() => alert('ScanConnect Helpdesk:\nCall 080-473-59856 or email rj@sampark.me for 24/7 driver support.')}
+              onClick={() => alert('ScanConnect Helpdesk:\nCall 080-473-59856 or email rj@Scan Connect.me for 24/7 driver support.')}
               className="p-2 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
               title="Support & FAQ"
             >
