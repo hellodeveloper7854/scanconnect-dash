@@ -359,7 +359,37 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 3. ABOUT SCAN CONNECT SECTION */}
+        {/* 3. VIDEO SECTION */}
+        <section className="py-20 bg-white relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
+            <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
+                VIDEO SECTION
+              </span>
+              <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-5xl text-[#1B1C1C] tracking-tight">
+                See Scan Connect in Action
+              </h2>
+              <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] leading-[26px] max-w-2xl mx-auto">
+                Watch our quick 90-second walkthrough and discover how Scan Connect helps people reach you without revealing your phone number.
+              </p>
+            </div>
+
+            {/* Video Player Box */}
+            <button
+              onClick={() => setIsVideoModalOpen(true)}
+              className="max-w-4xl mx-auto relative rounded-3xl overflow-hidden border border-neutral-200 shadow-2xl group bg-white block w-full cursor-pointer"
+            >
+              <img
+                src={tutorialVideoPreviewImg}
+                alt="Tutorial Video Preview"
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+              />
+            </button>
+          </div>
+        </section>
+
+
+        {/* 4. ABOUT SCAN CONNECT SECTION */}
         <section className="py-20 bg-white">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
             <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
@@ -703,37 +733,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 9. VIDEO SECTION */}
-        <section className="py-20 bg-white relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
-            <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                VIDEO SECTION
-              </span>
-              <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-5xl text-[#1B1C1C] tracking-tight">
-                See Scan Connect in Action
-              </h2>
-              <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] leading-[26px] max-w-2xl mx-auto">
-                Watch our quick 90-second walkthrough and discover how Scan Connect helps people reach you without revealing your phone number.
-              </p>
-            </div>
-
-            {/* Video Player Box */}
-            <button
-              onClick={() => setIsVideoModalOpen(true)}
-              className="max-w-4xl mx-auto relative rounded-3xl overflow-hidden border border-neutral-200 shadow-2xl group bg-white block w-full cursor-pointer"
-            >
-              <img
-                src={tutorialVideoPreviewImg}
-                alt="Tutorial Video Preview"
-                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
-              />
-            </button>
-          </div>
-        </section>
-
-
-        {/* 9B. SOS EMERGENCY ASSISTANCE SECTION (SECOND) */}
+        {/* 9. SOS EMERGENCY ASSISTANCE SECTION (SECOND) */}
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#F2BA03]/40">
