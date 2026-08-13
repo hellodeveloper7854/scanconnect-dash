@@ -96,13 +96,19 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <button
               onClick={triggerSosAlert}
               title="Trigger Emergency SOS"
-              className={`relative group w-9 h-9 sm:w-10 sm:h-10 rounded-full font-extrabold text-xs text-white flex items-center justify-center cursor-pointer transition-all shadow-sm ${
+              className={`relative group w-11 h-11 sm:w-13 sm:h-13 rounded-full font-extrabold text-sm text-white flex items-center justify-center cursor-pointer transition-all shadow-lg overflow-hidden ${
                 sosActive
                   ? 'bg-red-700 animate-bounce ring-4 ring-red-400'
-                  : 'bg-[#FF0022] hover:bg-red-700 active:scale-95 border border-white/30'
+                  : 'bg-[#FF0022] hover:bg-red-700 active:scale-95 border-2 border-white/60'
               }`}
             >
-              <span>SOS</span>
+              {!sosActive && (
+                <span className="absolute inset-0 rounded-full bg-red-500 animate-sos-pulse-ring pointer-events-none" />
+              )}
+              <span className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                <span className="absolute inset-y-0 left-0 w-1/3 bg-white/40 blur-[2px] animate-sos-shimmer" />
+              </span>
+              <span className="relative z-10">SOS</span>
             </button>
 
             {/* Notification Bell */}
