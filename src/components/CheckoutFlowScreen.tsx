@@ -28,6 +28,14 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000
 // catalog is wired up to real backend products with matching UUIDs.
 const CHECKOUT_PRODUCT_ID = '5ab6e299-8795-4cfa-8293-d315bb75e98a';
 
+const VEHICLE_TYPES = ['Car', 'Bike', 'Scooter', 'Truck', 'Bus', 'Other'];
+
+// Mirrors the backend's registration format expectations loosely: letters,
+// digits, spaces and hyphens only, at least 4 characters.
+const REGISTRATION_PATTERN = /^[A-Za-z0-9 -]{4,}$/;
+const PHONE_PATTERN = /^\+?[0-9 ()-]{6,20}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 declare global {
   interface Window {
     Razorpay: new (options: Record<string, unknown>) => { open: () => void };
@@ -116,11 +124,20 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
   const [newVehicleRegistration, setNewVehicleRegistration] = useState('');
   const [newVehicleNickname, setNewVehicleNickname] = useState('');
+  const [newVehicleType, setNewVehicleType] = useState('');
+  const [newVehicleBrand, setNewVehicleBrand] = useState('');
+  const [newVehicleModel, setNewVehicleModel] = useState('');
+  const [newVehicleFuelType, setNewVehicleFuelType] = useState('');
+  const [newVehicleColor, setNewVehicleColor] = useState('');
+  const [vehicleFormError, setVehicleFormError] = useState('');
   const [isSavingVehicle, setIsSavingVehicle] = useState(false);
 
   const [isAddContactOpen, setIsAddContactOpen] = useState(false);
   const [newContactName, setNewContactName] = useState('');
+  const [newContactRole, setNewContactRole] = useState('');
   const [newContactPhone, setNewContactPhone] = useState('');
+  const [newContactEmail, setNewContactEmail] = useState('');
+  const [contactFormError, setContactFormError] = useState('');
   const [isSavingContact, setIsSavingContact] = useState(false);
 
   const loadAssignOptions = () => {
@@ -147,20 +164,41 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
 
   const handleAddVehicleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newVehicleRegistration.trim()) return;
+    setVehicleFormError('');
+
+    const registration = newVehicleRegistration.trim();
+    if (!registration) {
+      setVehicleFormError('Please enter a registration number.');
+      return;
+    }
+    if (!REGISTRATION_PATTERN.test(registration)) {
+      setVehicleFormError('Registration number should be at least 4 characters (letters, numbers, spaces or hyphens only).');
+      return;
+    }
+
     setIsSavingVehicle(true);
     try {
       const res = await api.post<{ vehicle: VehicleOption }>('/api/profile/vehicles', {
-        registration: newVehicleRegistration.trim(),
-        nickname: newVehicleNickname || undefined,
+        registration,
+        nickname: newVehicleNickname.trim() || undefined,
+        vehicleType: newVehicleType || undefined,
+        brand: newVehicleBrand.trim() || undefined,
+        model: newVehicleModel.trim() || undefined,
+        fuelType: newVehicleFuelType.trim() || undefined,
+        color: newVehicleColor.trim() || undefined,
       });
       loadAssignOptions();
       setSelectedVehicleId(res.vehicle.id);
       setIsAddVehicleOpen(false);
       setNewVehicleRegistration('');
       setNewVehicleNickname('');
+      setNewVehicleType('');
+      setNewVehicleBrand('');
+      setNewVehicleModel('');
+      setNewVehicleFuelType('');
+      setNewVehicleColor('');
     } catch (err) {
-      alert(err instanceof ApiError ? err.message : 'Failed to add vehicle');
+      setVehicleFormError(err instanceof ApiError ? err.message : 'Failed to add vehicle');
     } finally {
       setIsSavingVehicle(false);
     }
@@ -168,20 +206,46 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
 
   const handleAddContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newContactName.trim() || !newContactPhone.trim()) return;
+    setContactFormError('');
+
+    const name = newContactName.trim();
+    const phone = newContactPhone.trim();
+    const email = newContactEmail.trim();
+
+    if (!name) {
+      setContactFormError('Please enter a full name.');
+      return;
+    }
+    if (!phone) {
+      setContactFormError('Please enter a phone number.');
+      return;
+    }
+    if (!PHONE_PATTERN.test(phone)) {
+      setContactFormError('Please enter a valid phone number (6-20 digits, spaces, +, or - allowed).');
+      return;
+    }
+    if (email && !EMAIL_PATTERN.test(email)) {
+      setContactFormError('Please enter a valid email address.');
+      return;
+    }
+
     setIsSavingContact(true);
     try {
       const res = await api.post<{ contact: ContactOption }>('/api/profile/emergency-contacts', {
-        name: newContactName.trim(),
-        phone: newContactPhone.trim(),
+        name,
+        phone,
+        role: newContactRole.trim() || undefined,
+        email: email || undefined,
       });
       loadAssignOptions();
       setSelectedContactId(res.contact.id);
       setIsAddContactOpen(false);
       setNewContactName('');
+      setNewContactRole('');
       setNewContactPhone('');
+      setNewContactEmail('');
     } catch (err) {
-      alert(err instanceof ApiError ? err.message : 'Failed to add contact');
+      setContactFormError(err instanceof ApiError ? err.message : 'Failed to add contact');
     } finally {
       setIsSavingContact(false);
     }
@@ -796,7 +860,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
             {/* Inline Add Vehicle Modal */}
             {isAddVehicleOpen && (
               <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+                <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
                   <h3 className="text-lg font-black text-neutral-900">Add Vehicle</h3>
                   <form onSubmit={handleAddVehicleSubmit} className="space-y-3">
                     <div className="space-y-1">
@@ -820,10 +884,75 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
                       />
                     </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-[#5D5F5F]">Vehicle Type (optional)</label>
+                        <select
+                          value={newVehicleType}
+                          onChange={(e) => setNewVehicleType(e.target.value)}
+                          className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03] cursor-pointer"
+                        >
+                          <option value="">Select type</option>
+                          {VEHICLE_TYPES.map((t) => (
+                            <option key={t} value={t}>
+                              {t}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-[#5D5F5F]">Fuel Type (optional)</label>
+                        <input
+                          type="text"
+                          value={newVehicleFuelType}
+                          onChange={(e) => setNewVehicleFuelType(e.target.value)}
+                          placeholder="e.g. Petrol"
+                          className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-[#5D5F5F]">Brand (optional)</label>
+                        <input
+                          type="text"
+                          value={newVehicleBrand}
+                          onChange={(e) => setNewVehicleBrand(e.target.value)}
+                          placeholder="e.g. Maruti Suzuki"
+                          className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-[#5D5F5F]">Model (optional)</label>
+                        <input
+                          type="text"
+                          value={newVehicleModel}
+                          onChange={(e) => setNewVehicleModel(e.target.value)}
+                          placeholder="e.g. Swift"
+                          className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-[#5D5F5F]">Color (optional)</label>
+                      <input
+                        type="text"
+                        value={newVehicleColor}
+                        onChange={(e) => setNewVehicleColor(e.target.value)}
+                        placeholder="e.g. White"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                      />
+                    </div>
+
+                    {vehicleFormError && <p className="text-sm font-semibold text-red-600">{vehicleFormError}</p>}
+
                     <div className="flex gap-3 pt-2">
                       <button
                         type="button"
-                        onClick={() => setIsAddVehicleOpen(false)}
+                        onClick={() => {
+                          setIsAddVehicleOpen(false);
+                          setVehicleFormError('');
+                        }}
                         className="flex-1 py-2.5 bg-[#EFEDED] hover:bg-neutral-200 text-[#5D5F5F] font-bold text-xs rounded-lg cursor-pointer"
                       >
                         Cancel
@@ -859,6 +988,16 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       />
                     </div>
                     <div className="space-y-1">
+                      <label className="text-xs font-bold text-[#5D5F5F]">Role / Relationship (optional)</label>
+                      <input
+                        type="text"
+                        value={newContactRole}
+                        onChange={(e) => setNewContactRole(e.target.value)}
+                        placeholder="e.g. Security Supervisor"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                      />
+                    </div>
+                    <div className="space-y-1">
                       <label className="text-xs font-bold text-[#5D5F5F]">Phone Number</label>
                       <input
                         type="text"
@@ -869,10 +1008,26 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
                       />
                     </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-[#5D5F5F]">Email Address (optional)</label>
+                      <input
+                        type="email"
+                        value={newContactEmail}
+                        onChange={(e) => setNewContactEmail(e.target.value)}
+                        placeholder="e.g. alex@scanme.fleet"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                      />
+                    </div>
+
+                    {contactFormError && <p className="text-sm font-semibold text-red-600">{contactFormError}</p>}
+
                     <div className="flex gap-3 pt-2">
                       <button
                         type="button"
-                        onClick={() => setIsAddContactOpen(false)}
+                        onClick={() => {
+                          setIsAddContactOpen(false);
+                          setContactFormError('');
+                        }}
                         className="flex-1 py-2.5 bg-[#EFEDED] hover:bg-neutral-200 text-[#5D5F5F] font-bold text-xs rounded-lg cursor-pointer"
                       >
                         Cancel
