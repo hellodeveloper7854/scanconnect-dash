@@ -48,6 +48,7 @@ interface QrCodeRow {
   batchId: string;
   batchName: string;
   createdAt: string;
+  activatedAt: string | null;
   vehicle: {
     registration: string;
     nickname: string | null;
@@ -302,6 +303,7 @@ export const AdminQrCodes: React.FC = () => {
                 <th className="px-4 py-3">Vehicle Owner</th>
                 <th className="px-4 py-3">Batch</th>
                 <th className="px-4 py-3">Created</th>
+                <th className="px-4 py-3">Activated</th>
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
@@ -332,6 +334,13 @@ export const AdminQrCodes: React.FC = () => {
                   </td>
                   <td className="px-4 py-3 text-white/70 text-xs">{c.batchName}</td>
                   <td className="px-4 py-3 text-white/50 text-xs">{new Date(c.createdAt).toLocaleDateString()}</td>
+                  <td className="px-4 py-3 text-white/50 text-xs">
+                    {c.activatedAt ? (
+                      new Date(c.activatedAt).toLocaleString()
+                    ) : (
+                      <span className="text-white/20">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-right">
                     <button
                       type="button"
