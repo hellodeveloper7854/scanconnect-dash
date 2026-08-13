@@ -274,14 +274,13 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     <AtSign className="w-5 h-5 stroke-[1.8]" />
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => alert('Downloading Scan Connect Official Brochure...')}
-                    title="Brochure PDF"
+                  <a
+                    href="/terms"
+                    title="Terms & Conditions"
                     className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <FileText className="w-5 h-5 stroke-[1.8]" />
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>

@@ -22,6 +22,8 @@ import { BlogListPage } from './pages/BlogListPage';
 import { BlogPostPage } from './pages/BlogPostPage';
 import { InvestorsPage } from './pages/InvestorsPage';
 import { FaqPage } from './pages/FaqPage';
+import { TermsAndConditionsPage } from './pages/TermsAndConditionsPage';
+import { ShippingPolicyPage } from './pages/ShippingPolicyPage';
 import { AdminApp } from './pages/admin/AdminApp';
 
 const getInitialScreenFromUrl = (): ScreenType => {
@@ -69,6 +71,14 @@ export default function App() {
 
   if (path === '/faq') {
     return <FaqPage />;
+  }
+
+  if (path === '/terms') {
+    return <TermsAndConditionsPage />;
+  }
+
+  if (path === '/shipping-policy') {
+    return <ShippingPolicyPage />;
   }
 
   return <MainApp />;

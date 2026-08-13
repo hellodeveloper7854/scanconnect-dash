@@ -131,13 +131,17 @@ export const DashboardFooter: React.FC = () => {
               PRIVACY POLICY
             </h4>
             <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
-              {['Terms & conditions', 'Refund & returns', 'Shipping policy'].map((link) => (
-                <li key={link}>
-                  <button onClick={() => alert(`Policy: ${link}`)} className="hover:underline cursor-pointer text-left">
-                    {link}
-                  </button>
-                </li>
-              ))}
+              <li>
+                <a href="/terms" className="hover:underline cursor-pointer text-left">
+                  Terms &amp; conditions
+                </a>
+              </li>
+              
+              <li>
+                <a href="/shipping-policy" className="hover:underline cursor-pointer text-left">
+                  Shipping policy
+                </a>
+              </li>
             </ul>
           </div>
 
