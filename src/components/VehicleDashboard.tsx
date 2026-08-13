@@ -27,6 +27,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { BLOG_POSTS } from '../lib/blogPosts';
+import { useRevealOnScroll } from '../lib/useRevealOnScroll';
 import banner from '../assets/images/howitworksbanner.png'
 import videoWalkImg from '../assets/images/howitworks/videowalkimg.png'
 import tutorialVideoPreviewImg from '../assets/images/howitworks/tutorialvideopreview.png'
@@ -47,6 +48,24 @@ interface VehicleDashboardProps {
   onNavigate?: (nav: string) => void;
   isLoggedIn?: boolean;
 }
+
+/** Fades + rises a card into place the first time it scrolls into view, with an optional stagger delay. */
+const RevealCard: React.FC<{ delayMs?: number; className?: string; children: React.ReactNode }> = ({
+  delayMs = 0,
+  className = '',
+  children,
+}) => {
+  const { ref, isVisible } = useRevealOnScroll<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className={`reveal-on-scroll ${isVisible ? 'is-visible' : ''} ${className}`}
+      style={{ animationDelay: isVisible ? `${delayMs}ms` : undefined }}
+    >
+      {children}
+    </div>
+  );
+};
 
 export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, onLogout, onNavigate, isLoggedIn }) => {
   const [activeNav, setActiveNav] = useState('How it works');
@@ -271,7 +290,66 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 2. ABOUT SCAN CONNECT SECTION */}
+        {/* 2. HOW IT WORKS SECTION */}
+        <section id="how-it-works" className="py-20 bg-white">
+          <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+            <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
+                HOW IT WORKS
+              </span>
+              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
+                Simple. Secure. Instant.
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {howItWorksSteps.slice(0, 3).map((step, idx) => (
+                <RevealCard
+                  key={step.num}
+                  delayMs={idx * 120}
+                  className="bg-white border border-[#CCC7AA] rounded-[15px] p-7 shadow-[0_4px_20px_rgba(0,0,0,0.09)] flex flex-col justify-between space-y-4 hover:shadow-lg hover:-translate-y-1 transition-all"
+                >
+                  <div className="space-y-4">
+                    <div className="w-[60px] h-[60px] rounded-[12px] bg-[#F2BA03] text-white font-['Inter'] font-bold text-xl flex items-center justify-center shadow-xs">
+                      {step.num}
+                    </div>
+                    <h3 className="font-['Poppins'] font-bold text-xl text-[#111827] leading-[28px]">
+                      {step.title}
+                    </h3>
+                    <p className="font-['Inter'] font-normal text-sm text-[#6B7280] leading-[23px]">
+                      {step.desc}
+                    </p>
+                  </div>
+                </RevealCard>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto mt-6">
+              {howItWorksSteps.slice(3, 5).map((step, idx) => (
+                <RevealCard
+                  key={step.num}
+                  delayMs={(idx + 3) * 120}
+                  className="bg-white border border-[#CCC7AA] rounded-[15px] p-7 shadow-[0_4px_20px_rgba(0,0,0,0.09)] flex flex-col justify-between space-y-4 hover:shadow-lg hover:-translate-y-1 transition-all"
+                >
+                  <div className="space-y-4">
+                    <div className="w-[60px] h-[60px] rounded-[12px] bg-[#F2BA03] text-white font-['Inter'] font-bold text-xl flex items-center justify-center shadow-xs">
+                      {step.num}
+                    </div>
+                    <h3 className="font-['Poppins'] font-bold text-xl text-[#111827] leading-[28px]">
+                      {step.title}
+                    </h3>
+                    <p className="font-['Inter'] font-normal text-sm text-[#6B7280] leading-[23px]">
+                      {step.desc}
+                    </p>
+                  </div>
+                </RevealCard>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+        {/* 3. ABOUT SCAN CONNECT SECTION */}
         <section className="py-20 bg-white">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
             <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
@@ -295,7 +373,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 3. WHY CHOOSE SCAN CONNECT SECTION */}
+        {/* 4. WHY CHOOSE SCAN CONNECT SECTION */}
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -330,42 +408,6 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                   People can reach you instantly without compromising your privacy.
                 </p>
               </div>
-            </div>
-          </div>
-        </section>
-
-
-        {/* 4. HOW IT WORKS SECTION */}
-        <section id="how-it-works" className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                HOW IT WORKS
-              </span>
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
-                Simple. Secure. Instant.
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-              {howItWorksSteps.map((step) => (
-                <div
-                  key={step.num}
-                  className="bg-white border border-[#CCC7AA] rounded-[15px] p-7 shadow-[0_4px_20px_rgba(0,0,0,0.09)] flex flex-col justify-between space-y-4 hover:shadow-lg transition-all"
-                >
-                  <div className="space-y-4">
-                    <div className="w-[60px] h-[60px] rounded-[12px] bg-[#F2BA03] text-white font-['Inter'] font-bold text-xl flex items-center justify-center shadow-xs">
-                      {step.num}
-                    </div>
-                    <h3 className="font-['Poppins'] font-bold text-xl text-[#111827] leading-[28px]">
-                      {step.title}
-                    </h3>
-                    <p className="font-['Inter'] font-normal text-sm text-[#6B7280] leading-[23px]">
-                      {step.desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </section>
