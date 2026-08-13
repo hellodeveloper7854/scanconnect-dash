@@ -4,13 +4,13 @@ import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { ProductDetailScreen } from './ProductDetailScreen';
 import shopBannerImg from '../assets/images/shopbanner.png';
-import qrImage from '../assets/images/qrimage.png';
 import {
   ArrowRight,
   ChevronRight,
   Star,
   Package,
   Check,
+  X,
   Truck,
   Lock,
   Zap,
@@ -37,6 +37,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
   const [activeNav, setActiveNav] = useState('Shop');
   const [visibleProductsCount, setVisibleProductsCount] = useState(6);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const [featuresModalProductId, setFeaturesModalProductId] = useState<number | null>(null);
 
   React.useEffect(() => {
     if (window.location.hash) return;
@@ -340,90 +341,75 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               </p>
             </div>
 
-            {/* Product Cards Grid (2 cards per row) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-8">
+            {/* Product Cards Grid (4 cards per row) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {products.map((prod) => {
                 const ProductIcon = prod.icon;
+                const hasMoreDetails = (prod.idealFor && prod.idealFor.length > 0) || (prod.features && prod.features.length > 0);
                 return (
                 <div
                   key={prod.id}
-                  className="bg-white border border-neutral-200 rounded-3xl p-6 sm:p-8 shadow-xs hover:shadow-xl transition-all flex flex-col justify-between space-y-5"
+                  className="group bg-white border border-neutral-200 rounded-2xl shadow-xs hover:shadow-xl hover:border-[#F2BA03]/40 hover:-translate-y-1 transition-all flex flex-col overflow-hidden"
                 >
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      {prod.id === 1 ? (
-                        <img src={qrImage} alt={prod.title} className="w-14 h-14 rounded-lg object-cover" />
-                      ) : (
-                        <div className="w-14 h-14 rounded-lg bg-amber-50 flex items-center justify-center">
-                          <ProductIcon className="w-7 h-7 text-[#F2BA03]" />
-                        </div>
-                      )}
+                  {/* Header — icon, badge, rating */}
+                  <div className="p-6 pb-0 space-y-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/60 flex items-center justify-center ring-1 ring-amber-100 shrink-0 group-hover:scale-105 transition-transform">
+                        <ProductIcon className="w-6 h-6 text-[#F2BA03]" />
+                      </div>
                       {prod.badge && (
-                        <span className="px-3 py-1 bg-[#F2BA03] text-[#1B1C1C] font-bold rounded-full text-[10px] uppercase tracking-wider">
+                        <span className="px-2.5 py-1 bg-[#F2BA03] text-[#1B1C1C] font-bold rounded-full text-[10px] uppercase tracking-wider whitespace-nowrap shrink-0">
                           {prod.badge}
                         </span>
                       )}
                     </div>
 
-                    <h3 className="text-xl sm:text-2xl font-extrabold text-[#0F0F0F] leading-snug">
-                      {prod.title}
-                    </h3>
+                    <div>
+                      <h3 className="text-base font-extrabold text-[#0F0F0F] leading-snug">
+                        {prod.title}
+                      </h3>
+                      {prod.rating && (
+                        <div className="flex items-center gap-1 mt-1.5">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className="w-3 h-3 fill-[#F2BA03] text-[#F2BA03]" />
+                          ))}
+                          <span className="text-[#5D5F5F] font-medium text-[11px] ml-1">{prod.rating}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-                    {prod.rating && (
-                      <div className="flex items-center gap-1.5 text-sm font-bold text-[#0F0F0F]">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-[#F2BA03] text-[#F2BA03]" />
-                        ))}
-                        <span className="text-[#5D5F5F] font-medium ml-1">{prod.rating}</span>
-                      </div>
-                    )}
-
-                    <p className="text-[#5D5F5F] text-sm sm:text-base leading-relaxed">
+                  {/* Body — short description only; full details live in the modal */}
+                  <div className="p-6 pt-4 flex-1 space-y-3">
+                    <p className="text-[#5D5F5F] text-sm leading-relaxed line-clamp-3">
                       {prod.desc}
                     </p>
 
-                    <div className="space-y-1.5">
-                      <span className="text-[10px] font-bold tracking-widest text-[#5D5F5F] uppercase block">
-                        Ideal For
-                      </span>
-                      <div className="flex flex-wrap gap-2">
-                        {prod.idealFor.map((item) => (
-                          <span key={item} className="px-2.5 py-1 bg-neutral-100 rounded-full text-xs font-semibold text-[#0F0F0F]">
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {prod.features && (
-                      <div className="space-y-1.5 pt-1">
-                        <span className="text-[10px] font-bold tracking-widest text-[#5D5F5F] uppercase block">
-                          Features
-                        </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                          {prod.features.map((f) => (
-                            <div key={f} className="flex items-center gap-2">
-                              <Check className="w-3.5 h-3.5 text-[#F2BA03] stroke-[3] shrink-0" />
-                              <span className="text-[#1B1C1C] text-xs sm:text-sm">{f}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                    {hasMoreDetails && (
+                      <button
+                        onClick={() => setFeaturesModalProductId(prod.id)}
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[#0F0F0F] underline decoration-[#F2BA03] decoration-2 underline-offset-4 hover:text-[#F2BA03] cursor-pointer"
+                      >
+                        See all features
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
                     )}
                   </div>
 
-                  {/* Bottom Price & CTA */}
-                  <div className="flex items-center justify-between pt-4 border-t border-neutral-100">
+                  {/* Bottom Price & CTA — pinned to the card's bottom edge */}
+                  <div className="mt-auto px-6 py-4 bg-neutral-50/80 border-t border-neutral-100 space-y-3">
                     <div>
-                      {prod.price && (
+                      {prod.price ? (
                         <>
-                          <span className="text-[10px] font-bold tracking-widest text-[#5D5F5F] uppercase block">
-                            PRICE
+                          <span className="text-[10px] font-medium tracking-widest text-[#9CA3AF] uppercase block">
+                            Price
                           </span>
-                          <span className="text-xl sm:text-2xl font-black text-[#0F0F0F] font-sans">
+                          <span className="text-lg font-semibold text-[#3F3F3F]">
                             {prod.price}
                           </span>
                         </>
+                      ) : (
+                        <span className="text-xs font-semibold text-[#5D5F5F]">Custom pricing available</span>
                       )}
                     </div>
 
@@ -438,7 +424,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                           price: prod.price && prod.price.startsWith('₹') ? prod.price : '₹499',
                         })
                       }
-                      className="h-[44px] px-5 bg-[#0F0F0F] hover:bg-[#F2BA03] text-white hover:text-[#0F0F0F] font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs"
+                      className="w-full h-[42px] bg-[#0F0F0F] hover:bg-[#F2BA03] text-white hover:text-[#0F0F0F] font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95 shadow-xs"
                     >
                       <span>{prod.cta}</span>
                       <ArrowRight className="w-4 h-4" />
@@ -451,6 +437,76 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
           </div>
         </section>
+
+        {/* Product Features Modal — full "Ideal For" + "Features" detail on demand */}
+        {featuresModalProductId !== null && (() => {
+          const prod = products.find((p) => p.id === featuresModalProductId);
+          if (!prod) return null;
+          const ProductIcon = prod.icon;
+          return (
+            <div
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+              onClick={() => setFeaturesModalProductId(null)}
+            >
+              <div
+                className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 max-h-[85vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/60 flex items-center justify-center ring-1 ring-amber-100 shrink-0">
+                      <ProductIcon className="w-6 h-6 text-[#F2BA03]" />
+                    </div>
+                    <h3 className="text-lg font-extrabold text-[#0F0F0F] leading-snug">
+                      {prod.title}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => setFeaturesModalProductId(null)}
+                    className="p-1 text-neutral-400 hover:text-neutral-900 rounded-lg cursor-pointer shrink-0"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <p className="text-[#5D5F5F] text-sm leading-relaxed">
+                  {prod.desc}
+                </p>
+
+                {prod.idealFor && prod.idealFor.length > 0 && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold tracking-widest text-[#9CA3AF] uppercase block">
+                      Ideal For
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {prod.idealFor.map((item) => (
+                        <span key={item} className="px-2.5 py-1 bg-neutral-100 rounded-full text-xs font-semibold text-[#0F0F0F]">
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {prod.features && prod.features.length > 0 && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold tracking-widest text-[#9CA3AF] uppercase block">
+                      Features
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {prod.features.map((f) => (
+                        <div key={f} className="flex items-center gap-2">
+                          <Check className="w-3.5 h-3.5 text-[#F2BA03] stroke-[3] shrink-0" />
+                          <span className="text-[#1B1C1C] text-sm">{f}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
 
         {/* 4. WHY CHOOSE SCAN CONNECT SECTION */}
