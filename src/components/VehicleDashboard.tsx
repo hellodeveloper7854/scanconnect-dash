@@ -243,7 +243,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 The Smart QR Tag for Every Vehicle.
               </p>
 
-              <p className="font-['Rubik'] font-medium text-sm sm:text-base text-[#D1D5DB] leading-[26px] max-w-md pt-1">
+              <p className="font-['Rubik'] font-normal text-xs sm:text-sm text-[#D1D5DB] leading-[24px] max-w-md pt-1">
                 Whether it&apos;s a blocked driveway, headlights left on, or an emergency, anyone can contact you instantly&mdash;without ever seeing your phone number.
               </p>
 
