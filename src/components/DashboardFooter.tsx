@@ -3,7 +3,7 @@ import { Youtube, Instagram, Facebook, Twitter, Linkedin } from 'lucide-react';
 
 export const DashboardFooter: React.FC = () => {
   return (
-    <footer className="relative bg-[#F2BA03] text-white pt-20 pb-12 overflow-hidden">
+    <footer className="relative bg-[#EFCE1F] text-[#1B1C1C] font-['Rubik',sans-serif] pt-20 pb-12 overflow-hidden">
       {/* Top Slanted Diagonal Border */}
       <div
         className="absolute top-0 inset-x-0 h-16 bg-white pointer-events-none"
@@ -19,7 +19,7 @@ export const DashboardFooter: React.FC = () => {
         
         {/* Top Tagline & Social Icons */}
         <div className="mb-14 space-y-6">
-          <p className="text-base sm:text-lg font-semibold text-white/95 max-w-xl leading-snug">
+          <p className="text-base sm:text-lg font-semibold text-[#1B1C1C]/95 max-w-xl leading-snug">
             Privacy-first contact tags for vehicles. Made in India by Creative Frame Works Pvt Ltd.
           </p>
 
@@ -52,10 +52,10 @@ export const DashboardFooter: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 pb-12">
           {/* Column 1: SHOP */}
           <div className="space-y-4">
-            <h4 className="text-base font-black tracking-wider text-white uppercase font-sans">
+            <h4 className="text-base font-black tracking-wider text-[#1B1C1C] uppercase font-sans">
               SHOP
             </h4>
-            <ul className="space-y-3 text-sm font-medium text-white/90">
+            <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
               {[
                 { label: 'Bike tag', href: '/shop?product=2' },
                 { label: 'Car SCAN ME tag', href: '/shop?product=1' },
@@ -73,10 +73,10 @@ export const DashboardFooter: React.FC = () => {
 
           {/* Column 2: ABOUT */}
           <div className="space-y-4">
-            <h4 className="text-base font-black tracking-wider text-white uppercase font-sans">
+            <h4 className="text-base font-black tracking-wider text-[#1B1C1C] uppercase font-sans">
               ABOUT
             </h4>
-            <ul className="space-y-3 text-sm font-medium text-white/90">
+            <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
               {[
                 { label: 'Contact', href: '/contact' },
                 { label: 'Become a reseller', href: null },
@@ -100,10 +100,10 @@ export const DashboardFooter: React.FC = () => {
 
           {/* Column 3: ALL AUTO TOOLS */}
           <div className="space-y-4">
-            <h4 className="text-base font-black tracking-wider text-white uppercase font-sans">
+            <h4 className="text-base font-black tracking-wider text-[#1B1C1C] uppercase font-sans">
               ALL AUTO TOOLS
             </h4>
-            <ul className="space-y-3 text-sm font-medium text-white/90">
+            <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
               {[
                 { label: 'Car loan calculator', href: null },
                 { label: 'Fuel prices', href: null },
@@ -127,10 +127,10 @@ export const DashboardFooter: React.FC = () => {
 
           {/* Column 4: PRIVACY POLICY */}
           <div className="space-y-4">
-            <h4 className="text-base font-black tracking-wider text-white uppercase font-sans">
+            <h4 className="text-base font-black tracking-wider text-[#1B1C1C] uppercase font-sans">
               PRIVACY POLICY
             </h4>
-            <ul className="space-y-3 text-sm font-medium text-white/90">
+            <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
               {['Terms & conditions', 'Refund & returns', 'Shipping policy'].map((link) => (
                 <li key={link}>
                   <button onClick={() => alert(`Policy: ${link}`)} className="hover:underline cursor-pointer text-left">
@@ -143,10 +143,10 @@ export const DashboardFooter: React.FC = () => {
 
           {/* Column 5: CONTACT */}
           <div className="space-y-4">
-            <h4 className="text-base font-black tracking-wider text-white uppercase font-sans">
+            <h4 className="text-base font-black tracking-wider text-[#1B1C1C] uppercase font-sans">
               CONTACT
             </h4>
-            <ul className="space-y-3 text-sm font-medium text-white/90">
+            <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
               <li>
                 <a href="mailto:rj@sampark.me" className="hover:underline block">
                   rj@sampark.me
@@ -162,11 +162,11 @@ export const DashboardFooter: React.FC = () => {
         </div>
 
         {/* Thin Horizontal Divider Line */}
-        <div className="border-t border-white/60 my-6" />
+        <div className="border-t border-[#1B1C1C]/20 my-6" />
 
         {/* Bottom Bar */}
-        <div className="flex items-center justify-center text-xs font-semibold text-white/95">
-          <p className="text-white/90">
+        <div className="flex items-center justify-center text-xs font-semibold text-[#1B1C1C]/95">
+          <p className="text-[#1B1C1C]/90">
             © 2026 SCAN CONNECT - Creative Frame Works Pvt Ltd
           </p>
         </div>

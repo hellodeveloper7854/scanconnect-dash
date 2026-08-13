@@ -413,7 +413,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 4. WHY CHOOSE SCAN CONNECT SECTION */}
+        {/* 5. WHY CHOOSE SCAN CONNECT SECTION */}
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -505,7 +505,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 5. SOS EMERGENCY ASSISTANCE SECTION */}
+        {/* 6. SOS EMERGENCY ASSISTANCE SECTION */}
         <section className="py-20 bg-[#1B1C1C] text-white relative overflow-hidden">
           <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-[#F2BA03]/10 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-[28rem] h-[28rem] bg-red-500/10 rounded-full blur-[140px] pointer-events-none translate-x-1/3 translate-y-1/3" />
@@ -600,7 +600,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 6. WHY THOUSANDS CHOOSE SCAN CONNECT SECTION */}
+        {/* 7. WHY THOUSANDS CHOOSE SCAN CONNECT SECTION */}
         <section className="py-20 bg-[#FAFAFA]">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
@@ -627,7 +627,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 7. SMART VEHICLE SERVICES SECTION */}
+        {/* 8. SMART VEHICLE SERVICES SECTION */}
         <section className="py-20 bg-white border-t border-neutral-100">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="flex items-center justify-between mb-4">
@@ -683,7 +683,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 8. INDUSTRIES WE SERVE SECTION */}
+        {/* 9. INDUSTRIES WE SERVE SECTION */}
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
@@ -733,7 +733,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 9. SOS EMERGENCY ASSISTANCE SECTION (SECOND) */}
+        {/* 10. SOS EMERGENCY ASSISTANCE SECTION (SECOND) */}
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#F2BA03]/40">
@@ -774,7 +774,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 10. CUSTOMER BENEFITS SECTION */}
+        {/* 11. CUSTOMER BENEFITS SECTION */}
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
@@ -798,7 +798,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 11. DOWNLOAD THE APP SECTION */}
+        {/* 12. DOWNLOAD THE APP SECTION */}
         <section className="py-20 bg-white border-t border-neutral-100">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -853,7 +853,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 12. ABOUT COMPANY SECTION */}
+        {/* 13. ABOUT COMPANY SECTION */}
         <section className="py-20 bg-[#1B1C1C] text-white">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-5">
             <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
@@ -872,7 +872,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 13. CTA SECTION */}
+        {/* 14. CTA SECTION */}
         <section className="py-20 bg-white border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
