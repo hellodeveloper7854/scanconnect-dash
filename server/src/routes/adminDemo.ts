@@ -58,15 +58,6 @@ function crudRouter(
   });
 }
 
-// QR Codes
-crudRouter(
-  '/qr-codes',
-  prisma.demoQrCode,
-  z.object({ vehicleNickname: z.string().min(1), status: z.enum(['ACTIVE', 'DEACTIVATED']).default('ACTIVE'), scans: z.number().int().min(0).default(0) }),
-  z.object({ vehicleNickname: z.string().min(1).optional(), status: z.enum(['ACTIVE', 'DEACTIVATED']).optional(), scans: z.number().int().min(0).optional() }),
-  'qrCodes',
-);
-
 adminDemoRouter.get('/qr-analytics', (_req, res) => res.json({ isDemo: true, analytics: demoQrScanAnalytics }));
 
 // Stickers

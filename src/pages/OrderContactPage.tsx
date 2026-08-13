@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Mail, Phone, ShieldCheck, Car, UserRound } from 'lucide-react';
+import { ScanResultCard } from '../components/ScanResultCard';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -33,81 +33,28 @@ export const OrderContactPage: React.FC<{ token: string }> = ({ token }) => {
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load'));
   }, [token]);
 
-  return (
-    <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-white rounded-2xl p-8 space-y-6 shadow-2xl">
-        <div className="flex items-center gap-2 text-amber-500">
-          <ShieldCheck className="w-5 h-5" />
-          <span className="font-black uppercase tracking-wide text-xs">Order Contact Details</span>
-        </div>
-
-        {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
-
-        {!data && !error && <p className="text-neutral-500 text-sm">Loading...</p>}
-
-        {data && (
-          <div className="space-y-4">
-            <div>
-              <p className="text-xs font-bold uppercase text-neutral-400">Order</p>
-              <p className="font-mono text-neutral-900">{data.orderId.slice(0, 8).toUpperCase()}</p>
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase text-neutral-400">Customer</p>
-              <p className="text-neutral-900 font-bold">{data.customer.fullName}</p>
-            </div>
-            <div className="flex items-center gap-2 text-neutral-700">
-              <Mail className="w-4 h-4 text-amber-500" />
-              <a href={`mailto:${data.customer.email}`} className="hover:underline">
-                {data.customer.email}
-              </a>
-            </div>
-            {data.customer.mobileNumber && (
-              <div className="flex items-center gap-2 text-neutral-700">
-                <Phone className="w-4 h-4 text-amber-500" />
-                <a href={`tel:${data.customer.mobileNumber}`} className="hover:underline">
-                  {data.customer.mobileNumber}
-                </a>
-              </div>
-            )}
-
-            {data.vehicle && (
-              <div className="pt-4 border-t border-neutral-100 space-y-2">
-                <div className="flex items-center gap-2 text-xs font-bold uppercase text-neutral-400">
-                  <Car className="w-3.5 h-3.5" /> Vehicle
-                </div>
-                <p className="text-neutral-900 font-bold">
-                  {data.vehicle.nickname || data.vehicle.registration}
-                </p>
-                <p className="text-neutral-600 text-sm font-mono">{data.vehicle.registration}</p>
-                {(data.vehicle.brand || data.vehicle.model || data.vehicle.color) && (
-                  <p className="text-neutral-500 text-xs">
-                    {[data.vehicle.brand, data.vehicle.model, data.vehicle.color].filter(Boolean).join(' · ')}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {data.emergencyContact && (
-              <div className="pt-4 border-t border-neutral-100 space-y-2">
-                <div className="flex items-center gap-2 text-xs font-bold uppercase text-neutral-400">
-                  <UserRound className="w-3.5 h-3.5" /> Emergency Contact
-                </div>
-                <p className="text-neutral-900 font-bold">{data.emergencyContact.name}</p>
-                {data.emergencyContact.role && (
-                  <p className="text-neutral-500 text-xs">{data.emergencyContact.role}</p>
-                )}
-                <a
-                  href={`tel:${data.emergencyContact.phone}`}
-                  className="flex items-center gap-2 text-neutral-700 hover:underline"
-                >
-                  <Phone className="w-4 h-4 text-amber-500" />
-                  {data.emergencyContact.phone}
-                </a>
-              </div>
-            )}
-          </div>
-        )}
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#FAFAF9] flex items-center justify-center p-4">
+        <p className="text-sm font-semibold text-red-600">{error}</p>
       </div>
-    </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-[#FAFAF9] flex items-center justify-center p-4">
+        <p className="text-[#5F5E5E] text-sm">Loading...</p>
+      </div>
+    );
+  }
+
+  return (
+    <ScanResultCard
+      label={`Order #${data.orderId.slice(0, 8).toUpperCase()}`}
+      owner={data.customer}
+      vehicle={data.vehicle}
+      emergencyContacts={data.emergencyContact ? [data.emergencyContact] : []}
+    />
   );
 };

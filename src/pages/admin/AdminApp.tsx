@@ -6,13 +6,13 @@ import { AdminDashboard } from './AdminDashboard';
 import { AdminOrders } from './AdminOrders';
 import { AdminUsers } from './AdminUsers';
 import { AdminVehicles } from './AdminVehicles';
+import { AdminQrCodes } from './AdminQrCodes';
 import { AdminPayments } from './AdminPayments';
 import { AdminEmergencyContacts } from './AdminEmergencyContacts';
 import { AdminReports } from './AdminReports';
 import { AdminReviews } from './AdminReviews';
 import { AdminSosAlerts } from './AdminSosAlerts';
 import {
-  AdminQrCodes,
   AdminQrAnalytics,
   AdminStickers,
   AdminIvr,

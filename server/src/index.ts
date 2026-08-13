@@ -10,6 +10,7 @@ import { profileRouter } from './routes/profile.js';
 import { reviewsRouter } from './routes/reviews.js';
 import { sosRouter } from './routes/sos.js';
 import { orderContactRouter } from './routes/orderContact.js';
+import { adminQrCodesRouter, qrCodesRouter } from './routes/qrCodes.js';
 
 const app = express();
 
@@ -35,6 +36,8 @@ app.use('/api/profile', profileRouter);
 app.use('/api/reviews', reviewsRouter);
 app.use('/api/sos', sosRouter);
 app.use('/api/order-contact', orderContactRouter);
+app.use('/api/admin/qr-codes', adminQrCodesRouter);
+app.use('/api/qr', qrCodesRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);

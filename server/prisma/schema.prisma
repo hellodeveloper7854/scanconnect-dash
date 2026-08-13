@@ -67,7 +67,8 @@ model EmergencyContact {
   isPrimary Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  orders Order[]
+  orders  Order[]
+  qrCodes QrCode[]
 
   @@index([userId])
 }
@@ -88,9 +89,33 @@ model Vehicle {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  orders Order[]
+  orders       Order[]
+  qrCodeRecord QrCode?
 
   @@index([userId])
+}
+
+enum QrCodeStatus {
+  INACTIVE
+  ACTIVE
+}
+
+model QrCode {
+  id             String       @id @default(uuid())
+  code           String       @unique
+  status         QrCodeStatus @default(INACTIVE)
+  batchId        String
+  batchCreatedAt DateTime     @default(now())
+  vehicleId      String?      @unique
+  vehicle        Vehicle?     @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  activatedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  emergencyContacts EmergencyContact[]
+
+  @@index([batchId])
+  @@index([status])
 }
 
 model Product {

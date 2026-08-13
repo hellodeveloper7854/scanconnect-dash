@@ -31,38 +31,6 @@ const Table: React.FC<{ headers: string[]; children: React.ReactNode }> = ({ hea
   </div>
 );
 
-interface QrCode {
-  id: string;
-  vehicleNickname: string;
-  status: string;
-  scans: number;
-  createdAt: string;
-}
-
-export const AdminQrCodes: React.FC = () => {
-  const qrCodes = useDemoData<QrCode[]>('/api/admin/demo/qr-codes', 'qrCodes');
-  return (
-    <div className="p-8 space-y-6">
-      <h1 className="text-2xl font-black text-white uppercase tracking-wide">QR Code Management</h1>
-      <DemoBanner note="Real QR generation isn't wired up yet." />
-      {!qrCodes ? (
-        <div className="text-white/60">Loading...</div>
-      ) : (
-        <Table headers={['Vehicle', 'Status', 'Scans', 'Created']}>
-          {qrCodes.map((qr) => (
-            <tr key={qr.id} className="border-b border-white/5">
-              <td className="px-4 py-3 text-white">{qr.vehicleNickname}</td>
-              <td className="px-4 py-3 text-white/70">{qr.status}</td>
-              <td className="px-4 py-3 text-white/70">{qr.scans}</td>
-              <td className="px-4 py-3 text-white/50 text-xs">{qr.createdAt}</td>
-            </tr>
-          ))}
-        </Table>
-      )}
-    </div>
-  );
-};
-
 interface QrAnalytics {
   daily: number[];
   weekly: number[];

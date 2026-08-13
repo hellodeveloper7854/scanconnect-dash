@@ -50,6 +50,7 @@ const SECTIONS: NavSection[] = [
       { to: '/admin/orders', label: 'Orders', icon: ShoppingCart },
       { to: '/admin/users', label: 'Users', icon: Users },
       { to: '/admin/vehicles', label: 'Vehicles', icon: Car },
+      { to: '/admin/qr-codes', label: 'QR Codes', icon: QrCode },
       { to: '/admin/payments', label: 'Payments', icon: IndianRupee },
       { to: '/admin/emergency-contacts', label: 'Emergency Contacts', icon: Phone },
       { to: '/admin/reports', label: 'Reports', icon: FileSpreadsheet },
@@ -60,7 +61,6 @@ const SECTIONS: NavSection[] = [
   {
     title: 'Demo Sections',
     items: [
-      { to: '/admin/qr-codes', label: 'QR Codes', icon: QrCode },
       { to: '/admin/qr-analytics', label: 'QR Analytics', icon: BarChart3 },
       { to: '/admin/stickers', label: 'Stickers', icon: Package },
       { to: '/admin/ivr', label: 'IVR Numbers', icon: Headset },

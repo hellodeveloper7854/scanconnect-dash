@@ -244,6 +244,12 @@ profileRouter.delete('/vehicles/:id', async (req, res) => {
     return res.status(404).json({ error: 'Vehicle not found' });
   }
 
-  await prisma.vehicle.delete({ where: { id: req.params.id } });
+  await prisma.$transaction([
+    prisma.qrCode.updateMany({
+      where: { vehicleId: req.params.id },
+      data: { vehicleId: null, status: 'INACTIVE', activatedAt: null },
+    }),
+    prisma.vehicle.delete({ where: { id: req.params.id } }),
+  ]);
   res.json({ ok: true });
 });
