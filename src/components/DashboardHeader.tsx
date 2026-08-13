@@ -71,7 +71,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 text-base font-medium font-['Comic_Relief','Comic_Sans_MS','Inter',sans-serif] text-white">
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 text-base font-['Rubik',sans-serif] text-[#1B1C1C]">
             {navItems.map((item) => {
               const isActive = activeNav === item;
               return (
@@ -80,8 +80,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   onClick={() => handleNav(item)}
                   className={`transition-all relative py-1 cursor-pointer ${
                     isActive
-                      ? 'text-white underline decoration-2 underline-offset-8 font-bold'
-                      : 'text-white/95 hover:text-white'
+                      ? 'text-[#1B1C1C] underline decoration-2 underline-offset-8 font-bold'
+                      : 'text-[#1B1C1C]/80 hover:text-[#1B1C1C] font-medium'
                   }`}
                 >
                   {item}
@@ -108,7 +108,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             {/* Notification Bell */}
             <button
               onClick={() => alert(`Notifications (2):\n• Parking ping from SC-MH12-9881\n• Shield security scan complete`)}
-              className="relative p-2 text-white hover:bg-black/10 rounded-full transition-colors cursor-pointer"
+              className="relative p-2 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
               title="Notifications"
             >
               <Bell className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
@@ -120,7 +120,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             {/* Help / FAQ Icon */}
             <button
               onClick={() => alert('ScanConnect Helpdesk:\nCall 080-473-59856 or email rj@sampark.me for 24/7 driver support.')}
-              className="p-2 text-white hover:bg-black/10 rounded-full transition-colors cursor-pointer"
+              className="p-2 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
               title="Support & FAQ"
             >
               <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
@@ -148,7 +148,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                   title="Account Menu"
-                  className="p-1 text-white hover:bg-black/10 rounded-full transition-colors cursor-pointer"
+                  className="p-1 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
                 >
                   <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
@@ -216,7 +216,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-white hover:bg-black/10 rounded-lg"
+              className="md:hidden p-2 text-[#1B1C1C] hover:bg-black/10 rounded-lg"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -226,7 +226,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#e0a800] border-t border-white/20 px-4 pt-2 pb-4 space-y-2 font-bold text-white">
+        <div className="md:hidden bg-[#e0a800] border-t border-black/10 px-4 pt-2 pb-4 space-y-2 font-['Rubik',sans-serif] font-bold text-[#1B1C1C]">
           {navItems.map((item) => (
             <button
               key={item}
@@ -249,7 +249,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   setMobileMenuOpen(false);
                   onLogout();
                 }}
-                className="block w-full text-left py-2 px-3 rounded-lg text-red-200 font-extrabold hover:bg-red-500/20"
+                className="block w-full text-left py-2 px-3 rounded-lg text-red-800 font-extrabold hover:bg-red-500/20"
               >
                 Logout
               </button>
