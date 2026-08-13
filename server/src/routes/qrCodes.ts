@@ -232,6 +232,27 @@ adminQrCodesRouter.get('/:id/qr.png', async (req, res) => {
  */
 export const qrCodesRouter = Router();
 
+/**
+ * Lets the vehicle owner download their own linked QR tag's PNG (e.g. from
+ * the Profile page's vehicle card). Scoped to the requesting user so someone
+ * can't download another vehicle's sticker just by knowing its code.
+ */
+qrCodesRouter.get('/:code/qr.png', requireAuth, async (req, res) => {
+  const qrCode = await prisma.qrCode.findUnique({
+    where: { code: req.params.code },
+    include: { vehicle: true },
+  });
+
+  if (!qrCode || !qrCode.vehicle || qrCode.vehicle.userId !== req.user!.id) {
+    return res.status(404).json({ error: 'QR code not found' });
+  }
+
+  const url = `${env.corsOrigin}/qr/${qrCode.code}`;
+  const png = await QRCode.toBuffer(url, { type: 'png', width: 300, margin: 2 });
+  res.setHeader('Content-Type', 'image/png');
+  res.send(png);
+});
+
 qrCodesRouter.get('/:code', async (req, res) => {
   const qrCode = await prisma.qrCode.findUnique({ where: { code: req.params.code } });
   if (!qrCode) {

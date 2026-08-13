@@ -3,7 +3,7 @@ import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { OtpModal } from './OtpModal';
-import { api, ApiError } from '../lib/api';
+import { api, ApiError, downloadFile } from '../lib/api';
 import { auth } from '../lib/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import {
@@ -23,7 +23,9 @@ import {
   Trash2,
   Link2,
   Car,
-  Search
+  Search,
+  QrCode as QrCodeIcon,
+  Download
 } from 'lucide-react';
 
 interface BackendUser {
@@ -61,6 +63,7 @@ interface Vehicle {
   color: string | null;
   isPrimary: boolean;
   qrCode: string | null;
+  qrCodeRecord: { code: string } | null;
 }
 
 const VEHICLE_TYPES = ['Car', 'Bike', 'Scooter', 'Truck', 'Bus', 'Other'];
@@ -800,6 +803,35 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                             <p className="text-xs text-[#5D5F5F] font-normal font-mono">{vehicle.registration}</p>
                           </div>
                         </div>
+
+                        {vehicle.qrCodeRecord && (
+                          <div className="flex items-center justify-between gap-2 px-3 py-2 bg-[#F2BA03]/10 border border-[#F2BA03]/30 rounded-lg">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <QrCodeIcon className="w-4 h-4 text-[#736B00] shrink-0" />
+                              <div className="min-w-0">
+                                <span className="text-[10px] text-[#736B00] uppercase font-bold block">
+                                  Linked QR Code
+                                </span>
+                                <span className="text-xs font-mono text-[#1B1C1C] truncate block">
+                                  {vehicle.qrCodeRecord.code}
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                downloadFile(
+                                  `/api/qr/${vehicle.qrCodeRecord!.code}/qr.png`,
+                                  `scanconnect-qr-${vehicle.qrCodeRecord!.code}.png`,
+                                )
+                              }
+                              title="Download QR"
+                              className="p-1.5 text-[#736B00] hover:text-[#1B1C1C] hover:bg-[#F2BA03]/20 rounded-md cursor-pointer shrink-0"
+                            >
+                              <Download className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
 
                         <div className="pt-4 border-t border-[#CCC7AA] text-sm text-[#1B1C1C] font-normal grid grid-cols-2 gap-2">
                           {vehicle.brand && (

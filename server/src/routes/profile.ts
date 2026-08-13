@@ -148,6 +148,7 @@ profileRouter.get('/vehicles', async (req, res) => {
           }
         : {}),
     },
+    include: { qrCodeRecord: { select: { code: true } } },
     orderBy: [{ isPrimary: 'desc' }, { createdAt: 'asc' }],
   });
 
