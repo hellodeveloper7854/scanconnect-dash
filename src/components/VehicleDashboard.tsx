@@ -283,7 +283,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <button
                   onClick={() => { window.location.href = '/shop#products'; }}
-                  className="h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                  className="btn-shimmer h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
                 >
                   <span>Buy Now</span>
                   <ArrowRight className="w-4 h-4" />
@@ -884,14 +884,14 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <button
                 onClick={() => { window.location.href = '/shop#products'; }}
-                className="h-[56px] px-9 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                className="btn-shimmer h-[56px] px-9 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
               >
                 <span>Buy Now</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-                className="h-[56px] px-9 bg-white border border-[#1B1C1C] hover:bg-neutral-50 text-[#1B1C1C] font-bold text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
+                className="btn-shimmer h-[56px] px-9 bg-[#1B1C1C] hover:bg-neutral-800 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 border border-[#1B1C1C] text-white font-bold text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
               >
                 Learn More
               </button>

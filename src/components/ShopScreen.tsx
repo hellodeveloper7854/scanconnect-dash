@@ -424,7 +424,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                           price: prod.price && prod.price.startsWith('₹') ? prod.price : '₹499',
                         })
                       }
-                      className="w-full h-[42px] bg-[#0F0F0F] hover:bg-[#F2BA03] text-white hover:text-[#0F0F0F] font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95 shadow-xs"
+                      className="btn-shimmer w-full h-[42px] bg-[#0F0F0F] hover:bg-[#F2BA03] hover:shadow-[0_8px_20px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#0F0F0F] font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95 shadow-xs"
                     >
                       <span>{prod.cta}</span>
                       <ArrowRight className="w-4 h-4" />
@@ -541,7 +541,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
             </p>
             <button
               onClick={() => onNavigate('contact')}
-              className="inline-flex items-center gap-2 h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer active:scale-95"
+              className="btn-shimmer inline-flex items-center gap-2 h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer active:scale-95"
             >
               <span>Explore More Products</span>
               <ArrowRight className="w-4 h-4" />

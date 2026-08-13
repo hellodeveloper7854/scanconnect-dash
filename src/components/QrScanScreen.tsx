@@ -122,7 +122,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <button
                     onClick={() => setIsQrScannerOpen(true)}
-                    className="sm:hidden h-[58px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-bold text-base rounded-lg transition-all cursor-pointer flex items-center gap-2 shadow-sm active:scale-95"
+                    className="btn-shimmer sm:hidden h-[58px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-bold text-base rounded-lg transition-all cursor-pointer flex items-center gap-2 shadow-sm active:scale-95"
                   >
                     <QrCode className="w-5 h-5 text-white" />
                     <span>Scan a QR Tag</span>
@@ -130,7 +130,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
 
                   <button
                     onClick={() => { window.location.href = '/shop#products'; }}
-                    className="h-[58px] px-8 bg-white hover:bg-neutral-50 text-[#0F0F0F] border border-[#0F0F0F] font-bold text-base rounded-lg transition-all cursor-pointer active:scale-95"
+                    className="btn-shimmer h-[58px] px-8 bg-[#0F0F0F] hover:bg-neutral-800 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 text-white border border-[#0F0F0F] font-bold text-base rounded-lg transition-all cursor-pointer active:scale-95"
                   >
                     Buy Your Scan Connect Tag
                   </button>
@@ -296,14 +296,14 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <button
                 onClick={() => { window.location.href = '/shop#products'; }}
-                className="h-[66px] px-10 bg-[#0F0F0F] hover:bg-black text-white font-bold text-lg sm:text-[20px] rounded-[12px] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] transition-all cursor-pointer active:scale-95 inline-flex items-center justify-center gap-2"
+                className="btn-shimmer h-[66px] px-10 bg-[#0F0F0F] hover:bg-black hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 text-white font-bold text-lg sm:text-[20px] rounded-[12px] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] transition-all cursor-pointer active:scale-95 inline-flex items-center justify-center gap-2"
               >
                 <Car className="w-5 h-5" />
                 Get Your Scan Connect Tag
               </button>
               <button
                 onClick={() => { window.location.href = '/shop#products'; }}
-                className="h-[66px] px-10 bg-white hover:bg-neutral-50 text-black border border-[#5F5E5E] font-bold text-lg sm:text-[20px] rounded-[12px] transition-all cursor-pointer active:scale-95 inline-flex items-center justify-center gap-2"
+                className="btn-shimmer h-[66px] px-10 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-lg sm:text-[20px] rounded-[12px] transition-all cursor-pointer active:scale-95 inline-flex items-center justify-center gap-2"
               >
                 <IndianRupee className="w-5 h-5" />
                 View Plans & Pricing

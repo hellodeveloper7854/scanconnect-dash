@@ -251,7 +251,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     type="button"
                     onClick={() => alert('Launching Scan Connect WhatsApp Live Assistant...')}
                     title="Live Support Chat"
-                    className="w-10 h-10 border border-[#E3E2E2] rounded-none bg-white hover:bg-[#FAF9F6] hover:border-[#1B1C1C] text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
+                    className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <MessageSquare className="w-5 h-5 stroke-[1.8]" />
                   </button>
@@ -260,7 +260,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     type="button"
                     onClick={() => alert('Redirecting to official web portal https://scanconnect.com')}
                     title="Web Portal"
-                    className="w-10 h-10 border border-[#E3E2E2] rounded-none bg-white hover:bg-[#FAF9F6] hover:border-[#1B1C1C] text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
+                    className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <Globe className="w-5 h-5 stroke-[1.8]" />
                   </button>
@@ -269,7 +269,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     type="button"
                     onClick={() => alert('Social Handles: @scanconnect')}
                     title="Email & Social Tag"
-                    className="w-10 h-10 border border-[#E3E2E2] rounded-none bg-white hover:bg-[#FAF9F6] hover:border-[#1B1C1C] text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
+                    className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <AtSign className="w-5 h-5 stroke-[1.8]" />
                   </button>
@@ -278,7 +278,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     type="button"
                     onClick={() => alert('Downloading Scan Connect Official Brochure...')}
                     title="Brochure PDF"
-                    className="w-10 h-10 border border-[#E3E2E2] rounded-none bg-white hover:bg-[#FAF9F6] hover:border-[#1B1C1C] text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
+                    className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <FileText className="w-5 h-5 stroke-[1.8]" />
                   </button>
@@ -473,7 +473,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitted}
-                className="w-full h-12 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-['Manrope',sans-serif] font-semibold text-sm uppercase tracking-[1.4px] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] disabled:opacity-50"
+                className="btn-shimmer w-full h-12 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_20px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-['Manrope',sans-serif] font-semibold text-sm uppercase tracking-[1.4px] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] disabled:opacity-50"
               >
                 <Send className="w-4.5 h-4.5 text-white stroke-[2.2]" />
                 <span>{isSubmitted ? 'SENDING INQUIRY...' : 'SEND INQUIRY'}</span>

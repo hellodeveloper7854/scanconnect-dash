@@ -88,7 +88,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <button
                     onClick={() => onNavigate('shop')}
-                    className="h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                    className="btn-shimmer h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
                   >
                     <span>GET YOUR TAG</span>
                     <ArrowRight className="w-4 h-4" />
@@ -96,7 +96,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
 
                   <button
                     onClick={() => onNavigate('dashboard')}
-                    className="h-[52px] px-8 bg-white border border-[#0F0F0F] hover:bg-neutral-50 text-[#0F0F0F] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
+                    className="btn-shimmer h-[52px] px-8 bg-[#0F0F0F] hover:bg-neutral-800 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 border border-[#0F0F0F] text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
                   >
                     HOW IT WORKS
                   </button>
