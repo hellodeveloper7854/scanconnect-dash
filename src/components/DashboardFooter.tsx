@@ -52,7 +52,7 @@ export const DashboardFooter: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 pb-12">
           {/* Column 1: SHOP */}
           <div className="space-y-4">
-            <h4 className="text-base font-black tracking-wider text-[#1B1C1C] uppercase font-sans">
+            <h4 className="text-base font-semibold tracking-wider text-[#1B1C1C] uppercase">
               SHOP
             </h4>
             <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
@@ -73,7 +73,7 @@ export const DashboardFooter: React.FC = () => {
 
           {/* Column 2: ABOUT */}
           <div className="space-y-4">
-            <h4 className="text-base font-black tracking-wider text-[#1B1C1C] uppercase font-sans">
+            <h4 className="text-base font-semibold tracking-wider text-[#1B1C1C] uppercase">
               ABOUT
             </h4>
             <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
@@ -100,7 +100,7 @@ export const DashboardFooter: React.FC = () => {
 
           {/* Column 3: ALL AUTO TOOLS */}
           <div className="space-y-4">
-            <h4 className="text-base font-black tracking-wider text-[#1B1C1C] uppercase font-sans">
+            <h4 className="text-base font-semibold tracking-wider text-[#1B1C1C] uppercase">
               ALL AUTO TOOLS
             </h4>
             <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
@@ -127,7 +127,7 @@ export const DashboardFooter: React.FC = () => {
 
           {/* Column 4: PRIVACY POLICY */}
           <div className="space-y-4">
-            <h4 className="text-base font-black tracking-wider text-[#1B1C1C] uppercase font-sans">
+            <h4 className="text-base font-semibold tracking-wider text-[#1B1C1C] uppercase">
               PRIVACY POLICY
             </h4>
             <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
@@ -143,7 +143,7 @@ export const DashboardFooter: React.FC = () => {
 
           {/* Column 5: CONTACT */}
           <div className="space-y-4">
-            <h4 className="text-base font-black tracking-wider text-[#1B1C1C] uppercase font-sans">
+            <h4 className="text-base font-semibold tracking-wider text-[#1B1C1C] uppercase">
               CONTACT
             </h4>
             <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
