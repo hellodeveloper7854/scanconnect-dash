@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Download, Printer, X } from 'lucide-react';
+import { Download, Printer, X, Search, FileArchive } from 'lucide-react';
 import { api, downloadFile } from '../../lib/api';
 import { auth } from '../../lib/firebase';
 
@@ -46,6 +46,7 @@ interface QrCodeRow {
   code: string;
   status: 'INACTIVE' | 'ACTIVE';
   batchId: string;
+  batchName: string;
   createdAt: string;
   vehicle: {
     registration: string;
@@ -56,9 +57,26 @@ interface QrCodeRow {
 
 interface BatchSummary {
   batchId: string;
+  batchName: string;
   batchCreatedAt: string;
   total: number;
   activated: number;
+}
+
+function buildFilterParams(filters: {
+  statusFilter: string;
+  batchFilter: string;
+  nameFilter: string;
+  dateFrom: string;
+  dateTo: string;
+}): URLSearchParams {
+  const params = new URLSearchParams();
+  if (filters.statusFilter) params.set('status', filters.statusFilter);
+  if (filters.batchFilter) params.set('batchId', filters.batchFilter);
+  if (filters.nameFilter) params.set('name', filters.nameFilter);
+  if (filters.dateFrom) params.set('dateFrom', filters.dateFrom);
+  if (filters.dateTo) params.set('dateTo', filters.dateTo);
+  return params;
 }
 
 export const AdminQrCodes: React.FC = () => {
@@ -67,16 +85,19 @@ export const AdminQrCodes: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [statusFilter, setStatusFilter] = useState('');
   const [batchFilter, setBatchFilter] = useState('');
+  const [nameFilter, setNameFilter] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [quantity, setQuantity] = useState(100);
+  const [batchName, setBatchName] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isDownloadingZip, setIsDownloadingZip] = useState(false);
   const [error, setError] = useState('');
   const [printBatchId, setPrintBatchId] = useState<string | null>(null);
   const [printCodes, setPrintCodes] = useState<QrCodeRow[] | null>(null);
 
   const load = () => {
-    const params = new URLSearchParams();
-    if (statusFilter) params.set('status', statusFilter);
-    if (batchFilter) params.set('batchId', batchFilter);
+    const params = buildFilterParams({ statusFilter, batchFilter, nameFilter, dateFrom, dateTo });
     api
       .get<{ codes: QrCodeRow[]; total: number; batches: BatchSummary[] }>(`/api/admin/qr-codes?${params}`)
       .then((res) => {
@@ -87,19 +108,44 @@ export const AdminQrCodes: React.FC = () => {
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load QR codes'));
   };
 
-  useEffect(load, [statusFilter, batchFilter]);
+  useEffect(() => {
+    const handle = setTimeout(load, 300);
+    return () => clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter, batchFilter, nameFilter, dateFrom, dateTo]);
 
   const handleGenerate = async () => {
+    if (!batchName.trim()) {
+      setError('Please enter a name for this batch.');
+      return;
+    }
     setIsGenerating(true);
     setError('');
     try {
-      const res = await api.post<{ batchId: string; quantity: number }>('/api/admin/qr-codes/bulk', { quantity });
+      const res = await api.post<{ batchId: string; quantity: number }>('/api/admin/qr-codes/bulk', {
+        quantity,
+        name: batchName.trim(),
+      });
       setBatchFilter(res.batchId);
+      setBatchName('');
       load();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate batch');
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleDownloadZip = async () => {
+    setIsDownloadingZip(true);
+    setError('');
+    try {
+      const params = buildFilterParams({ statusFilter, batchFilter, nameFilter, dateFrom, dateTo });
+      await downloadFile(`/api/admin/qr-codes/download.zip?${params}`, `qr-codes-${Date.now()}.zip`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to download ZIP');
+    } finally {
+      setIsDownloadingZip(false);
     }
   };
 
@@ -120,6 +166,16 @@ export const AdminQrCodes: React.FC = () => {
 
       {/* Bulk generate */}
       <div className="bg-white/5 border border-white/10 rounded-xl p-5 flex flex-wrap items-end gap-4">
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-white/50 uppercase">Batch Name</label>
+          <input
+            type="text"
+            value={batchName}
+            onChange={(e) => setBatchName(e.target.value)}
+            placeholder="e.g. Mall Parking Lot A"
+            className="w-56 h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400"
+          />
+        </div>
         <div className="space-y-1">
           <label className="text-xs font-bold text-white/50 uppercase">Quantity</label>
           <input
@@ -142,28 +198,77 @@ export const AdminQrCodes: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold text-white/40 uppercase">Name</label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+            <input
+              value={nameFilter}
+              onChange={(e) => setNameFilter(e.target.value)}
+              placeholder="Search batch name"
+              className="pl-9 pr-3 h-10 bg-white/10 border border-white/10 text-white text-sm rounded-md w-56 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            />
+          </div>
+        </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           className="h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md cursor-pointer"
         >
-          <option value="">All statuses</option>
-          <option value="INACTIVE">Inactive</option>
-          <option value="ACTIVE">Active</option>
+          <option value="" className="bg-neutral-900 text-white">All statuses</option>
+          <option value="INACTIVE" className="bg-neutral-900 text-white">Inactive</option>
+          <option value="ACTIVE" className="bg-neutral-900 text-white">Active</option>
         </select>
         <select
           value={batchFilter}
           onChange={(e) => setBatchFilter(e.target.value)}
           className="h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md cursor-pointer max-w-xs"
         >
-          <option value="">All batches</option>
+          <option value="" className="bg-neutral-900 text-white">All batches</option>
           {batches.map((b) => (
-            <option key={b.batchId} value={b.batchId}>
-              {new Date(b.batchCreatedAt).toLocaleString()} — {b.activated}/{b.total} activated
+            <option key={b.batchId} value={b.batchId} className="bg-neutral-900 text-white">
+              {b.batchName} — {new Date(b.batchCreatedAt).toLocaleDateString()} — {b.activated}/{b.total} activated
             </option>
           ))}
         </select>
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold text-white/40 uppercase">From</label>
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md cursor-pointer [color-scheme:dark]"
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold text-white/40 uppercase">To</label>
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md cursor-pointer [color-scheme:dark]"
+          />
+        </div>
+        {(dateFrom || dateTo) && (
+          <button
+            onClick={() => {
+              setDateFrom('');
+              setDateTo('');
+            }}
+            className="h-10 px-3 text-white/50 hover:text-white text-xs font-bold cursor-pointer"
+          >
+            Clear dates
+          </button>
+        )}
+        <button
+          onClick={handleDownloadZip}
+          disabled={isDownloadingZip || total === 0}
+          className="inline-flex items-center gap-1.5 h-10 px-4 bg-amber-400/15 hover:bg-amber-400/25 text-amber-400 text-xs font-bold rounded-md cursor-pointer disabled:opacity-50"
+          title="Download every QR code matching the current filters as a ZIP of PNGs"
+        >
+          <FileArchive className="w-3.5 h-3.5" /> {isDownloadingZip ? 'Zipping...' : `Download ZIP (${total})`}
+        </button>
         {batchFilter && (
           <>
             <button
@@ -225,7 +330,7 @@ export const AdminQrCodes: React.FC = () => {
                       <span className="text-white/30">— unclaimed —</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-white/40 text-xs font-mono">{c.batchId.slice(0, 8)}</td>
+                  <td className="px-4 py-3 text-white/70 text-xs">{c.batchName}</td>
                   <td className="px-4 py-3 text-white/50 text-xs">{new Date(c.createdAt).toLocaleDateString()}</td>
                   <td className="px-4 py-3 text-right">
                     <button

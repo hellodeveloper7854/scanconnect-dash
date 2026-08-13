@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { randomBytes, randomUUID } from 'node:crypto';
 import QRCode from 'qrcode';
+import { ZipArchive } from 'archiver';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { env } from '../lib/env.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
 import { toCsv } from '../lib/csv.js';
+import type { Prisma } from '@prisma/client';
 
 // Crockford-ish base32 alphabet, ambiguous characters (0/O, 1/I) removed so
 // printed/handwritten codes on physical stickers can't be misread.
@@ -37,6 +39,7 @@ adminQrCodesRouter.use(requireAuth, requireAdmin);
 
 const bulkCreateSchema = z.object({
   quantity: z.number().int().min(1).max(5000),
+  name: z.string().min(1).max(120),
 });
 
 adminQrCodesRouter.post('/bulk', async (req, res) => {
@@ -45,7 +48,7 @@ adminQrCodesRouter.post('/bulk', async (req, res) => {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
 
-  const { quantity } = parsed.data;
+  const { quantity, name } = parsed.data;
   const batchId = randomUUID();
   const batchCreatedAt = new Date();
 
@@ -57,9 +60,9 @@ adminQrCodesRouter.post('/bulk', async (req, res) => {
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
       await prisma.qrCode.createMany({
-        data: rows.map((r) => ({ id: r.id, code: r.code, batchId, batchCreatedAt })),
+        data: rows.map((r) => ({ id: r.id, code: r.code, batchId, batchName: name, batchCreatedAt })),
       });
-      return res.status(201).json({ batchId, quantity, codes: rows });
+      return res.status(201).json({ batchId, batchName: name, quantity, codes: rows });
     } catch (err) {
       if (err instanceof Error && err.message.includes('Unique constraint') && attempt < 4) {
         const existing = await prisma.qrCode.findMany({
@@ -81,16 +84,37 @@ adminQrCodesRouter.post('/bulk', async (req, res) => {
   res.status(500).json({ error: 'Failed to generate unique codes, please retry' });
 });
 
+function buildQrCodeWhere(query: Record<string, unknown>): Prisma.QrCodeWhereInput {
+  const status = typeof query.status === 'string' ? query.status : undefined;
+  const batchId = typeof query.batchId === 'string' ? query.batchId : undefined;
+  const name = typeof query.name === 'string' ? query.name : undefined;
+  const dateFrom = typeof query.dateFrom === 'string' ? new Date(query.dateFrom) : undefined;
+  const dateTo = typeof query.dateTo === 'string' ? new Date(query.dateTo) : undefined;
+
+  const createdAtFilter =
+    dateFrom || dateTo
+      ? {
+          createdAt: {
+            ...(dateFrom && !Number.isNaN(dateFrom.getTime()) ? { gte: dateFrom } : {}),
+            ...(dateTo && !Number.isNaN(dateTo.getTime())
+              ? { lte: new Date(dateTo.getTime() + 24 * 60 * 60 * 1000 - 1) }
+              : {}),
+          },
+        }
+      : {};
+
+  return {
+    ...(status ? { status: status as never } : {}),
+    ...(batchId ? { batchId } : {}),
+    ...(name ? { batchName: { contains: name, mode: 'insensitive' } } : {}),
+    ...createdAtFilter,
+  };
+}
+
 adminQrCodesRouter.get('/', async (req, res) => {
   const page = Math.max(1, Number(req.query.page ?? 1));
   const pageSize = Math.min(100, Number(req.query.pageSize ?? 25));
-  const status = typeof req.query.status === 'string' ? req.query.status : undefined;
-  const batchId = typeof req.query.batchId === 'string' ? req.query.batchId : undefined;
-
-  const where = {
-    ...(status ? { status: status as never } : {}),
-    ...(batchId ? { batchId } : {}),
-  };
+  const where = buildQrCodeWhere(req.query as Record<string, unknown>);
 
   const [codes, total, batchGroups] = await Promise.all([
     prisma.qrCode.findMany({
@@ -104,7 +128,7 @@ adminQrCodesRouter.get('/', async (req, res) => {
     }),
     prisma.qrCode.count({ where }),
     prisma.qrCode.groupBy({
-      by: ['batchId', 'batchCreatedAt'],
+      by: ['batchId', 'batchName', 'batchCreatedAt'],
       _count: { _all: true },
       orderBy: { batchCreatedAt: 'desc' },
     }),
@@ -119,6 +143,7 @@ adminQrCodesRouter.get('/', async (req, res) => {
 
   const batches = batchGroups.map((b) => ({
     batchId: b.batchId,
+    batchName: b.batchName,
     batchCreatedAt: b.batchCreatedAt,
     total: b._count._all,
     activated: activatedByBatch.get(b.batchId) ?? 0,
@@ -147,6 +172,47 @@ adminQrCodesRouter.get('/:batchId/download.csv', async (req, res) => {
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', `attachment; filename="qr-batch-${req.params.batchId.slice(0, 8)}.csv"`);
   res.send(csv);
+});
+
+const MAX_ZIP_CODES = 5000;
+
+/**
+ * Streams a ZIP of every QR PNG matching the currently applied filters
+ * (status, batch, name search, date range) — a plain query-filtered export
+ * rather than a single-batch download, so an admin can e.g. export every
+ * code named "Mall Parking" regardless of which batch(es) it spans.
+ */
+adminQrCodesRouter.get('/download.zip', async (req, res) => {
+  const where = buildQrCodeWhere(req.query as Record<string, unknown>);
+
+  const codes = await prisma.qrCode.findMany({
+    where,
+    orderBy: { createdAt: 'asc' },
+    take: MAX_ZIP_CODES,
+  });
+
+  if (codes.length === 0) {
+    return res.status(404).json({ error: 'No QR codes match the current filters' });
+  }
+
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', 'attachment; filename="qr-codes.zip"');
+
+  const archive = new ZipArchive({ zlib: { level: 9 } });
+  archive.on('error', (err: Error) => {
+    console.error('ZIP generation failed:', err);
+    res.destroy(err);
+  });
+  archive.pipe(res);
+
+  for (const code of codes) {
+    const url = `${env.corsOrigin}/qr/${code.code}`;
+    const png = await QRCode.toBuffer(url, { type: 'png', width: 300, margin: 2 });
+    const safeBatchName = code.batchName.replace(/[^a-zA-Z0-9 _-]/g, '').trim() || 'batch';
+    archive.append(png, { name: `${safeBatchName}/${code.code}.png` });
+  }
+
+  await archive.finalize();
 });
 
 adminQrCodesRouter.get('/:id/qr.png', async (req, res) => {
