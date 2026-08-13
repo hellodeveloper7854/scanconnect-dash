@@ -293,14 +293,14 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         {/* 2. HOW IT WORKS SECTION */}
         <section id="how-it-works" className="py-20 bg-white">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
+            <RevealCard className="text-center max-w-2xl mx-auto mb-14 space-y-3">
               <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
                 HOW IT WORKS
               </span>
               <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
                 Simple. Secure. Instant.
               </h2>
-            </div>
+            </RevealCard>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {howItWorksSteps.slice(0, 3).map((step, idx) => (
@@ -390,12 +390,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
                   Your vehicle becomes instantly reachable while your identity stays protected through our secure communication platform.
                 </p>
-                <p className="font-['Hanken_Grotesk'] font-bold text-base text-[#1B1C1C]">
-                  Whether it&apos;s:
-                </p>
               </div>
 
               <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-10 shadow-xs space-y-4">
+                <p className="font-['Hanken_Grotesk'] font-bold text-base text-[#1B1C1C]">
+                  Whether it&apos;s:
+                </p>
                 {whyChooseScenarios.map((item) => (
                   <div key={item} className="flex items-center gap-3">
                     <div className="w-6 h-6 rounded-full bg-[#F2BA03]/15 flex items-center justify-center shrink-0">
