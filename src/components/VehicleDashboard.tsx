@@ -19,12 +19,15 @@ import {
   Sparkles,
   Check,
   ShieldAlert,
+  ShieldCheck,
   Phone,
   Users,
   Clock,
   MapPinned,
   Globe2,
-  ArrowRight
+  ArrowRight,
+  Plane,
+  GraduationCap
 } from 'lucide-react';
 import { BLOG_POSTS } from '../lib/blogPosts';
 import { useRevealOnScroll } from '../lib/useRevealOnScroll';
@@ -152,43 +155,49 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
     { id: 'licence', title: 'Driving Licence Verification', image: licenceDetailsImg, detail: 'Check DL validity, endorsement records & renewal timelines.' },
   ];
 
-  // Industries We Serve
+  // Industries We Serve — 6 industries with benefits sub-lists
   const industries = [
     {
       id: 'municipal',
       icon: Building2,
       title: 'Municipal Corporations',
-      desc: 'Transform urban parking with intelligent vehicle identification, digital communication, and efficient parking management.',
+      desc: 'Digitize urban parking with intelligent vehicle identification, real-time communication, and efficient parking management designed for high-density cities.',
+      benefits: ['Smart Parking Management', 'Digital Vehicle Communication', 'Reduced Traffic Congestion', 'Better Citizen Experience'],
     },
     {
       id: 'retail',
       icon: ShoppingBag,
-      title: 'Shopping Malls & Retail Parks',
-      desc: 'Enhance customer convenience while improving parking efficiency and visitor satisfaction.',
+      title: 'Shopping Centres & Retail',
+      desc: 'Improve customer satisfaction with seamless parking communication while gaining valuable operational insights to enhance retail experiences.',
+      benefits: ['Better Customer Convenience', 'Improved Parking Flow', 'Increased Visitor Satisfaction', 'Enhanced Merchant Experience'],
+    },
+    {
+      id: 'airports',
+      icon: Plane,
+      title: 'Airports',
+      desc: 'Transform airport parking through digital vehicle communication, faster customer assistance, and intelligent parking operations.',
+      benefits: ['Efficient Parking Management', 'Improved Traveler Experience', 'Real-Time Communication', 'Smart Digital Infrastructure'],
     },
     {
       id: 'supermarkets',
       icon: ShoppingCart,
       title: 'Supermarkets',
-      desc: 'Deliver a hassle-free parking experience with enhanced safety and quick customer assistance.',
+      desc: 'Offer shoppers a hassle-free parking experience with quick owner notifications and improved vehicle safety.',
+      benefits: ['Faster Customer Assistance', 'Safer Parking Areas', 'Convenient Shopping Experience', 'Better Parking Utilization'],
     },
     {
       id: 'railways',
       icon: Train,
       title: 'Railway Stations',
-      desc: 'Simplify parking management for daily commuters with smart parking technology and permit integration.',
+      desc: 'Simplify commuter parking with secure vehicle identification, monthly pass integration, and seamless communication.',
+      benefits: ['Daily Commuter Convenience', 'Digital Permit Management', 'Smart Parking Solutions', 'Efficient Operations'],
     },
     {
-      id: 'residential',
-      icon: MapPinned,
-      title: 'Residential Communities',
-      desc: 'Enable residents and visitors to communicate securely without exposing personal contact information.',
-    },
-    {
-      id: 'corporate',
-      icon: Building2,
-      title: 'Corporate Campuses',
-      desc: 'Improve workplace parking management with secure employee vehicle identification.',
+      id: 'universities',
+      icon: GraduationCap,
+      title: 'Universities & Educational Campuses',
+      desc: 'Create safer campuses with intelligent vehicle management for students, faculty, and visitors.',
+      benefits: ['Campus Parking Management', 'Student & Staff Convenience', 'Visitor Vehicle Communication', 'Data & Analytics Dashboard'],
     },
   ];
 
@@ -610,17 +619,30 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 return (
                   <div
                     key={ind.id}
-                    className="bg-white border border-[#E5E7EB] rounded-xl p-7 hover:shadow-md transition-shadow space-y-4"
+                    className="bg-white border border-[#E5E7EB] rounded-2xl p-7 hover:shadow-lg transition-all flex flex-col justify-between space-y-5"
                   >
-                    <div className="w-11 h-11 shrink-0 rounded-full border border-[#F2BA03] bg-white flex items-center justify-center text-[#F2BA03]">
-                      <IconComp className="w-5 h-5 stroke-[2]" />
+                    <div className="space-y-4">
+                      <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#F2BA03]">
+                        <IconComp className="w-6 h-6 stroke-[2.2]" />
+                      </div>
+                      <h3 className="font-['Plus_Jakarta_Sans'] font-semibold text-lg text-[#1B1C1C] leading-snug">
+                        {ind.title}
+                      </h3>
+                      <p className="font-['Hanken_Grotesk'] font-normal text-sm text-[#6B7280] leading-[22px]">
+                        {ind.desc}
+                      </p>
+                      <div className="pt-2 space-y-1.5">
+                        <span className="text-[10px] font-bold tracking-widest text-[#9CA3AF] uppercase block">
+                          Benefits
+                        </span>
+                        {ind.benefits.map((b) => (
+                          <div key={b} className="flex items-center gap-2">
+                            <Check className="w-3.5 h-3.5 text-[#F2BA03] stroke-[3] shrink-0" />
+                            <span className="font-['Hanken_Grotesk'] text-[#1B1C1C] text-sm">{b}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <h3 className="font-['Plus_Jakarta_Sans'] font-semibold text-lg text-[#1B1C1C] leading-snug">
-                      {ind.title}
-                    </h3>
-                    <p className="font-['Hanken_Grotesk'] font-normal text-sm text-[#6B7280] leading-[22px]">
-                      {ind.desc}
-                    </p>
                   </div>
                 );
               })}
