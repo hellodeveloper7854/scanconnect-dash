@@ -35,7 +35,9 @@ import {
   FileWarning,
   Car,
   IdCard,
-  Zap
+  Zap,
+  Ambulance,
+  Flame
 } from 'lucide-react';
 import { BLOG_POSTS } from '../lib/blogPosts';
 import { useRevealOnScroll } from '../lib/useRevealOnScroll';
@@ -146,8 +148,17 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
     { icon: Globe2, label: 'Works Across India' },
   ];
 
-  // Second SOS block — Emergency Help When Every Second Counts
-  const emergencyQuickAccess = ['Ambulance', 'Police', 'Fire Department', 'Hospitals', 'Roadside Assistance'];
+  // Second SOS block — Emergency Help When Every Second Counts. "Emergency Family
+  // Contact" leads the list and is flagged `differentiator: true` since it's unique
+  // to Scan Connect, unlike the generic services (ambulance, police, etc.) that follow.
+  const emergencyQuickAccess = [
+    { label: 'Emergency Family Contact', icon: Users, differentiator: true },
+    { label: 'Ambulance', icon: Ambulance, differentiator: false },
+    { label: 'Police', icon: Shield, differentiator: false },
+    { label: 'Fire Department', icon: Flame, differentiator: false },
+    { label: 'Hospitals', icon: HeartPulse, differentiator: false },
+    { label: 'Roadside Assistance', icon: Wrench, differentiator: false },
+  ];
 
   // Why Thousands Choose — benefits checklist. `core: true` marks the strongest
   // differentiators, which get an emphasized visual treatment in the grid.
@@ -816,14 +827,29 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 Quick access to:
               </span>
               <div className="flex flex-wrap items-center justify-center gap-3">
-                {emergencyQuickAccess.map((item) => (
-                  <span
-                    key={item}
-                    className="px-4 py-2 bg-white border border-[#E5E7EB] rounded-full text-sm font-semibold text-[#1B1C1C]"
-                  >
-                    {item}
-                  </span>
-                ))}
+                {emergencyQuickAccess.map((item) => {
+                  const ItemIcon = item.icon;
+                  return item.differentiator ? (
+                    <span
+                      key={item.label}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#1B1C1C] border border-[#1B1C1C] rounded-full text-sm font-bold text-white shadow-[0_6px_18px_rgba(0,0,0,0.25)]"
+                    >
+                      <ItemIcon className="w-4 h-4 text-[#F2BA03]" />
+                      {item.label}
+                      <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-[#F2BA03] text-[#1B1C1C] text-[9px] font-extrabold uppercase tracking-wide">
+                        Only on Scan Connect
+                      </span>
+                    </span>
+                  ) : (
+                    <span
+                      key={item.label}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#E5E7EB] rounded-full text-sm font-semibold text-[#1B1C1C]"
+                    >
+                      <ItemIcon className="w-4 h-4 text-[#F2BA03]" />
+                      {item.label}
+                    </span>
+                  );
+                })}
               </div>
             </div>
 
