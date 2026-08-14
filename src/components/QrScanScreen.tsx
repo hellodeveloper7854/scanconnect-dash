@@ -25,6 +25,7 @@ import { DashboardFooter } from './DashboardFooter';
 import { UserFormData } from '../types';
 import scanBannerImg from '../assets/images/scanbanner.png';
 import { useQrScanner } from '../lib/useQrScanner';
+import { useRevealOnScroll } from '../lib/useRevealOnScroll';
 
 interface QrScanScreenProps {
   userData: UserFormData;
@@ -32,6 +33,34 @@ interface QrScanScreenProps {
   onNavigate: (nav: string) => void;
   isLoggedIn?: boolean;
 }
+
+/** Fades + rises a card into place the first time it scrolls into view, with an optional stagger delay. */
+const RevealCard: React.FC<{ delayMs?: number; className?: string; children: React.ReactNode }> = ({
+  delayMs = 0,
+  className = '',
+  children,
+}) => {
+  const { ref, isVisible } = useRevealOnScroll<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className={`reveal-on-scroll ${isVisible ? 'is-visible' : ''} ${className}`}
+      style={{ animationDelay: isVisible ? `${delayMs}ms` : undefined }}
+    >
+      {children}
+    </div>
+  );
+};
+
+/** Growing progress bar that only animates once scrolled into view, used behind the step timeline icons. */
+const RevealTimelineBar: React.FC<{ className?: string }> = ({ className = '' }) => {
+  const { ref, isVisible } = useRevealOnScroll<HTMLDivElement>();
+  return (
+    <div ref={ref} className={className}>
+      <div className={`h-full bg-gradient-to-r from-[#F2BA03] to-[#e0ac00] ${isVisible ? 'animate-timeline-grow' : 'scale-x-0 origin-left'}`} />
+    </div>
+  );
+};
 
 export const QrScanScreen: React.FC<QrScanScreenProps> = ({
   userData,
@@ -167,65 +196,86 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
           </div>
         </section>
 
-        {/* SECTION 3: 3 STEP CARDS */}
-        <section className="py-8 bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* SECTION 3: 3 STEP CARDS — same timeline UI as the home page "Simple. Secure. Instant." section */}
+        <section className="py-12 sm:py-16 bg-gradient-to-b from-[#FFFBF0] to-white">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="relative grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 items-stretch">
+              {/* Connecting timeline — desktop only, grows left-to-right once scrolled into view */}
+              <RevealTimelineBar className="hidden md:block absolute top-[42px] left-[16.66%] right-[16.66%] h-[3px] bg-neutral-200 rounded-full overflow-hidden" />
 
-              {/* Step 1 Card */}
-              <div className="bg-white rounded-[15px] p-7 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.09)] border border-neutral-100 flex flex-col items-start text-left min-h-[266px]">
-                <div className="w-[60px] h-[60px] bg-[#F2BA03] rounded-[12px] flex items-center justify-center text-white mb-5 shrink-0">
-                  <Scan className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-[#111827] mb-3 font-sans">
-                  Step 1 &mdash; Scan the QR Tag
-                </h3>
-                <p className="text-[#6B7280] text-lg sm:text-[18px] leading-[27px] font-normal">
-                  Use your smartphone camera to scan the Scan Connect QR Tag displayed on the vehicle. No app downloads, registrations, or complicated setup required.
-                </p>
-                <div className="flex items-center gap-2 pt-4">
-                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3]" />
-                  <span className="text-sm font-semibold text-[#1B1C1C]">Works with any smartphone</span>
-                </div>
-              </div>
+              {[
+                {
+                  num: '1',
+                  icon: Scan,
+                  title: 'Step 1 — Scan the QR Tag',
+                  desc: 'Use your smartphone camera to scan the Scan Connect QR Tag displayed on the vehicle. No app downloads, registrations, or complicated setup required.',
+                  extra: (
+                    <div className="flex items-center gap-2 pt-3">
+                      <Check className="w-4 h-4 text-[#F2BA03] stroke-[3]" />
+                      <span className="text-sm font-semibold text-[#1B1C1C]">Works with any smartphone</span>
+                    </div>
+                  ),
+                },
+                {
+                  num: '2',
+                  icon: MessageSquare,
+                  title: 'Step 2 — Choose How to Contact',
+                  desc: 'Once the QR page opens, select your preferred way to reach the vehicle owner.',
+                  extra: (
+                    <div className="space-y-2 pt-3">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
+                        <PhoneCall className="w-4 h-4 text-[#F2BA03]" /> Secure Call
+                      </div>
+                      <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
+                        <MessageCircle className="w-4 h-4 text-[#F2BA03]" /> WhatsApp Message
+                      </div>
+                      <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
+                        <Mail className="w-4 h-4 text-[#F2BA03]" /> SMS
+                      </div>
+                    </div>
+                  ),
+                },
+                {
+                  num: '3',
+                  icon: ShieldCheck,
+                  title: 'Step 3 — Privacy Protected',
+                  desc: "Scan Connect securely routes every call and message through its privacy network. The scanner never sees the owner's phone number. The owner never sees the scanner's phone number. Both parties stay protected while communicating seamlessly.",
+                  extra: null,
+                },
+              ].map((step, idx) => {
+                const StepIcon = step.icon;
+                return (
+                  <RevealCard
+                    key={step.num}
+                    delayMs={idx * 350}
+                    className="relative flex flex-col items-center text-center group h-full"
+                  >
+                    {/* Icon + step number badge */}
+                    <div className="relative z-10 w-[84px] h-[84px] rounded-full bg-gradient-to-br from-[#F2BA03] to-[#e0ac00] flex items-center justify-center shadow-[0_10px_30px_rgba(242,186,3,0.4)] mb-7 ring-8 ring-white group-hover:scale-105 transition-transform duration-300 shrink-0">
+                      <StepIcon className="w-9 h-9 text-white stroke-[1.75]" />
+                      <span className="absolute -top-2 -right-1.5 w-8 h-8 rounded-full bg-[#1B1C1C] text-white font-['Inter'] font-extrabold text-xs flex items-center justify-center shadow-lg ring-2 ring-white">
+                        {step.num}
+                      </span>
+                    </div>
 
-              {/* Step 2 Card */}
-              <div className="bg-white rounded-[15px] p-7 sm:p-8 shadow-[0_4px_4px_rgba(0,0,0,0.09)] border border-neutral-100 flex flex-col items-start text-left min-h-[266px]">
-                <div className="w-[60px] h-[60px] bg-[#F2BA03] rounded-[12px] flex items-center justify-center text-white mb-5 shrink-0">
-                  <MessageSquare className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-[#111827] mb-3 font-sans">
-                  Step 2 &mdash; Choose How to Contact
-                </h3>
-                <p className="text-[#6B7280] text-lg sm:text-[18px] leading-[27px] font-normal">
-                  Once the QR page opens, select your preferred way to reach the vehicle owner.
-                </p>
-                <div className="space-y-2 pt-3">
-                  <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
-                    <PhoneCall className="w-4 h-4 text-[#F2BA03]" /> Secure Call
-                  </div>
-                  <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
-                    <MessageCircle className="w-4 h-4 text-[#F2BA03]" /> WhatsApp Message
-                  </div>
-                  <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
-                    <Mail className="w-4 h-4 text-[#F2BA03]" /> SMS
-                  </div>
-                </div>
-              </div>
+                    {/* Mobile-only connector below the icon, between stacked steps */}
+                    {idx < 2 && (
+                      <div className="md:hidden absolute top-[84px] left-1/2 -translate-x-1/2 w-0.5 h-12 bg-gradient-to-b from-[#F2BA03]/50 to-[#F2BA03]/10" />
+                    )}
 
-              {/* Step 3 Card */}
-              <div className="bg-white rounded-[15px] p-7 sm:p-8 shadow-[0_4px_4px_rgba(0,0,0,0.09)] border border-neutral-100 flex flex-col items-start text-left min-h-[266px]">
-                <div className="w-[60px] h-[60px] bg-[#F2BA03] rounded-[12px] flex items-center justify-center text-white mb-5 shrink-0">
-                  <ShieldCheck className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-[#111827] mb-3 font-sans">
-                  Step 3 &mdash; Privacy Protected
-                </h3>
-                <p className="text-[#6B7280] text-lg sm:text-[18px] leading-[27px] font-normal">
-                  Scan Connect securely routes every call and message through its privacy network. The scanner never sees the owner&apos;s phone number. The owner never sees the scanner&apos;s phone number. Both parties stay protected while communicating seamlessly.
-                </p>
-              </div>
-
+                    {/* Card body — flex-1 + equal padding keeps every card the same height regardless of copy length */}
+                    <div className="w-full flex-1 bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.07)] flex flex-col gap-3 hover:shadow-[0_16px_40px_rgba(242,186,3,0.18)] hover:border-[#F2BA03]/50 hover:-translate-y-1.5 transition-all duration-300 text-left">
+                      <h3 className="font-['Poppins'] font-bold text-lg sm:text-xl text-[#111827] leading-snug">
+                        {step.title}
+                      </h3>
+                      <p className="font-['Inter'] font-normal text-sm text-[#374151] leading-[23px]">
+                        {step.desc}
+                      </p>
+                      {step.extra}
+                    </div>
+                  </RevealCard>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -261,14 +311,14 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
               {useCases.map(({ icon: Icon, label }) => (
                 <div
                   key={label}
-                  className="bg-white border border-[#E5E7EB] rounded-xl p-6 flex flex-col items-center text-center gap-3 shadow-xs hover:shadow-md hover:border-[#F2BA03] transition-all"
+                  className="h-full bg-white border border-[#E5E7EB] rounded-xl p-6 flex flex-col items-center justify-center text-center gap-3 shadow-xs hover:shadow-md hover:border-[#F2BA03] transition-all"
                 >
-                  <Icon className="w-7 h-7 text-[#F2BA03]" />
-                  <span className="font-['Hanken_Grotesk'] font-semibold text-sm text-[#1B1C1C]">{label}</span>
+                  <Icon className="w-7 h-7 text-[#F2BA03] shrink-0" />
+                  <span className="font-['Hanken_Grotesk'] font-semibold text-sm text-[#1B1C1C] leading-snug flex items-center min-h-[40px]">{label}</span>
                 </div>
               ))}
             </div>
