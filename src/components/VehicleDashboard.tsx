@@ -71,6 +71,16 @@ const RevealCard: React.FC<{ delayMs?: number; className?: string; children: Rea
   );
 };
 
+/** Growing progress bar that only animates once scrolled into view, used behind the How It Works timeline icons. */
+const RevealTimelineBar: React.FC<{ className?: string }> = ({ className = '' }) => {
+  const { ref, isVisible } = useRevealOnScroll<HTMLDivElement>();
+  return (
+    <div ref={ref} className={className}>
+      <div className={`h-full bg-gradient-to-r from-[#F2BA03] to-[#e0ac00] ${isVisible ? 'animate-timeline-grow' : 'scale-x-0 origin-left'}`} />
+    </div>
+  );
+};
+
 export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, onLogout, onNavigate, isLoggedIn }) => {
   const [activeNav, setActiveNav] = useState('How it works');
   const [selectedService, setSelectedService] = useState<string | null>(null);
@@ -89,32 +99,25 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
     'A security concern',
   ];
 
-  // How It Works — 5 Steps
+  // How It Works — 3 Steps
   const howItWorksSteps = [
     {
       num: '01',
-      title: 'Place Your Scan Connect Tag',
-      desc: 'Attach the premium waterproof QR tag to your car or bike. Activate it once by scanning the QR code and linking your mobile number securely.',
+      icon: QrCode,
+      title: 'Activate Your Tag',
+      desc: 'Attach the premium waterproof QR tag to your car or bike and activate it once by linking your mobile number securely.',
     },
     {
       num: '02',
-      title: 'Someone Scans the QR Code',
-      desc: 'If someone needs to contact you, they simply scan the QR code using any smartphone camera. No app. No registration. No installation.',
+      icon: Scan,
+      title: 'Anyone Scans & Connects',
+      desc: 'Using any smartphone camera—no app, no registration—they simply scan and choose to Call, SMS, or WhatsApp you instantly.',
     },
     {
       num: '03',
-      title: 'Contact You Securely',
-      desc: 'The scanner can choose to Call, Send SMS, or WhatsApp. All communication happens through Scan Connect’s secure privacy system. Neither party sees the other’s personal phone number.',
-    },
-    {
-      num: '04',
-      title: 'Your Privacy Stays Protected',
-      desc: 'Receive the message instantly. Respond whenever you’re available. Your personal number is never shared publicly.',
-    },
-    {
-      num: '05',
-      title: 'Stay Connected Anywhere',
-      desc: 'Whether you’re parked at airports, railway stations, shopping malls, offices, residential complexes, hospitals or tourist locations, you’ll always remain reachable without compromising your privacy.',
+      icon: ShieldCheck,
+      title: 'Your Privacy Stays Protected, Anywhere',
+      desc: 'Neither party ever sees the other’s number. Stay reachable at airports, malls, offices, or the roadside—anywhere in India.',
     },
   ];
 
@@ -368,9 +371,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
 
         {/* 3. HOW IT WORKS SECTION */}
-        <section id="how-it-works" className="py-20 bg-white">
+        <section id="how-it-works" className="py-20 bg-gradient-to-b from-[#FFFBF0] to-white">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
-            <RevealCard className="text-center max-w-2xl mx-auto mb-14 space-y-3">
+            <RevealCard className="text-center max-w-2xl mx-auto mb-16 space-y-3">
               <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
                 HOW IT WORKS
               </span>
@@ -379,48 +382,43 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               </h2>
             </RevealCard>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              {howItWorksSteps.slice(0, 3).map((step, idx) => (
-                <RevealCard
-                  key={step.num}
-                  delayMs={idx * 120}
-                  className="bg-white border border-[#CCC7AA] rounded-[15px] p-7 shadow-[0_4px_20px_rgba(0,0,0,0.09)] flex flex-col justify-between space-y-4 hover:shadow-lg hover:-translate-y-1 transition-all"
-                >
-                  <div className="space-y-4">
-                    <div className="w-[60px] h-[60px] rounded-[12px] bg-[#F2BA03] text-white font-['Inter'] font-bold text-xl flex items-center justify-center shadow-xs">
-                      {step.num}
-                    </div>
-                    <h3 className="font-['Poppins'] font-bold text-xl text-[#111827] leading-[28px]">
-                      {step.title}
-                    </h3>
-                    <p className="font-['Inter'] font-normal text-sm text-[#6B7280] leading-[23px]">
-                      {step.desc}
-                    </p>
-                  </div>
-                </RevealCard>
-              ))}
-            </div>
+            <div className="relative grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 max-w-5xl mx-auto items-stretch">
+              {/* Connecting timeline — desktop only, grows left-to-right once scrolled into view */}
+              <RevealTimelineBar className="hidden md:block absolute top-[42px] left-[16.66%] right-[16.66%] h-[3px] bg-neutral-200 rounded-full overflow-hidden" />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto mt-6">
-              {howItWorksSteps.slice(3, 5).map((step, idx) => (
-                <RevealCard
-                  key={step.num}
-                  delayMs={(idx + 3) * 120}
-                  className="bg-white border border-[#CCC7AA] rounded-[15px] p-7 shadow-[0_4px_20px_rgba(0,0,0,0.09)] flex flex-col justify-between space-y-4 hover:shadow-lg hover:-translate-y-1 transition-all"
-                >
-                  <div className="space-y-4">
-                    <div className="w-[60px] h-[60px] rounded-[12px] bg-[#F2BA03] text-white font-['Inter'] font-bold text-xl flex items-center justify-center shadow-xs">
-                      {step.num}
+              {howItWorksSteps.map((step, idx) => {
+                const StepIcon = step.icon;
+                return (
+                  <RevealCard
+                    key={step.num}
+                    delayMs={idx * 350}
+                    className="relative flex flex-col items-center text-center group h-full"
+                  >
+                    {/* Icon + step number badge */}
+                    <div className="relative z-10 w-[84px] h-[84px] rounded-full bg-gradient-to-br from-[#F2BA03] to-[#e0ac00] flex items-center justify-center shadow-[0_10px_30px_rgba(242,186,3,0.4)] mb-7 ring-8 ring-white group-hover:scale-105 transition-transform duration-300 shrink-0">
+                      <StepIcon className="w-9 h-9 text-white stroke-[1.75]" />
+                      <span className="absolute -top-2 -right-1.5 w-8 h-8 rounded-full bg-[#1B1C1C] text-white font-['Inter'] font-extrabold text-xs flex items-center justify-center shadow-lg ring-2 ring-white">
+                        {step.num}
+                      </span>
                     </div>
-                    <h3 className="font-['Poppins'] font-bold text-xl text-[#111827] leading-[28px]">
-                      {step.title}
-                    </h3>
-                    <p className="font-['Inter'] font-normal text-sm text-[#6B7280] leading-[23px]">
-                      {step.desc}
-                    </p>
-                  </div>
-                </RevealCard>
-              ))}
+
+                    {/* Mobile-only connector below the icon, between stacked steps */}
+                    {idx < howItWorksSteps.length - 1 && (
+                      <div className="md:hidden absolute top-[84px] left-1/2 -translate-x-1/2 w-0.5 h-12 bg-gradient-to-b from-[#F2BA03]/50 to-[#F2BA03]/10" />
+                    )}
+
+                    {/* Card body — flex-1 + equal padding keeps every card the same height regardless of copy length */}
+                    <div className="w-full flex-1 bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.07)] flex flex-col gap-3 hover:shadow-[0_16px_40px_rgba(242,186,3,0.18)] hover:border-[#F2BA03]/50 hover:-translate-y-1.5 transition-all duration-300">
+                      <h3 className="font-['Poppins'] font-bold text-lg sm:text-xl text-[#111827] leading-snug">
+                        {step.title}
+                      </h3>
+                      <p className="font-['Inter'] font-normal text-sm text-[#374151] leading-[23px]">
+                        {step.desc}
+                      </p>
+                    </div>
+                  </RevealCard>
+                );
+              })}
             </div>
           </div>
         </section>
