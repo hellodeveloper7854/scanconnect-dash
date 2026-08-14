@@ -242,6 +242,16 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     </div>
                   ))}
                 </div>
+
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <button
+                    onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="btn-shimmer h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                  >
+                    <span>View Products</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Right Column Image */}
@@ -262,9 +272,6 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               <h2 className="text-2xl sm:text-3xl font-black text-[#0F0F0F]">
                 Trusted Across India
               </h2>
-              <p className="text-[#F2BA03] text-xl sm:text-2xl font-extrabold">
-                950,000+ Active QR Tags
-              </p>
               <p className="text-[#5D5F5F] text-sm sm:text-base max-w-2xl mx-auto">
                 Helping vehicle owners, businesses, and organizations stay connected with secure, privacy-first communication.
               </p>
