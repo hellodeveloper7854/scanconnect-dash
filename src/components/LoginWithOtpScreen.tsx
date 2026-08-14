@@ -1,6 +1,7 @@
 import React from 'react';
-import { Phone, Mail, ShieldCheck } from 'lucide-react';
+import { Phone, Mail, ShieldCheck, X } from 'lucide-react';
 import { ScreenType } from '../types';
+import logoImg from '../assets/images/logo.png';
 
 interface LoginWithOtpScreenProps {
   onNavigate: (screen: ScreenType) => void;
@@ -8,109 +9,98 @@ interface LoginWithOtpScreenProps {
 
 export const LoginWithOtpScreen: React.FC<LoginWithOtpScreenProps> = ({ onNavigate }) => {
   return (
-    <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex items-center justify-center">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
-
-        {/* Left Column - Access Dashboard Branding */}
-        <div className="lg:col-span-6 flex flex-col items-start space-y-6 relative">
-          {/* Ambient glow blob */}
-          <div className="absolute -left-10 -top-10 w-40 h-40 bg-[#695F00]/20 blur-[32px] rounded-full pointer-events-none" />
-
-          {/* Back Button */}
+    <div
+      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center overflow-y-auto bg-black/60 backdrop-blur-sm p-4 py-10 animate-fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onNavigate('dashboard');
+      }}
+    >
+      <div className="w-full max-w-md h-fit">
+        <div className="relative bg-white border border-neutral-200 rounded-2xl shadow-2xl p-8 sm:p-10">
+          {/* Close Button */}
           <button
             onClick={() => onNavigate('dashboard')}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-[#F2BA03] font-extrabold text-xs uppercase tracking-wider transition-all cursor-pointer border border-[#F2BA03]/30 shadow-md relative z-10"
+            aria-label="Close"
+            className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-[#0F0F0F] hover:bg-neutral-100 rounded-full transition-colors cursor-pointer"
           >
-            ← Back to How it works
+            <X className="w-5 h-5" />
           </button>
 
-          {/* Badge */}
-          <div className="inline-flex items-center px-3 py-1 bg-[#FEFE00] text-black text-xs font-bold tracking-[1.2px] uppercase relative z-10">
-            NETWORK CONNECTED
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <button onClick={() => onNavigate('dashboard')} className="cursor-pointer">
+              <img src={logoImg} alt="Scan Connect" className="h-12 w-auto object-contain" />
+            </button>
           </div>
 
-          {/* Heading */}
-          <div className="relative z-10 -skew-x-[10deg]">
-            <h1 className="text-[44px] sm:text-[60px] leading-[75px] text-white font-sans">
-              <span className="font-semibold block">ACCESS</span>
-              <span className="font-semibold block">YOUR</span>
-              <span className="font-bold block text-[#F9E534]">DASHBOARD</span>
+          {/* Header */}
+          <div className="text-center mb-8 space-y-2">
+            <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs mb-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
+              <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
+                Secure Sign In
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#0F0F0F] tracking-tight">
+              Access your dashboard
             </h1>
+            <p className="text-[#5D5F5F] text-sm sm:text-base font-normal">
+              Choose how you&apos;d like to sign in to Scan Connect.
+            </p>
           </div>
 
-          {/* Subtitle */}
-          <p className="text-white text-base leading-[26px] max-w-xs font-normal relative z-10">
-            The heartbeat of your vehicle in the palm of your hand. Secure, fast, and unified.
-          </p>
-        </div>
+          {/* Login Options */}
+          <div className="space-y-4">
+            <button
+              type="button"
+              onClick={() => onNavigate('send-otp')}
+              className="w-full h-14 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-3 cursor-pointer"
+            >
+              <Phone className="w-5 h-5" />
+              <span>Login with OTP</span>
+            </button>
 
-        {/* Right Column - Glassmorphic Options Card */}
-        <div className="lg:col-span-6 flex justify-center lg:justify-end w-full">
-          <div className="w-full max-w-[440px] bg-white/10 backdrop-blur-[12px] border-2 border-white/30 shadow-[0px_8px_32px_rgba(0,0,0,0.3)] rounded-none p-12 flex flex-col gap-6 relative overflow-hidden">
-
-            {/* Top Indicator */}
-            <div className="flex items-center gap-2 text-white/60">
-              <ShieldCheck className="w-3 h-4" />
-              <span className="text-[10px] font-normal uppercase tracking-[1px]">END-TO-END ENCRYPTED SESSION</span>
+            <div className="flex items-center gap-4 py-1">
+              <div className="flex-1 h-px bg-neutral-200" />
+              <span className="text-neutral-400 text-xs font-semibold uppercase tracking-wider">
+                or
+              </span>
+              <div className="flex-1 h-px bg-neutral-200" />
             </div>
 
-            {/* Login Options */}
-            <div className="space-y-4">
-              {/* Option 1: LOGIN WITH OTP */}
-              <button
-                type="button"
-                onClick={() => onNavigate('send-otp')}
-                className="w-full h-[60px] bg-[#F2BA03] hover:bg-[#e0ac00] text-black font-bold text-sm uppercase shadow-[0px_4px_0px_rgba(0,0,0,0.2)] active:scale-[0.99] transition-all flex items-center justify-center gap-3 cursor-pointer"
-              >
-                <Phone className="w-5 h-5" />
-                <span>LOGIN WITH OTP</span>
-              </button>
+            <button
+              type="button"
+              onClick={() => onNavigate('login')}
+              className="w-full h-14 bg-white hover:bg-neutral-50 border border-neutral-300 text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl transition-all flex items-center justify-center gap-3 cursor-pointer"
+            >
+              <Mail className="w-5 h-5 text-[#0F0F0F]" />
+              <span>Login with Email</span>
+            </button>
+          </div>
 
-              {/* Divider */}
-              <div className="flex items-center gap-4 py-3">
-                <div className="flex-1 h-[1px] bg-white/20" />
-                <span className="text-white text-[10px] font-medium uppercase tracking-[2px]">
-                  OR UTILIZE
-                </span>
-                <div className="flex-1 h-[1px] bg-white/20" />
-              </div>
-
-              {/* Option 2: LOGIN WITH EMAIL */}
-              <button
-                type="button"
-                onClick={() => onNavigate('login')}
-                className="w-full h-[62px] bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-sm uppercase transition-all flex items-center justify-center gap-3 cursor-pointer"
-              >
-                <Mail className="w-5 h-5 text-white" />
-                <span>LOGIN WITH EMAIL</span>
-              </button>
-            </div>
-
-            {/* Footer Navigation Link */}
-            <div className="pt-8 border-t border-white/10 text-center text-base text-white/50 font-normal">
-              New to the network?{' '}
-              <button
-                onClick={() => onNavigate('register')}
-                className="text-[#F9E534] font-bold hover:underline underline-offset-4 ml-1 cursor-pointer"
-              >
-                Register Now
-              </button>
-            </div>
-
-            {/* Terms disclaimer */}
-            <div className="text-center">
-              <p className="text-[10px] text-white/30 uppercase leading-[16px]">
-                BY CONTINUING, YOU AGREE TO SCAN CONNECT&apos;S{' '}
-                <span className="text-[#F2BA03] underline cursor-pointer">TERMS OF SERVICE</span> &{' '}
-                <span className="text-[#F2BA03] underline cursor-pointer">PRIVACY POLICY</span>
-              </p>
-            </div>
-
+          {/* Footer Navigation Link */}
+          <div className="mt-8 pt-6 border-t border-neutral-100 text-center text-sm text-[#5D5F5F] font-normal">
+            New to Scan Connect?{' '}
+            <button
+              onClick={() => onNavigate('register')}
+              className="text-[#0F0F0F] font-bold hover:underline underline-offset-4 ml-1 cursor-pointer"
+            >
+              Register Now
+            </button>
           </div>
         </div>
 
+        <p className="text-center text-xs text-white/70 mt-6 leading-relaxed">
+          By continuing, you agree to Scan Connect&apos;s{' '}
+          <a href="/terms" className="text-white font-semibold underline underline-offset-2">
+            Terms of Service
+          </a>{' '}
+          &amp;{' '}
+          <a href="/terms" className="text-white font-semibold underline underline-offset-2">
+            Privacy Policy
+          </a>
+        </p>
       </div>
     </div>
   );
 };
-

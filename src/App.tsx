@@ -3,7 +3,6 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { ScreenType, UserFormData } from './types';
 import { auth } from './lib/firebase';
 import { api, ApiError } from './lib/api';
-import { BackgroundCockpit } from './components/BackgroundCockpit';
 import { RegistrationScreen } from './components/RegistrationScreen';
 import { LoginScreen } from './components/LoginScreen';
 import { SendOtpScreen } from './components/SendOtpScreen';
@@ -161,6 +160,20 @@ function MainApp() {
     window.scrollTo(0, 0);
   }, [activeScreen]);
 
+  // Auth screens render as an overlay on top of the dashboard; lock page
+  // scroll while one is open so the dimmed dashboard behind it stays still.
+  const authOverlayScreens: ScreenType[] = ['login', 'login-options', 'register', 'send-otp'];
+  useEffect(() => {
+    if (authOverlayScreens.includes(activeScreen)) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [activeScreen]);
+
   const handleGlobalNavigate = (nav: string) => {
     const normalized = nav.toLowerCase().trim().replace(/^\//, '');
     let targetScreen: ScreenType = 'dashboard';
@@ -241,7 +254,7 @@ function MainApp() {
     (activeScreen === 'profile' || activeScreen === 'orders' || authOnlyScreens.includes(activeScreen))
   ) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-white text-[#0F0F0F]">
         Loading...
       </div>
     );
@@ -387,37 +400,44 @@ function MainApp() {
     );
   }
 
+  // Auth screens (login/register/OTP) render as an overlay on top of the
+  // dashboard, so the site behind them stays visible through a dimmed backdrop
+  // instead of navigating away to a separate page.
   return (
-    <BackgroundCockpit>
-      {/* Main Screen Content */}
-      <main className="flex-1 flex flex-col justify-center">
-        {activeScreen === 'register' && (
-          <RegistrationScreen
-            onNavigate={navigateToScreen}
-            onSubmitSuccess={handleRegisterSuccess}
-          />
-        )}
+    <>
+      <VehicleDashboard
+        userData={userData}
+        isLoggedIn={isLoggedIn}
+        onLogout={handleLogout}
+        onNavigate={handleGlobalNavigate}
+      />
 
-        {activeScreen === 'login' && (
-          <LoginScreen
-            onNavigate={navigateToScreen}
-            onSubmitSuccess={handleLoginSuccess}
-          />
-        )}
+      {activeScreen === 'register' && (
+        <RegistrationScreen
+          onNavigate={navigateToScreen}
+          onSubmitSuccess={handleRegisterSuccess}
+        />
+      )}
 
-        {activeScreen === 'send-otp' && (
-          <SendOtpScreen
-            onVerifySuccess={handleOtpVerifiedSuccess}
-            onNavigate={navigateToScreen}
-          />
-        )}
+      {activeScreen === 'login' && (
+        <LoginScreen
+          onNavigate={navigateToScreen}
+          onSubmitSuccess={handleLoginSuccess}
+        />
+      )}
 
-        {activeScreen === 'login-options' && (
-          <LoginWithOtpScreen
-            onNavigate={navigateToScreen}
-          />
-        )}
-      </main>
+      {activeScreen === 'send-otp' && (
+        <SendOtpScreen
+          onVerifySuccess={handleOtpVerifiedSuccess}
+          onNavigate={navigateToScreen}
+        />
+      )}
+
+      {activeScreen === 'login-options' && (
+        <LoginWithOtpScreen
+          onNavigate={navigateToScreen}
+        />
+      )}
 
       {/* Interactive OTP Modal */}
       <OtpModal
@@ -426,7 +446,6 @@ function MainApp() {
         onClose={() => setIsOtpModalOpen(false)}
         onVerifySuccess={handleOtpVerifiedSuccess}
       />
-
-    </BackgroundCockpit>
+    </>
   );
 }

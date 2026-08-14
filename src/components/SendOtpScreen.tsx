@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Phone, ArrowRight, Check, RefreshCw } from 'lucide-react';
+import { Phone, ArrowRight, Check, RefreshCw, ShieldCheck, X } from 'lucide-react';
 import { signInWithPhoneNumber, type ConfirmationResult } from 'firebase/auth';
 import { auth, getRecaptchaVerifier } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
 import { ScreenType, UserFormData } from '../types';
+import logoImg from '../assets/images/logo.png';
 
 interface SendOtpScreenProps {
   onVerifySuccess: (data: Partial<UserFormData>) => void;
@@ -106,219 +107,181 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
   };
 
   return (
-    <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 flex items-center justify-center">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
-        
-        {/* Left Column - Verify Branding */}
-        <div className="lg:col-span-6 flex flex-col items-start space-y-6">
-          {/* Back Button */}
+    <div
+      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center overflow-y-auto bg-black/60 backdrop-blur-sm p-4 py-10 animate-fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onNavigate('dashboard');
+      }}
+    >
+      <div className="w-full max-w-md h-fit">
+        <div className="relative bg-white border border-neutral-200 rounded-2xl shadow-2xl p-8 sm:p-10">
+          {/* Close Button */}
           <button
             onClick={() => onNavigate('dashboard')}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-amber-400 font-extrabold text-xs uppercase tracking-wider transition-all cursor-pointer border border-amber-400/30 shadow-md"
+            aria-label="Close"
+            className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-[#0F0F0F] hover:bg-neutral-100 rounded-full transition-colors cursor-pointer"
           >
-            ← Back to How it works
+            <X className="w-5 h-5" />
           </button>
 
-          {/* SCAN ME Badge */}
-          <div className="inline-flex items-center px-4 py-1.5 bg-[#F2BA03] text-[#1B1C1C] text-xl font-black tracking-[-0.5px] border-2 border-[#1B1C1C] shadow-[4px_4px_0px_#1B1C1C] -skew-x-12">
-            <span className="skew-x-12 block">SCAN CONNECT</span>
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <button onClick={() => onNavigate('dashboard')} className="cursor-pointer">
+              <img src={logoImg} alt="Scan Connect" className="h-12 w-auto object-contain" />
+            </button>
           </div>
 
-          {/* Heading */}
-          <div className="space-y-1 pt-6">
-            <h1 className="text-3xl sm:text-[36px] font-extrabold tracking-[-0.64px] text-white font-sans leading-[40px]">
-              Secure Access to Your <br />
-              <span className="text-[#F2BA03] font-black block mt-1 drop-shadow-[0_2px_12px_rgba(242,186,3,0.35)]">
-                Vehicle Ecosystem.
+          {/* Header */}
+          <div className="text-center mb-8 space-y-2">
+            <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs mb-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
+              <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
+                Verify Identity
               </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#0F0F0F] tracking-tight">
+              Secure access via OTP
             </h1>
+            <p className="text-[#5D5F5F] text-sm sm:text-base font-normal">
+              We&apos;ll text a 6-digit code to verify it&apos;s you.
+            </p>
           </div>
 
-          {/* Description */}
-          <p className="text-white/80 text-xl font-medium max-w-md leading-[26px]">
-            Connect instantly with vehicle owners and manage your automotive services with high-octane efficiency.
-          </p>
-
-          {/* Trust Banner */}
-          <div className="pt-12 flex items-center gap-6 bg-black/40 backdrop-blur-[6px] border-l-4 border-[#F2BA03] p-2">
-            <div className="flex items-center -space-x-3">
-              <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-                alt="User Avatar"
-                referrerPolicy="no-referrer"
-                className="w-10 h-10 rounded-full border-2 border-[#1B1C1C] bg-[#E5E2E1] object-cover"
-              />
-              <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80"
-                alt="User Avatar"
-                referrerPolicy="no-referrer"
-                className="w-10 h-10 rounded-full border-2 border-[#1B1C1C] bg-[#E5E2E1] object-cover"
-              />
-              <img
-                src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80"
-                alt="User Avatar"
-                referrerPolicy="no-referrer"
-                className="w-10 h-10 rounded-full border-2 border-[#1B1C1C] bg-[#E5E2E1] object-cover"
-              />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-[#F2BA03] uppercase tracking-[0.6px]">
-                TRUSTED BY
-              </div>
-              <div className="text-xl font-bold text-white">
-                50k+ Users
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column - Verify Identity Glassmorphic Card */}
-        <div className="lg:col-span-6 flex justify-center lg:justify-end w-full">
-          <div className="w-full max-w-[440px] bg-white/10 backdrop-blur-[12px] border-2 border-white/30 shadow-[0px_8px_32px_rgba(0,0,0,0.3)] rounded-none p-12 relative overflow-hidden">
-
-            {/* Card Header */}
-            <div className="mb-6">
-              <h2 className="text-3xl sm:text-[36px] font-extrabold text-white leading-[21px]">
-                VERIFY IDENTITY
-              </h2>
-              <span className="block w-24 h-1 bg-[#F2BA03] mt-4" />
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Mobile Number */}
-              <div className="space-y-1">
-                <label className="block text-xs font-bold tracking-[1.2px] text-white uppercase">
-                  MOBILE NUMBER
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#5E5E5E]">
-                    <Phone className="w-5 h-5" />
-                  </div>
-                  <input
-                    type="tel"
-                    required
-                    disabled={isOtpSent}
-                    value={mobileNumber}
-                    onChange={(e) => setMobileNumber(e.target.value)}
-                    placeholder="+91 98765 43210"
-                    className="w-full h-[59px] pl-12 pr-4 bg-white/90 text-[#1B1C1C] font-normal placeholder-[#6B7280] rounded-none text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] transition-all disabled:opacity-70"
-                  />
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Mobile Number */}
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold tracking-wide text-[#0F0F0F] uppercase">
+                Mobile Number
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-neutral-400">
+                  <Phone className="w-5 h-5" />
                 </div>
-                {!isOtpSent && (
-                  <p className="text-[10px] font-normal text-white/40 uppercase mt-1">
-                    WE&apos;LL SEND A 6-DIGIT CODE VIA SMS
+                <input
+                  type="tel"
+                  required
+                  disabled={isOtpSent}
+                  value={mobileNumber}
+                  onChange={(e) => setMobileNumber(e.target.value)}
+                  placeholder="+91 98765 43210"
+                  className="w-full h-[52px] pl-12 pr-4 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] focus:border-transparent transition-all disabled:opacity-70 disabled:bg-neutral-50"
+                />
+              </div>
+              {!isOtpSent && (
+                <p className="text-xs font-normal text-neutral-400 mt-1">
+                  We&apos;ll send a 6-digit code via SMS
+                </p>
+              )}
+            </div>
+
+            {!isOtpSent ? (
+              /* Send OTP Button */
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-[52px] bg-[#F2BA03] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isSubmitting ? (
+                  <span>Sending SMS...</span>
+                ) : (
+                  <>
+                    <span>Send OTP</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            ) : (
+              /* Inline OTP Entry */
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold tracking-wide text-[#0F0F0F] uppercase">
+                    Enter OTP Code
+                  </label>
+                  <div className="flex justify-between gap-2">
+                    {otpDigits.map((digit, index) => (
+                      <input
+                        key={index}
+                        type="text"
+                        maxLength={1}
+                        value={digit}
+                        ref={(el) => (inputRefs.current[index] = el)}
+                        onChange={(e) => handleOtpChange(index, e.target.value)}
+                        onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                        className="w-full h-14 text-center text-xl font-bold bg-white border border-neutral-300 text-[#0F0F0F] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F2BA03] focus:border-transparent transition-all"
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {errorMsg && (
+                  <p className="text-xs font-semibold text-rose-600">
+                    {errorMsg}
                   </p>
                 )}
-              </div>
 
-              {!isOtpSent ? (
-                /* Send OTP Button */
                 <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full h-14 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-sm uppercase tracking-[1.4px] rounded-none shadow-md active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  type="button"
+                  onClick={handleVerify}
+                  disabled={isVerifying}
+                  className="w-full h-[52px] bg-[#F2BA03] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  {isSubmitting ? (
-                    <span>SENDING SMS...</span>
+                  {isVerifying ? (
+                    <span>Verifying code...</span>
                   ) : (
                     <>
-                      <span>SEND OTP</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <Check className="w-4 h-4 stroke-[3]" />
+                      <span>Verify & Proceed</span>
                     </>
                   )}
                 </button>
-              ) : (
-                /* Inline OTP Entry */
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="block text-xs font-bold tracking-[1.2px] text-white uppercase">
-                      ENTER OTP CODE
-                    </label>
-                    <div className="flex justify-between gap-2">
-                      {otpDigits.map((digit, index) => (
-                        <input
-                          key={index}
-                          type="text"
-                          maxLength={1}
-                          value={digit}
-                          ref={(el) => (inputRefs.current[index] = el)}
-                          onChange={(e) => handleOtpChange(index, e.target.value)}
-                          onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                          className="w-full h-14 text-center text-xl font-bold bg-white/90 text-[#1B1C1C] rounded-none focus:outline-none focus:ring-2 focus:ring-[#F2BA03] transition-all"
-                        />
-                      ))}
-                    </div>
-                  </div>
 
-                  {errorMsg && (
-                    <p className="text-xs font-semibold text-rose-400">
-                      {errorMsg}
-                    </p>
+                <div className="flex items-center justify-between text-xs text-neutral-500">
+                  <span>Didn&apos;t receive code?</span>
+                  {timer > 0 ? (
+                    <span className="font-bold text-[#0F0F0F]">
+                      Resend in {timer}s
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={sendOtp}
+                      className="flex items-center gap-1 text-[#0F0F0F] font-bold hover:underline cursor-pointer"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
+                    </button>
                   )}
-
-                  <button
-                    type="button"
-                    onClick={handleVerify}
-                    disabled={isVerifying}
-                    className="w-full h-14 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-sm uppercase tracking-[1.4px] rounded-none shadow-md active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    {isVerifying ? (
-                      <span>VERIFYING CODE...</span>
-                    ) : (
-                      <>
-                        <Check className="w-4 h-4 stroke-[3]" />
-                        <span>VERIFY & PROCEED</span>
-                      </>
-                    )}
-                  </button>
-
-                  <div className="flex items-center justify-between text-xs text-white/50">
-                    <span>Didn&apos;t receive code?</span>
-                    {timer > 0 ? (
-                      <span className="font-bold text-[#F2BA03]">
-                        Resend in {timer}s
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={sendOtp}
-                        className="flex items-center gap-1 text-[#F2BA03] font-bold hover:underline cursor-pointer"
-                      >
-                        <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
-                      </button>
-                    )}
-                  </div>
                 </div>
-              )}
-
-              <div id={RECAPTCHA_CONTAINER_ID} />
-
-              {/* Contact Support */}
-              <div className="text-center text-sm text-white/50 font-normal">
-                Trouble logging in?{' '}
-                <button
-                  type="button"
-                  onClick={() => alert('Support team notified. We will reach out to your registered phone number.')}
-                  className="text-[#F2BA03] font-bold hover:underline cursor-pointer"
-                >
-                  Contact Support
-                </button>
               </div>
+            )}
 
-              {/* Terms disclaimer at bottom */}
-              <div className="text-center">
-                <p className="text-[10px] text-white/30 uppercase leading-[16px]">
-                  BY CONTINUING, YOU AGREE TO SCAN CONNECT&apos;S{' '}
-                  <span className="text-[#F2BA03] underline cursor-pointer">TERMS OF SERVICE</span> &{' '}
-                  <span className="text-[#F2BA03] underline cursor-pointer">PRIVACY POLICY</span>
-                </p>
-              </div>
-            </form>
+            <div id={RECAPTCHA_CONTAINER_ID} />
 
-          </div>
+            {/* Contact Support */}
+            <div className="text-center text-sm text-neutral-500 font-normal">
+              Trouble logging in?{' '}
+              <button
+                type="button"
+                onClick={() => alert('Support team notified. We will reach out to your registered phone number.')}
+                className="text-[#0F0F0F] font-bold hover:underline cursor-pointer"
+              >
+                Contact Support
+              </button>
+            </div>
+          </form>
         </div>
 
+        {/* Terms disclaimer at bottom */}
+        <p className="text-center text-xs text-white/70 mt-6 leading-relaxed">
+          By continuing, you agree to Scan Connect&apos;s{' '}
+          <a href="/terms" className="text-white font-semibold underline underline-offset-2">
+            Terms of Service
+          </a>{' '}
+          &amp;{' '}
+          <a href="/terms" className="text-white font-semibold underline underline-offset-2">
+            Privacy Policy
+          </a>
+        </p>
       </div>
     </div>
   );
