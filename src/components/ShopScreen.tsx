@@ -135,9 +135,20 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
     {
       id: 2,
       icon: Bike,
+      rating: '4.7/5 Customer Rating',
       title: 'Scan Connect Bike Tag',
       desc: 'Designed specifically for motorcycles and scooters with a compact, durable design that withstands all weather conditions.',
       idealFor: ['Motorcycles', 'Scooters', 'Electric Two-Wheelers'],
+      features: [
+        'Privacy-Protected Calls',
+        'Instant QR Scan',
+        'Compact Weatherproof Design',
+        'UV Resistant Premium Material',
+        'Secure Call Routing',
+        'Easy Self Activation',
+        'Lifetime QR Activation',
+        'No Battery Required',
+      ],
       price: 'Starting from ₹399',
       cta: 'View Product',
     },
@@ -156,6 +167,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       title: 'Home & Society QR Tags',
       desc: 'Enable visitors, security personnel, and neighbors to contact residents securely without exposing private phone numbers.',
       idealFor: ['Apartments', 'Villas', 'Gated Communities', 'Residential Complexes'],
+      price: 'Starting from ₹349',
       cta: 'View Product',
     },
   ];
@@ -525,10 +537,10 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch">
               {whyChoose.map((item) => (
-                <div key={item} className="flex items-start gap-2.5 bg-neutral-50/70 border border-neutral-200 rounded-xl p-4">
-                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] mt-0.5 shrink-0" />
+                <div key={item} className="h-full flex items-center gap-2.5 bg-neutral-50/70 border border-neutral-200 rounded-xl p-4">
+                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] shrink-0" />
                   <span className="text-sm font-semibold text-[#0F0F0F] leading-snug">{item}</span>
                 </div>
               ))}

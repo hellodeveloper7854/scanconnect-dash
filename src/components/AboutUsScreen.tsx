@@ -12,6 +12,9 @@ import {
   ParkingSquare,
   ArrowRight,
   ShieldCheck,
+  HeartHandshake,
+  BadgeCheck,
+  Clock,
 } from 'lucide-react';
 
 interface AboutUsScreenProps {
@@ -130,51 +133,84 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
-              {/* Pillar 1 */}
-              <div className="space-y-4">
-                <div className="w-11 h-11 rounded-lg bg-amber-50 flex items-center justify-center">
-                  <Lock className="w-5 h-5 text-[#F2BA03] fill-[#F2BA03]" />
-                </div>
-                <h3 className="text-xl font-bold text-[#0F0F0F]">
-                  Privacy by Default
-                </h3>
-                <p className="text-[#5D5F5F] text-base leading-relaxed">
-                  Your phone number is never shared or stored in plaintext. Everything we design ensures absolute privacy, keeping unwanted calls and scams at zero.
-                </p>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-5">
+              {[
+                {
+                  icon: Lock,
+                  title: 'Privacy by Default',
+                  desc: 'Your phone number is never shared or stored in plaintext. Everything we design ensures absolute privacy, keeping unwanted calls and scams at zero.',
+                  featured: true,
+                },
+                {
+                  icon: Zap,
+                  title: 'Instant & Frictionless',
+                  desc: 'No app downloads required for scanners. Anyone with a smartphone camera can scan the tag and alert you instantly.',
+                  featured: false,
+                },
+                {
+                  icon: Globe,
+                  title: 'Made in India',
+                  desc: 'Designed, manufactured, and supported locally by Creative Frame Works Pvt Ltd for fast-growing Indian cities.',
+                  featured: false,
+                },
+                {
+                  icon: ShieldCheck,
+                  title: 'Built to Last',
+                  desc: 'Weatherproof, UV-resistant tags. No batteries, no maintenance — just a tag that keeps working for years.',
+                  featured: true,
+                },
+                {
+                  icon: Clock,
+                  title: 'Always-On Support',
+                  desc: 'Our helpdesk and SOS response systems are available 24×7, never more than a call or message away.',
+                  featured: false,
+                },
+                {
+                  icon: HeartHandshake,
+                  title: 'Honest, Transparent Pricing',
+                  desc: 'One-time purchase, lifetime activation, no hidden subscriptions or renewal fees — ever.',
+                  featured: false,
+                },
+              ].map((pillar) => {
+                const PillarIcon = pillar.icon;
+                return (
+                  <div
+                    key={pillar.title}
+                    className={`group relative overflow-hidden rounded-2xl p-6 flex flex-col gap-4 transition-all hover:-translate-y-1 sm:col-span-1 lg:col-span-3 ${
+                      pillar.featured
+                        ? 'bg-[#1B1C1C] text-white shadow-[0_16px_40px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]'
+                        : 'bg-white border border-neutral-200 shadow-xs hover:shadow-lg hover:border-[#F2BA03]/50'
+                    }`}
+                  >
+                    {/* Decorative oversized watermark icon for visual variety */}
+                    <PillarIcon
+                      className={`absolute -right-4 -bottom-4 w-28 h-28 rotate-12 pointer-events-none transition-transform group-hover:rotate-6 ${
+                        pillar.featured ? 'text-white/[0.06]' : 'text-[#F2BA03]/[0.08]'
+                      }`}
+                    />
 
-              {/* Pillar 2 */}
-              <div className="space-y-4">
-                <div className="w-11 h-11 rounded-lg bg-amber-50 flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-[#F2BA03] fill-[#F2BA03]" />
-                </div>
-                <h3 className="text-xl font-bold text-[#0F0F0F]">
-                  Instant &amp; Frictionless
-                </h3>
-                <p className="text-[#5D5F5F] text-base leading-relaxed">
-                  No mobile app downloads required for scanners. Anyone with a smartphone camera can scan the tag and alert you instantly in urgent situations.
-                </p>
-              </div>
-
-              {/* Pillar 3 */}
-              <div className="space-y-4">
-                <div className="w-11 h-11 rounded-lg bg-amber-50 flex items-center justify-center">
-                  <Globe className="w-5 h-5 text-[#F2BA03]" />
-                </div>
-                <h3 className="text-xl font-bold text-[#0F0F0F]">
-                  Made in India
-                </h3>
-                <p className="text-[#5D5F5F] text-base leading-relaxed">
-                  Designed, manufactured, and supported locally by Creative Frame Works Pvt Ltd. Built to solve the real everyday parking challenges in fast-growing cities.
-                </p>
-              </div>
+                    <div
+                      className={`relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
+                        pillar.featured ? 'bg-[#F2BA03]' : 'bg-[#1B1C1C]'
+                      }`}
+                    >
+                      <PillarIcon className={`w-7 h-7 ${pillar.featured ? 'text-[#1B1C1C]' : 'text-[#F2BA03]'}`} />
+                    </div>
+                    <h3 className={`relative z-10 text-xl font-bold ${pillar.featured ? 'text-white' : 'text-[#0F0F0F]'}`}>
+                      {pillar.title}
+                    </h3>
+                    <p className={`relative z-10 text-base leading-relaxed ${pillar.featured ? 'text-neutral-300' : 'text-[#5D5F5F]'}`}>
+                      {pillar.desc}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
 
         {/* 4. CUSTOM SOLUTIONS SECTION */}
-        <section className="py-16 sm:py-20 bg-white border-t border-neutral-200/60">
+        <section className="pt-10 sm:pt-12 pb-16 sm:pb-20 bg-white border-t border-neutral-200/60">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-12">
               <h2 className="text-3xl sm:text-4xl font-black text-[#0F0F0F] tracking-tight font-sans">
