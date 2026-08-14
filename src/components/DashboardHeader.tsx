@@ -125,7 +125,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
             {/* Help / FAQ Icon — desktop only, moved into hamburger drawer on mobile */}
             <button
-              onClick={() => alert('ScanConnect Helpdesk:\nCall 080-473-59856 or email rj@Scan Connect.me for 24/7 driver support.')}
+              onClick={() => alert('ScanConnect Helpdesk:\nCall 080-473-59856 or email support@scanconnect.com for 24/7 driver support.')}
               className="hidden md:inline-flex p-2 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
               title="Support & FAQ"
             >
@@ -264,7 +264,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                alert('ScanConnect Helpdesk:\nCall 080-473-59856 or email rj@Scan Connect.me for 24/7 driver support.');
+                alert('ScanConnect Helpdesk:\nCall 080-473-59856 or email support@scanconnect.com for 24/7 driver support.');
               }}
               className="w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 flex items-center gap-2.5"
             >
