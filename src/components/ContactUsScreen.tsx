@@ -15,7 +15,9 @@ import {
   FileText,
   ExternalLink,
   Check,
-  ShieldCheck
+  ShieldCheck,
+  User,
+  ChevronDown
 } from 'lucide-react';
 
 interface ContactUsScreenProps {
@@ -27,7 +29,7 @@ interface ContactUsScreenProps {
 
 // Interactive Embedded Google Map for Greater Noida Head Office
 const GoogleMapEmbed = () => (
-  <div className="w-full h-full min-h-[260px] rounded-xl border border-[#E3E2E2] overflow-hidden relative shadow-sm group bg-neutral-100 flex flex-col">
+  <div className="w-full h-full min-h-[420px] rounded-xl border border-[#E3E2E2] overflow-hidden relative shadow-sm group bg-neutral-100 flex flex-col">
     {/* Map Header Bar matching Google Maps UI */}
     <div className="bg-white/95 backdrop-blur-md px-3.5 py-2 border-b border-neutral-200 flex items-center justify-between text-xs z-10 shadow-2xs">
       <div className="flex items-center gap-2">
@@ -176,7 +178,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
                 <div className="space-y-3 font-['Manrope',sans-serif] text-sm text-[#1B1C1C]">
                   <div>
-                    <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#735C00] uppercase block">
+                    <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
                       General Enquiries
                     </span>
                     <a href="mailto:info@scanconnect.com" className="block hover:text-[#F2BA03] transition-colors text-base">
@@ -184,7 +186,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     </a>
                   </div>
                   <div>
-                    <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#735C00] uppercase block">
+                    <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
                       Customer Support
                     </span>
                     <a href="mailto:support@scanconnect.com" className="block hover:text-[#F2BA03] transition-colors text-base">
@@ -192,7 +194,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     </a>
                   </div>
                   <div>
-                    <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#735C00] uppercase block">
+                    <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
                       Sales &amp; Business Partnerships
                     </span>
                     <a href="mailto:sales@scanconnect.com" className="block hover:text-[#F2BA03] transition-colors text-base">
@@ -219,7 +221,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     +91 99909 61299
                   </a>
                   <div className="pt-1">
-                    <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#735C00] uppercase block">
+                    <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
                       Support Hours
                     </span>
                     <p className="text-sm font-normal text-[#5F5E5E]">
@@ -234,16 +236,21 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               </div>
             </div>
 
-            {/* Card 3: Connect Module (Aligns on right column in top row or bottom row) */}
-            <div className="bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 flex flex-col justify-center items-center lg:items-start space-y-6 lg:row-start-2 lg:col-start-3">
+            {/* Card 3: Connect Module (sits in row 1 beside Email Us and Call Our Support Team) */}
+            <div className="bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 flex flex-col items-center lg:items-start space-y-6">
               <div className="w-10 h-10 bg-[#F2BA03] rounded-lg text-white flex items-center justify-center shrink-0">
                 <Share2 className="w-5 h-5 text-white stroke-[2.2]" />
               </div>
 
               <div className="space-y-6 text-center lg:text-left w-full">
-                <h3 className="font-['Noto_Serif',serif] font-semibold text-2xl text-[#1B1C1C]">
-                  Connect
-                </h3>
+                <div className="space-y-2">
+                  <h3 className="font-['Noto_Serif',serif] font-semibold text-2xl text-[#1B1C1C]">
+                    Connect
+                  </h3>
+                  <p className="font-['Manrope',sans-serif] text-sm text-[#5F5E5E]">
+                    Reach us instantly through live chat, our web portal, social handles, or review our terms &amp; conditions.
+                  </p>
+                </div>
 
                 {/* 4 Square Social / Action Buttons matching Image 4 */}
                 <div className="flex items-center justify-center lg:justify-start gap-4 pt-1">
@@ -291,9 +298,9 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 <MapPin className="w-5 h-5 text-white stroke-[2.2]" />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-                {/* Left Side Office Addresses */}
-                <div className="space-y-6 flex flex-col justify-between">
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
+                {/* Office Addresses */}
+                <div className="lg:col-span-2 space-y-6 flex flex-col justify-between">
                   <h3 className="font-['Noto_Serif',serif] font-semibold text-2xl text-[#1B1C1C]">
                     Visit Our Offices
                   </h3>
@@ -301,7 +308,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                   <div className="space-y-6">
                     {/* Corporate Head Office */}
                     <div className="space-y-1.5">
-                      <h4 className="font-['Manrope',sans-serif] font-semibold text-sm tracking-[0.7px] text-[#735C00] uppercase">
+                      <h4 className="font-['Manrope',sans-serif] font-semibold text-sm tracking-[0.7px] text-[#9CA3AF] uppercase">
                         Corporate Head Office
                       </h4>
                       <p className="font-['Manrope',sans-serif] font-normal text-base text-[#1B1C1C] leading-relaxed">
@@ -316,7 +323,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
                     {/* Kolkata Branch Office */}
                     <div className="space-y-1.5">
-                      <h4 className="font-['Manrope',sans-serif] font-semibold text-sm tracking-[0.7px] text-[#735C00] uppercase">
+                      <h4 className="font-['Manrope',sans-serif] font-semibold text-sm tracking-[0.7px] text-[#9CA3AF] uppercase">
                         Kolkata Branch Office
                       </h4>
                       <p className="font-['Manrope',sans-serif] font-normal text-base text-[#1B1C1C] leading-relaxed">
@@ -338,8 +345,8 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                   </div>
                 </div>
 
-                {/* Right Side Interactive Embedded Google Map */}
-                <div className="w-full h-full min-h-[260px]">
+                {/* Interactive Embedded Google Map — same row as addresses on laptop/desktop, wider column and taller than before */}
+                <div className="lg:col-span-3 w-full h-[420px]">
                   <GoogleMapEmbed />
                 </div>
               </div>
@@ -350,7 +357,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
         </div>
 
         {/* SECTION 3: DIRECT INQUIRY FORM SECTION (Image 3 & CSS Specs) */}
-        <div className="mt-20 bg-[rgba(245,243,243,0.3)] border-t border-[#E3E2E2] py-16 px-4 sm:px-6 lg:px-8">
+        <div className="mt-12 bg-[rgba(245,243,243,0.3)] border-t border-[#E3E2E2] py-16 px-4 sm:px-6 lg:px-8">
           <div className="max-w-[768px] mx-auto bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 sm:p-12 space-y-8">
             
             {/* Form Title */}
@@ -370,88 +377,104 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Full Name */}
                 <div className="space-y-2">
-                  <label className="block font-['Manrope',sans-serif] font-medium text-xs text-[#4D4635] uppercase">
-                    FULL NAME
+                  <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
+                    Full Name <span className="text-[#F2BA03]">*</span>
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Enter your full name"
-                    className="w-full h-[51px] bg-[#F5F3F3] px-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all rounded-none"
-                  />
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
+                    <input
+                      type="text"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Enter your full name"
+                      className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all rounded-none"
+                    />
+                  </div>
                 </div>
 
                 {/* Email Address */}
                 <div className="space-y-2">
-                  <label className="block font-['Manrope',sans-serif] font-medium text-xs text-[#4D4635] uppercase">
-                    EMAIL ADDRESS
+                  <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
+                    Email Address <span className="text-[#F2BA03]">*</span>
                   </label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    placeholder="Enter your email address"
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-[51px] bg-[#F5F3F3] px-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all rounded-none"
-                  />
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      placeholder="Enter your email address"
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all rounded-none"
+                    />
+                  </div>
                 </div>
               </div>
 
               {/* Phone Number (Optional) */}
               <div className="space-y-2">
-                <label className="block font-['Manrope',sans-serif] font-medium text-xs text-[#4D4635] uppercase">
-                  PHONE NUMBER (OPTIONAL)
+                <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
+                  Phone Number <span className="text-[#9CA3AF] font-medium normal-case">(Optional)</span>
                 </label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Enter your contact number"
-                  className="w-full h-[51px] bg-[#F5F3F3] px-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all rounded-none"
-                />
+                <div className="relative">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Enter your contact number"
+                    className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all rounded-none"
+                  />
+                </div>
               </div>
 
               {/* Subject Dropdown */}
               <div className="space-y-2">
-                <label className="block font-['Manrope',sans-serif] font-medium text-xs text-[#4D4635] uppercase">
-                  SUBJECT
+                <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
+                  Subject <span className="text-[#F2BA03]">*</span>
                 </label>
-                <select
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  className="w-full h-[51px] bg-[#F5F3F3] px-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none cursor-pointer transition-all rounded-none"
-                >
-                  <option value="General Enquiry">General Enquiry</option>
-                  <option value="Product Information">Product Information</option>
-                  <option value="Technical Support">Technical Support</option>
-                  <option value="Order & Delivery">Order &amp; Delivery</option>
-                  <option value="Activation Support">Activation Support</option>
-                  <option value="Bulk Orders">Bulk Orders</option>
-                  <option value="Business Partnership">Business Partnership</option>
-                  <option value="Reseller Program">Reseller Program</option>
-                  <option value="Franchise Enquiry">Franchise Enquiry</option>
-                  <option value="Feedback">Feedback</option>
-                  <option value="Other">Other</option>
-                </select>
+                <div className="relative">
+                  <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
+                  <select
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none cursor-pointer transition-all rounded-none appearance-none"
+                  >
+                    <option value="General Enquiry">General Enquiry</option>
+                    <option value="Product Information">Product Information</option>
+                    <option value="Technical Support">Technical Support</option>
+                    <option value="Order & Delivery">Order &amp; Delivery</option>
+                    <option value="Activation Support">Activation Support</option>
+                    <option value="Bulk Orders">Bulk Orders</option>
+                    <option value="Business Partnership">Business Partnership</option>
+                    <option value="Reseller Program">Reseller Program</option>
+                    <option value="Franchise Enquiry">Franchise Enquiry</option>
+                    <option value="Feedback">Feedback</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
+                </div>
               </div>
 
               {/* Message Textarea */}
               <div className="space-y-2">
-                <label className="block font-['Manrope',sans-serif] font-medium text-xs text-[#4D4635] uppercase">
-                  MESSAGE
+                <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
+                  Message <span className="text-[#F2BA03]">*</span>
                 </label>
                 <p className="font-['Manrope',sans-serif] text-xs text-[#5F5E5E]">
                   Tell us how we can help you. Please provide as much detail as possible so our team can assist you efficiently.
                 </p>
-                <textarea
-                  rows={5}
-                  required
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="w-full h-[147px] bg-[#F5F3F3] p-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none resize-none transition-all rounded-none"
-                />
+                <div className="relative">
+                  <MessageSquare className="absolute left-4 top-4 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
+                  <textarea
+                    rows={5}
+                    required
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className="w-full h-[147px] bg-[#F5F3F3] pl-11 pr-4 py-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none resize-none transition-all rounded-none"
+                  />
+                </div>
               </div>
 
               {/* Consent Checkbox */}
@@ -479,8 +502,8 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               </button>
 
               {/* Confidentiality Footer Note */}
-              <div className="flex items-center justify-center gap-2 text-xs font-['Manrope',sans-serif] font-medium text-[#4D4635] pt-1">
-                <Lock className="w-3.5 h-3.5 text-[#4D4635]" />
+              <div className="flex items-center justify-center gap-2 text-xs font-['Manrope',sans-serif] font-medium text-[#5F5E5E] pt-1">
+                <Lock className="w-3.5 h-3.5 text-[#5F5E5E]" />
                 <span>Your information is secure and confidential.</span>
               </div>
 
