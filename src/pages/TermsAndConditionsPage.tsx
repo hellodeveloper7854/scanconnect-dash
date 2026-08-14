@@ -87,7 +87,18 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '5. QR Tag Usage',
+    title: '5. Product Validity & Warranty',
+    body: (
+      <>
+        <p>
+          Each Scan Connect QR tag carries a validity period of 10 years from the date of activation, covering
+          manufacturing defects under normal use.
+        </p>
+      </>
+    ),
+  },
+  {
+    title: '6. QR Tag Usage',
     body: (
       <>
         <p>The QR tag should be installed according to the instructions provided with the product.</p>
@@ -104,7 +115,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '6. Privacy & Number Protection',
+    title: '7. Privacy & Number Protection',
     body: (
       <>
         <p>Privacy is a core feature of Scan Connect.</p>
@@ -126,7 +137,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '7. Calls, SMS & WhatsApp Communication',
+    title: '8. Calls, SMS & WhatsApp Communication',
     body: (
       <>
         <p>
@@ -153,7 +164,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '8. SOS & Emergency Features',
+    title: '9. SOS & Emergency Features',
     body: (
       <>
         <p>
@@ -179,7 +190,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '9. Product Information & Pricing',
+    title: '10. Product Information & Pricing',
     body: (
       <>
         <p>
@@ -196,7 +207,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '10. Orders & Payments',
+    title: '11. Orders & Payments',
     body: (
       <>
         <p>An order is considered successfully placed only after payment authorization and order confirmation.</p>
@@ -218,7 +229,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '11. Intellectual Property',
+    title: '12. Intellectual Property',
     body: (
       <>
         <p>All content available through Scan Connect, including:</p>
@@ -245,7 +256,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '12. Prohibited Activities',
+    title: '13. Prohibited Activities',
     body: (
       <>
         <p>You agree not to:</p>
@@ -266,7 +277,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '13. Third-Party Services',
+    title: '14. Third-Party Services',
     body: (
       <>
         <p>
@@ -282,7 +293,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '14. Service Availability',
+    title: '15. Service Availability',
     body: (
       <>
         <p>We aim to maintain reliable Services but do not guarantee uninterrupted or error-free operation.</p>
@@ -302,7 +313,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '15. Limitation of Liability',
+    title: '16. Limitation of Liability',
     body: (
       <>
         <p>
@@ -325,7 +336,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '16. Indemnification',
+    title: '17. Indemnification',
     body: (
       <>
         <p>
@@ -344,7 +355,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '17. Termination',
+    title: '18. Termination',
     body: (
       <>
         <p>We may suspend or terminate access to the Services where we reasonably believe that:</p>
@@ -360,7 +371,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '18. Changes to These Terms',
+    title: '19. Changes to These Terms',
     body: (
       <>
         <p>We may update these Terms from time to time.</p>
@@ -373,7 +384,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '19. Governing Law & Jurisdiction',
+    title: '20. Governing Law & Jurisdiction',
     body: (
       <>
         <p>These Terms shall be governed by the laws applicable in India.</p>
@@ -385,7 +396,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '20. Contact Us',
+    title: '21. Contact Us',
     body: (
       <>
         <p>For questions regarding these Terms, please contact:</p>
