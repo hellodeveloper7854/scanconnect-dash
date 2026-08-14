@@ -300,7 +300,74 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 2. HOW IT WORKS SECTION */}
+        {/* 2. WHY CHOOSE SCAN CONNECT SECTION */}
+        <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
+          <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-5">
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
+                  WHY CHOOSE SCAN CONNECT?
+                </span>
+                <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[40px] tracking-tight text-[#1B1C1C] leading-tight">
+                  Privacy Meets Convenience
+                </h2>
+                <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
+                  Traditional parking contact stickers expose your personal phone number to everyone. Scan Connect changes that.
+                </p>
+                <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
+                  Your vehicle becomes instantly reachable while your identity stays protected through our secure communication platform.
+                </p>
+              </div>
+
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-10 shadow-xs space-y-4">
+                <p className="font-['Hanken_Grotesk'] font-bold text-base text-[#1B1C1C]">
+                  Whether it&apos;s:
+                </p>
+                {whyChooseScenarios.map((item) => (
+                  <div key={item} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-[#F2BA03]/15 flex items-center justify-center shrink-0">
+                      <Check className="w-3.5 h-3.5 text-[#F2BA03] stroke-[3]" />
+                    </div>
+                    <span className="font-['Hanken_Grotesk'] font-medium text-base text-[#1B1C1C]">{item}</span>
+                  </div>
+                ))}
+                <p className="font-['Hanken_Grotesk'] font-semibold text-sm text-[#5F5E5E] pt-3 border-t border-neutral-100">
+                  People can reach you instantly without compromising your privacy.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        {/* 2b. WHY THOUSANDS CHOOSE SCAN CONNECT SECTION */}
+        <section className="py-20 bg-[#FAFAFA]">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+            <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
+                WHY THOUSANDS CHOOSE SCAN CONNECT
+              </span>
+              <h2 className="font-['Rubik'] font-bold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
+                One Purchase. Lifetime Peace of Mind.
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
+              {thousandsChooseBenefits.map((benefit) => (
+                <div
+                  key={benefit}
+                  className="bg-white border border-[#E5E7EB] rounded-xl p-5 flex items-start gap-3 shadow-xs"
+                >
+                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] mt-0.5 shrink-0" />
+                  <span className="font-['Hanken_Grotesk'] font-medium text-sm text-[#1B1C1C] leading-snug">{benefit}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+        {/* 3. HOW IT WORKS SECTION */}
         <section id="how-it-works" className="py-20 bg-white">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
             <RevealCard className="text-center max-w-2xl mx-auto mb-14 space-y-3">
@@ -359,7 +426,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 3. VIDEO SECTION */}
+        {/* 3b. VIDEO SECTION */}
         <section className="py-20 bg-white relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
             <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
@@ -389,7 +456,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 4. ABOUT SCAN CONNECT SECTION */}
+        {/* 3c. ABOUT SCAN CONNECT SECTION */}
         <section className="py-20 bg-white">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
             <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
@@ -413,99 +480,137 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 5. WHY CHOOSE SCAN CONNECT SECTION */}
+        {/* 4. CUSTOMER BENEFITS SECTION */}
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
-          <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-5">
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                  WHY CHOOSE SCAN CONNECT?
-                </span>
-                <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[40px] tracking-tight text-[#1B1C1C] leading-tight">
-                  Privacy Meets Convenience
-                </h2>
-                <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
-                  Traditional parking contact stickers expose your personal phone number to everyone. Scan Connect changes that.
-                </p>
-                <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
-                  Your vehicle becomes instantly reachable while your identity stays protected through our secure communication platform.
-                </p>
-              </div>
-
-              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-10 shadow-xs space-y-4">
-                <p className="font-['Hanken_Grotesk'] font-bold text-base text-[#1B1C1C]">
-                  Whether it&apos;s:
-                </p>
-                {whyChooseScenarios.map((item) => (
-                  <div key={item} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-[#F2BA03]/15 flex items-center justify-center shrink-0">
-                      <Check className="w-3.5 h-3.5 text-[#F2BA03] stroke-[3]" />
-                    </div>
-                    <span className="font-['Hanken_Grotesk'] font-medium text-base text-[#1B1C1C]">{item}</span>
-                  </div>
-                ))}
-                <p className="font-['Hanken_Grotesk'] font-semibold text-sm text-[#5F5E5E] pt-3 border-t border-neutral-100">
-                  People can reach you instantly without compromising your privacy.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-
-        {/* GUIDES & ARTICLES SECTION */}
-        <section className="py-16 sm:py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-            <div className="flex items-center justify-between">
-              <h2 className="font-['Plus_Jakarta_Sans'] font-black text-3xl sm:text-4xl text-neutral-900 tracking-tight">
-                Guides & articles
+          <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
+            <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
+                CUSTOMER BENEFITS
+              </span>
+              <h2 className="font-['Rubik'] font-semibold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
+                More Than Just a QR Sticker
               </h2>
-              <a
-                href="/blog"
-                className="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4"
-              >
-                View more
-                <ArrowRight className="w-4 h-4" />
-              </a>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {BLOG_POSTS.slice(0, 3).map((post) => (
-                <a
-                  key={post.slug}
-                  href={`/blog/${post.slug}`}
-                  className="group bg-white rounded-2xl border border-neutral-200/60 overflow-hidden hover:shadow-lg transition-shadow"
-                >
-                  <div className="h-[180px] bg-neutral-100 flex items-center justify-center text-neutral-400 text-xs font-semibold px-4 text-center">
-                    {post.title}
-                  </div>
-                  <div className="p-6 space-y-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-neutral-400">{post.date}</p>
-                    <h3 className="text-xl font-black text-neutral-900 leading-snug group-hover:text-[#F2BA03] transition-colors">
-                      {post.title}
-                    </h3>
-                    <p className="text-sm text-neutral-500 line-clamp-2">{post.excerpt}</p>
-                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4">
-                      Read article
-                      <ArrowRight className="w-4 h-4" />
-                    </span>
-                  </div>
-                </a>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {customerBenefits.map((benefit) => (
+                <div key={benefit} className="flex items-center gap-3 bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs">
+                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] shrink-0" />
+                  <span className="font-['Hanken_Grotesk'] font-medium text-sm sm:text-base text-[#1B1C1C]">{benefit}</span>
+                </div>
               ))}
             </div>
-
-            <a
-              href="/blog"
-              className="sm:hidden inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4"
-            >
-              View more
-              <ArrowRight className="w-4 h-4" />
-            </a>
           </div>
         </section>
 
 
-        {/* 6. SOS EMERGENCY ASSISTANCE SECTION */}
+        {/* 5. INDUSTRIES WE SERVE SECTION */}
+        <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+            <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
+                INDUSTRIES WE SERVE
+              </span>
+              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
+                Smart Mobility Solutions for Every Parking Ecosystem
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {industries.map((ind) => {
+                const IconComp = ind.icon;
+                return (
+                  <div
+                    key={ind.id}
+                    className="bg-white border border-[#E5E7EB] rounded-2xl p-7 hover:shadow-lg transition-all flex flex-col justify-between space-y-5"
+                  >
+                    <div className="space-y-4">
+                      <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#F2BA03]">
+                        <IconComp className="w-6 h-6 stroke-[2.2]" />
+                      </div>
+                      <h3 className="font-['Plus_Jakarta_Sans'] font-semibold text-lg text-[#1B1C1C] leading-snug">
+                        {ind.title}
+                      </h3>
+                      <p className="font-['Hanken_Grotesk'] font-normal text-sm text-[#6B7280] leading-[22px]">
+                        {ind.desc}
+                      </p>
+                      <div className="pt-2 space-y-1.5">
+                        <span className="text-[10px] font-bold tracking-widest text-[#9CA3AF] uppercase block">
+                          Benefits
+                        </span>
+                        {ind.benefits.map((b) => (
+                          <div key={b} className="flex items-center gap-2">
+                            <Check className="w-3.5 h-3.5 text-[#F2BA03] stroke-[3] shrink-0" />
+                            <span className="font-['Hanken_Grotesk'] text-[#1B1C1C] text-sm">{b}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+
+        {/* 6. SMART VEHICLE SERVICES SECTION */}
+        <section className="py-20 bg-white border-t border-neutral-100">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+            <div className="flex items-center justify-between mb-4">
+              <div className="space-y-2">
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
+                  SMART VEHICLE SERVICES
+                </span>
+                <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-[38px] text-[#1B1C1C]">
+                  Everything Your Vehicle Needs in One Place
+                </h2>
+              </div>
+
+              <div className="hidden sm:flex items-center gap-2">
+                <button
+                  onClick={() => alert('Previous services batch')}
+                  className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => alert('Next services batch')}
+                  className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] max-w-2xl mb-12">
+              Access useful automotive services directly from the Scan Connect ecosystem.
+            </p>
+
+            {/* 8 Service Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {vehicleServices.map((svc) => {
+                return (
+                  <button
+                    key={svc.id}
+                    onClick={() => setSelectedService(svc.id)}
+                    className="bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-10 shadow-xs hover:shadow-md hover:border-[#F2BA03] transition-all flex flex-col items-center justify-center text-center space-y-4 group cursor-pointer"
+                  >
+                    <div className="group-hover:scale-110 transition-transform flex items-center justify-center h-16">
+                      <img src={svc.image} alt={svc.title} className="h-16 w-auto object-contain" />
+                    </div>
+
+                    <h3 className="font-['Plus_Jakarta_Sans','Rubik',sans-serif] font-bold text-lg sm:text-xl text-[#111827] leading-snug">
+                      {svc.title}
+                    </h3>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+
+        {/* 7. SOS EMERGENCY ASSISTANCE SECTION */}
         <section className="py-20 bg-[#1B1C1C] text-white relative overflow-hidden">
           <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-[#F2BA03]/10 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-[28rem] h-[28rem] bg-red-500/10 rounded-full blur-[140px] pointer-events-none translate-x-1/3 translate-y-1/3" />
@@ -600,140 +705,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 7. WHY THOUSANDS CHOOSE SCAN CONNECT SECTION */}
-        <section className="py-20 bg-[#FAFAFA]">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                WHY THOUSANDS CHOOSE SCAN CONNECT
-              </span>
-              <h2 className="font-['Rubik'] font-bold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
-                One Purchase. Lifetime Peace of Mind.
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
-              {thousandsChooseBenefits.map((benefit) => (
-                <div
-                  key={benefit}
-                  className="bg-white border border-[#E5E7EB] rounded-xl p-5 flex items-start gap-3 shadow-xs"
-                >
-                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] mt-0.5 shrink-0" />
-                  <span className="font-['Hanken_Grotesk'] font-medium text-sm text-[#1B1C1C] leading-snug">{benefit}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-
-        {/* 8. SMART VEHICLE SERVICES SECTION */}
-        <section className="py-20 bg-white border-t border-neutral-100">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="flex items-center justify-between mb-4">
-              <div className="space-y-2">
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                  SMART VEHICLE SERVICES
-                </span>
-                <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-[38px] text-[#1B1C1C]">
-                  Everything Your Vehicle Needs in One Place
-                </h2>
-              </div>
-
-              <div className="hidden sm:flex items-center gap-2">
-                <button
-                  onClick={() => alert('Previous services batch')}
-                  className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => alert('Next services batch')}
-                  className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] max-w-2xl mb-12">
-              Access useful automotive services directly from the Scan Connect ecosystem.
-            </p>
-
-            {/* 8 Service Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {vehicleServices.map((svc) => {
-                return (
-                  <button
-                    key={svc.id}
-                    onClick={() => setSelectedService(svc.id)}
-                    className="bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-10 shadow-xs hover:shadow-md hover:border-[#F2BA03] transition-all flex flex-col items-center justify-center text-center space-y-4 group cursor-pointer"
-                  >
-                    <div className="group-hover:scale-110 transition-transform flex items-center justify-center h-16">
-                      <img src={svc.image} alt={svc.title} className="h-16 w-auto object-contain" />
-                    </div>
-
-                    <h3 className="font-['Plus_Jakarta_Sans','Rubik',sans-serif] font-bold text-lg sm:text-xl text-[#111827] leading-snug">
-                      {svc.title}
-                    </h3>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-
-        {/* 9. INDUSTRIES WE SERVE SECTION */}
-        <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                INDUSTRIES WE SERVE
-              </span>
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
-                Smart Mobility Solutions for Every Parking Ecosystem
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {industries.map((ind) => {
-                const IconComp = ind.icon;
-                return (
-                  <div
-                    key={ind.id}
-                    className="bg-white border border-[#E5E7EB] rounded-2xl p-7 hover:shadow-lg transition-all flex flex-col justify-between space-y-5"
-                  >
-                    <div className="space-y-4">
-                      <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#F2BA03]">
-                        <IconComp className="w-6 h-6 stroke-[2.2]" />
-                      </div>
-                      <h3 className="font-['Plus_Jakarta_Sans'] font-semibold text-lg text-[#1B1C1C] leading-snug">
-                        {ind.title}
-                      </h3>
-                      <p className="font-['Hanken_Grotesk'] font-normal text-sm text-[#6B7280] leading-[22px]">
-                        {ind.desc}
-                      </p>
-                      <div className="pt-2 space-y-1.5">
-                        <span className="text-[10px] font-bold tracking-widest text-[#9CA3AF] uppercase block">
-                          Benefits
-                        </span>
-                        {ind.benefits.map((b) => (
-                          <div key={b} className="flex items-center gap-2">
-                            <Check className="w-3.5 h-3.5 text-[#F2BA03] stroke-[3] shrink-0" />
-                            <span className="font-['Hanken_Grotesk'] text-[#1B1C1C] text-sm">{b}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-
-        {/* 10. SOS EMERGENCY ASSISTANCE SECTION (SECOND) */}
+        {/* 7b. SOS EMERGENCY ASSISTANCE SECTION (SECOND) */}
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#F2BA03]/40">
@@ -774,31 +746,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 11. CUSTOMER BENEFITS SECTION */}
-        <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
-          <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                CUSTOMER BENEFITS
-              </span>
-              <h2 className="font-['Rubik'] font-semibold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
-                More Than Just a QR Sticker
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {customerBenefits.map((benefit) => (
-                <div key={benefit} className="flex items-center gap-3 bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs">
-                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] shrink-0" />
-                  <span className="font-['Hanken_Grotesk'] font-medium text-sm sm:text-base text-[#1B1C1C]">{benefit}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-
-        {/* 12. DOWNLOAD THE APP SECTION */}
+        {/* 8. DOWNLOAD THE APP SECTION */}
         <section className="py-20 bg-white border-t border-neutral-100">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -853,7 +801,59 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 13. ABOUT COMPANY SECTION */}
+        {/* 9. SOCIAL PROOF — GUIDES & ARTICLES SECTION */}
+        <section className="py-16 sm:py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <div className="flex items-center justify-between">
+              <h2 className="font-['Plus_Jakarta_Sans'] font-black text-3xl sm:text-4xl text-neutral-900 tracking-tight">
+                Guides & articles
+              </h2>
+              <a
+                href="/blog"
+                className="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4"
+              >
+                View more
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {BLOG_POSTS.slice(0, 3).map((post) => (
+                <a
+                  key={post.slug}
+                  href={`/blog/${post.slug}`}
+                  className="group bg-white rounded-2xl border border-neutral-200/60 overflow-hidden hover:shadow-lg transition-shadow"
+                >
+                  <div className="h-[180px] bg-neutral-100 flex items-center justify-center text-neutral-400 text-xs font-semibold px-4 text-center">
+                    {post.title}
+                  </div>
+                  <div className="p-6 space-y-3">
+                    <p className="text-xs font-bold uppercase tracking-wide text-neutral-400">{post.date}</p>
+                    <h3 className="text-xl font-black text-neutral-900 leading-snug group-hover:text-[#F2BA03] transition-colors">
+                      {post.title}
+                    </h3>
+                    <p className="text-sm text-neutral-500 line-clamp-2">{post.excerpt}</p>
+                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4">
+                      Read article
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </div>
+                </a>
+              ))}
+            </div>
+
+            <a
+              href="/blog"
+              className="sm:hidden inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4"
+            >
+              View more
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+        </section>
+
+
+        {/* 10. ABOUT COMPANY SECTION */}
         <section className="py-20 bg-[#1B1C1C] text-white">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-5">
             <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
@@ -872,7 +872,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 14. CTA SECTION */}
+        {/* 11. CTA SECTION */}
         <section className="py-20 bg-white border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
