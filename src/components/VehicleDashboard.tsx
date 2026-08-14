@@ -880,7 +880,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                   DOWNLOAD THE APP
                 </span>
 
-                <h2 className="font-['Comic_Relief','Comic_Sans_MS',cursive] font-bold text-3xl sm:text-4xl lg:text-5xl text-[#1A1A1A] leading-[40px]">
+                <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[40px] text-[#1A1A1A] tracking-tight leading-tight">
                   Manage Your Vehicle Anytime
                 </h2>
 
