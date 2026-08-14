@@ -27,7 +27,15 @@ import {
   Globe2,
   ArrowRight,
   Plane,
-  GraduationCap
+  GraduationCap,
+  Fuel,
+  Shield,
+  HeartPulse,
+  Wrench,
+  FileWarning,
+  Car,
+  IdCard,
+  Zap
 } from 'lucide-react';
 import { BLOG_POSTS } from '../lib/blogPosts';
 import { useRevealOnScroll } from '../lib/useRevealOnScroll';
@@ -37,14 +45,6 @@ import videoWalkImg from '../assets/images/howitworks/videowalkimg.png'
 import tutorialVideoPreviewImg from '../assets/images/howitworks/tutorialvideopreview.png'
 import appStoreImg from '../assets/images/howitworks/appstore.png'
 import playStoreImg from '../assets/images/howitworks/playstore.png'
-import fuelStationImg from '../assets/images/howitworks/services/Fuel Station.png'
-import policeStationImg from '../assets/images/howitworks/services/Police Station.png'
-import hospitalCareImg from '../assets/images/howitworks/services/Hospital Care.png'
-import punctureShopImg from '../assets/images/howitworks/services/Puncture Shop.png'
-import rechargeFastagImg from '../assets/images/howitworks/services/Recharge FASTag.png'
-import trafficChallanImg from '../assets/images/howitworks/services/Traffic Challan.png'
-import vehicleDetailsImg from '../assets/images/howitworks/services/Vehicle Details.png'
-import licenceDetailsImg from '../assets/images/howitworks/services/Licence Details.png'
 
 interface VehicleDashboardProps {
   userData: UserFormData;
@@ -88,6 +88,22 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
   const [scannedTagId, setScannedTagId] = useState('');
   const [isScanSuccess, setIsScanSuccess] = useState(false);
+  const [servicesPerView, setServicesPerView] = useState(4);
+  const [servicesPage, setServicesPage] = useState(0);
+
+  // Cards-per-view tracks the same breakpoints as the services grid
+  // (1 col on mobile, 2 on sm, 4 on lg) so the carousel paging matches what's visible.
+  React.useEffect(() => {
+    const computePerView = () => {
+      if (window.innerWidth >= 1024) return 4;
+      if (window.innerWidth >= 640) return 2;
+      return 1;
+    };
+    const onResize = () => setServicesPerView(computePerView());
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   // Why Choose Scan Connect — situations list
   const whyChooseScenarios = [
@@ -148,16 +164,16 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
     { label: 'Works 24×7', core: false },
   ];
 
-  // Smart Vehicle Services with Custom SVG Icons
+  // Smart Vehicle Services
   const vehicleServices = [
-    { id: 'fuel', title: 'Nearby Fuel Stations', image: fuelStationImg, detail: 'Find nearest petrol, diesel & EV charging pumps near your vehicle location.' },
-    { id: 'police', title: 'Police Assistance', image: policeStationImg, detail: 'Instant contact numbers & directions for nearest traffic and city police stations.' },
-    { id: 'hospital', title: 'Hospitals & Emergency Care', image: hospitalCareImg, detail: 'Emergency trauma centers & ambulance contacts available 24/7.' },
-    { id: 'puncture', title: 'Tyre & Puncture Repair', image: punctureShopImg, detail: '24x7 roadside tyre repair, puncture fix & battery jumpstart services.' },
-    { id: 'fastag', title: 'FASTag Recharge', image: rechargeFastagImg, detail: 'Instant FASTag balance check & toll recharge via UPI/Netbanking.' },
-    { id: 'challan', title: 'Traffic Challan Check', image: trafficChallanImg, detail: 'Check pending traffic fines & pay challans online instantly by VIN.' },
-    { id: 'vehicle', title: 'Vehicle Information', image: vehicleDetailsImg, detail: 'Verify RTO RC status, insurance expiry & vehicle ownership details.' },
-    { id: 'licence', title: 'Driving Licence Verification', image: licenceDetailsImg, detail: 'Check DL validity, endorsement records & renewal timelines.' },
+    { id: 'fuel', title: 'Nearby Fuel Stations', icon: Fuel, detail: 'Find nearest petrol, diesel & EV charging pumps near your vehicle location.' },
+    { id: 'police', title: 'Police Assistance', icon: Shield, detail: 'Instant contact numbers & directions for nearest traffic and city police stations.' },
+    { id: 'hospital', title: 'Hospitals & Emergency Care', icon: HeartPulse, detail: 'Emergency trauma centers & ambulance contacts available 24/7.' },
+    { id: 'puncture', title: 'Tyre & Puncture Repair', icon: Wrench, detail: '24x7 roadside tyre repair, puncture fix & battery jumpstart services.' },
+    { id: 'fastag', title: 'FASTag Recharge', icon: Zap, detail: 'Instant FASTag balance check & toll recharge via UPI/Netbanking.' },
+    { id: 'challan', title: 'Traffic Challan Check', icon: FileWarning, detail: 'Check pending traffic fines & pay challans online instantly by VIN.' },
+    { id: 'vehicle', title: 'Vehicle Information', icon: Car, detail: 'Verify RTO RC status, insurance expiry & vehicle ownership details.' },
+    { id: 'licence', title: 'Driving Licence Verification', icon: IdCard, detail: 'Check DL validity, endorsement records & renewal timelines.' },
   ];
 
   // Industries We Serve — 6 industries with benefits sub-lists
@@ -574,55 +590,110 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         {/* 6. SMART VEHICLE SERVICES SECTION */}
         <section className="py-20 bg-white border-t border-neutral-100">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="flex items-center justify-between mb-4">
-              <div className="space-y-2">
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                  SMART VEHICLE SERVICES
-                </span>
-                <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-[38px] text-[#1B1C1C]">
-                  Everything Your Vehicle Needs in One Place
-                </h2>
-              </div>
+            {(() => {
+              const totalPages = Math.max(1, Math.ceil(vehicleServices.length / servicesPerView));
+              const currentPage = Math.min(servicesPage, totalPages - 1);
+              const goToPage = (page: number) => setServicesPage(((page % totalPages) + totalPages) % totalPages);
 
-              <div className="hidden sm:flex items-center gap-2">
-                <button
-                  onClick={() => alert('Previous services batch')}
-                  className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => alert('Next services batch')}
-                  className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] max-w-2xl mb-12">
-              Access useful automotive services directly from the Scan Connect ecosystem.
-            </p>
-
-            {/* 8 Service Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {vehicleServices.map((svc) => {
-                return (
-                  <button
-                    key={svc.id}
-                    onClick={() => setSelectedService(svc.id)}
-                    className="bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-10 shadow-xs hover:shadow-md hover:border-[#F2BA03] transition-all flex flex-col items-center justify-center text-center space-y-4 group cursor-pointer"
-                  >
-                    <div className="group-hover:scale-110 transition-transform flex items-center justify-center h-16">
-                      <img src={svc.image} alt={svc.title} className="h-16 w-auto object-contain" />
+              return (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="space-y-2">
+                      <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
+                        SMART VEHICLE SERVICES
+                      </span>
+                      <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-[38px] text-[#1B1C1C]">
+                        Everything Your Vehicle Needs in One Place
+                      </h2>
                     </div>
 
-                    <h3 className="font-['Plus_Jakarta_Sans','Rubik',sans-serif] font-bold text-lg sm:text-xl text-[#111827] leading-snug">
-                      {svc.title}
-                    </h3>
-                  </button>
-                );
-              })}
-            </div>
+                    <div className="hidden sm:flex items-center gap-3">
+                      <div className="flex items-center gap-1.5" aria-label={`Page ${currentPage + 1} of ${totalPages}`}>
+                        {Array.from({ length: totalPages }).map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => goToPage(idx)}
+                            aria-label={`Go to page ${idx + 1}`}
+                            className={`rounded-full transition-all cursor-pointer ${
+                              idx === currentPage ? 'w-5 h-1.5 bg-[#F2BA03]' : 'w-1.5 h-1.5 bg-[#E5E7EB] hover:bg-[#F2BA03]/50'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <button
+                        onClick={() => goToPage(currentPage - 1)}
+                        aria-label="Previous services"
+                        className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => goToPage(currentPage + 1)}
+                        aria-label="Next services"
+                        className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] max-w-2xl mb-12">
+                    Access useful automotive services directly from the Scan Connect ecosystem.
+                  </p>
+
+                  {/* Sliding carousel track — width driven by number of pages, offset by currentPage */}
+                  <div className="overflow-hidden">
+                    <div
+                      className="flex transition-transform duration-500 ease-out"
+                      style={{ transform: `translateX(-${currentPage * 100}%)` }}
+                    >
+                      {Array.from({ length: totalPages }).map((_, pageIdx) => (
+                        <div
+                          key={pageIdx}
+                          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch shrink-0 w-full"
+                        >
+                          {vehicleServices
+                            .slice(pageIdx * servicesPerView, pageIdx * servicesPerView + servicesPerView)
+                            .map((svc) => {
+                              const SvcIcon = svc.icon;
+                              return (
+                                <button
+                                  key={svc.id}
+                                  onClick={() => setSelectedService(svc.id)}
+                                  className="h-full bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-xs hover:shadow-md hover:border-[#F2BA03] transition-all flex flex-col items-center text-center group cursor-pointer"
+                                >
+                                  <div className="flex-1 flex items-center justify-center">
+                                    <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#F2BA03] group-hover:scale-110 transition-transform">
+                                      <SvcIcon className="w-6 h-6 stroke-[2.2]" />
+                                    </div>
+                                  </div>
+
+                                  <h3 className="mt-5 min-h-[56px] flex items-center justify-center font-['Plus_Jakarta_Sans','Rubik',sans-serif] font-bold text-lg text-[#111827] leading-snug">
+                                    {svc.title}
+                                  </h3>
+                                </button>
+                              );
+                            })}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Mobile pagination dots — arrows are desktop-only, so mobile needs a visible page indicator too */}
+                  <div className="sm:hidden flex items-center justify-center gap-1.5 mt-6">
+                    {Array.from({ length: totalPages }).map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => goToPage(idx)}
+                        aria-label={`Go to page ${idx + 1}`}
+                        className={`rounded-full transition-all cursor-pointer ${
+                          idx === currentPage ? 'w-5 h-1.5 bg-[#F2BA03]' : 'w-1.5 h-1.5 bg-[#E5E7EB]'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </section>
 
@@ -1060,10 +1131,11 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             {(() => {
               const svc = vehicleServices.find((s) => s.id === selectedService);
               if (!svc) return null;
+              const SvcIcon = svc.icon;
               return (
                 <>
-                  <div className="flex items-center justify-center p-3 rounded-xl bg-amber-50/80 border border-[#F2BA03]/40 w-fit">
-                    <img src={svc.image} alt={svc.title} className="h-14 w-auto object-contain" />
+                  <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#F2BA03]">
+                    <SvcIcon className="w-6 h-6 stroke-[2.2]" />
                   </div>
                   <h3 className="text-2xl font-black text-neutral-900 tracking-tight">
                     {svc.title}
