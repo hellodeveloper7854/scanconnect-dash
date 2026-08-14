@@ -142,6 +142,12 @@ export const DashboardFooter: React.FC = () => {
                   Shipping policy
                 </a>
               </li>
+
+              <li>
+                <a href="/refund-returns" className="hover:underline cursor-pointer text-left">
+                  Refund &amp; returns
+                </a>
+              </li>
             </ul>
           </div>
 

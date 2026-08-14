@@ -396,7 +396,61 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: '21. Contact Us',
+    title: '21. Delivery & OTP Verification Notice',
+    body: (
+      <>
+        <p>
+          Prepaid orders require OTP verification upon delivery to ensure secure handing over of packages.
+        </p>
+        <p>
+          If your package is marked as &ldquo;Delivered&rdquo; on the tracking system without an OTP verification or
+          physical receipt, or if you receive a damaged, incomplete, or wrong product, you must notify our support
+          team within 48 hours of delivery.
+        </p>
+        <p>
+          Genuine non-delivery issues raised within this timeframe will be investigated immediately; failure to
+          resolve valid claims may result in formal escalation through authorized legal and consumer grievance
+          portals.
+        </p>
+      </>
+    ),
+  },
+  {
+    title: '22. Refund, Return & Cancellation Policy',
+    body: (
+      <>
+        <p>
+          All purchases, cancellations, returns, and refund requests are governed strictly by our dedicated Refund
+          &amp; Returns Policy.
+        </p>
+        <ul className="list-disc list-inside space-y-1">
+          <li>
+            <span className="font-semibold text-[#1B1C1C]">Cancellation:</span> Orders can be cancelled prior to
+            dispatch by contacting support. Once dispatched, orders cannot be cancelled mid-transit.
+          </li>
+          <li>
+            <span className="font-semibold text-[#1B1C1C]">Refund Eligibility:</span> Refunds are processed only for
+            damaged, defective, or incorrect items reported within 48 hours of receipt along with unboxing
+            proof/images.
+          </li>
+          <li>
+            <span className="font-semibold text-[#1B1C1C]">Processing Time:</span> Approved refunds will be
+            initiated to the original payment method within 5&ndash;7 business days.
+          </li>
+        </ul>
+        <p>
+          For full details, eligibility criteria, and step-by-step return instructions, please visit our complete
+          policy page:{' '}
+          <a href="/refund-returns" className="text-[#F2BA03] font-semibold hover:underline">
+            Refund &amp; Returns Policy
+          </a>
+          .
+        </p>
+      </>
+    ),
+  },
+  {
+    title: '23. Contact Us',
     body: (
       <>
         <p>For questions regarding these Terms, please contact:</p>

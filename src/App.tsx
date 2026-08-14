@@ -23,6 +23,7 @@ import { InvestorsPage } from './pages/InvestorsPage';
 import { FaqPage } from './pages/FaqPage';
 import { TermsAndConditionsPage } from './pages/TermsAndConditionsPage';
 import { ShippingPolicyPage } from './pages/ShippingPolicyPage';
+import { RefundReturnsPage } from './pages/RefundReturnsPage';
 import { AdminApp } from './pages/admin/AdminApp';
 
 const getInitialScreenFromUrl = (): ScreenType => {
@@ -78,6 +79,10 @@ export default function App() {
 
   if (path === '/shipping-policy') {
     return <ShippingPolicyPage />;
+  }
+
+  if (path === '/refund-returns') {
+    return <RefundReturnsPage />;
   }
 
   return <MainApp />;
