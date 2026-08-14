@@ -133,18 +133,19 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
   // Second SOS block — Emergency Help When Every Second Counts
   const emergencyQuickAccess = ['Ambulance', 'Police', 'Fire Department', 'Hospitals', 'Roadside Assistance'];
 
-  // Why Thousands Choose — benefits checklist
+  // Why Thousands Choose — benefits checklist. `core: true` marks the strongest
+  // differentiators, which get an emphasized visual treatment in the grid.
   const thousandsChooseBenefits = [
-    'Privacy-Protected Communication',
-    'Premium Waterproof QR Tag',
-    'No Monthly Subscription',
-    'Lifetime QR Activation',
-    'No App Required for Visitors',
-    'Instant Call',
-    'Secure Contact Routing',
-    'Fast Delivery Across India',
-    'Easy Self Activation',
-    'Works 24×7',
+    { label: 'Privacy-Protected Communication', core: true },
+    { label: 'Premium Waterproof QR Tag', core: false },
+    { label: 'No Monthly Subscription', core: true },
+    { label: 'Lifetime QR Activation', core: true },
+    { label: 'No App Required for Visitors', core: false },
+    { label: 'Instant Call', core: false },
+    { label: 'Secure Contact Routing', core: true },
+    { label: 'Fast Delivery Across India', core: false },
+    { label: 'Easy Self Activation', core: false },
+    { label: 'Works 24×7', core: false },
   ];
 
   // Smart Vehicle Services with Custom SVG Icons
@@ -355,14 +356,32 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto items-stretch">
               {thousandsChooseBenefits.map((benefit) => (
                 <div
-                  key={benefit}
-                  className="bg-white border border-[#E5E7EB] rounded-xl p-5 flex items-start gap-3 shadow-xs"
+                  key={benefit.label}
+                  className={`h-full rounded-xl p-5 flex items-center gap-3 transition-all ${
+                    benefit.core
+                      ? 'bg-white border-2 border-[#F2BA03] shadow-[0_6px_20px_rgba(242,186,3,0.18)]'
+                      : 'bg-white border border-[#E5E7EB] shadow-xs'
+                  }`}
                 >
-                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] mt-0.5 shrink-0" />
-                  <span className="font-['Hanken_Grotesk'] font-medium text-sm text-[#1B1C1C] leading-snug">{benefit}</span>
+                  <div
+                    className={`rounded-full flex items-center justify-center shrink-0 ${
+                      benefit.core ? 'w-7 h-7 bg-[#F2BA03]' : 'w-4 h-4'
+                    }`}
+                  >
+                    <Check
+                      className={benefit.core ? 'w-4 h-4 text-white stroke-[3]' : 'w-4 h-4 text-[#F2BA03] stroke-[3]'}
+                    />
+                  </div>
+                  <span
+                    className={`font-['Hanken_Grotesk'] leading-snug ${
+                      benefit.core ? 'font-bold text-base text-[#1B1C1C]' : 'font-medium text-sm text-[#4B5563]'
+                    }`}
+                  >
+                    {benefit.label}
+                  </span>
                 </div>
               ))}
             </div>
