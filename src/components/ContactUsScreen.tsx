@@ -537,15 +537,34 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
 
         {/* SECTION 5: YOUR PRIVACY MATTERS */}
-        <section className="py-12 bg-[#FAFAFA] border-t border-[#E3E2E2]">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-3">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200">
-              <ShieldCheck className="w-4 h-4 text-[#F2BA03]" />
-              <span className="font-bold text-xs tracking-wider uppercase text-[#1B1C1C]">Your Privacy Matters</span>
+        <section className="py-16 bg-[#FAFAFA] border-t border-[#E3E2E2]">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-[#1B1C1C] flex items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+              <ShieldCheck className="w-8 h-8 text-[#F2BA03]" />
             </div>
-            <p className="text-[#6B7280] text-sm sm:text-base leading-relaxed">
-              Every inquiry is handled with the highest level of confidentiality. Your personal information is securely protected and used only to respond to your request&mdash;we never share your data with third parties.
-            </p>
+
+            <div className="space-y-3">
+              <span className="font-bold text-xs tracking-wider uppercase text-[#F2BA03] block">Your Privacy Matters</span>
+              <p className="text-[#6B7280] text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
+                Every inquiry is handled with the highest level of confidentiality. Your personal information is securely protected and used only to respond to your request&mdash;we never share your data with third parties.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
+              {[
+                'Data Encrypted in Transit',
+                'Never Sold or Shared',
+                'Used Only to Respond to You',
+              ].map((point) => (
+                <span
+                  key={point}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 rounded-full text-xs sm:text-sm font-semibold text-[#1B1C1C] shadow-xs"
+                >
+                  <Check className="w-3.5 h-3.5 text-[#F2BA03] stroke-[3]" />
+                  {point}
+                </span>
+              ))}
+            </div>
           </div>
         </section>
 
