@@ -91,12 +91,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </nav>
 
           {/* Right Action Icons & User Avatar */}
-          <div className="flex items-center space-x-3 sm:space-x-4">
-            {/* SOS Emergency Button */}
+          <div className="flex items-center gap-2.5 sm:gap-4">
+            {/* SOS Emergency Button — always visible, highest priority */}
             <button
               onClick={triggerSosAlert}
               title="Trigger Emergency SOS"
-              className={`relative group w-11 h-11 sm:w-13 sm:h-13 rounded-full font-extrabold text-sm text-white flex items-center justify-center cursor-pointer transition-all shadow-lg overflow-hidden ${
+              className={`relative group w-11 h-11 sm:w-13 sm:h-13 rounded-full font-extrabold text-sm text-white flex items-center justify-center cursor-pointer transition-all shadow-lg overflow-hidden shrink-0 ${
                 sosActive
                   ? 'bg-red-700 animate-bounce ring-4 ring-red-400'
                   : 'bg-[#FF0022] hover:bg-red-700 active:scale-95 border-2 border-white/60'
@@ -111,10 +111,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               <span className="relative z-10">SOS</span>
             </button>
 
-            {/* Notification Bell */}
+            {/* Notification Bell — desktop only, moved into hamburger drawer on mobile */}
             <button
               onClick={() => alert(`Notifications (2):\n• Parking ping from SC-MH12-9881\n• Shield security scan complete`)}
-              className="relative p-2 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
+              className="hidden md:inline-flex relative p-2 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
               title="Notifications"
             >
               <Bell className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
@@ -123,18 +123,18 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               )}
             </button>
 
-            {/* Help / FAQ Icon */}
+            {/* Help / FAQ Icon — desktop only, moved into hamburger drawer on mobile */}
             <button
               onClick={() => alert('ScanConnect Helpdesk:\nCall 080-473-59856 or email rj@Scan Connect.me for 24/7 driver support.')}
-              className="p-2 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
+              className="hidden md:inline-flex p-2 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
               title="Support & FAQ"
             >
               <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
             </button>
 
-            {/* User Profile Avatar / Login Button */}
+            {/* User Profile Avatar / Login Button — desktop only, moved into hamburger drawer on mobile */}
             {isLoggedIn ? (
-              <div className="relative flex items-center gap-1">
+              <div className="hidden md:flex relative items-center gap-1">
                 <button
                   onClick={() => {
                     setUserDropdownOpen(false);
@@ -212,7 +212,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               <button
                 onClick={() => handleNav('Profile')}
                 title="Login or Register Account"
-                className="px-3.5 py-1.5 sm:px-4 sm:py-2 bg-neutral-950 hover:bg-neutral-800 text-amber-400 font-extrabold text-xs sm:text-sm rounded-full shadow-md transition-all cursor-pointer flex items-center gap-1.5 border border-amber-400/30"
+                className="hidden md:inline-flex px-3.5 py-1.5 sm:px-4 sm:py-2 bg-neutral-950 hover:bg-neutral-800 text-amber-400 font-extrabold text-xs sm:text-sm rounded-full shadow-md transition-all cursor-pointer items-center gap-1.5 border border-amber-400/30"
               >
                 <User className="w-3.5 h-3.5 text-amber-400" />
                 <span>Login / Register</span>
@@ -222,7 +222,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-[#1B1C1C] hover:bg-black/10 rounded-lg"
+              className="md:hidden p-2 -mr-1 text-[#1B1C1C] hover:bg-black/10 rounded-lg shrink-0"
+              title="Menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -242,32 +243,69 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               {item}
             </button>
           ))}
-          {isLoggedIn ? (
-            <>
+
+          {/* Secondary icons moved out of the top bar to reduce mobile crowding */}
+          <div className="border-t border-black/10 pt-2 space-y-1">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                alert(`Notifications (2):\n• Parking ping from SC-MH12-9881\n• Shield security scan complete`);
+              }}
+              className="w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 flex items-center gap-2.5"
+            >
+              <span className="relative inline-flex">
+                <Bell className="w-4.5 h-4.5 stroke-[2.2]" />
+                {notificationsCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-600 border border-[#e0a800] rounded-full" />
+                )}
+              </span>
+              Notifications
+            </button>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                alert('ScanConnect Helpdesk:\nCall 080-473-59856 or email rj@Scan Connect.me for 24/7 driver support.');
+              }}
+              className="w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 flex items-center gap-2.5"
+            >
+              <HelpCircle className="w-4.5 h-4.5 stroke-[2.2]" /> Support &amp; FAQ
+            </button>
+          </div>
+
+          <div className="border-t border-black/10 pt-2 space-y-1">
+            {isLoggedIn ? (
+              <>
+                <button
+                  onClick={() => handleNav('Profile')}
+                  className="w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 font-extrabold flex items-center gap-2.5"
+                >
+                  <User className="w-4.5 h-4.5" /> My Profile
+                </button>
+                <button
+                  onClick={() => handleNav('My Orders')}
+                  className="w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 font-extrabold flex items-center gap-2.5"
+                >
+                  <Package className="w-4.5 h-4.5" /> My Orders
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onLogout();
+                  }}
+                  className="w-full text-left py-2 px-3 rounded-lg text-red-800 font-extrabold hover:bg-red-500/20 flex items-center gap-2.5"
+                >
+                  <LogOut className="w-4.5 h-4.5" /> Logout
+                </button>
+              </>
+            ) : (
               <button
                 onClick={() => handleNav('Profile')}
-                className="block w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 font-extrabold flex items-center gap-2"
+                className="block w-full text-left py-2 px-3 rounded-lg bg-neutral-950 text-amber-400 font-extrabold hover:bg-neutral-900"
               >
-                <User className="w-4 h-4" /> My Profile
+                Login / Register
               </button>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onLogout();
-                }}
-                className="block w-full text-left py-2 px-3 rounded-lg text-red-800 font-extrabold hover:bg-red-500/20"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => handleNav('Profile')}
-              className="block w-full text-left py-2 px-3 rounded-lg bg-neutral-950 text-amber-400 font-extrabold hover:bg-neutral-900"
-            >
-              Login / Register
-            </button>
-          )}
+            )}
+          </div>
         </div>
       )}
     </header>
