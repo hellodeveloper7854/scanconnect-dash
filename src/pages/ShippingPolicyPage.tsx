@@ -349,7 +349,7 @@ export const ShippingPolicyPage: React.FC = () => {
           <div className="pt-2 space-y-1">
             <p className="font-black text-[#1B1C1C] text-lg">Scan Connect</p>
             <p className="text-[#5D5F5F] font-semibold">Smart Protection. Secure Connection.</p>
-            <p className="text-[#5D5F5F]">Operated by Creative Frame Works Pvt Ltd</p>
+            <p className="text-[#5D5F5F]">Operated by Creative Frameworks</p>
           </div>
         </div>
       </main>

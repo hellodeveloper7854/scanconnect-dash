@@ -150,7 +150,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                 {
                   icon: Globe,
                   title: 'Made in India',
-                  desc: 'Designed, manufactured, and supported locally by Creative Frame Works Pvt Ltd for fast-growing Indian cities.',
+                  desc: 'Designed, manufactured, and supported locally by Creative Frameworks for fast-growing Indian cities.',
                   featured: false,
                 },
                 {

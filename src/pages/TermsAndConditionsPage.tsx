@@ -236,7 +236,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
           <li>Illustrations</li>
           <li>Documentation</li>
         </ul>
-        <p>is owned by or licensed to Creative Frame Works Pvt Ltd unless otherwise stated.</p>
+        <p>is owned by or licensed to Creative Frameworks unless otherwise stated.</p>
         <p>
           You may not reproduce, modify, distribute, sell, copy, reverse engineer, or commercially exploit our
           intellectual property without prior written permission.
@@ -306,7 +306,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     body: (
       <>
         <p>
-          To the maximum extent permitted by applicable law, Scan Connect and Creative Frame Works Pvt Ltd shall not
+          To the maximum extent permitted by applicable law, Scan Connect and Creative Frameworks shall not
           be liable for indirect, incidental, special, consequential, or punitive losses arising from the use or
           inability to use the Services.
         </p>
@@ -329,7 +329,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     body: (
       <>
         <p>
-          You agree to indemnify and hold harmless Creative Frame Works Pvt Ltd, its employees, directors, officers,
+          You agree to indemnify and hold harmless Creative Frameworks, its employees, directors, officers,
           partners, contractors, and service providers against claims, losses, damages, liabilities, and expenses
           arising from:
         </p>
@@ -389,7 +389,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     body: (
       <>
         <p>For questions regarding these Terms, please contact:</p>
-        <p className="font-bold text-[#1B1C1C]">Creative Frame Works Pvt Ltd / Scan Connect</p>
+        <p className="font-bold text-[#1B1C1C]">Creative Frameworks / Scan Connect</p>
         <p>
           Email:{' '}
           <a href="mailto:support@scanconnect.com" className="text-[#F2BA03] font-semibold hover:underline">
@@ -427,7 +427,7 @@ export const TermsAndConditionsPage: React.FC = () => {
             <h1 className="text-3xl sm:text-4xl font-black text-[#0F0F0F] tracking-tight">Terms &amp; Conditions</h1>
             <p className="text-[#5D5F5F] text-sm font-semibold uppercase tracking-wider">Last Updated: August 2026</p>
             <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed">
-              Welcome to Scan Connect, operated by Creative Frame Works Pvt Ltd. These Terms govern your access to
+              Welcome to Scan Connect, operated by Creative Frameworks. These Terms govern your access to
               and use of the Scan Connect website, mobile application, QR contact tags, products, communication
               services, and related services. By accessing our website, purchasing a product, activating a Scan
               Connect tag, or using our Services, you agree to be bound by these Terms.
