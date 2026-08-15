@@ -29,7 +29,7 @@ export const LoginWithOtpScreen: React.FC<LoginWithOtpScreenProps> = ({ onNaviga
           {/* Logo */}
           <div className="flex justify-center mb-6">
             <button onClick={() => onNavigate('dashboard')} className="cursor-pointer">
-              <img src={logoImg} alt="Scan Connect" className="h-12 w-auto object-contain" />
+              <img src={logoImg} alt="Scan Connect" className="h-9 w-auto object-contain" />
             </button>
           </div>
 

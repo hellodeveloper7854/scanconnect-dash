@@ -67,7 +67,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           
           {/* Left Brand Logo */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNav('How it works')}>
-            <img src={logoImg} alt="Scan Connect" className="h-12 md:h-14 w-auto object-contain" />
+            <img src={logoImg} alt="Scan Connect" className="h-9 md:h-11 w-auto object-contain" />
           </div>
 
           {/* Desktop Navigation Links */}
