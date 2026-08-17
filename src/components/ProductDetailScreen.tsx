@@ -50,8 +50,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   product
 }) => {
   const [activeNav, setActiveNav] = useState('Shop');
-  const [activeThumbnail, setActiveThumbnail] = useState(0);
-  const [activeTab, setActiveTab] = useState<'how' | 'security' | 'reviews'>('how');
+  const [activeTab, setActiveTab] = useState<'how' | 'security'>('how');
   const [cartCount, setCartCount] = useState(0);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
@@ -84,8 +83,6 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
   const productTitle = product?.title || 'SCAN CONNECT Pro Tag - Digital Vehicle Protection';
   const productPrice = product?.price || '₹499';
-
-  const thumbnails = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
 
   const handleBuyNow = () => {
     setIsCheckoutOpen(true);
@@ -157,23 +154,6 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
                 alt={productTitle}
                 className="h-full w-auto object-cover"
               />
-            </div>
-
-            {/* Thumbnail Row */}
-            <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-1">
-              {thumbnails.map((thumb, idx) => (
-                <button
-                  key={thumb.id}
-                  onClick={() => setActiveThumbnail(idx)}
-                  className={`aspect-square rounded-[8px] border-2 overflow-hidden transition-all cursor-pointer ${
-                    activeThumbnail === idx
-                      ? 'border-[#676000] opacity-100 shadow-xs'
-                      : 'border-[#CCC7AA] opacity-70 hover:opacity-100'
-                  }`}
-                >
-                  <img src={qrImage} alt={productTitle} className="w-full h-full object-cover" />
-                </button>
-              ))}
             </div>
           </div>
 
@@ -268,18 +248,18 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             </div>
 
             {/* Bottom Trust Badges Row */}
-            <div className="grid grid-cols-3 gap-2 pt-[16px] border-t border-[#E4E2E2] text-center font-['Hanken_Grotesk'] font-normal text-[11px] leading-[16px] text-[#5F5E5E]">
+            <div className="grid grid-cols-3 gap-2 pt-[16px] border-t border-[#E4E2E2] text-center font-['Hanken_Grotesk'] font-bold text-[11px] leading-[16px] text-[#1B1C1C]">
               <div className="flex flex-col items-center gap-[4px]">
-                <Lock className="w-[16px] h-[21px] text-[#5F5E5E]" />
+                <Lock className="w-[16px] h-[21px] text-[#676000]" />
                 <span>SECURE PAYMENT</span>
               </div>
               <div className="flex flex-col items-center gap-[4px]">
-                <ShieldCheck className="w-[16px] h-[20px] text-[#5F5E5E]" />
+                <ShieldCheck className="w-[16px] h-[20px] text-[#676000]" />
                 <span>DATA MASKING</span>
               </div>
               <div className="flex flex-col items-center gap-[4px]">
-                <RefreshCw className="w-[16px] h-[16px] text-[#5F5E5E]" />
-                <span>7 DAY RETURNS</span>
+                <RefreshCw className="w-[16px] h-[16px] text-[#676000]" />
+                <span>48-HR RETURNS</span>
               </div>
             </div>
 
@@ -388,17 +368,6 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             >
               Security Features
             </button>
-
-            <button
-              onClick={() => setActiveTab('reviews')}
-              className={`pb-[16px] px-[8px] cursor-pointer transition-colors relative whitespace-nowrap font-['Hanken_Grotesk'] font-bold text-[18px] sm:text-[20px] leading-[24px] ${
-                activeTab === 'reviews'
-                  ? 'text-[#676000] border-b-2 border-[#676000]'
-                  : 'text-[#5F5E5E] hover:text-[#1B1C1C]'
-              }`}
-            >
-              Customer Reviews
-            </button>
           </div>
 
           {/* TAB 1: HOW IT WORKS BENTO GRID */}
@@ -500,40 +469,40 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             </div>
           )}
 
-          {/* TAB 3: REVIEWS */}
-          {activeTab === 'reviews' && (
-            <div className="bg-[#FAFAFA] border border-[#E4E2E2] rounded-[12px] p-[24px] sm:p-[40px] space-y-[24px] animate-fade-in">
-              <div className="flex items-center justify-between border-b border-[#E4E2E2] pb-[16px]">
-                <h3 className="font-['Rubik'] font-semibold text-[24px] sm:text-[28px] text-[#1B1C1C]">
-                  Customer Reviews (4.8 / 5.0)
-                </h3>
-                <span className="font-['Hanken_Grotesk'] font-bold text-[12px] text-[#1B1C1C] bg-[#F2BA03] px-[12px] py-[4px] rounded-full uppercase">
-                  Verified Owners
-                </span>
+        </section>
+
+        {/* SECTION 4: CUSTOMER REVIEWS — always visible, not hidden behind a tab */}
+        <section className="pb-4">
+          <div className="bg-[#FAFAFA] border border-[#E4E2E2] rounded-[12px] p-[24px] sm:p-[40px] space-y-[24px]">
+            <div className="flex items-center justify-between border-b border-[#E4E2E2] pb-[16px]">
+              <h3 className="font-['Rubik'] font-semibold text-[24px] sm:text-[28px] text-[#1B1C1C]">
+                Customer Reviews (4.8 / 5.0)
+              </h3>
+              <span className="font-['Hanken_Grotesk'] font-bold text-[12px] text-[#1B1C1C] bg-[#F2BA03] px-[12px] py-[4px] rounded-full uppercase">
+                Verified Owners
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[20px] font-['Hanken_Grotesk']">
+              <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
+                <div className="flex text-[#FFD700]">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
+                  ))}
+                </div>
+                <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;Saved my car from towing in Pune city! A shopkeeper scanned the tag and called me privately.&rdquo;</p>
+                <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— Rajesh Sharma, MH-12</span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-[20px] font-['Hanken_Grotesk']">
-                <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
-                  <div className="flex text-[#FFD700]">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
-                    ))}
-                  </div>
-                  <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;Saved my car from towing in Pune city! A shopkeeper scanned the tag and called me privately.&rdquo;</p>
-                  <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— Rajesh Sharma, MH-12</span>
+              <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
+                <div className="flex text-[#FFD700]">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
+                  ))}
                 </div>
-                <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
-                  <div className="flex text-[#FFD700]">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
-                    ))}
-                  </div>
-                  <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;Super simple sticker to apply. Nobody gets my personal WhatsApp or phone number now.&rdquo;</p>
-                  <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— Ananya Deshmukh, MH-14</span>
-                </div>
+                <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;Super simple sticker to apply. Nobody gets my personal WhatsApp or phone number now.&rdquo;</p>
+                <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— Ananya Deshmukh, MH-14</span>
               </div>
             </div>
-          )}
-
+          </div>
         </section>
 
       </main>
