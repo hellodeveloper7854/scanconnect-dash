@@ -233,16 +233,23 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#e0a800] border-t border-black/10 px-4 pt-2 pb-4 space-y-2 font-['Rubik',sans-serif] font-bold text-[#1B1C1C]">
-          {navItems.map((item) => (
-            <button
-              key={item}
-              onClick={() => handleNav(item)}
-              className="block w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 transition-colors"
-            >
-              {item}
-            </button>
-          ))}
+        <div className="md:hidden bg-[#EFCE1F] border-t border-black/10 px-4 pt-2 pb-4 space-y-2 font-['Rubik',sans-serif] font-bold text-[#1B1C1C]">
+          {navItems.map((item) => {
+            const isActive = activeNav === item;
+            return (
+              <button
+                key={item}
+                onClick={() => handleNav(item)}
+                className={`block w-full text-left py-2 px-3 rounded-lg transition-colors ${
+                  isActive
+                    ? 'text-[#1B1C1C] underline decoration-2 underline-offset-4'
+                    : 'hover:bg-black/10'
+                }`}
+              >
+                {item}
+              </button>
+            );
+          })}
 
           {/* Secondary icons moved out of the top bar to reduce mobile crowding */}
           <div className="border-t border-black/10 pt-2 space-y-1">
