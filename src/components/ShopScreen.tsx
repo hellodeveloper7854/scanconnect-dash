@@ -225,7 +225,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   <span>SHOP</span>
                 </div>
 
-                <span className="font-mono text-xs font-semibold tracking-wider text-[#F2BA03] uppercase block">
+                <span className="font-mono text-xs font-bold tracking-wider text-[#B58500] uppercase block">
                   OFFICIAL STORE
                 </span>
 
@@ -268,7 +268,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
               {/* Right Column Image */}
               <div className="lg:col-span-6 flex justify-center lg:justify-end">
-                <div className="relative overflow-hidden max-w-lg w-full">
+                <div className="relative overflow-hidden max-w-lg w-full rounded-3xl border border-neutral-200 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
                   <img
                     src={shopBannerImg}
                     alt="ScanConnect Tag Product"
