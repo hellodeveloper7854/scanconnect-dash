@@ -172,18 +172,14 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
     },
   ];
 
-  // Why Choose Scan Connect checklist
-  const whyChoose = [
-    'One-Time Purchase',
-    'Lifetime Activation',
-    'Privacy-First Technology',
-    'Instant Secure Calling',
-    'WhatsApp & SMS Support',
-    'Premium Waterproof QR Tags',
-    'No App Required for Scanners',
-    'Easy DIY Installation',
-    'Fast Delivery Across India',
-    'Dedicated Customer Support',
+  // What's in the Box — product-specific unboxing contents, not a generic brand checklist
+  const boxContents = [
+    { icon: Package, title: '1x Premium QR Tag', desc: 'Waterproof, UV-resistant tag pre-printed with your unique secure QR code.' },
+    { icon: Zap, title: 'Lifetime Activation', desc: 'One-time setup linking the tag to your mobile number — no renewals, ever.' },
+    { icon: Lock, title: 'Privacy-First Routing', desc: 'Calls, SMS & WhatsApp reach you without revealing your real number.' },
+    { icon: Truck, title: 'Free Express Delivery', desc: 'Shipped across India at no extra cost, typically within 3-5 business days.' },
+    { icon: PhoneCall, title: 'Quick-Start Guide', desc: 'Simple instructions to activate and attach your tag in under a minute.' },
+    { icon: MapPin, title: 'Priority Support Access', desc: 'Dedicated help for setup, replacements, or activation issues.' },
   ];
 
   if (selectedProduct) {
@@ -268,13 +264,11 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
               {/* Right Column Image */}
               <div className="lg:col-span-6 flex justify-center lg:justify-end">
-                <div className="relative overflow-hidden max-w-lg w-full rounded-3xl border border-neutral-200 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
-                  <img
-                    src={shopBannerImg}
-                    alt="ScanConnect Tag Product"
-                    className="w-full h-[280px] sm:h-[340px] object-contain"
-                  />
-                </div>
+                <img
+                  src={shopBannerImg}
+                  alt="ScanConnect Tag Product"
+                  className="w-full max-w-lg h-[280px] sm:h-[340px] object-cover rounded-3xl"
+                />
               </div>
 
             </div>
@@ -528,20 +522,31 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         })()}
 
 
-        {/* 4. WHY CHOOSE SCAN CONNECT SECTION */}
+        {/* 4. WHAT'S IN THE BOX SECTION */}
         <section className="py-16 sm:py-20 bg-white border-t border-neutral-100">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+              <span className="font-mono text-xs font-bold tracking-wider text-[#B58500] uppercase block">
+                WHAT'S IN THE BOX
+              </span>
               <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0F0F0F] font-sans">
-                Why Choose Scan Connect?
+                Everything You Need, Included
               </h2>
+              <p className="text-[#5D5F5F] text-base sm:text-lg">
+                No hidden add-ons or renewal fees — every order ships ready to activate.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch">
-              {whyChoose.map((item) => (
-                <div key={item} className="h-full flex items-center gap-2.5 bg-neutral-50/70 border border-neutral-200 rounded-xl p-4">
-                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] shrink-0" />
-                  <span className="text-sm font-semibold text-[#0F0F0F] leading-snug">{item}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
+              {boxContents.map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="h-full bg-neutral-50/70 border border-neutral-200 rounded-2xl p-5 flex flex-col gap-3 hover:border-[#F2BA03]/50 hover:shadow-md transition-all">
+                  <div className="w-11 h-11 rounded-xl bg-[#F2BA03]/15 flex items-center justify-center shrink-0">
+                    <Icon className="w-5 h-5 text-[#B58500]" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-bold text-[#0F0F0F] leading-snug">{title}</h3>
+                    <p className="text-sm text-[#5D5F5F] leading-relaxed">{desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
