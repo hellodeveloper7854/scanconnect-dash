@@ -4,7 +4,7 @@ import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { CheckoutFlowScreen } from './CheckoutFlowScreen';
 import qrImage from '../assets/images/qrimage.png';
-import builtForOpenRoadImg from '../assets/images/builtforopenroad.jpg';
+import builtForOpenRoadImg from '../assets/images/builtforopenroad.png';
 import {
   Star,
   Truck,
