@@ -780,17 +780,8 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
-              {/* Left Graphic Banner Poster */}
-              <div className="lg:col-span-6 flex justify-center">
-                <img
-                  src={videoWalkImg}
-                  alt="Scan Connect - Get Started"
-                  className="w-full max-w-md "
-                />
-              </div>
-
-              {/* Right Content */}
-              <div className="lg:col-span-6 space-y-6">
+              {/* Right Content — heading/copy first in DOM so mobile shows text before the poster image */}
+              <div className="lg:col-span-6 lg:order-2 space-y-6">
                 <span className="font-['Inter'] font-bold text-base tracking-[1px] text-[#9CA3AF] uppercase block">
                   DOWNLOAD THE APP
                 </span>
@@ -823,6 +814,15 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     <img src={playStoreImg} alt="Get it on Google Play" className="h-11 sm:h-12" />
                   </button>
                 </div>
+              </div>
+
+              {/* Left Graphic Banner Poster */}
+              <div className="lg:col-span-6 lg:order-1 flex justify-center">
+                <img
+                  src={videoWalkImg}
+                  alt="Scan Connect - Get Started"
+                  className="w-full max-w-md "
+                />
               </div>
 
             </div>
