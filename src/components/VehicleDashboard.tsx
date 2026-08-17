@@ -931,7 +931,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
 
         {/* 11. LEFTOVER: WHY THOUSANDS CHOOSE SCAN CONNECT SECTION */}
-        <section className="py-20 bg-[#FAFAFA]">
+        {/* <section className="py-20 bg-[#FAFAFA]">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
               <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
@@ -972,7 +972,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
 
         {/* 12. LEFTOVER: VIDEO SECTION */}
