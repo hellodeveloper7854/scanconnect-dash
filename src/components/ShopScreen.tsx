@@ -18,7 +18,9 @@ import {
   Car,
   Bike,
   Home,
-  MapPin
+  MapPin,
+  ShieldCheck,
+  QrCode
 } from 'lucide-react';
 
 interface ShopScreenProps {
@@ -233,9 +235,12 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   <span>SHOP</span>
                 </div>
 
-                <span className="font-mono text-xs font-bold tracking-wider text-[#B58500] uppercase block">
-                  OFFICIAL STORE
-                </span>
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200 shadow-xs">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#B58500]" />
+                  <span className="font-mono text-xs font-bold tracking-wider text-[#B58500] uppercase">
+                    OFFICIAL STORE
+                  </span>
+                </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-[46px] lg:leading-[1.1] font-black text-[#0F0F0F] tracking-tight font-sans max-w-3xl">
                   Smart Protection for Every Journey
@@ -325,9 +330,12 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         {/* 2. SCAN CONNECT TAG INTRO SECTION */}
         <section className="py-16 sm:py-20 bg-white border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <span className="font-mono text-xs font-semibold tracking-wider text-[#F2BA03] uppercase block">
-              SCAN CONNECT TAG
-            </span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+              <QrCode className="w-3.5 h-3.5 text-[#B58500]" />
+              <span className="font-mono text-xs font-semibold tracking-wider text-[#B58500] uppercase">
+                SCAN CONNECT TAG
+              </span>
+            </div>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0F0F0F] font-sans">
               The Smart QR Tag That Protects Your Privacy
             </h2>
@@ -548,9 +556,12 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         <section className="py-16 sm:py-20 bg-white border-t border-neutral-100">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-              <span className="font-mono text-xs font-bold tracking-wider text-[#B58500] uppercase block">
-                WHAT'S IN THE BOX
-              </span>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+                <Package className="w-3.5 h-3.5 text-[#B58500]" />
+                <span className="font-mono text-xs font-bold tracking-wider text-[#B58500] uppercase">
+                  WHAT'S IN THE BOX
+                </span>
+              </div>
               <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0F0F0F] font-sans">
                 Everything You Need, Included
               </h2>

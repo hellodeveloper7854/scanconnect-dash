@@ -38,7 +38,10 @@ import {
   IdCard,
   Zap,
   Ambulance,
-  Flame
+  Flame,
+  Workflow,
+  Gift,
+  Info
 } from 'lucide-react';
 import { BLOG_POSTS } from '../lib/blogPosts';
 import { useRevealOnScroll } from '../lib/useRevealOnScroll';
@@ -358,9 +361,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
           <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-5">
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                  WHY CHOOSE SCAN CONNECT?
-                </span>
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
+                  <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                    WHY CHOOSE SCAN CONNECT?
+                  </span>
+                </div>
                 <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[40px] tracking-tight text-[#1B1C1C] leading-tight">
                   Privacy Meets Convenience
                 </h2>
@@ -418,9 +424,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section id="how-it-works" className="py-20 bg-gradient-to-b from-[#FFFBF0] to-white">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
             <RevealCard className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                HOW IT WORKS
-              </span>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+                <Workflow className="w-3.5 h-3.5 text-[#F2BA03]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                  HOW IT WORKS
+                </span>
+              </div>
               <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
                 Simple. Secure. Instant.
               </h2>
@@ -467,9 +476,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                CUSTOMER BENEFITS
-              </span>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+                <Gift className="w-3.5 h-3.5 text-[#F2BA03]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                  CUSTOMER BENEFITS
+                </span>
+              </div>
               <h2 className="font-['Rubik'] font-semibold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
                 More Than Just a QR Sticker
               </h2>
@@ -491,9 +503,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                INDUSTRIES WE SERVE
-              </span>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+                <Building2 className="w-3.5 h-3.5 text-[#F2BA03]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                  INDUSTRIES WE SERVE
+                </span>
+              </div>
               <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
                 Smart Mobility Solutions for Every Parking Ecosystem
               </h2>
@@ -549,9 +564,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 <>
                   <div className="flex items-center justify-between mb-4">
                     <div className="space-y-2">
-                      <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                        SMART VEHICLE SERVICES
-                      </span>
+                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+                        <Car className="w-3.5 h-3.5 text-[#F2BA03]" />
+                        <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                          SMART VEHICLE SERVICES
+                        </span>
+                      </div>
                       <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-[38px] text-[#1B1C1C]">
                         Everything Your Vehicle Needs in One Place
                       </h2>
@@ -782,9 +800,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
               {/* Right Content — heading/copy first in DOM so mobile shows text before the poster image */}
               <div className="lg:col-span-6 lg:order-2 space-y-6">
-                <span className="font-['Inter'] font-bold text-base tracking-[1px] text-[#9CA3AF] uppercase block">
-                  DOWNLOAD THE APP
-                </span>
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+                  <Zap className="w-3.5 h-3.5 text-[#F2BA03]" />
+                  <span className="font-['Inter'] font-bold text-xs tracking-[1.5px] text-[#B58500] uppercase">
+                    DOWNLOAD THE APP
+                  </span>
+                </div>
 
                 <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[40px] text-[#1A1A1A] tracking-tight leading-tight">
                   Manage Your Vehicle Anytime
@@ -885,9 +906,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         {/* 10. ABOUT COMPANY SECTION */}
         <section className="py-20 bg-[#1B1C1C] text-white">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-5">
-            <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-              ABOUT COMPANY
-            </span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+              <Info className="w-3.5 h-3.5 text-[#F2BA03]" />
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                ABOUT COMPANY
+              </span>
+            </div>
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[40px] tracking-tight text-white leading-tight">
               Made in India. Built for Smarter Mobility.
             </h2>
@@ -950,9 +974,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="py-20 bg-white relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
             <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                VIDEO SECTION
-              </span>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+                <Play className="w-3.5 h-3.5 text-[#F2BA03]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                  VIDEO SECTION
+                </span>
+              </div>
               <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-5xl text-[#1B1C1C] tracking-tight">
                 See Scan Connect in Action
               </h2>
@@ -979,9 +1006,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         {/* 13. LEFTOVER: ABOUT SCAN CONNECT SECTION */}
         <section className="py-20 bg-white">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
-            <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-              ABOUT SCAN CONNECT
-            </span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+              <Sparkles className="w-3.5 h-3.5 text-[#F2BA03]" />
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                ABOUT SCAN CONNECT
+              </span>
+            </div>
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[42px] tracking-tight text-[#1B1C1C] leading-tight">
               The Smarter Way to Connect with Your Parked Vehicle
             </h2>
