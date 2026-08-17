@@ -680,9 +680,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                   {sosHighlights.map(({ icon: Icon, label }) => (
                     <div
                       key={label}
-                      className="group bg-white/5 border border-white/10 rounded-xl p-5 flex flex-col items-start gap-3 hover:border-[#F2BA03]/60 hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all"
+                      className="group bg-white/5 border border-white/10 rounded-xl p-5 flex flex-row items-center gap-4 sm:flex-col sm:items-start sm:gap-3 hover:border-[#F2BA03]/60 hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all"
                     >
-                      <div className="w-10 h-10 rounded-lg bg-[#F2BA03]/15 flex items-center justify-center group-hover:bg-[#F2BA03]/25 group-hover:scale-110 transition-all">
+                      <div className="w-10 h-10 rounded-lg bg-[#F2BA03]/15 flex items-center justify-center group-hover:bg-[#F2BA03]/25 group-hover:scale-110 transition-all shrink-0">
                         <Icon className="w-5 h-5 text-[#F2BA03]" />
                       </div>
                       <span className="font-['Hanken_Grotesk'] font-semibold text-sm text-white leading-snug">{label}</span>
