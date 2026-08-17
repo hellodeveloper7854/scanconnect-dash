@@ -2,8 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { Download, Printer, X, Search, FileArchive } from 'lucide-react';
 import { api, downloadFile } from '../../lib/api';
 import { auth } from '../../lib/firebase';
+import logoImg from '../../assets/images/logo.png';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
+
+// Fetched and decoded once, then reused for every QR tile. createImageBitmap
+// gives a definite decoded-and-paintable result (unlike HTMLImageElement,
+// whose onload/decode() can resolve before it is actually safe to draw from
+// concurrently across many simultaneous canvas draws), which is what caused
+// the logo to be missing specifically on the first batch of tiles rendered.
+let cachedLogoBitmap: Promise<ImageBitmap> | null = null;
+function loadLogoBitmap(): Promise<ImageBitmap> {
+  if (!cachedLogoBitmap) {
+    cachedLogoBitmap = fetch(logoImg)
+      .then((res) => res.blob())
+      .then((blob) => createImageBitmap(blob));
+  }
+  return cachedLogoBitmap;
+}
 
 /** Shrinks the font size until `text` fits within `maxWidth`, then draws it centered at (x, y). */
 function fitTextToWidth(
@@ -23,16 +39,11 @@ function fitTextToWidth(
 
 /**
  * Composites the bare server-generated QR PNG onto a taller canvas with the
- * "SCAN CONNECT" wordmark above it and a caption below, so tags printed or
+ * Scan Connect logo above it and a caption below, so tags printed or
  * downloaded from this page are self-branded on the sticker itself.
  */
 async function drawBrandedQrCanvas(qrBlob: Blob): Promise<HTMLCanvasElement> {
-  const qrImage = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = URL.createObjectURL(qrBlob);
-  });
+  const [qrImage, logo] = await Promise.all([createImageBitmap(qrBlob), loadLogoBitmap()]);
 
   const size = qrImage.width;
   const topPad = Math.round(size * 0.18);
@@ -48,11 +59,15 @@ async function drawBrandedQrCanvas(qrBlob: Blob): Promise<HTMLCanvasElement> {
   ctx.textAlign = 'center';
   ctx.fillStyle = '#0F0F0F';
 
-  fitTextToWidth(ctx, 'SCAN CONNECT', maxTextWidth, Math.round(size * 0.11), 'bold');
-  ctx.fillText('SCAN CONNECT', canvas.width / 2, topPad * 0.65);
+  const logoMaxWidth = maxTextWidth;
+  const logoMaxHeight = topPad * 0.8;
+  const logoScale = Math.min(logoMaxWidth / logo.width, logoMaxHeight / logo.height);
+  const logoWidth = logo.width * logoScale;
+  const logoHeight = logo.height * logoScale;
+  ctx.drawImage(logo, (canvas.width - logoWidth) / 2, (topPad - logoHeight) / 2, logoWidth, logoHeight);
 
   ctx.drawImage(qrImage, 0, topPad, size, size);
-  URL.revokeObjectURL(qrImage.src);
+  qrImage.close();
 
   const caption = 'Scan to connect the vehicle owner';
   fitTextToWidth(ctx, caption, maxTextWidth, Math.round(size * 0.07), 'normal');
@@ -71,13 +86,19 @@ function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
  * The QR PNG endpoint requires a Bearer token, which a plain <img src> can't
  * send, so this fetches the image as an authenticated blob and renders it via
  * an object URL instead.
+ *
+ * `onReady` reports back once this tile's final image (branded or not) is
+ * actually painted, so callers that trigger window.print() can wait for every
+ * tile to finish — otherwise the browser can snapshot the page mid-render and
+ * capture some tiles before their branding has been composited in.
  */
-const AuthedQrImage: React.FC<{ id: string; alt: string; className?: string; branded?: boolean }> = ({
-  id,
-  alt,
-  className,
-  branded,
-}) => {
+const AuthedQrImage: React.FC<{
+  id: string;
+  alt: string;
+  className?: string;
+  branded?: boolean;
+  onReady?: () => void;
+}> = ({ id, alt, className, branded, onReady }) => {
   const [src, setSrc] = useState('');
 
   useEffect(() => {
@@ -104,7 +125,7 @@ const AuthedQrImage: React.FC<{ id: string; alt: string; className?: string; bra
   if (!src) {
     return <div className={`${className ?? ''} bg-neutral-100 animate-pulse`} />;
   }
-  return <img src={src} alt={alt} className={className} />;
+  return <img src={src} alt={alt} className={className} onLoad={onReady} />;
 };
 
 interface QrCodeRow {
@@ -162,6 +183,7 @@ export const AdminQrCodes: React.FC = () => {
   const [error, setError] = useState('');
   const [printBatchId, setPrintBatchId] = useState<string | null>(null);
   const [printCodes, setPrintCodes] = useState<QrCodeRow[] | null>(null);
+  const [readyTileCount, setReadyTileCount] = useState(0);
 
   const load = () => {
     const params = buildFilterParams({ statusFilter, batchFilter, nameFilter, dateFrom, dateTo });
@@ -240,6 +262,7 @@ export const AdminQrCodes: React.FC = () => {
 
   const openPrintView = async (batchId: string) => {
     setPrintBatchId(batchId);
+    setReadyTileCount(0);
     const params = new URLSearchParams({ batchId, pageSize: '5000' });
     const res = await api.get<{ codes: QrCodeRow[] }>(`/api/admin/qr-codes?${params}`);
     setPrintCodes(res.codes);
@@ -453,10 +476,16 @@ export const AdminQrCodes: React.FC = () => {
           <div className="bg-white rounded-xl max-w-4xl w-full max-h-[85vh] overflow-y-auto p-6 print:max-h-none print:rounded-none print:shadow-none">
             <div className="flex items-center justify-between mb-4 print:hidden">
               <h2 className="font-black text-lg text-neutral-900">Print QR Batch</h2>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-3">
+                {printCodes && readyTileCount < printCodes.length && (
+                  <span className="text-xs text-neutral-500">
+                    Preparing {readyTileCount}/{printCodes.length}...
+                  </span>
+                )}
                 <button
                   onClick={() => window.print()}
-                  className="px-4 py-2 bg-amber-400 text-neutral-950 font-bold text-xs rounded-md cursor-pointer"
+                  disabled={!printCodes || readyTileCount < printCodes.length}
+                  className="px-4 py-2 bg-amber-400 text-neutral-950 font-bold text-xs rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Print
                 </button>
@@ -475,12 +504,27 @@ export const AdminQrCodes: React.FC = () => {
               <p className="text-neutral-500 text-sm">Loading codes...</p>
             ) : (
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                {printCodes.map((c) => (
-                  <div key={c.id} className="flex flex-col items-center gap-1 p-2 border border-neutral-200 rounded-lg">
-                    <AuthedQrImage id={c.id} alt={c.code} className="w-28 h-auto" branded />
-                    <span className="text-[10px] font-mono text-neutral-700">{c.code}</span>
-                  </div>
-                ))}
+                {printCodes.map((c, index) => {
+                  // 4 columns x 4 rows = 16 tiles per printed page.
+                  const isLastOnPage = (index + 1) % 16 === 0 && index !== printCodes.length - 1;
+                  return (
+                    <div
+                      key={c.id}
+                      className={`flex flex-col items-center gap-1 p-2 border border-neutral-200 rounded-lg print:break-inside-avoid ${
+                        isLastOnPage ? 'print:break-after-page' : ''
+                      }`}
+                    >
+                      <AuthedQrImage
+                        id={c.id}
+                        alt={c.code}
+                        className="w-28 h-auto"
+                        branded
+                        onReady={() => setReadyTileCount((prev) => prev + 1)}
+                      />
+                      <span className="text-[10px] font-mono text-neutral-700">{c.code}</span>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
