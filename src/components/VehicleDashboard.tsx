@@ -297,7 +297,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-20 sm:py-24 lg:py-28 relative z-10 w-full">
             <div className="max-w-xl space-y-5">
               <h1 className="font-['Rubik'] font-bold text-3xl sm:text-4xl lg:text-[46px] tracking-[-1px] leading-[1.15] text-white">
-                Protect Your Privacy. <span className="text-[#F2BA03]">Stay Reachable.</span>
+                Protect Your Privacy. <br></br><span className="text-[#F2BA03]">Stay Reachable.</span>
               </h1>
               <p className="font-['Rubik'] font-semibold text-lg sm:text-xl text-white leading-[1.3]">
                 The Smart QR Tag for Every Vehicle.
@@ -350,10 +350,31 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 </p>
               </div>
 
-              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-10 shadow-xs space-y-4">
-                <p className="font-['Hanken_Grotesk'] font-bold text-base text-[#1B1C1C]">
-                  Whether it&apos;s:
-                </p>
+              <button
+                onClick={() => setIsVideoModalOpen(true)}
+                className="relative rounded-2xl overflow-hidden shadow-lg border border-[#E5E7EB] group cursor-pointer block w-full"
+              >
+                <img
+                  src={videoWalkImg}
+                  alt="Scan Connect walkthrough: scan the QR code and instantly contact the vehicle owner"
+                  className="w-full h-auto object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
+                  <span className="relative flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20">
+                    <span className="absolute inset-0 rounded-full bg-[#F2BA03] animate-ping opacity-75" />
+                    <span className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#F2BA03] flex items-center justify-center shadow-xl">
+                      <Play className="w-6 h-6 sm:w-7 sm:h-7 text-[#1B1C1C] fill-current ml-1" />
+                    </span>
+                  </span>
+                </div>
+              </button>
+            </div>
+
+            <div className="mt-16 sm:mt-20 bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-10 shadow-xs">
+              <p className="font-['Hanken_Grotesk'] font-bold text-base text-[#1B1C1C] mb-5">
+                Whether it&apos;s:
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
                 {whyChooseScenarios.map((item) => (
                   <div key={item} className="flex items-center gap-3">
                     <div className="w-6 h-6 rounded-full bg-[#F2BA03]/15 flex items-center justify-center shrink-0">
@@ -362,55 +383,10 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     <span className="font-['Hanken_Grotesk'] font-medium text-base text-[#1B1C1C]">{item}</span>
                   </div>
                 ))}
-                <p className="font-['Hanken_Grotesk'] font-semibold text-sm text-[#5F5E5E] pt-3 border-t border-neutral-100">
-                  People can reach you instantly without compromising your privacy.
-                </p>
               </div>
-            </div>
-          </div>
-        </section>
-
-
-        {/* 2b. WHY THOUSANDS CHOOSE SCAN CONNECT SECTION */}
-        <section className="py-20 bg-[#FAFAFA]">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                WHY THOUSANDS CHOOSE SCAN CONNECT
-              </span>
-              <h2 className="font-['Rubik'] font-bold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
-                One Purchase. Lifetime Peace of Mind.
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto items-stretch">
-              {thousandsChooseBenefits.map((benefit) => (
-                <div
-                  key={benefit.label}
-                  className={`h-full rounded-xl p-5 flex items-center gap-3 transition-all ${
-                    benefit.core
-                      ? 'bg-white border-2 border-[#F2BA03] shadow-[0_6px_20px_rgba(242,186,3,0.18)]'
-                      : 'bg-white border border-[#E5E7EB] shadow-xs'
-                  }`}
-                >
-                  <div
-                    className={`rounded-full flex items-center justify-center shrink-0 ${
-                      benefit.core ? 'w-7 h-7 bg-[#F2BA03]' : 'w-4 h-4'
-                    }`}
-                  >
-                    <Check
-                      className={benefit.core ? 'w-4 h-4 text-white stroke-[3]' : 'w-4 h-4 text-[#F2BA03] stroke-[3]'}
-                    />
-                  </div>
-                  <span
-                    className={`font-['Hanken_Grotesk'] leading-snug ${
-                      benefit.core ? 'font-bold text-base text-[#1B1C1C]' : 'font-medium text-sm text-[#4B5563]'
-                    }`}
-                  >
-                    {benefit.label}
-                  </span>
-                </div>
-              ))}
+              <p className="font-['Hanken_Grotesk'] font-semibold text-sm text-[#5F5E5E] pt-5 mt-5 border-t border-neutral-100">
+                People can reach you instantly without compromising your privacy.
+              </p>
             </div>
           </div>
         </section>
@@ -466,60 +442,6 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 );
               })}
             </div>
-          </div>
-        </section>
-
-
-        {/* 3b. VIDEO SECTION */}
-        <section className="py-20 bg-white relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
-            <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                VIDEO SECTION
-              </span>
-              <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-5xl text-[#1B1C1C] tracking-tight">
-                See Scan Connect in Action
-              </h2>
-              <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] leading-[26px] max-w-2xl mx-auto">
-                Watch our quick 90-second walkthrough and discover how Scan Connect helps people reach you without revealing your phone number.
-              </p>
-            </div>
-
-            {/* Video Player Box */}
-            <button
-              onClick={() => setIsVideoModalOpen(true)}
-              className="max-w-4xl mx-auto relative rounded-3xl overflow-hidden border border-neutral-200 shadow-2xl group bg-white block w-full cursor-pointer"
-            >
-              <img
-                src={tutorialVideoPreviewImg}
-                alt="Tutorial Video Preview"
-                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
-              />
-            </button>
-          </div>
-        </section>
-
-
-        {/* 3c. ABOUT SCAN CONNECT SECTION */}
-        <section className="py-20 bg-white">
-          <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
-            <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-              ABOUT SCAN CONNECT
-            </span>
-            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[42px] tracking-tight text-[#1B1C1C] leading-tight">
-              The Smarter Way to Connect with Your Parked Vehicle
-            </h2>
-            <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
-              Your vehicle is often left unattended&mdash;in parking lots, offices, shopping malls, railway stations, hospitals, or on the roadside. Unexpected situations can happen anytime.
-            </p>
-            <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
-              With Scan Connect, anyone can safely reach you by simply scanning the QR code attached to your vehicle. Your phone number always remains private while you receive instant calls, SMS, or WhatsApp notifications.
-            </p>
-            <p className="font-['Hanken_Grotesk'] font-bold text-lg sm:text-xl text-[#1B1C1C] leading-[30px] pt-2">
-              No complicated setup. No app required for the person scanning.
-              <br />
-              Just smart, secure communication whenever it matters.
-            </p>
           </div>
         </section>
 
@@ -986,7 +908,106 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
-        {/* 11. CTA SECTION */}
+        {/* 11. LEFTOVER: WHY THOUSANDS CHOOSE SCAN CONNECT SECTION */}
+        <section className="py-20 bg-[#FAFAFA]">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+            <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
+                WHY THOUSANDS CHOOSE SCAN CONNECT
+              </span>
+              <h2 className="font-['Rubik'] font-bold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
+                One Purchase. Lifetime Peace of Mind.
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto items-stretch">
+              {thousandsChooseBenefits.map((benefit) => (
+                <div
+                  key={benefit.label}
+                  className={`h-full rounded-xl p-5 flex items-center gap-3 transition-all ${
+                    benefit.core
+                      ? 'bg-white border-2 border-[#F2BA03] shadow-[0_6px_20px_rgba(242,186,3,0.18)]'
+                      : 'bg-white border border-[#E5E7EB] shadow-xs'
+                  }`}
+                >
+                  <div
+                    className={`rounded-full flex items-center justify-center shrink-0 ${
+                      benefit.core ? 'w-7 h-7 bg-[#F2BA03]' : 'w-4 h-4'
+                    }`}
+                  >
+                    <Check
+                      className={benefit.core ? 'w-4 h-4 text-white stroke-[3]' : 'w-4 h-4 text-[#F2BA03] stroke-[3]'}
+                    />
+                  </div>
+                  <span
+                    className={`font-['Hanken_Grotesk'] leading-snug ${
+                      benefit.core ? 'font-bold text-base text-[#1B1C1C]' : 'font-medium text-sm text-[#4B5563]'
+                    }`}
+                  >
+                    {benefit.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+        {/* 12. LEFTOVER: VIDEO SECTION */}
+        <section className="py-20 bg-white relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
+            <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
+                VIDEO SECTION
+              </span>
+              <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-5xl text-[#1B1C1C] tracking-tight">
+                See Scan Connect in Action
+              </h2>
+              <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] leading-[26px] max-w-2xl mx-auto">
+                Watch our quick 90-second walkthrough and discover how Scan Connect helps people reach you without revealing your phone number.
+              </p>
+            </div>
+
+            {/* Video Player Box */}
+            <button
+              onClick={() => setIsVideoModalOpen(true)}
+              className="max-w-4xl mx-auto relative rounded-3xl overflow-hidden border border-neutral-200 shadow-2xl group bg-white block w-full cursor-pointer"
+            >
+              <img
+                src={tutorialVideoPreviewImg}
+                alt="Tutorial Video Preview"
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+              />
+            </button>
+          </div>
+        </section>
+
+
+        {/* 13. LEFTOVER: ABOUT SCAN CONNECT SECTION */}
+        <section className="py-20 bg-white">
+          <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
+            <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
+              ABOUT SCAN CONNECT
+            </span>
+            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[42px] tracking-tight text-[#1B1C1C] leading-tight">
+              The Smarter Way to Connect with Your Parked Vehicle
+            </h2>
+            <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
+              Your vehicle is often left unattended&mdash;in parking lots, offices, shopping malls, railway stations, hospitals, or on the roadside. Unexpected situations can happen anytime.
+            </p>
+            <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
+              With Scan Connect, anyone can safely reach you by simply scanning the QR code attached to your vehicle. Your phone number always remains private while you receive instant calls, SMS, or WhatsApp notifications.
+            </p>
+            <p className="font-['Hanken_Grotesk'] font-bold text-lg sm:text-xl text-[#1B1C1C] leading-[30px] pt-2">
+              No complicated setup. No app required for the person scanning.
+              <br />
+              Just smart, secure communication whenever it matters.
+            </p>
+          </div>
+        </section>
+
+
+        {/* 14. CTA SECTION */}
         <section className="py-20 bg-white border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
