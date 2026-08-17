@@ -64,57 +64,50 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
 
       {/* Main Content */}
       <main className="flex-1">
-        {/* 1. HERO MISSION SECTION */}
+        {/* 1. HERO MISSION SECTION — centered editorial layout, story-first */}
         <section className="py-12 sm:py-16 lg:py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+            {/* Mission Badge */}
+            <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
+              <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
+                OUR MISSION
+              </span>
+            </div>
 
-              {/* Left Column Text */}
-              <div className="lg:col-span-6 space-y-6">
-                {/* Mission Badge */}
-                <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
-                  <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
-                    OUR MISSION
-                  </span>
-                </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl lg:leading-[1.15] font-black text-[#0F0F0F] tracking-tight font-sans">
+              Privacy shouldn&apos;t cost you a phone call.
+            </h1>
 
-                <h1 className="text-3xl sm:text-4xl lg:text-[42px] lg:leading-[1.15] font-black text-[#0F0F0F] tracking-tight font-sans">
-                  Privacy shouldn&apos;t cost you a phone call.
-                </h1>
+            <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal max-w-2xl mx-auto">
+              Scan Connect started with a simple frustration: leaving your phone number on your dashboard meant spam calls, harassment, and zero privacy. We built a smart QR tag that lets anyone reach you instantly — without ever seeing your actual phone number.
+            </p>
 
-                <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal max-w-xl">
-                  Scan Connect started with a simple frustration: leaving your phone number on your dashboard meant spam calls, harassment, and zero privacy. We built a smart QR tag that lets anyone reach you instantly — without ever seeing your actual phone number.
-                </p>
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+              <button
+                onClick={() => onNavigate('shop')}
+                className="btn-shimmer h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+              >
+                <span>GET YOUR TAG</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
 
-                {/* CTA Buttons */}
-                <div className="flex flex-wrap items-center gap-4 pt-2">
-                  <button
-                    onClick={() => onNavigate('shop')}
-                    className="btn-shimmer h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
-                  >
-                    <span>GET YOUR TAG</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+              <button
+                onClick={() => onNavigate('dashboard')}
+                className="btn-shimmer h-[52px] px-8 bg-[#0F0F0F] hover:bg-neutral-800 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 border border-[#0F0F0F] text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
+              >
+                HOW IT WORKS
+              </button>
+            </div>
 
-                  <button
-                    onClick={() => onNavigate('dashboard')}
-                    className="btn-shimmer h-[52px] px-8 bg-[#0F0F0F] hover:bg-neutral-800 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 border border-[#0F0F0F] text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
-                  >
-                    HOW IT WORKS
-                  </button>
-                </div>
-              </div>
-
-              {/* Right Column Image */}
-              <div className="lg:col-span-6 flex justify-center lg:justify-end">
-                <img
-                  src={aboutBannerImg}
-                  alt="ScanConnect Tag on Car"
-                  className="w-full max-w-lg h-[280px] sm:h-[340px] object-cover rounded-3xl"
-                />
-              </div>
-
+            {/* Full-width banner image below the story, not beside it */}
+            <div className="pt-8">
+              <img
+                src={aboutBannerImg}
+                alt="ScanConnect Tag on Car"
+                className="w-full h-[280px] sm:h-[400px] lg:h-[460px] object-cover rounded-3xl"
+              />
             </div>
           </div>
         </section>

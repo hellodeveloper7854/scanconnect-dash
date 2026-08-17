@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
@@ -36,6 +36,18 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 }) => {
   const [activeNav, setActiveNav] = useState('Shop');
   const [visibleProductsCount, setVisibleProductsCount] = useState(6);
+  const heroImageRef = useRef<HTMLDivElement>(null);
+  const [heroTilt, setHeroTilt] = useState({ x: 0, y: 0 });
+
+  const handleHeroImageMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = heroImageRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    setHeroTilt({ x: py * -10, y: px * 10 });
+  };
+
+  const resetHeroTilt = () => setHeroTilt({ x: 0, y: 0 });
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [featuresModalProductId, setFeaturesModalProductId] = useState<number | null>(null);
 
@@ -208,13 +220,13 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
       {/* Main Content */}
       <main className="flex-1">
-        {/* 1. SHOP HERO BANNER SECTION */}
-        <section className="py-12 sm:py-16 lg:py-20 bg-[#F8F9FB]">
+        {/* 1. SHOP HERO BANNER SECTION — asymmetric split with an interactive tilt image */}
+        <section className="py-12 sm:py-16 lg:py-20 bg-[#F8F9FB] overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
 
-              {/* Left Column Text */}
-              <div className="lg:col-span-6 space-y-6">
+              {/* Left Column Text — wider, carries the visual weight */}
+              <div className="lg:col-span-9 space-y-5 relative z-10">
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-[#0F0F0F] uppercase">
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -225,7 +237,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   OFFICIAL STORE
                 </span>
 
-                <h1 className="text-3xl sm:text-4xl lg:text-[42px] lg:leading-[1.15] font-black text-[#0F0F0F] tracking-tight font-sans">
+                <h1 className="text-3xl sm:text-4xl lg:text-[46px] lg:leading-[1.1] font-black text-[#0F0F0F] tracking-tight font-sans max-w-3xl">
                   Smart Protection for Every Journey
                 </h1>
 
@@ -233,11 +245,11 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   Privacy-First QR Tags for Cars, Bikes &amp; Fleets
                 </p>
 
-                <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal max-w-xl">
+                <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal max-w-3xl">
                   Protect your personal phone number while staying instantly reachable whenever someone needs to contact you. Whether it&apos;s wrong parking, a vehicle emergency, or a helpful alert, Scan Connect ensures secure communication without revealing your identity.
                 </p>
 
-                <div className="space-y-2 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 max-w-2xl">
                   {[
                     'One-Time Purchase • Lifetime Activation',
                     'No Monthly Subscription',
@@ -262,13 +274,23 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                 </div>
               </div>
 
-              {/* Right Column Image */}
-              <div className="lg:col-span-6 flex justify-center lg:justify-end">
-                <img
-                  src={shopBannerImg}
-                  alt="ScanConnect Tag Product"
-                  className="w-full max-w-lg h-[280px] sm:h-[340px] object-cover rounded-3xl"
-                />
+              {/* Right Column Image — smaller, overlapping the text column; tilts toward the cursor on hover */}
+              <div className="lg:col-span-3 flex justify-center lg:justify-start lg:-ml-24">
+                <div
+                  ref={heroImageRef}
+                  onMouseMove={handleHeroImageMove}
+                  onMouseLeave={resetHeroTilt}
+                  className="relative w-full max-w-[240px] sm:max-w-[260px] [perspective:1000px]"
+                >
+                  <img
+                    src={shopBannerImg}
+                    alt="ScanConnect Tag Product"
+                    style={{
+                      transform: `rotateX(${heroTilt.x}deg) rotateY(${heroTilt.y}deg) scale(${heroTilt.x || heroTilt.y ? 1.03 : 1})`,
+                    }}
+                    className="w-full h-[220px] sm:h-[280px] object-cover rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.15)] transition-transform duration-150 ease-out will-change-transform"
+                  />
+                </div>
               </div>
 
             </div>
