@@ -78,6 +78,19 @@
   animation: sos-glow 3.5s ease-in-out infinite;
 }
 
+@keyframes gentle-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+.animate-gentle-float {
+  animation: gentle-float 4s ease-in-out infinite;
+}
+
 /*
  * Hover-triggered single shimmer sweep for buttons — unlike .animate-sos-shimmer
  * (which loops forever, appropriate only for the always-urgent SOS button),

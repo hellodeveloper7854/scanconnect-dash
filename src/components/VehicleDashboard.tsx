@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
@@ -42,6 +43,7 @@ import {
 import { BLOG_POSTS } from '../lib/blogPosts';
 import { useRevealOnScroll } from '../lib/useRevealOnScroll';
 import banner from '../assets/images/howitworksbanner.png'
+import logoImg from '../assets/images/logo.png'
 import sosEmergencyImg from '../assets/images/sosemmergencyimg.png'
 import videoWalkImg from '../assets/images/howitworks/videowalkimg.png'
 import tutorialVideoPreviewImg from '../assets/images/howitworks/tutorialvideopreview.png'
@@ -294,37 +296,57 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             <div className="absolute inset-0 bg-gradient-to-r from-[#1B1C1C] via-[#1B1C1C]/85 to-transparent" />
           </div>
 
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-20 sm:py-24 lg:py-28 relative z-10 w-full">
-            <div className="max-w-xl space-y-5">
-              <h1 className="font-['Rubik'] font-bold text-3xl sm:text-4xl lg:text-[46px] tracking-[-1px] leading-[1.15] text-white">
-                Protect Your Privacy. <br></br><span className="text-[#F2BA03]">Stay Reachable.</span>
-              </h1>
-              <p className="font-['Rubik'] font-semibold text-lg sm:text-xl text-white leading-[1.3]">
-                The Smart QR Tag for Every Vehicle.
-              </p>
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 sm:py-20 lg:py-24 relative z-10 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-7 max-w-xl space-y-5">
+                <h1 className="font-['Rubik'] font-bold text-3xl sm:text-4xl lg:text-[46px] tracking-[-1px] leading-[1.15] text-white">
+                  Protect Your Privacy. <br></br><span className="text-[#F2BA03]">Stay Reachable.</span>
+                </h1>
+                <p className="font-['Rubik'] font-semibold text-lg sm:text-xl text-white leading-[1.3]">
+                  The Smart QR Tag for Every Vehicle.
+                </p>
 
-              <p className="font-['Rubik'] font-normal text-xs sm:text-sm text-[#D1D5DB] leading-[24px] max-w-md pt-1">
-                Whether it&apos;s a blocked driveway, headlights left on, or an emergency, anyone can contact you instantly&mdash;without ever seeing your phone number.
-              </p>
+                <p className="font-['Rubik'] font-normal text-xs sm:text-sm text-[#D1D5DB] leading-[24px] max-w-md pt-1">
+                  Whether it&apos;s a blocked driveway, headlights left on, or an emergency, anyone can contact you instantly&mdash;without ever seeing your phone number.
+                </p>
 
-              <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#F2BA03]">
-                Privacy-First &bull; Instant Contact &bull; No App Required &bull; Lifetime Access
-              </p>
+                <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#F2BA03]">
+                  Privacy-First &bull; Instant Contact &bull; No App Required &bull; Lifetime Access
+                </p>
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <button
-                  onClick={() => { window.location.href = '/shop#products'; }}
-                  className="btn-shimmer h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
-                >
-                  <span>Buy Now</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="h-[52px] px-8 bg-transparent border border-white/60 hover:bg-white/10 text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
-                >
-                  How It Works
-                </button>
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <button
+                    onClick={() => { window.location.href = '/shop#products'; }}
+                    className="btn-shimmer h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                  >
+                    <span>Buy Now</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="h-[52px] px-8 bg-transparent border border-white/60 hover:bg-white/10 text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
+                  >
+                    How It Works
+                  </button>
+                </div>
+              </div>
+
+              {/* Floating QR card — fills the empty right side, draws the eye
+                  to the product, and scanning it takes shoppers straight to
+                  the shop's products section. */}
+              <div className="hidden lg:flex lg:col-span-5 justify-end">
+                <div className="animate-gentle-float bg-white rounded-2xl p-5 shadow-2xl border border-white/20 w-56 xl:w-64 flex flex-col items-center gap-3">
+                  <img src={logoImg} alt="Scan Connect" className="h-6 w-auto object-contain" />
+                  <QRCodeSVG
+                    value={`${window.location.origin}/shop#products`}
+                    size={168}
+                    level="M"
+                    marginSize={0}
+                    fgColor="#1B1C1C"
+                    bgColor="#FFFFFF"
+                    title="Scan to shop Scan Connect QR tags"
+                  />
+                </div>
               </div>
             </div>
           </div>
