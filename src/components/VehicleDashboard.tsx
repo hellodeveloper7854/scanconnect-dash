@@ -452,7 +452,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     )}
 
                     {/* Card body — flex-1 + equal padding keeps every card the same height regardless of copy length */}
-                    <div className="w-full flex-1 bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.07)] flex flex-col gap-3 hover:shadow-[0_16px_40px_rgba(242,186,3,0.18)] hover:border-[#F2BA03]/50 hover:-translate-y-1.5 transition-all duration-300">
+                    <div className="w-full flex-1 bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.07)] flex flex-col justify-center gap-3 hover:shadow-[0_16px_40px_rgba(242,186,3,0.18)] hover:border-[#F2BA03]/50 hover:-translate-y-1.5 transition-all duration-300">
                       <h3 className="font-['Poppins'] font-bold text-lg sm:text-xl text-[#111827] leading-snug">
                         {step.title}
                       </h3>
