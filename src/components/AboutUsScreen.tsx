@@ -67,8 +67,8 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
         {/* 1. HERO MISSION SECTION */}
         <section className="py-12 sm:py-16 lg:py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-              
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+
               {/* Left Column Text */}
               <div className="lg:col-span-6 space-y-6">
                 {/* Mission Badge */}
@@ -108,13 +108,11 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
 
               {/* Right Column Image */}
               <div className="lg:col-span-6 flex justify-center lg:justify-end">
-                <div className="relative overflow-hidden  max-w-lg w-full">
-                  <img
-                    src={aboutBannerImg}
-                    alt="ScanConnect Tag on Car"
-                    className="w-full h-[360px] sm:h-[420px] object-cover"
-                  />
-                </div>
+                <img
+                  src={aboutBannerImg}
+                  alt="ScanConnect Tag on Car"
+                  className="w-full max-w-lg h-[280px] sm:h-[340px] object-cover rounded-3xl"
+                />
               </div>
 
             </div>
