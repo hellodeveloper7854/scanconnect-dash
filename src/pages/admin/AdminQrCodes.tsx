@@ -5,35 +5,101 @@ import { auth } from '../../lib/firebase';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
+/** Shrinks the font size until `text` fits within `maxWidth`, then draws it centered at (x, y). */
+function fitTextToWidth(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  startFontSize: number,
+  fontWeight: string,
+): number {
+  let fontSize = startFontSize;
+  do {
+    ctx.font = `${fontWeight} ${fontSize}px sans-serif`;
+    fontSize -= 1;
+  } while (ctx.measureText(text).width > maxWidth && fontSize > 8);
+  return fontSize + 1;
+}
+
+/**
+ * Composites the bare server-generated QR PNG onto a taller canvas with the
+ * "SCAN CONNECT" wordmark above it and a caption below, so tags printed or
+ * downloaded from this page are self-branded on the sticker itself.
+ */
+async function drawBrandedQrCanvas(qrBlob: Blob): Promise<HTMLCanvasElement> {
+  const qrImage = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = URL.createObjectURL(qrBlob);
+  });
+
+  const size = qrImage.width;
+  const topPad = Math.round(size * 0.18);
+  const bottomPad = Math.round(size * 0.22);
+  const maxTextWidth = size * 0.94;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size + topPad + bottomPad;
+
+  const ctx = canvas.getContext('2d')!;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#0F0F0F';
+
+  fitTextToWidth(ctx, 'SCAN CONNECT', maxTextWidth, Math.round(size * 0.11), 'bold');
+  ctx.fillText('SCAN CONNECT', canvas.width / 2, topPad * 0.65);
+
+  ctx.drawImage(qrImage, 0, topPad, size, size);
+  URL.revokeObjectURL(qrImage.src);
+
+  const caption = 'Scan to connect the vehicle owner';
+  fitTextToWidth(ctx, caption, maxTextWidth, Math.round(size * 0.07), 'normal');
+  ctx.fillText(caption, canvas.width / 2, topPad + size + bottomPad * 0.6);
+
+  return canvas;
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('Failed to render PNG'))), 'image/png');
+  });
+}
+
 /**
  * The QR PNG endpoint requires a Bearer token, which a plain <img src> can't
  * send, so this fetches the image as an authenticated blob and renders it via
  * an object URL instead.
  */
-const AuthedQrImage: React.FC<{ id: string; alt: string; className?: string }> = ({ id, alt, className }) => {
+const AuthedQrImage: React.FC<{ id: string; alt: string; className?: string; branded?: boolean }> = ({
+  id,
+  alt,
+  className,
+  branded,
+}) => {
   const [src, setSrc] = useState('');
 
   useEffect(() => {
     let objectUrl = '';
     let cancelled = false;
 
-    auth.currentUser?.getIdToken().then((idToken) => {
-      fetch(`${API_BASE_URL}/api/admin/qr-codes/${id}/qr.png`, {
+    auth.currentUser?.getIdToken().then(async (idToken) => {
+      const res = await fetch(`${API_BASE_URL}/api/admin/qr-codes/${id}/qr.png`, {
         headers: idToken ? { Authorization: `Bearer ${idToken}` } : {},
-      })
-        .then((res) => res.blob())
-        .then((blob) => {
-          if (cancelled) return;
-          objectUrl = URL.createObjectURL(blob);
-          setSrc(objectUrl);
-        });
+      });
+      const rawBlob = await res.blob();
+      const blob = branded ? await canvasToBlob(await drawBrandedQrCanvas(rawBlob)) : rawBlob;
+      if (cancelled) return;
+      objectUrl = URL.createObjectURL(blob);
+      setSrc(objectUrl);
     });
 
     return () => {
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [id]);
+  }, [id, branded]);
 
   if (!src) {
     return <div className={`${className ?? ''} bg-neutral-100 animate-pulse`} />;
@@ -134,6 +200,28 @@ export const AdminQrCodes: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to generate batch');
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const downloadBrandedQrPng = async (id: string, code: string) => {
+    try {
+      const idToken = await auth.currentUser?.getIdToken();
+      const res = await fetch(`${API_BASE_URL}/api/admin/qr-codes/${id}/qr.png`, {
+        headers: idToken ? { Authorization: `Bearer ${idToken}` } : {},
+      });
+      const rawBlob = await res.blob();
+      const canvas = await drawBrandedQrCanvas(rawBlob);
+      const blob = await canvasToBlob(canvas);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `qr-${code}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to download PNG');
     }
   };
 
@@ -344,7 +432,7 @@ export const AdminQrCodes: React.FC = () => {
                   <td className="px-4 py-3 text-right">
                     <button
                       type="button"
-                      onClick={() => downloadFile(`/api/admin/qr-codes/${c.id}/qr.png`, `qr-${c.code}.png`)}
+                      onClick={() => downloadBrandedQrPng(c.id, c.code)}
                       className="p-1.5 text-white/50 hover:text-amber-400 cursor-pointer inline-block"
                       title="Download PNG"
                     >
@@ -389,7 +477,7 @@ export const AdminQrCodes: React.FC = () => {
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
                 {printCodes.map((c) => (
                   <div key={c.id} className="flex flex-col items-center gap-1 p-2 border border-neutral-200 rounded-lg">
-                    <AuthedQrImage id={c.id} alt={c.code} className="w-24 h-24" />
+                    <AuthedQrImage id={c.id} alt={c.code} className="w-28 h-auto" branded />
                     <span className="text-[10px] font-mono text-neutral-700">{c.code}</span>
                   </div>
                 ))}
