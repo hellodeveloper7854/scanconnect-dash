@@ -176,6 +176,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
     { label: 'Fast Delivery Across India', core: false },
     { label: 'Easy Self Activation', core: false },
     { label: 'Works 24×7', core: false },
+    { label: 'Emergency Family Contact', core: true },
   ];
 
   // Smart Vehicle Services
@@ -907,11 +908,11 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
 
         {/* 11. LEFTOVER: WHY THOUSANDS CHOOSE SCAN CONNECT SECTION */}
-        {/* <section className="py-20 bg-[#FAFAFA]">
+        <section className="py-20 bg-[#FAFAFA]">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
               <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                WHY THOUSANDS CHOOSE SCAN CONNECT
+                TRUSTED BY THOUSANDS OF VEHICLE OWNERS
               </span>
               <h2 className="font-['Rubik'] font-bold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
                 One Purchase. Lifetime Peace of Mind.
@@ -948,7 +949,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               ))}
             </div>
           </div>
-        </section> */}
+        </section>
 
 
         {/* 12. LEFTOVER: VIDEO SECTION */}
