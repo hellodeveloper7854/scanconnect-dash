@@ -22,7 +22,9 @@ import {
   CheckCircle,
   Layers,
   Thermometer,
-  Sparkles
+  Sparkles,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 interface ProductDetailScreenProps {
@@ -53,10 +55,46 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   const [activeTab, setActiveTab] = useState<'how' | 'security'>('how');
   const [cartCount, setCartCount] = useState(0);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const reviewsTrackRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     window.scrollTo(0, 0);
   }, [isCheckoutOpen]);
+
+  const scrollReviews = (direction: 'left' | 'right') => {
+    const track = reviewsTrackRef.current;
+    if (!track) return;
+    const card = track.querySelector<HTMLElement>('[data-review-card]');
+    const cardWidth = card ? card.offsetWidth + 20 : track.clientWidth * 0.85;
+    track.scrollBy({ left: direction === 'left' ? -cardWidth : cardWidth, behavior: 'smooth' });
+  };
+
+  const customerReviews = [
+    {
+      quote: 'Saved my car from towing in Pune city! A shopkeeper scanned the tag and called me privately.',
+      name: 'Rajesh Sharma, MH-12',
+    },
+    {
+      quote: 'Super simple sticker to apply. Nobody gets my personal WhatsApp or phone number now.',
+      name: 'Ananya Deshmukh, MH-14',
+    },
+    {
+      quote: 'Someone blocked in our society parking scanned the QR and reached me in seconds. Genuinely useful.',
+      name: 'Vikram Nair, KA-05',
+    },
+    {
+      quote: 'Bought this for my delivery fleet. Drivers get contacted for wrong parking without sharing personal numbers.',
+      name: 'Fatima Sheikh, DL-08',
+    },
+    {
+      quote: 'Waterproof claim is real — my bike tag survived an entire monsoon season without fading.',
+      name: 'Arjun Mehta, GJ-01',
+    },
+    {
+      quote: 'Setup took less than two minutes. Great peace of mind for street parking in the city.',
+      name: 'Priya Iyer, TN-09',
+    },
+  ];
 
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
@@ -471,7 +509,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
         </section>
 
-        {/* SECTION 4: CUSTOMER REVIEWS — always visible, not hidden behind a tab */}
+        {/* SECTION 4: CUSTOMER REVIEWS — left-to-right carousel with nav buttons */}
         <section className="pb-4">
           <div className="bg-[#FAFAFA] border border-[#E4E2E2] rounded-[12px] p-[24px] sm:p-[40px] space-y-[24px]">
             <div className="flex items-center justify-between border-b border-[#E4E2E2] pb-[16px]">
@@ -482,25 +520,46 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
                 Verified Owners
               </span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-[20px] font-['Hanken_Grotesk']">
-              <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
-                <div className="flex text-[#FFD700]">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
-                  ))}
-                </div>
-                <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;Saved my car from towing in Pune city! A shopkeeper scanned the tag and called me privately.&rdquo;</p>
-                <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— Rajesh Sharma, MH-12</span>
+
+            <div className="relative">
+              <div
+                ref={reviewsTrackRef}
+                className="flex gap-[20px] overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {customerReviews.map((review, i) => (
+                  <div
+                    key={i}
+                    data-review-card
+                    className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px] font-['Hanken_Grotesk'] shrink-0 snap-start w-[280px] sm:w-[320px]"
+                  >
+                    <div className="flex text-[#FFD700]">
+                      {[...Array(5)].map((_, star) => (
+                        <Star key={star} className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
+                      ))}
+                    </div>
+                    <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;{review.quote}&rdquo;</p>
+                    <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— {review.name}</span>
+                  </div>
+                ))}
               </div>
-              <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
-                <div className="flex text-[#FFD700]">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
-                  ))}
-                </div>
-                <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;Super simple sticker to apply. Nobody gets my personal WhatsApp or phone number now.&rdquo;</p>
-                <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— Ananya Deshmukh, MH-14</span>
-              </div>
+
+              {/* Nav Buttons */}
+              <button
+                type="button"
+                onClick={() => scrollReviews('left')}
+                aria-label="Scroll reviews left"
+                className="hidden sm:flex absolute left-[-16px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-[#E4E2E2] shadow-md items-center justify-center text-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] transition-colors cursor-pointer"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollReviews('right')}
+                aria-label="Scroll reviews right"
+                className="hidden sm:flex absolute right-[-16px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-[#E4E2E2] shadow-md items-center justify-center text-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] transition-colors cursor-pointer"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </section>
