@@ -306,7 +306,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   ref={heroImageRef}
                   onMouseMove={handleHeroImageMove}
                   onMouseLeave={resetHeroTilt}
-                  className="relative w-full max-w-[240px] sm:max-w-[260px] [perspective:1000px]"
+                  className="relative w-full max-w-none sm:max-w-[240px] lg:max-w-[260px] [perspective:1000px]"
                 >
                   <img
                     src={shopBannerImg}
