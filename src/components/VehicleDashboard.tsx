@@ -48,6 +48,11 @@ import banner from '../assets/images/howitworksbanner.png'
 import sosEmergencyImg from '../assets/images/sosemmergencyimg.png'
 import videoWalkImg from '../assets/images/howitworks/videowalkimg.png'
 import tutorialVideoPreviewImg from '../assets/images/howitworks/tutorialvideopreview.png'
+import videoWalkImg2 from '../assets/images/howitworks/videowalkimg2.png'
+import videoWalkImg3 from '../assets/images/howitworks/videowalkimg3.png'
+import scanBannerImg from '../assets/images/scanbanner.png'
+import scanBanner1Img from '../assets/images/scanbanner1.png'
+import scanBanner2Img from '../assets/images/scanbanner2.png'
 import appStoreImg from '../assets/images/howitworks/appstore.png'
 import playStoreImg from '../assets/images/howitworks/playstore.png'
 
@@ -89,12 +94,14 @@ const RevealTimelineBar: React.FC<{ className?: string }> = ({ className = '' })
 export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, onLogout, onNavigate, isLoggedIn }) => {
   const [activeNav, setActiveNav] = useState('How it works');
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
   const [scannedTagId, setScannedTagId] = useState('');
   const [isScanSuccess, setIsScanSuccess] = useState(false);
   const [servicesPerView, setServicesPerView] = useState(4);
   const [servicesPage, setServicesPage] = useState(0);
+  const [videosPerView, setVideosPerView] = useState(3);
+  const [videosPage, setVideosPage] = useState(0);
 
   // Cards-per-view tracks the same breakpoints as the services grid
   // (1 col on mobile, 2 on sm, 4 on lg) so the carousel paging matches what's visible.
@@ -105,6 +112,19 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
       return 1;
     };
     const onResize = () => setServicesPerView(computePerView());
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // Videos-per-view: 1 on mobile, 2 on sm, 3 on lg — matches the video grid columns.
+  React.useEffect(() => {
+    const computePerView = () => {
+      if (window.innerWidth >= 1024) return 3;
+      if (window.innerWidth >= 640) return 2;
+      return 1;
+    };
+    const onResize = () => setVideosPerView(computePerView());
     onResize();
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
@@ -160,6 +180,58 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
     { label: 'Fire Department', icon: Flame, differentiator: false },
     { label: 'Hospitals', icon: HeartPulse, differentiator: false },
     { label: 'Roadside Assistance', icon: Wrench, differentiator: false },
+  ];
+
+  // Video library — each card opens the tutorial modal with its own content.
+  const videoLibrary = [
+    {
+      id: 'walkthrough',
+      title: 'Scan Connect Video Walkthrough',
+      description: 'A quick 90-second walkthrough of activating your tag and staying reachable.',
+      thumbnail: tutorialVideoPreviewImg,
+      duration: '1:30',
+      caption: 'Walkthrough Video Playing: Activate your QR tag, receive secure calls, protect your privacy, and handle parking emergencies',
+    },
+    {
+      id: 'installation',
+      title: 'How to Install Your QR Tag',
+      description: 'Step-by-step guide to placing and activating your Scan Connect tag.',
+      thumbnail: videoWalkImg2,
+      duration: '1:10',
+      caption: 'Installation Video Playing: Peel, stick, and activate your Scan Connect QR tag in under two minutes',
+    },
+    {
+      id: 'sos-demo',
+      title: 'SOS & Emergency Contact Demo',
+      description: 'See how family and emergency contacts are reached in a single tap.',
+      thumbnail: videoWalkImg3,
+      duration: '0:55',
+      caption: 'SOS Demo Playing: One tap connects a scanner to your emergency family contact and nearby help services',
+    },
+    {
+      id: 'privacy',
+      title: 'How Your Number Stays Private',
+      description: 'A look at the masked-call technology that keeps both sides anonymous.',
+      thumbnail: scanBannerImg,
+      duration: '1:05',
+      caption: 'Privacy Demo Playing: Masked calling routes every conversation without exposing either phone number',
+    },
+    {
+      id: 'industries',
+      title: 'Scan Connect Across India',
+      description: 'From malls to airports, see where Scan Connect tags are used every day.',
+      thumbnail: scanBanner1Img,
+      duration: '1:20',
+      caption: 'Industries Demo Playing: Municipal corporations, malls, airports, and campuses using Scan Connect tags',
+    },
+    {
+      id: 'testimonial',
+      title: 'Real Owners, Real Stories',
+      description: 'Vehicle owners share how Scan Connect helped in real parking emergencies.',
+      thumbnail: scanBanner2Img,
+      duration: '1:40',
+      caption: 'Testimonial Playing: Vehicle owners describe how Scan Connect resolved real parking situations',
+    },
   ];
 
   // Why Thousands Choose — benefits checklist. `core: true` marks the strongest
@@ -360,7 +432,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               </div>
 
               <button
-                onClick={() => setIsVideoModalOpen(true)}
+                onClick={() => setActiveVideoId('walkthrough')}
                 className="relative rounded-2xl overflow-hidden shadow-lg border border-[#E5E7EB] group cursor-pointer block w-full"
               >
                 <img
@@ -449,6 +521,132 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 );
               })}
             </div>
+          </div>
+        </section>
+
+
+        {/* 3b. VIDEO SECTION */}
+        <section className="py-20 bg-white relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
+            {(() => {
+              const totalVideoPages = Math.max(1, Math.ceil(videoLibrary.length / videosPerView));
+              const currentVideoPage = Math.min(videosPage, totalVideoPages - 1);
+              const goToVideoPage = (page: number) =>
+                setVideosPage(((page % totalVideoPages) + totalVideoPages) % totalVideoPages);
+
+              return (
+                <>
+                  <div className="text-center max-w-3xl mx-auto mb-8 space-y-3">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+                      <Play className="w-3.5 h-3.5 text-[#F2BA03]" />
+                      <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                        VIDEO SECTION
+                      </span>
+                    </div>
+                    <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-5xl text-[#1B1C1C] tracking-tight">
+                      See Scan Connect in Action
+                    </h2>
+                    <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] leading-[26px] max-w-2xl mx-auto">
+                      Watch our quick walkthroughs and discover how Scan Connect helps people reach you without revealing your phone number.
+                    </p>
+                  </div>
+
+                  {/* Carousel controls */}
+                  <div className="hidden sm:flex items-center justify-center gap-3 mb-8">
+                    <button
+                      onClick={() => goToVideoPage(currentVideoPage - 1)}
+                      aria-label="Previous videos"
+                      className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <div className="flex items-center gap-1.5" aria-label={`Page ${currentVideoPage + 1} of ${totalVideoPages}`}>
+                      {Array.from({ length: totalVideoPages }).map((_, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => goToVideoPage(idx)}
+                          aria-label={`Go to page ${idx + 1}`}
+                          className={`rounded-full transition-all cursor-pointer ${
+                            idx === currentVideoPage ? 'w-5 h-1.5 bg-[#F2BA03]' : 'w-1.5 h-1.5 bg-[#E5E7EB] hover:bg-[#F2BA03]/50'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => goToVideoPage(currentVideoPage + 1)}
+                      aria-label="Next videos"
+                      className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Sliding carousel track — width driven by number of pages, offset by currentVideoPage */}
+                  <div className="overflow-hidden max-w-6xl mx-auto">
+                    <div
+                      className="flex transition-transform duration-500 ease-out"
+                      style={{ transform: `translateX(-${currentVideoPage * 100}%)` }}
+                    >
+                      {Array.from({ length: totalVideoPages }).map((_, pageIdx) => (
+                        <div
+                          key={pageIdx}
+                          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch shrink-0 w-full"
+                        >
+                          {videoLibrary
+                            .slice(pageIdx * videosPerView, pageIdx * videosPerView + videosPerView)
+                            .map((video) => (
+                              <button
+                                key={video.id}
+                                onClick={() => setActiveVideoId(video.id)}
+                                className="relative rounded-2xl overflow-hidden border border-neutral-200 shadow-lg hover:shadow-2xl hover:-translate-y-1 group bg-white block w-full text-left cursor-pointer transition-all"
+                              >
+                                <div className="relative aspect-video overflow-hidden">
+                                  <img
+                                    src={video.thumbnail}
+                                    alt={video.title}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                  />
+                                  <div className="absolute inset-0 bg-[#1B1C1C]/30 group-hover:bg-[#1B1C1C]/40 transition-colors" />
+                                  <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-14 h-14 rounded-full bg-[#F2BA03] flex items-center justify-center shadow-[0_6px_18px_rgba(0,0,0,0.35)] group-hover:scale-110 transition-transform">
+                                      <Play className="w-6 h-6 text-[#1B1C1C] fill-current ml-0.5" />
+                                    </div>
+                                  </div>
+                                  <span className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-md bg-black/70 text-white text-xs font-semibold font-['Inter']">
+                                    {video.duration}
+                                  </span>
+                                </div>
+                                <div className="p-4 space-y-1">
+                                  <h3 className="font-['Hanken_Grotesk'] font-bold text-base text-[#1B1C1C] leading-snug">
+                                    {video.title}
+                                  </h3>
+                                  <p className="font-['Hanken_Grotesk'] font-normal text-sm text-[#5F5E5E] leading-snug">
+                                    {video.description}
+                                  </p>
+                                </div>
+                              </button>
+                            ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Mobile pagination dots — arrows are desktop-only, so mobile needs a visible page indicator too */}
+                  <div className="sm:hidden flex items-center justify-center gap-1.5 mt-6">
+                    {Array.from({ length: totalVideoPages }).map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => goToVideoPage(idx)}
+                        aria-label={`Go to page ${idx + 1}`}
+                        className={`rounded-full transition-all cursor-pointer ${
+                          idx === currentVideoPage ? 'w-5 h-1.5 bg-[#F2BA03]' : 'w-1.5 h-1.5 bg-[#E5E7EB]'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </section>
 
@@ -934,9 +1132,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="py-20 bg-[#FAFAFA]">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03] block">
-                TRUSTED BY THOUSANDS OF VEHICLE OWNERS
-              </span>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                  TRUSTED BY THOUSANDS OF VEHICLE OWNERS
+                </span>
+              </div>
               <h2 className="font-['Rubik'] font-bold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
                 One Purchase. Lifetime Peace of Mind.
               </h2>
@@ -971,39 +1172,6 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-
-
-        {/* 12. LEFTOVER: VIDEO SECTION */}
-        <section className="py-20 bg-white relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
-            <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-                <Play className="w-3.5 h-3.5 text-[#F2BA03]" />
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
-                  VIDEO SECTION
-                </span>
-              </div>
-              <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-5xl text-[#1B1C1C] tracking-tight">
-                See Scan Connect in Action
-              </h2>
-              <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] leading-[26px] max-w-2xl mx-auto">
-                Watch our quick 90-second walkthrough and discover how Scan Connect helps people reach you without revealing your phone number.
-              </p>
-            </div>
-
-            {/* Video Player Box */}
-            <button
-              onClick={() => setIsVideoModalOpen(true)}
-              className="max-w-4xl mx-auto relative rounded-3xl overflow-hidden border border-neutral-200 shadow-2xl group bg-white block w-full cursor-pointer"
-            >
-              <img
-                src={tutorialVideoPreviewImg}
-                alt="Tutorial Video Preview"
-                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
-              />
-            </button>
           </div>
         </section>
 
@@ -1244,41 +1412,45 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
       )}
 
       {/* TUTORIAL VIDEO PLAYER MODAL */}
-      {isVideoModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div className="bg-neutral-900 text-white rounded-2xl max-w-3xl w-full p-4 sm:p-6 shadow-2xl relative border border-neutral-800 space-y-4">
-            <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-              <h3 className="text-lg font-bold text-[#F2BA03] flex items-center gap-2">
-                <Play className="w-5 h-5 fill-current" />
-                Scan Connect Video Walkthrough
-              </h3>
-              <button
-                onClick={() => setIsVideoModalOpen(false)}
-                className="p-1.5 text-neutral-400 hover:text-white rounded-lg cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Simulated Video Player */}
-            <div className="aspect-video bg-black rounded-xl relative flex flex-col items-center justify-center text-center p-8 space-y-4 border border-neutral-800 overflow-hidden">
-              <div className="w-16 h-16 rounded-full bg-[#F2BA03] text-neutral-950 flex items-center justify-center animate-pulse">
-                <Play className="w-8 h-8 fill-current ml-1" />
+      {activeVideoId && (() => {
+        const activeVideo = videoLibrary.find((v) => v.id === activeVideoId);
+        if (!activeVideo) return null;
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+            <div className="bg-neutral-900 text-white rounded-2xl max-w-3xl w-full p-4 sm:p-6 shadow-2xl relative border border-neutral-800 space-y-4">
+              <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
+                <h3 className="text-lg font-bold text-[#F2BA03] flex items-center gap-2">
+                  <Play className="w-5 h-5 fill-current" />
+                  {activeVideo.title}
+                </h3>
+                <button
+                  onClick={() => setActiveVideoId(null)}
+                  className="p-1.5 text-neutral-400 hover:text-white rounded-lg cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <p className="text-neutral-300 text-sm max-w-md font-mono">
-                [ Walkthrough Video Playing: Activate your QR tag, receive secure calls, protect your privacy, and handle parking emergencies ]
+
+              {/* Simulated Video Player */}
+              <div className="aspect-video bg-black rounded-xl relative flex flex-col items-center justify-center text-center p-8 space-y-4 border border-neutral-800 overflow-hidden">
+                <div className="w-16 h-16 rounded-full bg-[#F2BA03] text-neutral-950 flex items-center justify-center animate-pulse">
+                  <Play className="w-8 h-8 fill-current ml-1" />
+                </div>
+                <p className="text-neutral-300 text-sm max-w-md font-mono">
+                  [ {activeVideo.caption} ]
+                </p>
+                <div className="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden">
+                  <div className="bg-[#F2BA03] h-full w-2/3 animate-pulse" />
+                </div>
+              </div>
+
+              <p className="text-xs text-neutral-400 text-center">
+                Scan Connect QR tags require zero application install for scanning drivers.
               </p>
-              <div className="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden">
-                <div className="bg-[#F2BA03] h-full w-2/3 animate-pulse" />
-              </div>
             </div>
-
-            <p className="text-xs text-neutral-400 text-center">
-              Scan Connect QR tags require zero application install for scanning drivers.
-            </p>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Separate Footer Component */}
       <DashboardFooter />
