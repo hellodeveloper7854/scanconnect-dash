@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
+import { api, ApiError } from '../lib/api';
 import {
   Mail,
   Phone,
@@ -79,6 +80,8 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
   const [message, setMessage] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
@@ -101,18 +104,34 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
     }
   };
 
-  const handleSubmitInquiry = (e: React.FormEvent) => {
+  const handleSubmitInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreeTerms) {
       alert('Please agree to receive communications regarding your request.');
       return;
     }
-    setIsSubmitted(true);
-    setTimeout(() => {
-      alert(`Thank you, ${fullName}! Your inquiry regarding "${subject}" has been submitted successfully to Scan Connect support.`);
-      setMessage('');
-      setIsSubmitted(false);
-    }, 800);
+
+    setIsSubmitting(true);
+    setSubmitError('');
+    try {
+      await api.post('/api/contact', {
+        fullName,
+        email,
+        phone: phone.trim() || undefined,
+        subject,
+        message,
+      });
+      setIsSubmitted(true);
+      setTimeout(() => {
+        alert(`Thank you, ${fullName}! Your inquiry regarding "${subject}" has been submitted successfully to Scan Connect support.`);
+        setMessage('');
+        setIsSubmitted(false);
+      }, 800);
+    } catch (err) {
+      setSubmitError(err instanceof ApiError ? err.message : 'Failed to submit your inquiry. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Why Contact Scan Connect?
@@ -492,14 +511,18 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 </label>
               </div>
 
+              {submitError && (
+                <p className="text-xs font-semibold text-rose-500 text-center">{submitError}</p>
+              )}
+
               {/* Send Inquiry Button */}
               <button
                 type="submit"
-                disabled={isSubmitted}
+                disabled={isSubmitted || isSubmitting}
                 className="btn-shimmer w-full h-12 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_20px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-['Manrope',sans-serif] font-semibold text-sm uppercase tracking-[1.4px] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] disabled:opacity-50"
               >
                 <Send className="w-4.5 h-4.5 text-white stroke-[2.2]" />
-                <span>{isSubmitted ? 'SENDING INQUIRY...' : 'SEND INQUIRY'}</span>
+                <span>{isSubmitting || isSubmitted ? 'SENDING INQUIRY...' : 'SEND INQUIRY'}</span>
               </button>
 
               {/* Confidentiality Footer Note */}

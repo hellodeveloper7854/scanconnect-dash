@@ -24,6 +24,8 @@ import {
   ShieldCheck,
   Settings,
   LogOut,
+  Handshake,
+  Mail,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -56,6 +58,8 @@ const SECTIONS: NavSection[] = [
       { to: '/admin/reports', label: 'Reports', icon: FileSpreadsheet },
       { to: '/admin/reviews', label: 'Reviews', icon: Star },
       { to: '/admin/sos-alerts', label: 'SOS Alerts', icon: Siren },
+      { to: '/admin/resellers', label: 'Resellers', icon: Handshake },
+      { to: '/admin/contact-requests', label: 'Contact Requests', icon: Mail },
     ],
   },
   {

@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Youtube, Instagram, Facebook, Twitter, Linkedin } from 'lucide-react';
 import { WhatsAppChatWidget } from './WhatsAppChatWidget';
+import { ResellerModal } from './ResellerModal';
 
 export const DashboardFooter: React.FC = () => {
+  const [isResellerModalOpen, setIsResellerModalOpen] = useState(false);
+
   return (
     <>
     <footer className="relative bg-[#EFCE1F] text-[#1B1C1C] font-['Rubik',sans-serif] pt-20 pb-12 overflow-hidden">
@@ -89,6 +92,10 @@ export const DashboardFooter: React.FC = () => {
                     <a href={href} className="hover:underline cursor-pointer text-left">
                       {label}
                     </a>
+                  ) : label === 'Become a reseller' ? (
+                    <button onClick={() => setIsResellerModalOpen(true)} className="hover:underline cursor-pointer text-left">
+                      {label}
+                    </button>
                   ) : (
                     <button onClick={() => alert(`About: ${label}`)} className="hover:underline cursor-pointer text-left">
                       {label}
@@ -184,6 +191,7 @@ export const DashboardFooter: React.FC = () => {
 
       </div>
     </footer>
+    <ResellerModal isOpen={isResellerModalOpen} onClose={() => setIsResellerModalOpen(false)} />
     <WhatsAppChatWidget />
     </>
   );

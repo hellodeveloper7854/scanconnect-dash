@@ -12,6 +12,8 @@ import { AdminEmergencyContacts } from './AdminEmergencyContacts';
 import { AdminReports } from './AdminReports';
 import { AdminReviews } from './AdminReviews';
 import { AdminSosAlerts } from './AdminSosAlerts';
+import { AdminResellers } from './AdminResellers';
+import { AdminContactRequests } from './AdminContactRequests';
 import {
   AdminQrAnalytics,
   AdminStickers,
@@ -43,6 +45,8 @@ export const AdminApp: React.FC = () => (
           <Route path="reports" element={<AdminReports />} />
           <Route path="reviews" element={<AdminReviews />} />
           <Route path="sos-alerts" element={<AdminSosAlerts />} />
+          <Route path="resellers" element={<AdminResellers />} />
+          <Route path="contact-requests" element={<AdminContactRequests />} />
           <Route path="qr-codes" element={<AdminQrCodes />} />
           <Route path="qr-analytics" element={<AdminQrAnalytics />} />
           <Route path="stickers" element={<AdminStickers />} />

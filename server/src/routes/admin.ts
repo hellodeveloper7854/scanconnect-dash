@@ -316,6 +316,38 @@ adminRouter.patch('/sos-alerts/:id/status', async (req, res) => {
   res.json({ alert });
 });
 
+adminRouter.get('/resellers', async (req, res) => {
+  const page = Math.max(1, Number(req.query.page ?? 1));
+  const pageSize = Math.min(100, Number(req.query.pageSize ?? 25));
+
+  const [resellers, total] = await Promise.all([
+    prisma.reseller.findMany({
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.reseller.count(),
+  ]);
+
+  res.json({ resellers, total, page, pageSize });
+});
+
+adminRouter.get('/contact-requests', async (req, res) => {
+  const page = Math.max(1, Number(req.query.page ?? 1));
+  const pageSize = Math.min(100, Number(req.query.pageSize ?? 25));
+
+  const [contactRequests, total] = await Promise.all([
+    prisma.contactRequest.findMany({
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.contactRequest.count(),
+  ]);
+
+  res.json({ contactRequests, total, page, pageSize });
+});
+
 function sendCsv(res: import('express').Response, filename: string, csv: string) {
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

@@ -199,6 +199,30 @@ model SosAlert {
   @@index([status])
 }
 
+model Reseller {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String
+  address   String?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model ContactRequest {
+  id        String   @id @default(uuid())
+  fullName  String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 /**
  * The models below back the "Demo Sections" of the admin panel: full CRUD is
  * available so admins can manage the records, but none of it drives live app
