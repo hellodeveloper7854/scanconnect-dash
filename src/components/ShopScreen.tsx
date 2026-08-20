@@ -117,7 +117,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
   const perfectFor = [
     'Emergency Family Contact',
     'Wrong Parking Alerts',
-    'Emergency Contact',
+    'Emergency Family Contact',
     'Vehicle Safety Notifications',
     'Lost Vehicle Assistance',
     'Society & Office Parking',

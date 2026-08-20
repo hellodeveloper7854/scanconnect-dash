@@ -202,7 +202,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
     },
     {
       id: 'sos-demo',
-      title: 'SOS & Emergency Contact Demo',
+      title: 'SOS & Emergency Family Contact Demo',
       description: 'See how family and emergency contacts are reached in a single tap.',
       thumbnail: videoWalkImg3,
       duration: '0:55',
