@@ -143,11 +143,31 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         'Lifetime QR Activation',
         'No Battery Required',
       ],
-      price: '₹499',
+      price: '₹899',
       cta: 'View Product',
     },
     {
       id: 2,
+      icon: Car,
+      rating: '4.8/5 Customer Rating',
+      title: 'Scan Connect Car Tag (Single Pack)',
+      desc: 'Never worry about missed parking alerts again. Anyone can contact you instantly without seeing your personal phone number.',
+      idealFor: ['Cars & SUVs', 'Residential Parking', 'Office Parking', 'Shopping Malls', 'Public Parking'],
+      features: [
+        'Privacy-Protected Calls',
+        'Instant QR Scan',
+        'Waterproof & Weatherproof',
+        'UV Resistant Premium Material',
+        'Secure Call Routing',
+        'Easy Self Activation',
+        'Lifetime QR Activation',
+        'No Battery Required',
+      ],
+      price: '₹599',
+      cta: 'View Product',
+    },
+    {
+      id: 3,
       icon: Bike,
       rating: '4.7/5 Customer Rating',
       title: 'Scan Connect Bike Tag',
@@ -163,11 +183,11 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         'Lifetime QR Activation',
         'No Battery Required',
       ],
-      price: 'Starting from ₹399',
+      price: '₹399',
       cta: 'View Product',
     },
     {
-      id: 3,
+      id: 4,
       icon: Truck,
       title: 'Fleet & Commercial Tags',
       desc: 'Designed for logistics companies, delivery fleets, taxis, corporate vehicles, and commercial transportation.',
@@ -176,12 +196,12 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       cta: 'Contact Sales',
     },
     {
-      id: 4,
+      id: 5,
       icon: Home,
       title: 'Home & Society QR Tags',
       desc: 'Enable visitors, security personnel, and neighbors to contact residents securely without exposing private phone numbers.',
       idealFor: ['Apartments', 'Villas', 'Gated Communities', 'Residential Complexes'],
-      price: 'Starting from ₹349',
+      price: '₹349',
       cta: 'View Product',
     },
   ];
@@ -384,15 +404,15 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               </p>
             </div>
 
-            {/* Product Cards Grid (4 cards per row) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {products.map((prod) => {
+            {/* Product Cards Grid — 3 per row on laptop, remainder row centered */}
+            {(() => {
+              const renderProductCard = (prod: typeof products[number]) => {
                 const ProductIcon = prod.icon;
                 const hasMoreDetails = (prod.idealFor && prod.idealFor.length > 0) || (prod.features && prod.features.length > 0);
                 return (
                 <div
                   key={prod.id}
-                  className="group bg-white border border-neutral-200 rounded-2xl shadow-xs hover:shadow-xl hover:border-[#F2BA03]/40 hover:-translate-y-1 transition-all flex flex-col overflow-hidden"
+                  className="group bg-white border border-neutral-200 rounded-2xl shadow-xs hover:shadow-xl hover:border-[#F2BA03]/40 hover:-translate-y-1 transition-all flex flex-col overflow-hidden w-full h-full"
                 >
                   {/* Header — icon, badge, rating */}
                   <div className="p-6 pb-0 space-y-4">
@@ -475,8 +495,31 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   </div>
                 </div>
                 );
-              })}
-            </div>
+              };
+
+              const firstRow = products.slice(0, 3);
+              const remainder = products.slice(3);
+
+              return (
+                <div className="space-y-6 mb-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:items-stretch">
+                    {firstRow.map(renderProductCard)}
+                  </div>
+                  {remainder.length > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 lg:items-stretch">
+                      {remainder.map((prod, i) => (
+                        <div
+                          key={prod.id}
+                          className={`h-full lg:col-span-2 ${i === 0 ? 'lg:col-start-2' : ''}`}
+                        >
+                          {renderProductCard(prod)}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
           </div>
         </section>
