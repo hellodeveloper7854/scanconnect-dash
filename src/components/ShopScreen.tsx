@@ -115,6 +115,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
   // SCAN CONNECT TAG — Perfect For list
   const perfectFor = [
+    'Emergency Family Contact',
     'Wrong Parking Alerts',
     'Emergency Contact',
     'Vehicle Safety Notifications',
