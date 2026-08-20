@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
@@ -46,7 +45,6 @@ import {
 import { BLOG_POSTS } from '../lib/blogPosts';
 import { useRevealOnScroll } from '../lib/useRevealOnScroll';
 import banner from '../assets/images/howitworksbanner.png'
-import logoImg from '../assets/images/logo.png'
 import sosEmergencyImg from '../assets/images/sosemmergencyimg.png'
 import videoWalkImg from '../assets/images/howitworks/videowalkimg.png'
 import tutorialVideoPreviewImg from '../assets/images/howitworks/tutorialvideopreview.png'
@@ -300,8 +298,8 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
           </div>
 
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 sm:py-20 lg:py-24 relative z-10 w-full">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-7 max-w-xl space-y-5">
+            <div className="grid grid-cols-1 items-center">
+              <div className="max-w-xl space-y-5">
                 <h1 className="font-['Rubik'] font-bold text-3xl sm:text-4xl lg:text-[46px] tracking-[-1px] leading-[1.15] text-white">
                   Protect Your Privacy. <br></br><span className="text-[#F2BA03]">Stay Reachable.</span>
                 </h1>
@@ -315,7 +313,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 </p>
 
                 <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#F2BA03]">
-                  Privacy-First &bull; Instant Contact &bull; No App Required &bull; Lifetime Access
+                  Privacy-First &bull; Instant Contact &bull; No App Required &bull; Lifetime Access &bull; No Monthly Subscription
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -332,24 +330,6 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                   >
                     How It Works
                   </button>
-                </div>
-              </div>
-
-              {/* Floating QR card — fills the empty right side, draws the eye
-                  to the product, and scanning it takes shoppers straight to
-                  the shop's products section. */}
-              <div className="hidden lg:flex lg:col-span-5 justify-end">
-                <div className="animate-gentle-float bg-white rounded-2xl p-5 shadow-2xl border border-white/20 w-56 xl:w-64 flex flex-col items-center gap-3">
-                  <img src={logoImg} alt="Scan Connect" className="h-6 w-auto object-contain" />
-                  <QRCodeSVG
-                    value={`${window.location.origin}/shop#products`}
-                    size={168}
-                    level="M"
-                    marginSize={0}
-                    fgColor="#1B1C1C"
-                    bgColor="#FFFFFF"
-                    title="Scan to shop Scan Connect QR tags"
-                  />
                 </div>
               </div>
             </div>
