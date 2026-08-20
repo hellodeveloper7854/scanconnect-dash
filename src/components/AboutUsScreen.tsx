@@ -15,6 +15,7 @@ import {
   HeartHandshake,
   BadgeCheck,
   Clock,
+  PhoneCall,
 } from 'lucide-react';
 
 interface AboutUsScreenProps {
@@ -126,6 +127,12 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-5">
               {[
+                {
+                  icon: PhoneCall,
+                  title: 'Emergency Family Contact',
+                  desc: 'In an accident or emergency, first responders or bystanders can instantly reach your family through the tag — without needing your phone or unlocking it.',
+                  featured: true,
+                },
                 {
                   icon: Lock,
                   title: 'Privacy by Default',
