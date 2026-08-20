@@ -144,7 +144,6 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
   // SOS Emergency Assistance highlights
   const sosHighlights = [
-    { icon: PhoneCall, label: 'One-Tap Emergency Calling' },
     { icon: Users, label: 'Notify Family & Friends' },
     { icon: Clock, label: 'Available 24×7' },
     { icon: ShieldAlert, label: 'Designed for Roadside Emergencies' },
@@ -689,38 +688,6 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     </div>
                   ))}
                 </div>
-
-                {/* Quick access pills — the actual services one tap away */}
-                <div className="text-left">
-                  <span className="font-['Inter'] font-bold text-xs uppercase tracking-[2px] text-neutral-400 block mb-3">
-                    One tap connects you to
-                  </span>
-                  <div className="flex flex-wrap gap-2.5">
-                    {emergencyQuickAccess.map((item) => {
-                      const ItemIcon = item.icon;
-                      return item.differentiator ? (
-                        <span
-                          key={item.label}
-                          className="inline-flex items-center gap-2 pl-3.5 pr-2.5 py-2 bg-[#F2BA03] rounded-full text-sm font-bold text-[#1B1C1C] shadow-[0_6px_18px_rgba(242,186,3,0.35)]"
-                        >
-                          <ItemIcon className="w-4 h-4" />
-                          {item.label}
-                          <span className="px-1.5 py-0.5 rounded-full bg-[#1B1C1C] text-[#F2BA03] text-[9px] font-extrabold uppercase tracking-wide">
-                            Only Here
-                          </span>
-                        </span>
-                      ) : (
-                        <span
-                          key={item.label}
-                          className="inline-flex items-center gap-2 px-3.5 py-2 bg-white/5 border border-white/10 rounded-full text-sm font-semibold text-neutral-200 hover:border-[#F2BA03]/50 hover:bg-white/[0.08] transition-all"
-                        >
-                          <ItemIcon className="w-4 h-4 text-[#F2BA03]" />
-                          {item.label}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
               </RevealCard>
 
               {/* Right column — SOS emergency image, framed to pop against the dark section */}
@@ -771,6 +738,62 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 Your Safety. Your Family&apos;s Peace of Mind. Always Connected.
               </p>
             </RevealCard>
+          </div>
+        </section>
+
+
+        {/* 7b. SOS EMERGENCY ASSISTANCE SECTION (SECOND) */}
+        <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
+          <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+              <ShieldAlert className="w-4 h-4 text-[#F2BA03]" />
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                QUICK EMERGENCY ACCESS
+              </span>
+            </div>
+
+            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-4xl tracking-tight text-[#1B1C1C] leading-tight">
+              Emergency Help When Every Second Counts
+            </h2>
+
+            <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
+              Access important emergency services directly from the Scan Connect platform.
+            </p>
+
+            <div className="pt-2">
+              <span className="font-bold text-sm uppercase tracking-wider text-[#1B1C1C] block mb-4">
+                Quick access to:
+              </span>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                {emergencyQuickAccess.map((item) => {
+                  const ItemIcon = item.icon;
+                  return item.differentiator ? (
+                    <span
+                      key={item.label}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#1B1C1C] border border-[#1B1C1C] rounded-full text-sm font-bold text-white shadow-[0_6px_18px_rgba(0,0,0,0.25)]"
+                    >
+                      <ItemIcon className="w-4 h-4 text-[#F2BA03]" />
+                      {item.label}
+                      <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-[#F2BA03] text-[#1B1C1C] text-[9px] font-extrabold uppercase tracking-wide">
+                        Only Here
+                      </span>
+                    </span>
+                  ) : (
+                    <span
+                      key={item.label}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#E5E7EB] rounded-full text-sm font-semibold text-[#1B1C1C]"
+                    >
+                      <ItemIcon className="w-4 h-4 text-[#F2BA03]" />
+                      {item.label}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+
+            <p className="font-['Hanken_Grotesk'] font-bold text-lg text-[#1B1C1C] pt-2">
+              Because emergencies shouldn&apos;t wait.
+            </p>
           </div>
         </section>
 
