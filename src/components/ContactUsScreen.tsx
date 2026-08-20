@@ -10,6 +10,7 @@ import {
   Send,
   Lock,
   MessageSquare,
+  MessageCircle,
   Globe,
   AtSign,
   FileText,
@@ -205,20 +206,20 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               </div>
             </div>
 
-            {/* Card 2: Call Module */}
+            {/* Card 2: WhatsApp Support Module */}
             <div className="bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 flex flex-col space-y-6">
               <div className="w-10 h-10 bg-[#F2BA03] rounded-lg text-white flex items-center justify-center shrink-0">
-                <Phone className="w-5 h-5 text-white stroke-[2.2]" />
+                <MessageCircle className="w-5 h-5 text-white stroke-[2.2]" />
               </div>
 
               <div className="space-y-4">
                 <h3 className="font-['Noto_Serif',serif] font-semibold text-2xl text-[#1B1C1C]">
-                  Call Our Support Team
+                  Chat with our WhatsApp support team
                 </h3>
 
                 <div className="space-y-2 font-['Manrope',sans-serif]">
-                  <a href="tel:+919990961299" className="text-lg font-semibold text-[#1B1C1C] block hover:text-[#F2BA03] transition-colors">
-                    +91 99909 61299
+                  <a href="https://wa.me/919973878399" target="_blank" rel="noopener noreferrer" className="text-lg font-semibold text-[#1B1C1C] block hover:text-[#F2BA03] transition-colors">
+                    +91 99738 78399
                   </a>
                   <div className="pt-1">
                     <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
@@ -236,7 +237,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               </div>
             </div>
 
-            {/* Card 3: Connect Module (sits in row 1 beside Email Us and Call Our Support Team) */}
+            {/* Card 3: Connect Module (sits in row 1 beside Email Us and WhatsApp Support) */}
             <div className="bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 flex flex-col items-center lg:items-start space-y-6">
               <div className="w-10 h-10 bg-[#F2BA03] rounded-lg text-white flex items-center justify-center shrink-0">
                 <Share2 className="w-5 h-5 text-white stroke-[2.2]" />
