@@ -310,8 +310,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 </p>
 
                 <p className="font-['Rubik'] font-normal text-xs sm:text-sm text-[#D1D5DB] leading-[24px] max-w-md pt-1">
-                  Whether it&apos;s a blocked driveway, headlights left on, or an accidental
-                  emergency, anyone can contact you or your family members instantly&mdash;without ever seeing
+                  Whether it&apos;s a blocked driveway, headlights left on, or an <span className="text-[#F2BA03] font-semibold">accidental emergency</span>, anyone can contact you or your <span className="text-[#F2BA03] font-semibold">family members</span> instantly&mdash;without ever seeing
                   your phone number.
                 </p>
 
