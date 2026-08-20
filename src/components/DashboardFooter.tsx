@@ -1,8 +1,10 @@
 import React from 'react';
 import { Youtube, Instagram, Facebook, Twitter, Linkedin } from 'lucide-react';
+import { WhatsAppChatWidget } from './WhatsAppChatWidget';
 
 export const DashboardFooter: React.FC = () => {
   return (
+    <>
     <footer className="relative bg-[#EFCE1F] text-[#1B1C1C] font-['Rubik',sans-serif] pt-20 pb-12 overflow-hidden">
       {/* Top Slanted Diagonal Border */}
       <div
@@ -80,7 +82,6 @@ export const DashboardFooter: React.FC = () => {
               {[
                 { label: 'Contact', href: '/contact' },
                 { label: 'Become a reseller', href: null },
-                { label: 'Investors', href: '/investors' },
                 { label: 'Blog', href: '/blog' },
               ].map(({ label, href }) => (
                 <li key={label}>
@@ -163,8 +164,8 @@ export const DashboardFooter: React.FC = () => {
                 </a>
               </li>
               <li>
-                <a href="tel:08047359856" className="hover:underline block">
-                  080-473-59856
+                <a href="tel:+919973878399" className="hover:underline block">
+                  +91-9973878399
                 </a>
               </li>
             </ul>
@@ -183,6 +184,8 @@ export const DashboardFooter: React.FC = () => {
 
       </div>
     </footer>
+    <WhatsAppChatWidget />
+    </>
   );
 };
 
