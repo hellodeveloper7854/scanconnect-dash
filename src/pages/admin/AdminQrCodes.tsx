@@ -58,20 +58,26 @@ function drawWordmark(ctx: CanvasRenderingContext2D, x: number, y: number, maxWi
   const scanWidth = ctx.measureText(scanText).width;
   const connectWidth = ctx.measureText(connectText).width;
 
-  // Rough yellow marker-stroke behind "CONNECT", drawn as a few overlapping
-  // slightly-rotated bars so it reads as a hand-drawn highlight, not a clean box.
+  // Rough yellow zigzag marker-stroke behind "CONNECT", drawn as a thick
+  // hand-drawn-style zigzag ribbon rather than a clean box, for emphasis.
   ctx.save();
-  ctx.fillStyle = STICKER_YELLOW;
-  const strokeX = x + scanWidth - fontSize * 0.03;
-  const strokeY = baselineY - fontSize * 0.62;
-  const strokeH = fontSize * 0.5;
-  [-0.03, 0.02, -0.015].forEach((angle, i) => {
-    ctx.save();
-    ctx.translate(strokeX + connectWidth / 2, strokeY + strokeH / 2 + i * strokeH * 0.05);
-    ctx.rotate(angle);
-    ctx.fillRect(-connectWidth / 2 - fontSize * 0.04, -strokeH / 2, connectWidth + fontSize * 0.08, strokeH * 0.45);
-    ctx.restore();
-  });
+  const strokeX = x + scanWidth - fontSize * 0.05;
+  const strokeY = baselineY - fontSize * 0.42;
+  const strokeW = connectWidth + fontSize * 0.1;
+  const strokeAmplitude = fontSize * 0.13;
+  const zigzagCount = 6;
+  ctx.strokeStyle = STICKER_YELLOW;
+  ctx.lineWidth = fontSize * 0.32;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  for (let i = 0; i <= zigzagCount; i++) {
+    const px = strokeX + (strokeW / zigzagCount) * i;
+    const py = strokeY + (i % 2 === 0 ? -strokeAmplitude : strokeAmplitude);
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
   ctx.restore();
 
   ctx.font = `700 ${fontSize}px ${wordmarkFontFamily}`;
@@ -196,16 +202,23 @@ const LUCIDE_ICON_PATHS: { paths: string[]; stroke: string }[] = [
       'M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384',
     ],
   },
-  {
-    // ShieldAlert (SOS)
-    stroke: '#D6272C',
-    paths: [
-      'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
-      'M12 8v4',
-      'M12 16h.01',
-    ],
-  },
 ];
+
+/** Draws a filled red circular "SOS" badge (matching the 🆘 emoji style), rather than a stroked lucide icon. */
+function drawSosBadge(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) {
+  ctx.save();
+  ctx.fillStyle = '#D6272C';
+  ctx.beginPath();
+  ctx.arc(cx, cy, s / 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `800 ${Math.round(s * 0.42)}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('SOS', cx, cy + s * 0.02);
+  ctx.restore();
+}
 
 /** Draws one lucide-react icon (by its raw 24x24 path data) centered at (cx, cy), scaled to size `s`. */
 function drawLucideIcon(
@@ -228,9 +241,12 @@ function drawLucideIcon(
   ctx.restore();
 }
 
-const STICKER_ICONS = LUCIDE_ICON_PATHS.map(
-  (icon) => (ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) => drawLucideIcon(ctx, icon, cx, cy, s),
-);
+const STICKER_ICONS: ((ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) => void)[] = [
+  ...LUCIDE_ICON_PATHS.map(
+    (icon) => (ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) => drawLucideIcon(ctx, icon, cx, cy, s),
+  ),
+  drawSosBadge,
+];
 
 /**
  * Composites the bare server-generated QR PNG into a print-ready two-panel
@@ -244,7 +260,7 @@ async function drawBrandedQrCanvas(
 ): Promise<HTMLCanvasElement> {
   const [qrImage] = await Promise.all([
     createImageBitmap(qrBlob),
-    document.fonts.load("800 100px 'Montserrat'"),
+    document.fonts.load("800 100px 'Poppins'"),
     document.fonts.load("700 100px 'Roboto Condensed'"),
     document.fonts.load("500 100px 'Roboto Condensed'"),
   ]);
@@ -279,7 +295,7 @@ async function drawBrandedQrCanvas(
   const sublineLineCount = wrapText(ctx, text.subline, headlineMaxWidth).length;
   const headlineMaxHeight = height - headlineTop - pad - sublineFontSizeFitted * 1.35 * sublineLineCount;
 
-  const headlineFontFamily = "'Montserrat', sans-serif";
+  const headlineFontFamily = "'Poppins', sans-serif";
   let headlineFontSize = Math.round(height * 0.11);
   let headlineLines: { text: string; startWordIndex: number; wordCount: number }[] = [];
   let headlineLineHeight = 0;
