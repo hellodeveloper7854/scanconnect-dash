@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
-import { api, ApiError, downloadFile } from '../lib/api';
+import { api, ApiError } from '../lib/api';
+import { auth } from '../lib/firebase';
+import { fetchBrandedQrPngBlob, triggerBlobDownload, stickerSizeForProductName } from '../lib/qrSticker';
 import { Package, ShoppingBag, Download } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
@@ -137,12 +139,16 @@ export const MyOrdersScreen: React.FC<MyOrdersScreenProps> = ({ userData, onLogo
                     </span>
                     {order.qrToken && (
                       <button
-                        onClick={() =>
-                          downloadFile(
-                            `/api/order-contact/${order.qrToken}/qr.png`,
-                            `scanconnect-qr-${order.id.slice(0, 8)}.png`,
-                          )
-                        }
+                        onClick={async () => {
+                          const idToken = await auth.currentUser?.getIdToken();
+                          const size = stickerSizeForProductName(order.items[0]?.product.name);
+                          const blob = await fetchBrandedQrPngBlob(
+                            `${API_BASE_URL}/api/order-contact/${order.qrToken}/qr.png`,
+                            idToken,
+                            { lang: 'en', size },
+                          );
+                          triggerBlobDownload(blob, `scanconnect-qr-${order.id.slice(0, 8)}.png`);
+                        }}
                         title="Download QR"
                         className="p-2 text-neutral-500 hover:text-neutral-900 rounded-lg hover:bg-neutral-100 cursor-pointer"
                       >

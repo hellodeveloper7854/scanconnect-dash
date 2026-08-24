@@ -3,8 +3,9 @@ import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { OtpModal } from './OtpModal';
-import { api, ApiError, downloadFile } from '../lib/api';
+import { api, ApiError } from '../lib/api';
 import { auth } from '../lib/firebase';
+import { fetchBrandedQrPngBlob, triggerBlobDownload, stickerSizeForVehicleType } from '../lib/qrSticker';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import {
   Camera,
@@ -27,6 +28,8 @@ import {
   QrCode as QrCodeIcon,
   Download
 } from 'lucide-react';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
 interface BackendUser {
   fullName: string;
@@ -819,12 +822,16 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                             </div>
                             <button
                               type="button"
-                              onClick={() =>
-                                downloadFile(
-                                  `/api/qr/${vehicle.qrCodeRecord!.code}/qr.png`,
-                                  `scanconnect-qr-${vehicle.qrCodeRecord!.code}.png`,
-                                )
-                              }
+                              onClick={async () => {
+                                const code = vehicle.qrCodeRecord!.code;
+                                const idToken = await auth.currentUser?.getIdToken();
+                                const blob = await fetchBrandedQrPngBlob(
+                                  `${API_BASE_URL}/api/qr/${code}/qr.png`,
+                                  idToken,
+                                  { lang: 'en', size: stickerSizeForVehicleType(vehicle.vehicleType) },
+                                );
+                                triggerBlobDownload(blob, `scanconnect-qr-${code}.png`);
+                              }}
                               title="Download QR"
                               className="p-1.5 text-[#736B00] hover:text-[#1B1C1C] hover:bg-[#FFED00]/20 rounded-md cursor-pointer shrink-0"
                             >

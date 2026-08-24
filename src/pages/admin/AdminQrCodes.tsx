@@ -1,405 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import JSZip from 'jszip';
 import { Download, Printer, X, Search, FileArchive } from 'lucide-react';
 import { api, downloadFile } from '../../lib/api';
 import { auth } from '../../lib/firebase';
+import {
+  StickerLang,
+  StickerSize,
+  STICKER_DIMENSIONS_PX,
+  drawBrandedQrCanvas,
+  canvasToBlob,
+  fetchBrandedQrPngBlob,
+  triggerBlobDownload,
+} from '../../lib/qrSticker';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
-
-export type StickerLang = 'en' | 'hi';
-export type StickerSize = 'bike' | 'car';
-
-// Physical label sizes at 300 DPI. Car keeps the bike's 8:5 aspect ratio, doubled.
-const STICKER_DIMENSIONS_PX: Record<StickerSize, { width: number; height: number }> = {
-  bike: { width: 1200, height: 750 }, // 4in x 2.5in
-  car: { width: 2400, height: 1500 }, // 8in x 5in
-};
-
-const STICKER_TEXT: Record<StickerLang, {
-  headline: string;
-  /** 0-based word index where the headline's underline begins; runs to the last word. */
-  headlineUnderlineFrom: number;
-  subline: string;
-  iconCaption: string;
-}> = {
-  en: {
-    headline: 'Scan to connect with the vehicle owner',
-    headlineUnderlineFrom: 2, // underlines "connect with the vehicle owner"
-    subline: 'SCAN USING PHONE CAMERA, GOOGLE LENS OR ANY QR SCANNER APP. VISIT SCANCONNECT.CO.IN FOR MORE INFO',
-    iconCaption: 'Wrong Parking, Emergency Contact, any issue with the vehicle, Scan the QR',
-  },
-  hi: {
-    headline: 'वाहन मालिक से संपर्क करने के लिए कोड स्कैन करें।',
-    headlineUnderlineFrom: 3, // underlines "संपर्क करने के लिए कोड स्कैन करें।"
-    subline: 'फ़ोन कैमरा, गूगल लेंस या किसी भी QR स्कैनर ऐप से स्कैन करें। अधिक जानकारी के लिए SCANCONNECT.CO.IN पर जाएं।',
-    iconCaption: 'गलत पार्किंग, आपातकालीन संपर्क, वाहन संबंधी कोई भी समस्या, QR स्कैन करें',
-  },
-};
-
-const STICKER_YELLOW = '#FFED00';
-
-/**
- * Draws the "SCAN CONNECT" wordmark as text (no logo image) with a
- * "CONNECTING SOLUTION" subtitle beneath it, so the sticker doesn't depend on
- * loading/decoding an external image asset. "CONNECT" is black text with a
- * rough brand-yellow marker-stroke drawn behind it for emphasis. Returns the
- * total rendered height so callers can lay out the headline beneath it.
- */
-function drawWordmark(ctx: CanvasRenderingContext2D, x: number, y: number, maxWidth: number): number {
-  const wordmarkFontFamily = "'Roboto Condensed', sans-serif";
-  const fontSize = fitFontSize(ctx, 'SCAN CONNECT', maxWidth, maxWidth * 0.22, '700', wordmarkFontFamily);
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'alphabetic';
-
-  const scanText = 'SCAN ';
-  const connectText = 'CONNECT';
-  const baselineY = y + fontSize * 0.85;
-
-  ctx.font = `700 ${fontSize}px ${wordmarkFontFamily}`;
-  const scanWidth = ctx.measureText(scanText).width;
-  const connectWidth = ctx.measureText(connectText).width;
-
-  // Rough yellow zigzag marker-stroke behind "CONNECT", drawn as a thick
-  // hand-drawn-style zigzag ribbon rather than a clean box, for emphasis.
-  ctx.save();
-  const strokeX = x + scanWidth - fontSize * 0.05;
-  const strokeY = baselineY - fontSize * 0.42;
-  const strokeW = connectWidth + fontSize * 0.1;
-  const strokeAmplitude = fontSize * 0.13;
-  const zigzagCount = 6;
-  ctx.strokeStyle = STICKER_YELLOW;
-  ctx.lineWidth = fontSize * 0.32;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.beginPath();
-  for (let i = 0; i <= zigzagCount; i++) {
-    const px = strokeX + (strokeW / zigzagCount) * i;
-    const py = strokeY + (i % 2 === 0 ? -strokeAmplitude : strokeAmplitude);
-    if (i === 0) ctx.moveTo(px, py);
-    else ctx.lineTo(px, py);
-  }
-  ctx.stroke();
-  ctx.restore();
-
-  ctx.font = `700 ${fontSize}px ${wordmarkFontFamily}`;
-  ctx.fillStyle = '#0F0F0F';
-  ctx.fillText(scanText, x, baselineY);
-  ctx.fillText(connectText, x + scanWidth, baselineY);
-
-  const subtitleFontSize = Math.round(fontSize * 0.32);
-  const subtitleY = baselineY + subtitleFontSize * 1.4;
-  ctx.font = `500 ${subtitleFontSize}px ${wordmarkFontFamily}`;
-  ctx.fillStyle = '#0F0F0F';
-  // Letter-spaced manually since canvas has no tracking/letter-spacing property;
-  // total width is measured first so the whole line can be centered under the wordmark.
-  const subtitleText = 'CONNECTING SOLUTIONS';
-  const subtitleLetterGap = subtitleFontSize * 0.12;
-  let subtitleTotalWidth = -subtitleLetterGap;
-  for (const ch of subtitleText) {
-    subtitleTotalWidth += ctx.measureText(ch).width + subtitleLetterGap;
-  }
-  const wordmarkTotalWidth = scanWidth + connectWidth;
-  let cursorX = x + (wordmarkTotalWidth - subtitleTotalWidth) / 2;
-  for (const ch of subtitleText) {
-    ctx.fillText(ch, cursorX, subtitleY);
-    cursorX += ctx.measureText(ch).width + subtitleLetterGap;
-  }
-
-  return subtitleY - y;
-}
-
-/** Shrinks the font size until `text` fits within `maxWidth` (single line), returning the fitted size. */
-function fitFontSize(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number,
-  startFontSize: number,
-  fontWeight: string,
-  fontFamily = 'sans-serif',
-): number {
-  let fontSize = startFontSize;
-  do {
-    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-    fontSize -= 1;
-  } while (ctx.measureText(text).width > maxWidth && fontSize > 8);
-  return fontSize + 1;
-}
-
-/** Wraps `text` to fit within `maxWidth` at the given font, splitting on spaces; returns each line. */
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  return wrapTextWithWordIndex(ctx, text, maxWidth).map((line) => line.text);
-}
-
-/** Same wrapping as `wrapText`, but each line also reports the word-index range it covers (for partial-headline underlining). */
-function wrapTextWithWordIndex(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number,
-): { text: string; startWordIndex: number; wordCount: number }[] {
-  const words = text.split(' ');
-  const lines: { text: string; startWordIndex: number; wordCount: number }[] = [];
-  let current = '';
-  let lineStartIndex = 0;
-  let wordCountInLine = 0;
-  words.forEach((word, i) => {
-    const attempt = current ? `${current} ${word}` : word;
-    if (ctx.measureText(attempt).width > maxWidth && current) {
-      lines.push({ text: current, startWordIndex: lineStartIndex, wordCount: wordCountInLine });
-      current = word;
-      lineStartIndex = i;
-      wordCountInLine = 1;
-    } else {
-      current = attempt;
-      wordCountInLine += 1;
-    }
-  });
-  if (current) lines.push({ text: current, startWordIndex: lineStartIndex, wordCount: wordCountInLine });
-  return lines;
-}
-
-// Raw path data straight from lucide-react (24x24 viewBox, stroke-based icons),
-// so the sticker's icons are pixel-faithful to the ones used across the rest
-// of the app instead of hand-drawn approximations.
-const LUCIDE_ICON_PATHS: { paths: string[]; stroke: string }[] = [
-  {
-    // Siren
-    stroke: '#1B1C1C',
-    paths: [
-      'M7 18v-6a5 5 0 1 1 10 0v6',
-      'M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z',
-      'M21 12h1',
-      'M18.5 4.5 18 5',
-      'M2 12h1',
-      'M12 2v1',
-      'm4.929 4.929.707.707',
-      'M12 12v6',
-    ],
-  },
-  {
-    // CircleParkingOff
-    stroke: '#D6272C',
-    paths: [
-      'M12.656 7H13a3 3 0 0 1 2.984 3.307',
-      'M13 13H9',
-      'M19.071 19.071A1 1 0 0 1 4.93 4.93',
-      'm2 2 20 20',
-      'M8.357 2.687a10 10 0 0 1 12.956 12.956',
-      'M9 17V9',
-    ],
-  },
-  {
-    // TriangleAlert
-    stroke: '#1B1C1C',
-    paths: [
-      'm21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3',
-      'M12 9v4',
-      'M12 17h.01',
-    ],
-  },
-  {
-    // Phone
-    stroke: '#1B1C1C',
-    paths: [
-      'M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384',
-    ],
-  },
-];
-
-/** Draws a filled red circular "SOS" badge (matching the 🆘 emoji style), rather than a stroked lucide icon. */
-function drawSosBadge(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) {
-  ctx.save();
-  ctx.fillStyle = '#D6272C';
-  ctx.beginPath();
-  ctx.arc(cx, cy, s / 2, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = '#ffffff';
-  ctx.font = `800 ${Math.round(s * 0.42)}px sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('SOS', cx, cy + s * 0.02);
-  ctx.restore();
-}
-
-/** Draws one lucide-react icon (by its raw 24x24 path data) centered at (cx, cy), scaled to size `s`. */
-function drawLucideIcon(
-  ctx: CanvasRenderingContext2D,
-  icon: { paths: string[]; stroke: string },
-  cx: number,
-  cy: number,
-  s: number,
-) {
-  ctx.save();
-  ctx.translate(cx - s / 2, cy - s / 2);
-  ctx.scale(s / 24, s / 24);
-  ctx.strokeStyle = icon.stroke;
-  ctx.lineWidth = 2;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  for (const d of icon.paths) {
-    ctx.stroke(new Path2D(d));
-  }
-  ctx.restore();
-}
-
-const STICKER_ICONS: ((ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) => void)[] = [
-  ...LUCIDE_ICON_PATHS.map(
-    (icon) => (ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) => drawLucideIcon(ctx, icon, cx, cy, s),
-  ),
-  drawSosBadge,
-];
-
-/**
- * Composites the bare server-generated QR PNG into a print-ready two-panel
- * vehicle tag: left panel carries the Scan Connect logo and instructions,
- * right panel (brand yellow) carries the QR code plus emergency/parking icons.
- * Sized in real device pixels at 300 DPI for the requested physical label size.
- */
-async function drawBrandedQrCanvas(
-  qrBlob: Blob,
-  opts: { lang: StickerLang; size: StickerSize } = { lang: 'en', size: 'bike' },
-): Promise<HTMLCanvasElement> {
-  const [qrImage] = await Promise.all([
-    createImageBitmap(qrBlob),
-    document.fonts.load("800 100px 'Poppins'"),
-    document.fonts.load("700 100px 'Roboto Condensed'"),
-    document.fonts.load("500 100px 'Roboto Condensed'"),
-  ]);
-  const { width, height } = STICKER_DIMENSIONS_PX[opts.size];
-  const text = STICKER_TEXT[opts.lang];
-
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d')!;
-
-  const pad = Math.round(height * 0.07);
-  const leftWidth = Math.round(width * 0.52);
-  const rightWidth = width - leftWidth;
-
-  // Left panel — white background with the "SCAN CONNECT" wordmark + instructions.
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, leftWidth, height);
-
-  const wordmarkMaxWidth = leftWidth - pad * 2;
-  const wordmarkHeight = drawWordmark(ctx, pad, pad, wordmarkMaxWidth);
-
-  ctx.textAlign = 'left';
-  ctx.fillStyle = '#0F0F0F';
-  const headlineTextColor = '#000000';
-  const headlineMaxWidth = leftWidth - pad * 2;
-  const sublineFontSizeFitted = Math.round(height * 0.05 * 0.6);
-  const headlineTop = pad + wordmarkHeight * 1.6;
-  // Reserve room below the headline for the subline's *actual* wrapped line
-  // count (not a hardcoded guess) so a long subline can never be pushed off
-  // the bottom of the canvas by an oversized headline.
-  ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
-  const sublineLineCount = wrapText(ctx, text.subline, headlineMaxWidth).length;
-  const headlineMaxHeight = height - headlineTop - pad - sublineFontSizeFitted * 1.35 * sublineLineCount;
-
-  const headlineFontFamily = "'Poppins', sans-serif";
-  let headlineFontSize = Math.round(height * 0.11);
-  let headlineLines: { text: string; startWordIndex: number; wordCount: number }[] = [];
-  let headlineLineHeight = 0;
-  while (headlineFontSize > 10) {
-    ctx.font = `800 ${headlineFontSize}px ${headlineFontFamily}`;
-    headlineLines = wrapTextWithWordIndex(ctx, text.headline, headlineMaxWidth);
-    headlineLineHeight = headlineFontSize * 1.15;
-    if (headlineLines.length * headlineLineHeight <= headlineMaxHeight) break;
-    headlineFontSize -= 2;
-  }
-  ctx.font = `800 ${headlineFontSize}px ${headlineFontFamily}`;
-  ctx.fillStyle = headlineTextColor;
-  let headlineY = headlineTop + headlineLineHeight * 0.85;
-  const underlineFrom = text.headlineUnderlineFrom;
-  for (const line of headlineLines) {
-    ctx.fillText(line.text, pad, headlineY);
-
-    const lineEndWordIndex = line.startWordIndex + line.wordCount;
-    if (lineEndWordIndex > underlineFrom) {
-      const underlineStartInLine = Math.max(0, underlineFrom - line.startWordIndex);
-      const words = line.text.split(' ');
-      const beforeUnderline = words.slice(0, underlineStartInLine).join(' ');
-      const underlinedPart = words.slice(underlineStartInLine).join(' ');
-      const startX = pad + (beforeUnderline ? ctx.measureText(beforeUnderline + ' ').width : 0);
-      const underlineWidth = ctx.measureText(underlinedPart).width;
-      const underlineY = headlineY + headlineFontSize * 0.12;
-      ctx.beginPath();
-      ctx.moveTo(startX, underlineY);
-      ctx.lineTo(startX + underlineWidth, underlineY);
-      ctx.lineWidth = Math.max(2, headlineFontSize * 0.05);
-      ctx.strokeStyle = headlineTextColor;
-      ctx.stroke();
-    }
-
-    headlineY += headlineLineHeight;
-  }
-
-  ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
-  ctx.fillStyle = '#5F5E5E';
-  const sublineLines = wrapText(ctx, text.subline, headlineMaxWidth);
-  let sublineY = headlineY + sublineFontSizeFitted * 0.7;
-  for (const line of sublineLines) {
-    ctx.fillText(line, pad, sublineY);
-    sublineY += sublineFontSizeFitted * 1.35;
-  }
-
-  // Right panel — brand yellow background with QR code + icon row.
-  ctx.fillStyle = STICKER_YELLOW;
-  ctx.fillRect(leftWidth, 0, rightWidth, height);
-
-  const qrBoxSize = Math.min(rightWidth - pad * 2, height * 0.58);
-  const qrX = leftWidth + (rightWidth - qrBoxSize) / 2;
-  const qrY = pad * 0.8;
-  const qrFramePad = qrBoxSize * 0.06;
-  const qrFrameRadius = qrBoxSize * 0.06;
-
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.roundRect(qrX - qrFramePad, qrY - qrFramePad, qrBoxSize + qrFramePad * 2, qrBoxSize + qrFramePad * 2, qrFrameRadius);
-  ctx.fill();
-
-  ctx.strokeStyle = '#1B1C1C';
-  ctx.lineWidth = Math.max(3, qrBoxSize * 0.015);
-  ctx.beginPath();
-  ctx.roundRect(qrX - qrFramePad, qrY - qrFramePad, qrBoxSize + qrFramePad * 2, qrBoxSize + qrFramePad * 2, qrFrameRadius);
-  ctx.stroke();
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.roundRect(qrX, qrY, qrBoxSize, qrBoxSize, qrFrameRadius * 0.6);
-  ctx.clip();
-  ctx.drawImage(qrImage, qrX, qrY, qrBoxSize, qrBoxSize);
-  ctx.restore();
-  qrImage.close();
-
-  const iconRowY = qrY + qrBoxSize + qrFramePad * 2 + pad * 0.9;
-  const iconSize = height * 0.075;
-  const iconGap = rightWidth / (STICKER_ICONS.length + 1);
-  STICKER_ICONS.forEach((draw, i) => {
-    const cx = leftWidth + iconGap * (i + 1);
-    draw(ctx, cx, iconRowY, iconSize);
-  });
-
-  ctx.fillStyle = '#1B1C1C';
-  ctx.textAlign = 'center';
-  const captionMaxWidth = rightWidth - pad;
-  const captionFontSize = Math.round(height * 0.03);
-  ctx.font = `bold ${captionFontSize}px sans-serif`;
-  const captionLines = wrapText(ctx, text.iconCaption, captionMaxWidth);
-  let captionY = iconRowY + iconSize * 1.5;
-  for (const line of captionLines) {
-    ctx.fillText(line, leftWidth + rightWidth / 2, captionY);
-    captionY += captionFontSize * 1.3;
-  }
-
-  return canvas;
-}
-
-function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('Failed to render PNG'))), 'image/png');
-  });
-}
 
 /**
  * The QR PNG endpoint requires a Bearer token, which a plain <img src> can't
@@ -419,7 +33,7 @@ const AuthedQrImage: React.FC<{
   lang?: StickerLang;
   size?: StickerSize;
   onReady?: () => void;
-}> = ({ id, alt, className, branded, lang = 'en', size = 'bike', onReady }) => {
+}> = ({ id, alt, className, branded, lang = 'en' as StickerLang, size = 'bike' as StickerSize, onReady }) => {
   const [src, setSrc] = useState('');
 
   useEffect(() => {
@@ -427,11 +41,10 @@ const AuthedQrImage: React.FC<{
     let cancelled = false;
 
     auth.currentUser?.getIdToken().then(async (idToken) => {
-      const res = await fetch(`${API_BASE_URL}/api/admin/qr-codes/${id}/qr.png`, {
-        headers: idToken ? { Authorization: `Bearer ${idToken}` } : {},
-      });
-      const rawBlob = await res.blob();
-      const blob = branded ? await canvasToBlob(await drawBrandedQrCanvas(rawBlob, { lang, size })) : rawBlob;
+      const qrUrl = `${API_BASE_URL}/api/admin/qr-codes/${id}/qr.png`;
+      const blob = branded
+        ? await fetchBrandedQrPngBlob(qrUrl, idToken, { lang, size })
+        : await fetch(qrUrl, { headers: idToken ? { Authorization: `Bearer ${idToken}` } : {} }).then((r) => r.blob());
       if (cancelled) return;
       objectUrl = URL.createObjectURL(blob);
       setSrc(objectUrl);
@@ -566,20 +179,12 @@ export const AdminQrCodes: React.FC = () => {
   const downloadBrandedQrPng = async (id: string, code: string) => {
     try {
       const idToken = await auth.currentUser?.getIdToken();
-      const res = await fetch(`${API_BASE_URL}/api/admin/qr-codes/${id}/qr.png`, {
-        headers: idToken ? { Authorization: `Bearer ${idToken}` } : {},
-      });
-      const rawBlob = await res.blob();
-      const canvas = await drawBrandedQrCanvas(rawBlob, { lang: stickerLang, size: stickerSize });
-      const blob = await canvasToBlob(canvas);
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `qr-${code}-${stickerSize}-${stickerLang}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      const blob = await fetchBrandedQrPngBlob(
+        `${API_BASE_URL}/api/admin/qr-codes/${id}/qr.png`,
+        idToken,
+        { lang: stickerLang, size: stickerSize },
+      );
+      triggerBlobDownload(blob, `qr-${code}-${stickerSize}-${stickerLang}.png`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to download PNG');
     }
@@ -589,8 +194,22 @@ export const AdminQrCodes: React.FC = () => {
     setIsDownloadingZip(true);
     setError('');
     try {
-      const params = buildFilterParams({ statusFilter, batchFilter, nameFilter, dateFrom, dateTo });
-      await downloadFile(`/api/admin/qr-codes/download.zip?${params}`, `qr-codes-${Date.now()}.zip`);
+      const idToken = await auth.currentUser?.getIdToken();
+      const params = new URLSearchParams(buildFilterParams({ statusFilter, batchFilter, nameFilter, dateFrom, dateTo }));
+      params.set('pageSize', '5000');
+      const { codes: allCodes } = await api.get<{ codes: QrCodeRow[] }>(`/api/admin/qr-codes?${params}`);
+
+      const zip = new JSZip();
+      for (const c of allCodes) {
+        const blob = await fetchBrandedQrPngBlob(
+          `${API_BASE_URL}/api/admin/qr-codes/${c.id}/qr.png`,
+          idToken,
+          { lang: stickerLang, size: stickerSize },
+        );
+        zip.file(`qr-${c.code}-${stickerSize}-${stickerLang}.png`, blob);
+      }
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      triggerBlobDownload(zipBlob, `qr-codes-${stickerSize}-${stickerLang}-${Date.now()}.zip`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to download ZIP');
     } finally {
@@ -886,7 +505,7 @@ export const AdminQrCodes: React.FC = () => {
                     on break-after on individual flex items) is what actually
                     keeps each page's tile count exact and stops tiles from
                     being split across a page boundary when printed. */}
-                {chunk(printCodes, stickerSize === 'bike' ? 8 : 2).map((pageCodes, pageIndex) => (
+                {chunk<QrCodeRow>(printCodes, stickerSize === 'bike' ? 8 : 2).map((pageCodes, pageIndex) => (
                   <div key={pageIndex} className={`qr-print-page qr-print-page--${stickerSize}`}>
                     {pageCodes.map((c) => (
                       <div key={c.id} className={`qr-print-tile qr-print-tile--${stickerSize}`}>
