@@ -183,7 +183,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
               <img
                 src={qrImage}
                 alt={productTitle}
-                className="h-full w-auto object-cover"
+                className=" w-auto object-cover"
               />
             </div>
           </div>

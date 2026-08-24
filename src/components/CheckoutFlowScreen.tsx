@@ -598,7 +598,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 <div className="flex flex-row items-center gap-[16px] w-full">
                   {/* Thumbnail */}
                   <div className="w-[80px] h-[80px] bg-[#F5F3F3] rounded-[8px] overflow-hidden shrink-0">
-                    <img src={qrImage} alt={productTitle} className="w-full h-full object-cover" />
+                    <img src={qrImage} alt={productTitle} className="w-full  object-cover" />
                   </div>
 
                   {/* Title & Price Details */}
@@ -1090,7 +1090,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               <div className="flex flex-row items-center gap-[24px] pb-[24px] border-b border-[#EFEDED]">
                 {/* Thumbnail Background */}
                 <div className="w-[80px] h-[80px] bg-[#F5F3F3] rounded-[8px] overflow-hidden shrink-0">
-                  <img src={qrImage} alt={productTitle} className="w-full h-full object-cover" />
+                  <img src={qrImage} alt={productTitle} className="w-full  object-cover" />
                 </div>
 
                 {/* Details Container */}
