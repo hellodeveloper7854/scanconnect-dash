@@ -285,6 +285,7 @@ async function drawBrandedQrCanvas(
 
   ctx.textAlign = 'left';
   ctx.fillStyle = '#0F0F0F';
+  const headlineTextColor = '#000000';
   const headlineMaxWidth = leftWidth - pad * 2;
   const sublineFontSizeFitted = Math.round(height * 0.05 * 0.6);
   const headlineTop = pad + wordmarkHeight * 1.6;
@@ -307,6 +308,7 @@ async function drawBrandedQrCanvas(
     headlineFontSize -= 2;
   }
   ctx.font = `800 ${headlineFontSize}px ${headlineFontFamily}`;
+  ctx.fillStyle = headlineTextColor;
   let headlineY = headlineTop + headlineLineHeight * 0.85;
   const underlineFrom = text.headlineUnderlineFrom;
   for (const line of headlineLines) {
@@ -325,7 +327,7 @@ async function drawBrandedQrCanvas(
       ctx.moveTo(startX, underlineY);
       ctx.lineTo(startX + underlineWidth, underlineY);
       ctx.lineWidth = Math.max(2, headlineFontSize * 0.05);
-      ctx.strokeStyle = '#0F0F0F';
+      ctx.strokeStyle = headlineTextColor;
       ctx.stroke();
     }
 
