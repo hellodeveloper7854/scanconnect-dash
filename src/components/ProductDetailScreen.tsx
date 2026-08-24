@@ -13,7 +13,6 @@ import {
   Sun,
   Lock,
   Award,
-  ShoppingCart,
   ArrowRight,
   ArrowLeft,
   Phone,
@@ -52,8 +51,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   product
 }) => {
   const [activeNav, setActiveNav] = useState('Shop');
-  const [activeTab, setActiveTab] = useState<'how' | 'security'>('how');
-  const [cartCount, setCartCount] = useState(0);
+  const [activeTab, setActiveTab] = useState<'how' | 'security' | 'reviews'>('how');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const reviewsTrackRef = React.useRef<HTMLDivElement>(null);
 
@@ -143,11 +141,6 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
       />
     );
   }
-
-  const handleAddToCart = () => {
-    setCartCount(prev => prev + 1);
-    alert(`Added to Cart: ${productTitle}\nTotal in cart: ${cartCount + 1}`);
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#0F0F0F] font-sans antialiased">
@@ -267,21 +260,13 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             </div>
 
             {/* Action Buttons Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[16px] pt-2">
+            <div className="pt-2">
               <button
                 onClick={handleBuyNow}
-                className="h-[59px] bg-[#FFED00] hover:bg-[#e0ac00] text-white font-['Rubik'] font-semibold text-[18px] leading-[27px] rounded-[8px] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-all cursor-pointer flex items-center justify-center gap-[8px] active:scale-95"
+                className="w-full h-[59px] bg-[#FFED00] hover:bg-[#e0ac00] text-white font-['Rubik'] font-semibold text-[18px] leading-[27px] rounded-[8px] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-all cursor-pointer flex items-center justify-center gap-[8px] active:scale-95"
               >
                 <span>Buy Now</span>
                 <ArrowRight className="w-[16px] h-[16px] text-white" />
-              </button>
-
-              <button
-                onClick={handleAddToCart}
-                className="h-[59px] bg-[#1B1C1C] hover:bg-neutral-800 text-white font-['Plus_Jakarta_Sans'] font-normal text-[18px] leading-[27px] rounded-[8px] transition-all cursor-pointer flex items-center justify-center gap-[8px] active:scale-95"
-              >
-                <ShoppingCart className="w-[20px] h-[21px] text-white" />
-                <span>Add to Cart</span>
               </button>
             </div>
 
@@ -406,6 +391,17 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             >
               Security Features
             </button>
+
+            <button
+              onClick={() => setActiveTab('reviews')}
+              className={`pb-[16px] px-[8px] cursor-pointer transition-colors relative whitespace-nowrap font-['Hanken_Grotesk'] font-bold text-[18px] sm:text-[20px] leading-[24px] ${
+                activeTab === 'reviews'
+                  ? 'text-[#676000] border-b-2 border-[#676000]'
+                  : 'text-[#5F5E5E] hover:text-[#1B1C1C]'
+              }`}
+            >
+              Customer Reviews
+            </button>
           </div>
 
           {/* TAB 1: HOW IT WORKS BENTO GRID */}
@@ -507,61 +503,61 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             </div>
           )}
 
-        </section>
-
-        {/* SECTION 4: CUSTOMER REVIEWS — left-to-right carousel with nav buttons */}
-        <section className="pb-4">
-          <div className="bg-[#FAFAFA] border border-[#E4E2E2] rounded-[12px] p-[24px] sm:p-[40px] space-y-[24px]">
-            <div className="flex items-center justify-between border-b border-[#E4E2E2] pb-[16px]">
-              <h3 className="font-['Rubik'] font-semibold text-[24px] sm:text-[28px] text-[#1B1C1C]">
-                Customer Reviews (4.8 / 5.0)
-              </h3>
-              <span className="font-['Hanken_Grotesk'] font-bold text-[12px] text-[#1B1C1C] bg-[#FFED00] px-[12px] py-[4px] rounded-full uppercase">
-                Verified Owners
-              </span>
-            </div>
-
-            <div className="relative">
-              <div
-                ref={reviewsTrackRef}
-                className="flex gap-[20px] overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-              >
-                {customerReviews.map((review, i) => (
-                  <div
-                    key={i}
-                    data-review-card
-                    className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px] font-['Hanken_Grotesk'] shrink-0 snap-start w-[280px] sm:w-[320px]"
-                  >
-                    <div className="flex text-[#FFD700]">
-                      {[...Array(5)].map((_, star) => (
-                        <Star key={star} className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
-                      ))}
-                    </div>
-                    <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;{review.quote}&rdquo;</p>
-                    <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— {review.name}</span>
-                  </div>
-                ))}
+          {/* TAB 3: CUSTOMER REVIEWS — left-to-right carousel with nav buttons */}
+          {activeTab === 'reviews' && (
+            <div className="bg-[#FAFAFA] border border-[#E4E2E2] rounded-[12px] p-[24px] sm:p-[40px] space-y-[24px] animate-fade-in">
+              <div className="flex items-center justify-between border-b border-[#E4E2E2] pb-[16px]">
+                <h3 className="font-['Rubik'] font-semibold text-[24px] sm:text-[28px] text-[#1B1C1C]">
+                  Customer Reviews (4.8 / 5.0)
+                </h3>
+                <span className="font-['Hanken_Grotesk'] font-bold text-[12px] text-[#1B1C1C] bg-[#FFED00] px-[12px] py-[4px] rounded-full uppercase">
+                  Verified Owners
+                </span>
               </div>
 
-              {/* Nav Buttons */}
-              <button
-                type="button"
-                onClick={() => scrollReviews('left')}
-                aria-label="Scroll reviews left"
-                className="hidden sm:flex absolute left-[-16px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-[#E4E2E2] shadow-md items-center justify-center text-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] transition-colors cursor-pointer"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollReviews('right')}
-                aria-label="Scroll reviews right"
-                className="hidden sm:flex absolute right-[-16px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-[#E4E2E2] shadow-md items-center justify-center text-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] transition-colors cursor-pointer"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
+              <div className="relative">
+                <div
+                  ref={reviewsTrackRef}
+                  className="flex gap-[20px] overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                >
+                  {customerReviews.map((review, i) => (
+                    <div
+                      key={i}
+                      data-review-card
+                      className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px] font-['Hanken_Grotesk'] shrink-0 snap-start w-[280px] sm:w-[320px]"
+                    >
+                      <div className="flex text-[#FFD700]">
+                        {[...Array(5)].map((_, star) => (
+                          <Star key={star} className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
+                        ))}
+                      </div>
+                      <p className="text-[#5F5E5E] text-[15px] italic">&ldquo;{review.quote}&rdquo;</p>
+                      <span className="font-bold text-[#1B1C1C] text-[14px] block pt-1">— {review.name}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Nav Buttons */}
+                <button
+                  type="button"
+                  onClick={() => scrollReviews('left')}
+                  aria-label="Scroll reviews left"
+                  className="hidden sm:flex absolute left-[-16px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-[#E4E2E2] shadow-md items-center justify-center text-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollReviews('right')}
+                  aria-label="Scroll reviews right"
+                  className="hidden sm:flex absolute right-[-16px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-[#E4E2E2] shadow-md items-center justify-center text-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] transition-colors cursor-pointer"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
-          </div>
+          )}
+
         </section>
 
       </main>
