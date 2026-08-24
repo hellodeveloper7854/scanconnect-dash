@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Download, Printer, X, Search, FileArchive } from 'lucide-react';
 import { api, downloadFile } from '../../lib/api';
 import { auth } from '../../lib/firebase';
-import logoImg from '../../assets/images/logo.png';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -17,36 +16,89 @@ const STICKER_DIMENSIONS_PX: Record<StickerSize, { width: number; height: number
 
 const STICKER_TEXT: Record<StickerLang, {
   headline: string;
+  /** 0-based word index where the headline's underline begins; runs to the last word. */
+  headlineUnderlineFrom: number;
   subline: string;
   iconCaption: string;
 }> = {
   en: {
-    headline: 'Scan the code to contact the vehicle owner.',
-    subline: 'Scan using phone camera and Google Lens.',
+    headline: 'Scan to connect with the vehicle owner',
+    headlineUnderlineFrom: 2, // underlines "connect with the vehicle owner"
+    subline: 'SCAN USING PHONE CAMERA, GOOGLE LENS OR ANY QR SCANNER APP. VISIT SCANCONNECT.CO.IN FOR MORE INFO',
     iconCaption: 'Wrong Parking, Emergency Contact, any issue with the vehicle, Scan the QR',
   },
   hi: {
     headline: 'वाहन मालिक से संपर्क करने के लिए कोड स्कैन करें।',
-    subline: 'फ़ोन कैमरा और Google Lens से स्कैन करें।',
+    headlineUnderlineFrom: 3, // underlines "संपर्क करने के लिए कोड स्कैन करें।"
+    subline: 'फ़ोन कैमरा, गूगल लेंस या किसी भी QR स्कैनर ऐप से स्कैन करें। अधिक जानकारी के लिए SCANCONNECT.CO.IN पर जाएं।',
     iconCaption: 'गलत पार्किंग, आपातकालीन संपर्क, वाहन संबंधी कोई भी समस्या, QR स्कैन करें',
   },
 };
 
 const STICKER_YELLOW = '#FFED00';
 
-// Fetched and decoded once, then reused for every QR tile. createImageBitmap
-// gives a definite decoded-and-paintable result (unlike HTMLImageElement,
-// whose onload/decode() can resolve before it is actually safe to draw from
-// concurrently across many simultaneous canvas draws), which is what caused
-// the logo to be missing specifically on the first batch of tiles rendered.
-let cachedLogoBitmap: Promise<ImageBitmap> | null = null;
-function loadLogoBitmap(): Promise<ImageBitmap> {
-  if (!cachedLogoBitmap) {
-    cachedLogoBitmap = fetch(logoImg)
-      .then((res) => res.blob())
-      .then((blob) => createImageBitmap(blob));
+/**
+ * Draws the "SCAN CONNECT" wordmark as text (no logo image) with a
+ * "CONNECTING SOLUTION" subtitle beneath it, so the sticker doesn't depend on
+ * loading/decoding an external image asset. "CONNECT" is black text with a
+ * rough brand-yellow marker-stroke drawn behind it for emphasis. Returns the
+ * total rendered height so callers can lay out the headline beneath it.
+ */
+function drawWordmark(ctx: CanvasRenderingContext2D, x: number, y: number, maxWidth: number): number {
+  const wordmarkFontFamily = "'Roboto Condensed', sans-serif";
+  const fontSize = fitFontSize(ctx, 'SCAN CONNECT', maxWidth, maxWidth * 0.22, '700', wordmarkFontFamily);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+
+  const scanText = 'SCAN ';
+  const connectText = 'CONNECT';
+  const baselineY = y + fontSize * 0.85;
+
+  ctx.font = `700 ${fontSize}px ${wordmarkFontFamily}`;
+  const scanWidth = ctx.measureText(scanText).width;
+  const connectWidth = ctx.measureText(connectText).width;
+
+  // Rough yellow marker-stroke behind "CONNECT", drawn as a few overlapping
+  // slightly-rotated bars so it reads as a hand-drawn highlight, not a clean box.
+  ctx.save();
+  ctx.fillStyle = STICKER_YELLOW;
+  const strokeX = x + scanWidth - fontSize * 0.03;
+  const strokeY = baselineY - fontSize * 0.62;
+  const strokeH = fontSize * 0.5;
+  [-0.03, 0.02, -0.015].forEach((angle, i) => {
+    ctx.save();
+    ctx.translate(strokeX + connectWidth / 2, strokeY + strokeH / 2 + i * strokeH * 0.05);
+    ctx.rotate(angle);
+    ctx.fillRect(-connectWidth / 2 - fontSize * 0.04, -strokeH / 2, connectWidth + fontSize * 0.08, strokeH * 0.45);
+    ctx.restore();
+  });
+  ctx.restore();
+
+  ctx.font = `700 ${fontSize}px ${wordmarkFontFamily}`;
+  ctx.fillStyle = '#0F0F0F';
+  ctx.fillText(scanText, x, baselineY);
+  ctx.fillText(connectText, x + scanWidth, baselineY);
+
+  const subtitleFontSize = Math.round(fontSize * 0.32);
+  const subtitleY = baselineY + subtitleFontSize * 1.4;
+  ctx.font = `500 ${subtitleFontSize}px ${wordmarkFontFamily}`;
+  ctx.fillStyle = '#0F0F0F';
+  // Letter-spaced manually since canvas has no tracking/letter-spacing property;
+  // total width is measured first so the whole line can be centered under the wordmark.
+  const subtitleText = 'CONNECTING SOLUTION';
+  const subtitleLetterGap = subtitleFontSize * 0.12;
+  let subtitleTotalWidth = -subtitleLetterGap;
+  for (const ch of subtitleText) {
+    subtitleTotalWidth += ctx.measureText(ch).width + subtitleLetterGap;
   }
-  return cachedLogoBitmap;
+  const wordmarkTotalWidth = scanWidth + connectWidth;
+  let cursorX = x + (wordmarkTotalWidth - subtitleTotalWidth) / 2;
+  for (const ch of subtitleText) {
+    ctx.fillText(ch, cursorX, subtitleY);
+    cursorX += ctx.measureText(ch).width + subtitleLetterGap;
+  }
+
+  return subtitleY - y;
 }
 
 /** Shrinks the font size until `text` fits within `maxWidth` (single line), returning the fitted size. */
@@ -68,19 +120,33 @@ function fitFontSize(
 
 /** Wraps `text` to fit within `maxWidth` at the given font, splitting on spaces; returns each line. */
 function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  return wrapTextWithWordIndex(ctx, text, maxWidth).map((line) => line.text);
+}
+
+/** Same wrapping as `wrapText`, but each line also reports the word-index range it covers (for partial-headline underlining). */
+function wrapTextWithWordIndex(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+): { text: string; startWordIndex: number; wordCount: number }[] {
   const words = text.split(' ');
-  const lines: string[] = [];
+  const lines: { text: string; startWordIndex: number; wordCount: number }[] = [];
   let current = '';
-  for (const word of words) {
+  let lineStartIndex = 0;
+  let wordCountInLine = 0;
+  words.forEach((word, i) => {
     const attempt = current ? `${current} ${word}` : word;
     if (ctx.measureText(attempt).width > maxWidth && current) {
-      lines.push(current);
+      lines.push({ text: current, startWordIndex: lineStartIndex, wordCount: wordCountInLine });
       current = word;
+      lineStartIndex = i;
+      wordCountInLine = 1;
     } else {
       current = attempt;
+      wordCountInLine += 1;
     }
-  }
-  if (current) lines.push(current);
+  });
+  if (current) lines.push({ text: current, startWordIndex: lineStartIndex, wordCount: wordCountInLine });
   return lines;
 }
 
@@ -130,6 +196,15 @@ const LUCIDE_ICON_PATHS: { paths: string[]; stroke: string }[] = [
       'M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384',
     ],
   },
+  {
+    // ShieldAlert (SOS)
+    stroke: '#D6272C',
+    paths: [
+      'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
+      'M12 8v4',
+      'M12 16h.01',
+    ],
+  },
 ];
 
 /** Draws one lucide-react icon (by its raw 24x24 path data) centered at (cx, cy), scaled to size `s`. */
@@ -167,7 +242,12 @@ async function drawBrandedQrCanvas(
   qrBlob: Blob,
   opts: { lang: StickerLang; size: StickerSize } = { lang: 'en', size: 'bike' },
 ): Promise<HTMLCanvasElement> {
-  const [qrImage, logo] = await Promise.all([createImageBitmap(qrBlob), loadLogoBitmap()]);
+  const [qrImage] = await Promise.all([
+    createImageBitmap(qrBlob),
+    document.fonts.load("800 100px 'Montserrat'"),
+    document.fonts.load("700 100px 'Roboto Condensed'"),
+    document.fonts.load("500 100px 'Roboto Condensed'"),
+  ]);
   const { width, height } = STICKER_DIMENSIONS_PX[opts.size];
   const text = STICKER_TEXT[opts.lang];
 
@@ -180,45 +260,62 @@ async function drawBrandedQrCanvas(
   const leftWidth = Math.round(width * 0.52);
   const rightWidth = width - leftWidth;
 
-  // Left panel — white background with logo + instructions.
+  // Left panel — white background with the "SCAN CONNECT" wordmark + instructions.
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, leftWidth, height);
 
-  const logoMaxWidth = leftWidth - pad * 2;
-  const logoMaxHeight = height * 0.28;
-  const logoScale = Math.min(logoMaxWidth / logo.width, logoMaxHeight / logo.height);
-  const logoWidth = logo.width * logoScale;
-  const logoHeight = logo.height * logoScale;
-  ctx.drawImage(logo, pad, pad, logoWidth, logoHeight);
+  const wordmarkMaxWidth = leftWidth - pad * 2;
+  const wordmarkHeight = drawWordmark(ctx, pad, pad, wordmarkMaxWidth);
 
   ctx.textAlign = 'left';
   ctx.fillStyle = '#0F0F0F';
   const headlineMaxWidth = leftWidth - pad * 2;
-  const sublineFontSize = Math.round(height * 0.05);
-  const headlineTop = pad + logoHeight * 1.3;
-  // Reserve room below the headline for the subline (2 lines worst-case) before
-  // deciding how large the headline itself is allowed to grow.
-  const headlineMaxHeight = height - headlineTop - pad - sublineFontSize * 1.35 * 2;
+  const sublineFontSizeFitted = Math.round(height * 0.05 * 0.6);
+  const headlineTop = pad + wordmarkHeight * 1.6;
+  // Reserve room below the headline for the subline's *actual* wrapped line
+  // count (not a hardcoded guess) so a long subline can never be pushed off
+  // the bottom of the canvas by an oversized headline.
+  ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
+  const sublineLineCount = wrapText(ctx, text.subline, headlineMaxWidth).length;
+  const headlineMaxHeight = height - headlineTop - pad - sublineFontSizeFitted * 1.35 * sublineLineCount;
 
-  const headlineFontFamily = "'Arial Rounded MT Bold', 'Arial Rounded MT', sans-serif";
+  const headlineFontFamily = "'Montserrat', sans-serif";
   let headlineFontSize = Math.round(height * 0.11);
-  let headlineLines: string[] = [];
+  let headlineLines: { text: string; startWordIndex: number; wordCount: number }[] = [];
   let headlineLineHeight = 0;
   while (headlineFontSize > 10) {
-    ctx.font = `bold ${headlineFontSize}px ${headlineFontFamily}`;
-    headlineLines = wrapText(ctx, text.headline, headlineMaxWidth);
+    ctx.font = `800 ${headlineFontSize}px ${headlineFontFamily}`;
+    headlineLines = wrapTextWithWordIndex(ctx, text.headline, headlineMaxWidth);
     headlineLineHeight = headlineFontSize * 1.15;
     if (headlineLines.length * headlineLineHeight <= headlineMaxHeight) break;
     headlineFontSize -= 2;
   }
-  ctx.font = `bold ${headlineFontSize}px ${headlineFontFamily}`;
+  ctx.font = `800 ${headlineFontSize}px ${headlineFontFamily}`;
   let headlineY = headlineTop + headlineLineHeight * 0.85;
+  const underlineFrom = text.headlineUnderlineFrom;
   for (const line of headlineLines) {
-    ctx.fillText(line, pad, headlineY);
+    ctx.fillText(line.text, pad, headlineY);
+
+    const lineEndWordIndex = line.startWordIndex + line.wordCount;
+    if (lineEndWordIndex > underlineFrom) {
+      const underlineStartInLine = Math.max(0, underlineFrom - line.startWordIndex);
+      const words = line.text.split(' ');
+      const beforeUnderline = words.slice(0, underlineStartInLine).join(' ');
+      const underlinedPart = words.slice(underlineStartInLine).join(' ');
+      const startX = pad + (beforeUnderline ? ctx.measureText(beforeUnderline + ' ').width : 0);
+      const underlineWidth = ctx.measureText(underlinedPart).width;
+      const underlineY = headlineY + headlineFontSize * 0.12;
+      ctx.beginPath();
+      ctx.moveTo(startX, underlineY);
+      ctx.lineTo(startX + underlineWidth, underlineY);
+      ctx.lineWidth = Math.max(2, headlineFontSize * 0.05);
+      ctx.strokeStyle = '#0F0F0F';
+      ctx.stroke();
+    }
+
     headlineY += headlineLineHeight;
   }
 
-  const sublineFontSizeFitted = Math.round(sublineFontSize * 0.8);
   ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
   ctx.fillStyle = '#5F5E5E';
   const sublineLines = wrapText(ctx, text.subline, headlineMaxWidth);
@@ -235,10 +332,26 @@ async function drawBrandedQrCanvas(
   const qrBoxSize = Math.min(rightWidth - pad * 2, height * 0.58);
   const qrX = leftWidth + (rightWidth - qrBoxSize) / 2;
   const qrY = pad * 0.8;
-  ctx.fillStyle = '#ffffff';
   const qrFramePad = qrBoxSize * 0.06;
-  ctx.fillRect(qrX - qrFramePad, qrY - qrFramePad, qrBoxSize + qrFramePad * 2, qrBoxSize + qrFramePad * 2);
+  const qrFrameRadius = qrBoxSize * 0.06;
+
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.roundRect(qrX - qrFramePad, qrY - qrFramePad, qrBoxSize + qrFramePad * 2, qrBoxSize + qrFramePad * 2, qrFrameRadius);
+  ctx.fill();
+
+  ctx.strokeStyle = '#1B1C1C';
+  ctx.lineWidth = Math.max(3, qrBoxSize * 0.015);
+  ctx.beginPath();
+  ctx.roundRect(qrX - qrFramePad, qrY - qrFramePad, qrBoxSize + qrFramePad * 2, qrBoxSize + qrFramePad * 2, qrFrameRadius);
+  ctx.stroke();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(qrX, qrY, qrBoxSize, qrBoxSize, qrFrameRadius * 0.6);
+  ctx.clip();
   ctx.drawImage(qrImage, qrX, qrY, qrBoxSize, qrBoxSize);
+  ctx.restore();
   qrImage.close();
 
   const iconRowY = qrY + qrBoxSize + qrFramePad * 2 + pad * 0.9;
