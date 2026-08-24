@@ -237,6 +237,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
   // Why Thousands Choose — benefits checklist. `core: true` marks the strongest
   // differentiators, which get an emphasized visual treatment in the grid.
   const thousandsChooseBenefits = [
+    { label: 'Emergency Family Contact', core: true },
     { label: 'Privacy-Protected Communication', core: true },
     { label: 'Premium Waterproof QR Tag', core: false },
     { label: 'No Monthly Subscription', core: true },
@@ -247,7 +248,6 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
     { label: 'Fast Delivery Across India', core: false },
     { label: 'Easy Self Activation', core: false },
     { label: 'Works 24×7', core: false },
-    { label: 'Emergency Family Contact', core: true },
   ];
 
   // Smart Vehicle Services
@@ -996,6 +996,54 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         </section>
 
 
+        {/* 7c. LEFTOVER: WHY THOUSANDS CHOOSE SCAN CONNECT SECTION */}
+        <section className="py-20 bg-[#FAFAFA]">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+            <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#FFED00]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
+                  TRUSTED BY THOUSANDS OF VEHICLE OWNERS
+                </span>
+              </div>
+              <h2 className="font-['Rubik'] font-bold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
+                One Purchase. Lifetime Peace of Mind.
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto items-stretch">
+              {thousandsChooseBenefits.map((benefit) => (
+                <div
+                  key={benefit.label}
+                  className={`h-full rounded-xl p-5 flex items-center gap-3 transition-all ${
+                    benefit.core
+                      ? 'bg-white border-2 border-[#FFED00] shadow-[0_6px_20px_rgba(242,186,3,0.18)]'
+                      : 'bg-white border border-[#E5E7EB] shadow-xs'
+                  }`}
+                >
+                  <div
+                    className={`rounded-full flex items-center justify-center shrink-0 ${
+                      benefit.core ? 'w-7 h-7 bg-[#FFED00]' : 'w-4 h-4'
+                    }`}
+                  >
+                    <Check
+                      className={benefit.core ? 'w-4 h-4 text-white stroke-[3]' : 'w-4 h-4 text-[#FFED00] stroke-[3]'}
+                    />
+                  </div>
+                  <span
+                    className={`font-['Hanken_Grotesk'] leading-snug ${
+                      benefit.core ? 'font-bold text-base text-[#1B1C1C]' : 'font-medium text-sm text-[#4B5563]'
+                    }`}
+                  >
+                    {benefit.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
         {/* 8. DOWNLOAD THE APP SECTION */}
         <section className="py-20 bg-white border-t border-neutral-100">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
@@ -1124,54 +1172,6 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-neutral-300 leading-[28px]">
               We&apos;re committed to helping millions of vehicle owners stay connected without compromising personal information.
             </p>
-          </div>
-        </section>
-
-
-        {/* 11. LEFTOVER: WHY THOUSANDS CHOOSE SCAN CONNECT SECTION */}
-        <section className="py-20 bg-[#FAFAFA]">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#FFED00]" />
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
-                  TRUSTED BY THOUSANDS OF VEHICLE OWNERS
-                </span>
-              </div>
-              <h2 className="font-['Rubik'] font-bold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
-                One Purchase. Lifetime Peace of Mind.
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto items-stretch">
-              {thousandsChooseBenefits.map((benefit) => (
-                <div
-                  key={benefit.label}
-                  className={`h-full rounded-xl p-5 flex items-center gap-3 transition-all ${
-                    benefit.core
-                      ? 'bg-white border-2 border-[#FFED00] shadow-[0_6px_20px_rgba(242,186,3,0.18)]'
-                      : 'bg-white border border-[#E5E7EB] shadow-xs'
-                  }`}
-                >
-                  <div
-                    className={`rounded-full flex items-center justify-center shrink-0 ${
-                      benefit.core ? 'w-7 h-7 bg-[#FFED00]' : 'w-4 h-4'
-                    }`}
-                  >
-                    <Check
-                      className={benefit.core ? 'w-4 h-4 text-white stroke-[3]' : 'w-4 h-4 text-[#FFED00] stroke-[3]'}
-                    />
-                  </div>
-                  <span
-                    className={`font-['Hanken_Grotesk'] leading-snug ${
-                      benefit.core ? 'font-bold text-base text-[#1B1C1C]' : 'font-medium text-sm text-[#4B5563]'
-                    }`}
-                  >
-                    {benefit.label}
-                  </span>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
 
