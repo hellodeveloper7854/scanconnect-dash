@@ -97,8 +97,8 @@ export const AdminLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white flex">
-      <aside className="w-64 shrink-0 border-r border-white/10 flex flex-col overflow-y-auto">
+    <div className="min-h-screen bg-neutral-950 text-white flex print:block print:min-h-0 print:bg-white">
+      <aside className="w-64 shrink-0 border-r border-white/10 flex flex-col overflow-y-auto print:hidden">
         <div className="h-16 flex items-center px-6 border-b border-white/10 shrink-0">
           <span className="font-black uppercase tracking-wide text-amber-400">ScanConnect Admin</span>
         </div>
@@ -136,7 +136,7 @@ export const AdminLayout: React.FC = () => {
           </button>
         </div>
       </aside>
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto print:overflow-visible">
         <Outlet />
       </main>
     </div>

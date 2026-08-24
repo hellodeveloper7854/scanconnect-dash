@@ -444,7 +444,13 @@ const AuthedQrImage: React.FC<{
   }, [id, branded, lang, size]);
 
   if (!src) {
-    return <div className={`${className ?? ''} bg-neutral-100 animate-pulse`} />;
+    const { width, height } = STICKER_DIMENSIONS_PX[size];
+    return (
+      <div
+        className={`${className ?? ''} bg-neutral-100 animate-pulse`}
+        style={{ aspectRatio: `${width} / ${height}`, width: '100%' }}
+      />
+    );
   }
   return <img src={src} alt={alt} className={className} onLoad={onReady} />;
 };
@@ -470,6 +476,15 @@ interface BatchSummary {
   batchCreatedAt: string;
   total: number;
   activated: number;
+}
+
+/** Splits `items` into consecutive groups of at most `size`, e.g. for chunking into print pages. */
+function chunk<T>(items: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += size) {
+    chunks.push(items.slice(i, i + size));
+  }
+  return chunks;
 }
 
 function buildFilterParams(filters: {
@@ -594,7 +609,8 @@ export const AdminQrCodes: React.FC = () => {
   if (error) return <div className="p-8 text-rose-400">{error}</div>;
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-8 space-y-6 print:p-0 print:space-y-0">
+      <div className="print:hidden space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black text-white uppercase tracking-wide">QR Code Management</h1>
       </div>
@@ -828,11 +844,12 @@ export const AdminQrCodes: React.FC = () => {
         </div>
       )}
       <p className="text-white/30 text-xs">{total} total codes</p>
+      </div>
 
       {/* Print modal */}
       {printBatchId && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 print:bg-white print:p-0">
-          <div className="bg-white rounded-xl max-w-4xl w-full max-h-[85vh] overflow-y-auto p-6 print:max-h-none print:rounded-none print:shadow-none">
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 print:relative print:bg-white print:p-0 print:block">
+          <div className="bg-white rounded-xl max-w-4xl w-full max-h-[85vh] overflow-y-auto p-6 print:max-w-none print:w-auto print:h-auto print:max-h-none print:overflow-visible print:rounded-none print:shadow-none print:p-0">
             <div className="flex items-center justify-between mb-4 print:hidden">
               <h2 className="font-black text-lg text-neutral-900">Print QR Batch</h2>
               <div className="flex items-center gap-3">
@@ -862,31 +879,31 @@ export const AdminQrCodes: React.FC = () => {
             {!printCodes ? (
               <p className="text-neutral-500 text-sm">Loading codes...</p>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {printCodes.map((c, index) => {
-                  // 3 columns x 4 rows = 12 wide (8:5) tiles per printed page.
-                  const isLastOnPage = (index + 1) % 12 === 0 && index !== printCodes.length - 1;
-                  return (
-                    <div
-                      key={c.id}
-                      className={`flex flex-col items-center gap-1 p-2 border border-neutral-200 rounded-lg print:break-inside-avoid ${
-                        isLastOnPage ? 'print:break-after-page' : ''
-                      }`}
-                    >
-                      <AuthedQrImage
-                        id={c.id}
-                        alt={c.code}
-                        className="w-full h-auto"
-                        branded
-                        lang={stickerLang}
-                        size={stickerSize}
-                        onReady={() => setReadyTileCount((prev) => prev + 1)}
-                      />
-                      <span className="text-[10px] font-mono text-neutral-700">{c.code}</span>
-                    </div>
-                  );
-                })}
-              </div>
+              <>
+                {/* Letter paper (8.5x11in) at 0.15in margins fits 2x4=8 bike
+                    tiles (4x2.5in each) or 1x2=2 car tiles (8x5in each) per
+                    page. Chunking into one grid per page (instead of relying
+                    on break-after on individual flex items) is what actually
+                    keeps each page's tile count exact and stops tiles from
+                    being split across a page boundary when printed. */}
+                {chunk(printCodes, stickerSize === 'bike' ? 8 : 2).map((pageCodes, pageIndex) => (
+                  <div key={pageIndex} className={`qr-print-page qr-print-page--${stickerSize}`}>
+                    {pageCodes.map((c) => (
+                      <div key={c.id} className={`qr-print-tile qr-print-tile--${stickerSize}`}>
+                        <AuthedQrImage
+                          id={c.id}
+                          alt={c.code}
+                          branded
+                          lang={stickerLang}
+                          size={stickerSize}
+                          onReady={() => setReadyTileCount((prev) => prev + 1)}
+                        />
+                        <span className="text-[10px] font-mono text-neutral-700">{c.code}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </>
             )}
           </div>
         </div>

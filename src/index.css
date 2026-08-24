@@ -1,5 +1,64 @@
 @import "tailwindcss";
 
+/*
+ * QR sticker print sizing. Browsers ignore Tailwind's flex/grid-based widths
+ * when printing — without an explicit @page size and real inch dimensions per
+ * tile, "4in x 2.5in" is just a number in a comment, and the print dialog
+ * rescales everything to fit its own default margins/paper size instead.
+ * @page is a top-level at-rule (it cannot be nested inside @media or a
+ * selector), so bike/car both print on the same Letter sheet here — only the
+ * per-tile size (.qr-print-tile--bike / --car below) actually differs.
+ */
+@page {
+  size: 8.5in 11in;
+  margin: 0.1in;
+}
+
+/*
+ * Each .qr-print-page holds exactly one page's worth of tiles (chunked in JS)
+ * and forces a page break after itself. Chunking into fixed-size grids like
+ * this — rather than a single flex-wrap list with break-after on individual
+ * tiles — is what actually gives a predictable, exact tile count per printed
+ * page: a flex-wrap layout lets the browser's own pagination decide where
+ * rows split, which can cut a tile in half across a page boundary.
+ */
+.qr-print-page {
+  display: grid;
+  gap: 0.15in;
+  break-after: page;
+  width: max-content;
+}
+
+.qr-print-page:last-child {
+  break-after: auto;
+}
+
+.qr-print-page--bike {
+  grid-template-columns: repeat(2, 4in);
+}
+
+.qr-print-page--car {
+  grid-template-columns: 8in;
+}
+
+.qr-print-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.05in;
+  break-inside: avoid;
+}
+
+.qr-print-tile--bike img {
+  width: 4in;
+  height: 2.5in;
+}
+
+.qr-print-tile--car img {
+  width: 8in;
+  height: 5in;
+}
+
 @keyframes sos-shimmer {
   0% {
     transform: translateX(-120%) rotate(20deg);
