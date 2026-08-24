@@ -91,7 +91,7 @@ function drawWordmark(ctx: CanvasRenderingContext2D, x: number, y: number, maxWi
   ctx.fillStyle = '#0F0F0F';
   // Letter-spaced manually since canvas has no tracking/letter-spacing property;
   // total width is measured first so the whole line can be centered under the wordmark.
-  const subtitleText = 'CONNECTING SOLUTION';
+  const subtitleText = 'CONNECTING SOLUTIONS';
   const subtitleLetterGap = subtitleFontSize * 0.12;
   let subtitleTotalWidth = -subtitleLetterGap;
   for (const ch of subtitleText) {
