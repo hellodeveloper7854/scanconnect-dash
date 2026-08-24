@@ -29,17 +29,17 @@ interface ContactUsScreenProps {
   isLoggedIn?: boolean;
 }
 
-// Interactive Embedded Google Map for Greater Noida Head Office
+// Interactive Embedded Google Map for Jamshedpur Head Office
 const GoogleMapEmbed = () => (
   <div className="w-full h-full min-h-[420px] rounded-xl border border-[#E3E2E2] overflow-hidden relative shadow-sm group bg-neutral-100 flex flex-col">
     {/* Map Header Bar matching Google Maps UI */}
     <div className="bg-white/95 backdrop-blur-md px-3.5 py-2 border-b border-neutral-200 flex items-center justify-between text-xs z-10 shadow-2xs">
       <div className="flex items-center gap-2">
         <MapPin className="w-4 h-4 text-[#EA4335] shrink-0 fill-[#EA4335]/20 stroke-[2]" />
-        <span className="font-semibold text-neutral-800 truncate">Tech Zone 4, Greater Noida</span>
+        <span className="font-semibold text-neutral-800 truncate">Sonari, Jamshedpur</span>
       </div>
       <a
-        href="https://maps.google.com/?q=Tech+Zone+4+Greater+Noida+U.P.+201308"
+        href="https://maps.app.goo.gl/taLjuXVuYUhTaQ6aA"
         target="_blank"
         rel="noopener noreferrer"
         className="text-[11px] font-medium text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 shrink-0"
@@ -52,13 +52,13 @@ const GoogleMapEmbed = () => (
     {/* Live Google Map Iframe */}
     <div className="relative flex-1 w-full min-h-[220px] bg-neutral-200">
       <iframe
-        title="Greater Noida Head Office Google Map Location"
+        title="Jamshedpur Head Office Google Map Location"
         width="100%"
         height="100%"
         className="absolute inset-0 w-full h-full border-0"
         loading="lazy"
         allowFullScreen
-        src="https://maps.google.com/maps?q=Tech+Zone+4+Greater+Noida+U.P.+201308&t=&z=14&ie=UTF8&iwloc=&output=embed"
+        src="https://maps.google.com/maps?q=House+No+1265+Dispensary+Road+Sonari+Jamshedpur+East+Singhbhum+Jharkhand+831011&t=&z=15&ie=UTF8&iwloc=&output=embed"
       />
     </div>
   </div>
@@ -326,35 +326,21 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                   </h3>
 
                   <div className="space-y-6">
-                    {/* Corporate Head Office */}
+                    {/* Office Address */}
                     <div className="space-y-1.5">
                       <h4 className="font-['Manrope',sans-serif] font-semibold text-sm tracking-[0.7px] text-[#9CA3AF] uppercase">
-                        Corporate Head Office
+                        Office Address
                       </h4>
                       <p className="font-['Manrope',sans-serif] font-normal text-base text-[#1B1C1C] leading-relaxed">
-                        Scan Connect (Creative Frameworks) <br />
-                        Plot No. 11, Tech Zone IV, <br />
-                        Greater Noida, Uttar Pradesh &ndash; 201308
-                      </p>
-                    </div>
-
-                    {/* Horizontal Divider */}
-                    <div className="h-[1px] bg-[#E3E2E2] opacity-50 my-2" />
-
-                    {/* Kolkata Branch Office */}
-                    <div className="space-y-1.5">
-                      <h4 className="font-['Manrope',sans-serif] font-semibold text-sm tracking-[0.7px] text-[#9CA3AF] uppercase">
-                        Kolkata Branch Office
-                      </h4>
-                      <p className="font-['Manrope',sans-serif] font-normal text-base text-[#1B1C1C] leading-relaxed">
-                        RDB Boulevard, Block EP &amp; GP, <br />
-                        Sector V, Salt Lake, <br />
-                        Kolkata, West Bengal &ndash; 700091
+                        House No. 1265, Dispensary Road, <br />
+                        Behind Vishwakarma Temple, Near Aerodrome, <br />
+                        Sonari, Jamshedpur, East Singhbhum, <br />
+                        Jharkhand &ndash; 831011
                       </p>
                     </div>
 
                     <a
-                      href="https://maps.google.com/?q=Tech+Zone+4+Greater+Noida+U.P.+201308"
+                      href="https://maps.app.goo.gl/taLjuXVuYUhTaQ6aA"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-sm font-bold text-[#FFED00] hover:text-[#d19d00] transition-colors"
