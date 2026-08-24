@@ -116,7 +116,7 @@ const LoginGate: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Full Name"
-              className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+              className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
             />
           </div>
         )}
@@ -128,7 +128,7 @@ const LoginGate: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email address"
-            className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+            className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
           />
         </div>
         <div className="relative">
@@ -140,7 +140,7 @@ const LoginGate: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+            className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
           />
         </div>
 
@@ -149,7 +149,7 @@ const LoginGate: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-[48px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-lg font-bold text-white shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+          className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-white shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
         >
           {isSubmitting ? 'Please wait...' : mode === 'login' ? 'Log In' : 'Register'}
         </button>
@@ -214,7 +214,7 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="text-center space-y-1">
-            <Car className="w-8 h-8 text-[#F2BA03] mx-auto" />
+            <Car className="w-8 h-8 text-[#FFED00] mx-auto" />
             <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Verify Vehicle</h1>
             <p className="text-sm text-[#5F5E5E]">
               Enter the last 4 digits of the vehicle&apos;s registration number to place this call.
@@ -232,7 +232,7 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
               setErrorMsg('');
             }}
             placeholder="e.g. 1234"
-            className="w-full h-[54px] text-center text-lg font-mono tracking-[6px] bg-white border border-[#CCC7AA] rounded-lg outline-none focus:ring-2 focus:ring-[#F2BA03]"
+            className="w-full h-[54px] text-center text-lg font-mono tracking-[6px] bg-white border border-[#CCC7AA] rounded-lg outline-none focus:ring-2 focus:ring-[#FFED00]"
           />
 
           {errorMsg && <p className="text-sm font-semibold text-red-600 text-center">{errorMsg}</p>}
@@ -248,7 +248,7 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
             <button
               type="submit"
               disabled={isSubmitting || last4.length !== 4}
-              className="flex-1 h-[48px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-lg font-bold text-white shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
+              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-white shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
             >
               {isSubmitting ? 'Checking...' : 'Call'}
             </button>
@@ -399,7 +399,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
           <React.Fragment key={n}>
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                step === n ? 'bg-[#F2BA03] text-white' : step > n ? 'bg-[#F2BA03]/30 text-[#736B00]' : 'bg-[#E9E8E7] text-[#6B7280]'
+                step === n ? 'bg-[#FFED00] text-white' : step > n ? 'bg-[#FFED00]/30 text-[#736B00]' : 'bg-[#E9E8E7] text-[#6B7280]'
               }`}
             >
               {step > n ? <Check className="w-4 h-4" /> : n}
@@ -424,7 +424,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
               />
             </div>
           </div>
@@ -439,7 +439,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 value={mobileNumber}
                 onChange={(e) => setMobileNumber(e.target.value)}
                 placeholder="+91 98765 43210"
-                className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03] disabled:bg-[#F5F3F3] disabled:text-[#5F5E5E]"
+                className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] disabled:bg-[#F5F3F3] disabled:text-[#5F5E5E]"
               />
             </div>
             {mobileReadOnly && <p className="text-[10px] text-[#9CA3AF]">Verified number on your account.</p>}
@@ -447,7 +447,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
           <button
             onClick={() => setStep(2)}
             disabled={!step1Valid}
-            className="w-full h-[48px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-lg font-bold text-white transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+            className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-white transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
           >
             Next <ArrowRight className="w-4 h-4" />
           </button>
@@ -474,7 +474,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                     type="checkbox"
                     checked={selectedContactIds.includes(c.id)}
                     onChange={() => toggleContact(c.id)}
-                    className="w-4 h-4 accent-[#F2BA03]"
+                    className="w-4 h-4 accent-[#FFED00]"
                   />
                   <span className="text-sm text-[#1B1C1C]">
                     {c.name} — {c.phone}
@@ -482,7 +482,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 </label>
               ))}
               {newContacts.map((c, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-3 border border-[#F2BA03] bg-[#F2BA03]/5 rounded-lg">
+                <div key={idx} className="flex items-center gap-3 p-3 border border-[#FFED00] bg-[#FFED00]/5 rounded-lg">
                   <Check className="w-4 h-4 text-[#736B00]" />
                   <span className="text-sm text-[#1B1C1C]">
                     {c.name}
@@ -512,7 +512,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                   value={newContactName}
                   onChange={(e) => setNewContactName(e.target.value)}
                   placeholder="e.g. Alex Morgan"
-                  className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                 />
               </div>
               <div className="space-y-1">
@@ -522,7 +522,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                   value={newContactRole}
                   onChange={(e) => setNewContactRole(e.target.value)}
                   placeholder="e.g. Security Supervisor"
-                  className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                 />
               </div>
               <div className="space-y-1">
@@ -535,7 +535,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                   value={newContactPhone}
                   onChange={(e) => setNewContactPhone(e.target.value)}
                   placeholder="e.g. +44 7700 900888"
-                  className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                 />
               </div>
               <div className="space-y-1">
@@ -545,7 +545,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                   value={newContactEmail}
                   onChange={(e) => setNewContactEmail(e.target.value)}
                   placeholder="e.g. alex.morgan@example.com"
-                  className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                 />
               </div>
               <div className="flex gap-2">
@@ -559,7 +559,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 <button
                   type="button"
                   onClick={handleAddContact}
-                  className="flex-1 py-2 bg-[#F2BA03] text-white font-bold text-xs rounded-lg cursor-pointer"
+                  className="flex-1 py-2 bg-[#FFED00] text-white font-bold text-xs rounded-lg cursor-pointer"
                 >
                   Add
                 </button>
@@ -577,7 +577,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             <button
               onClick={() => setStep(3)}
               disabled={!step2Valid}
-              className="flex-1 h-[48px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-lg font-bold text-white transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-white transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
             >
               Next <ArrowRight className="w-4 h-4" />
             </button>
@@ -597,14 +597,14 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
               <button
                 type="button"
                 onClick={() => setUseNewVehicle(false)}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold cursor-pointer ${!useNewVehicle ? 'bg-[#F2BA03] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'}`}
+                className={`flex-1 py-2 rounded-lg text-xs font-bold cursor-pointer ${!useNewVehicle ? 'bg-[#FFED00] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'}`}
               >
                 Use Existing
               </button>
               <button
                 type="button"
                 onClick={() => setUseNewVehicle(true)}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold cursor-pointer ${useNewVehicle ? 'bg-[#F2BA03] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'}`}
+                className={`flex-1 py-2 rounded-lg text-xs font-bold cursor-pointer ${useNewVehicle ? 'bg-[#FFED00] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'}`}
               >
                 Add New
               </button>
@@ -615,7 +615,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             <select
               value={selectedVehicleId}
               onChange={(e) => setSelectedVehicleId(e.target.value)}
-              className="w-full h-[46px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03] cursor-pointer"
+              className="w-full h-[46px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] cursor-pointer"
             >
               <option value="">Select a vehicle</option>
               {existingVehicles.map((v) => (
@@ -630,18 +630,18 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 value={registration}
                 onChange={(e) => setRegistration(e.target.value)}
                 placeholder="Registration Number"
-                className="col-span-2 h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                className="col-span-2 h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
               />
               <input
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 placeholder="Nickname"
-                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
               />
               <select
                 value={vehicleType}
                 onChange={(e) => setVehicleType(e.target.value)}
-                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03] cursor-pointer"
+                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] cursor-pointer"
               >
                 <option value="">Vehicle Type</option>
                 {VEHICLE_TYPES.map((t) => (
@@ -654,25 +654,25 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
                 placeholder="Brand"
-                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
               />
               <input
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
                 placeholder="Model"
-                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
               />
               <input
                 value={fuelType}
                 onChange={(e) => setFuelType(e.target.value)}
                 placeholder="Fuel Type"
-                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
               />
               <input
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
                 placeholder="Color"
-                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
               />
             </div>
           )}
@@ -689,7 +689,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             <button
               onClick={handleFinish}
               disabled={!step3Valid || isSubmitting}
-              className="flex-1 h-[48px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-lg font-bold text-white transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-white transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {isSubmitting ? 'Activating...' : 'Activate Tag'}
             </button>
@@ -769,7 +769,7 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
     return (
       <CardShell>
         <div className="text-center space-y-4">
-          <div className="w-14 h-14 rounded-full bg-[#F2BA03] flex items-center justify-center mx-auto">
+          <div className="w-14 h-14 rounded-full bg-[#FFED00] flex items-center justify-center mx-auto">
             <QrCodeIcon className="w-7 h-7 text-white" />
           </div>
           <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Activate This QR Tag?</h1>
@@ -779,7 +779,7 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
           </p>
           <button
             onClick={() => setStage(isLoggedIn ? 'wizard' : 'login-gate')}
-            className="w-full h-[52px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-lg font-bold text-white shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+            className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-white shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
           >
             Yes, Activate <ArrowRight className="w-4 h-4" />
           </button>

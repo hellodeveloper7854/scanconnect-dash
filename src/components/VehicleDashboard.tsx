@@ -86,7 +86,7 @@ const RevealTimelineBar: React.FC<{ className?: string }> = ({ className = '' })
   const { ref, isVisible } = useRevealOnScroll<HTMLDivElement>();
   return (
     <div ref={ref} className={className}>
-      <div className={`h-full bg-gradient-to-r from-[#F2BA03] to-[#e0ac00] ${isVisible ? 'animate-timeline-grow' : 'scale-x-0 origin-left'}`} />
+      <div className={`h-full bg-gradient-to-r from-[#FFED00] to-[#e0ac00] ${isVisible ? 'animate-timeline-grow' : 'scale-x-0 origin-left'}`} />
     </div>
   );
 };
@@ -373,25 +373,25 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             <div className="grid grid-cols-1 items-center">
               <div className="max-w-xl space-y-5">
                 <h1 className="font-['Rubik'] font-bold text-3xl sm:text-4xl lg:text-[46px] tracking-[-1px] leading-[1.15] text-white">
-                  Protect Your Privacy. <br></br><span className="text-[#F2BA03]">Stay Reachable.</span>
+                  Protect Your Privacy. <br></br><span className="text-[#FFED00]">Stay Reachable.</span>
                 </h1>
                 <p className="font-['Rubik'] font-semibold text-lg sm:text-xl text-white leading-[1.3]">
                   The Smart QR Tag for Every Vehicle.
                 </p>
 
                 <p className="font-['Rubik'] font-normal text-xs sm:text-sm text-[#D1D5DB] leading-[24px] max-w-md pt-1">
-                  Whether it&apos;s a blocked driveway, headlights left on, or an <span className="text-[#F2BA03] font-semibold">accidental emergency</span>, anyone can contact you or your <span className="text-[#F2BA03] font-semibold">family members</span> instantly&mdash;without ever seeing
+                  Whether it&apos;s a blocked driveway, headlights left on, or an <span className="text-[#FFED00] font-semibold">accidental emergency</span>, anyone can contact you or your <span className="text-[#FFED00] font-semibold">family members</span> instantly&mdash;without ever seeing
                   your phone number.
                 </p>
 
-                <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#F2BA03]">
+                <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#FFED00]">
                   Privacy-First &bull; Instant Contact &bull; No App Required &bull; Lifetime Access &bull; No Monthly Subscription
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <button
                     onClick={() => { window.location.href = '/shop#products'; }}
-                    className="btn-shimmer h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                    className="btn-shimmer h-[52px] px-8 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
                   >
                     <span>Buy Now</span>
                     <ArrowRight className="w-4 h-4" />
@@ -414,9 +414,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
           <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-5">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
-                  <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#FFED00]" />
+                  <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
                     WHY CHOOSE SCAN CONNECT?
                   </span>
                 </div>
@@ -442,8 +442,8 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
                   <span className="relative flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20">
-                    <span className="absolute inset-0 rounded-full bg-[#F2BA03] animate-ping opacity-75" />
-                    <span className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#F2BA03] flex items-center justify-center shadow-xl">
+                    <span className="absolute inset-0 rounded-full bg-[#FFED00] animate-ping opacity-75" />
+                    <span className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FFED00] flex items-center justify-center shadow-xl">
                       <Play className="w-6 h-6 sm:w-7 sm:h-7 text-[#1B1C1C] fill-current ml-1" />
                     </span>
                   </span>
@@ -458,8 +458,8 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
                 {whyChooseScenarios.map((item) => (
                   <div key={item} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-[#F2BA03]/15 flex items-center justify-center shrink-0">
-                      <Check className="w-3.5 h-3.5 text-[#F2BA03] stroke-[3]" />
+                    <div className="w-6 h-6 rounded-full bg-[#FFED00]/15 flex items-center justify-center shrink-0">
+                      <Check className="w-3.5 h-3.5 text-[#FFED00] stroke-[3]" />
                     </div>
                     <span className="font-['Hanken_Grotesk'] font-medium text-base text-[#1B1C1C]">{item}</span>
                   </div>
@@ -477,9 +477,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section id="how-it-works" className="py-20 bg-gradient-to-b from-[#FFFBF0] to-white">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
             <RevealCard className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-                <Workflow className="w-3.5 h-3.5 text-[#F2BA03]" />
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+                <Workflow className="w-3.5 h-3.5 text-[#FFED00]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
                   HOW IT WORKS
                 </span>
               </div>
@@ -501,7 +501,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     className="relative flex flex-col items-center text-center group h-full"
                   >
                     {/* Icon + step number badge */}
-                    <div className="relative z-10 w-[84px] h-[84px] rounded-full bg-gradient-to-br from-[#F2BA03] to-[#e0ac00] flex items-center justify-center shadow-[0_10px_30px_rgba(242,186,3,0.4)] mb-7 ring-8 ring-white group-hover:scale-105 transition-transform duration-300 shrink-0">
+                    <div className="relative z-10 w-[84px] h-[84px] rounded-full bg-gradient-to-br from-[#FFED00] to-[#e0ac00] flex items-center justify-center shadow-[0_10px_30px_rgba(242,186,3,0.4)] mb-7 ring-8 ring-white group-hover:scale-105 transition-transform duration-300 shrink-0">
                       <StepIcon className="w-9 h-9 text-white stroke-[1.75]" />
                       <span className="absolute -top-2 -right-1.5 w-8 h-8 rounded-full bg-[#1B1C1C] text-white font-['Inter'] font-extrabold text-xs flex items-center justify-center shadow-lg ring-2 ring-white">
                         {step.num}
@@ -509,7 +509,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     </div>
 
                     {/* Card body — flex-1 + equal padding keeps every card the same height regardless of copy length */}
-                    <div className="w-full flex-1 bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.07)] flex flex-col justify-center gap-3 hover:shadow-[0_16px_40px_rgba(242,186,3,0.18)] hover:border-[#F2BA03]/50 hover:-translate-y-1.5 transition-all duration-300">
+                    <div className="w-full flex-1 bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.07)] flex flex-col justify-center gap-3 hover:shadow-[0_16px_40px_rgba(242,186,3,0.18)] hover:border-[#FFED00]/50 hover:-translate-y-1.5 transition-all duration-300">
                       <h3 className="font-['Poppins'] font-bold text-lg sm:text-xl text-[#111827] leading-snug">
                         {step.title}
                       </h3>
@@ -537,9 +537,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               return (
                 <>
                   <div className="text-center max-w-3xl mx-auto mb-8 space-y-3">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-                      <Play className="w-3.5 h-3.5 text-[#F2BA03]" />
-                      <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+                      <Play className="w-3.5 h-3.5 text-[#FFED00]" />
+                      <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
                         VIDEO SECTION
                       </span>
                     </div>
@@ -567,7 +567,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                           onClick={() => goToVideoPage(idx)}
                           aria-label={`Go to page ${idx + 1}`}
                           className={`rounded-full transition-all cursor-pointer ${
-                            idx === currentVideoPage ? 'w-5 h-1.5 bg-[#F2BA03]' : 'w-1.5 h-1.5 bg-[#E5E7EB] hover:bg-[#F2BA03]/50'
+                            idx === currentVideoPage ? 'w-5 h-1.5 bg-[#FFED00]' : 'w-1.5 h-1.5 bg-[#E5E7EB] hover:bg-[#FFED00]/50'
                           }`}
                         />
                       ))}
@@ -608,7 +608,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                                   />
                                   <div className="absolute inset-0 bg-[#1B1C1C]/30 group-hover:bg-[#1B1C1C]/40 transition-colors" />
                                   <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="w-14 h-14 rounded-full bg-[#F2BA03] flex items-center justify-center shadow-[0_6px_18px_rgba(0,0,0,0.35)] group-hover:scale-110 transition-transform">
+                                    <div className="w-14 h-14 rounded-full bg-[#FFED00] flex items-center justify-center shadow-[0_6px_18px_rgba(0,0,0,0.35)] group-hover:scale-110 transition-transform">
                                       <Play className="w-6 h-6 text-[#1B1C1C] fill-current ml-0.5" />
                                     </div>
                                   </div>
@@ -639,7 +639,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                         onClick={() => goToVideoPage(idx)}
                         aria-label={`Go to page ${idx + 1}`}
                         className={`rounded-full transition-all cursor-pointer ${
-                          idx === currentVideoPage ? 'w-5 h-1.5 bg-[#F2BA03]' : 'w-1.5 h-1.5 bg-[#E5E7EB]'
+                          idx === currentVideoPage ? 'w-5 h-1.5 bg-[#FFED00]' : 'w-1.5 h-1.5 bg-[#E5E7EB]'
                         }`}
                       />
                     ))}
@@ -655,9 +655,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-                <Gift className="w-3.5 h-3.5 text-[#F2BA03]" />
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+                <Gift className="w-3.5 h-3.5 text-[#FFED00]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
                   CUSTOMER BENEFITS
                 </span>
               </div>
@@ -669,7 +669,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {customerBenefits.map((benefit) => (
                 <div key={benefit} className="flex items-center gap-3 bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs">
-                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] shrink-0" />
+                  <Check className="w-4 h-4 text-[#FFED00] stroke-[3] shrink-0" />
                   <span className="font-['Hanken_Grotesk'] font-medium text-sm sm:text-base text-[#1B1C1C]">{benefit}</span>
                 </div>
               ))}
@@ -682,9 +682,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-                <Building2 className="w-3.5 h-3.5 text-[#F2BA03]" />
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+                <Building2 className="w-3.5 h-3.5 text-[#FFED00]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
                   INDUSTRIES WE SERVE
                 </span>
               </div>
@@ -702,7 +702,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     className="bg-white border border-[#E5E7EB] rounded-2xl p-7 hover:shadow-lg transition-all flex flex-col justify-between space-y-5"
                   >
                     <div className="space-y-4">
-                      <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#F2BA03]">
+                      <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#FFED00]">
                         <IconComp className="w-6 h-6 stroke-[2.2]" />
                       </div>
                       <h3 className="font-['Plus_Jakarta_Sans'] font-semibold text-lg text-[#1B1C1C] leading-snug">
@@ -717,7 +717,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                         </span>
                         {ind.benefits.map((b) => (
                           <div key={b} className="flex items-center gap-2">
-                            <Check className="w-3.5 h-3.5 text-[#F2BA03] stroke-[3] shrink-0" />
+                            <Check className="w-3.5 h-3.5 text-[#FFED00] stroke-[3] shrink-0" />
                             <span className="font-['Hanken_Grotesk'] text-[#1B1C1C] text-sm">{b}</span>
                           </div>
                         ))}
@@ -743,9 +743,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 <>
                   <div className="flex items-center justify-between mb-4">
                     <div className="space-y-2">
-                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-                        <Car className="w-3.5 h-3.5 text-[#F2BA03]" />
-                        <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+                        <Car className="w-3.5 h-3.5 text-[#FFED00]" />
+                        <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
                           SMART VEHICLE SERVICES
                         </span>
                       </div>
@@ -762,7 +762,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                             onClick={() => goToPage(idx)}
                             aria-label={`Go to page ${idx + 1}`}
                             className={`rounded-full transition-all cursor-pointer ${
-                              idx === currentPage ? 'w-5 h-1.5 bg-[#F2BA03]' : 'w-1.5 h-1.5 bg-[#E5E7EB] hover:bg-[#F2BA03]/50'
+                              idx === currentPage ? 'w-5 h-1.5 bg-[#FFED00]' : 'w-1.5 h-1.5 bg-[#E5E7EB] hover:bg-[#FFED00]/50'
                             }`}
                           />
                         ))}
@@ -806,10 +806,10 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                                 <button
                                   key={svc.id}
                                   onClick={() => setSelectedService(svc.id)}
-                                  className="h-full bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-xs hover:shadow-md hover:border-[#F2BA03] transition-all flex flex-col items-center text-center group cursor-pointer"
+                                  className="h-full bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-xs hover:shadow-md hover:border-[#FFED00] transition-all flex flex-col items-center text-center group cursor-pointer"
                                 >
                                   <div className="flex-1 flex items-center justify-center">
-                                    <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#F2BA03] group-hover:scale-110 transition-transform">
+                                    <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#FFED00] group-hover:scale-110 transition-transform">
                                       <SvcIcon className="w-6 h-6 stroke-[2.2]" />
                                     </div>
                                   </div>
@@ -833,7 +833,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                         onClick={() => goToPage(idx)}
                         aria-label={`Go to page ${idx + 1}`}
                         className={`rounded-full transition-all cursor-pointer ${
-                          idx === currentPage ? 'w-5 h-1.5 bg-[#F2BA03]' : 'w-1.5 h-1.5 bg-[#E5E7EB]'
+                          idx === currentPage ? 'w-5 h-1.5 bg-[#FFED00]' : 'w-1.5 h-1.5 bg-[#E5E7EB]'
                         }`}
                       />
                     ))}
@@ -847,7 +847,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
         {/* 7. SOS EMERGENCY ASSISTANCE SECTION */}
         <section className="py-20 bg-[#1B1C1C] text-white relative overflow-hidden">
-          <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-[#F2BA03]/10 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" />
+          <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-[#FFED00]/10 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-[28rem] h-[28rem] bg-red-500/10 rounded-full blur-[140px] pointer-events-none translate-x-1/3 translate-y-1/3" />
 
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
@@ -855,18 +855,18 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
               {/* Left column — copy + highlight cards */}
               <RevealCard className="space-y-8 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F2BA03] opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F2BA03]" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFED00] opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FFED00]" />
                   </span>
-                  <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+                  <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
                     SOS EMERGENCY ASSISTANCE
                   </span>
                 </div>
 
                 <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-white leading-tight">
-                  Help is Just <span className="text-[#F2BA03]">One Tap</span> Away
+                  Help is Just <span className="text-[#FFED00]">One Tap</span> Away
                 </h2>
 
                 <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-neutral-300 leading-[28px]">
@@ -877,10 +877,10 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                   {sosHighlights.map(({ icon: Icon, label }) => (
                     <div
                       key={label}
-                      className="group bg-white/5 border border-white/10 rounded-xl p-5 flex flex-row items-center gap-4 sm:flex-col sm:items-start sm:gap-3 hover:border-[#F2BA03]/60 hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all"
+                      className="group bg-white/5 border border-white/10 rounded-xl p-5 flex flex-row items-center gap-4 sm:flex-col sm:items-start sm:gap-3 hover:border-[#FFED00]/60 hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all"
                     >
-                      <div className="w-10 h-10 rounded-lg bg-[#F2BA03]/15 flex items-center justify-center group-hover:bg-[#F2BA03]/25 group-hover:scale-110 transition-all shrink-0">
-                        <Icon className="w-5 h-5 text-[#F2BA03]" />
+                      <div className="w-10 h-10 rounded-lg bg-[#FFED00]/15 flex items-center justify-center group-hover:bg-[#FFED00]/25 group-hover:scale-110 transition-all shrink-0">
+                        <Icon className="w-5 h-5 text-[#FFED00]" />
                       </div>
                       <span className="font-['Hanken_Grotesk'] font-semibold text-sm text-white leading-snug">{label}</span>
                     </div>
@@ -890,7 +890,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
               {/* Right column — SOS emergency image, framed to pop against the dark section */}
               <RevealCard delayMs={150} className="relative">
-                <div className="absolute -inset-4 bg-gradient-to-tr from-[#F2BA03]/25 via-red-500/15 to-transparent rounded-[28px] blur-2xl pointer-events-none animate-sos-glow" />
+                <div className="absolute -inset-4 bg-gradient-to-tr from-[#FFED00]/25 via-red-500/15 to-transparent rounded-[28px] blur-2xl pointer-events-none animate-sos-glow" />
                 <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5)] group">
                   <img
                     src={sosEmergencyImg}
@@ -913,7 +913,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
                   {/* Bottom caption overlay */}
                   <div className="absolute bottom-0 inset-x-0 p-5 sm:p-6 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-[#F2BA03] flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-full bg-[#FFED00] flex items-center justify-center shrink-0">
                       <ShieldAlert className="w-4.5 h-4.5 text-[#1B1C1C]" />
                     </div>
                     <p className="font-['Hanken_Grotesk'] font-bold text-white text-sm sm:text-base">
@@ -931,7 +931,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               <p className="font-['Hanken_Grotesk'] font-normal text-base text-neutral-300 leading-[28px] max-w-2xl mx-auto">
                 Whether you&apos;re driving through a busy city, travelling on highways, or parking in unfamiliar locations, the Scan Connect SOS feature ensures that help is always just a tap away.
               </p>
-              <p className="font-['Hanken_Grotesk'] font-bold text-lg text-[#F2BA03] pt-2 inline-flex items-center gap-2">
+              <p className="font-['Hanken_Grotesk'] font-bold text-lg text-[#FFED00] pt-2 inline-flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5" />
                 Your Safety. Your Family&apos;s Peace of Mind. Always Connected.
               </p>
@@ -943,9 +943,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         {/* 7b. SOS EMERGENCY ASSISTANCE SECTION (SECOND) */}
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-              <ShieldAlert className="w-4 h-4 text-[#F2BA03]" />
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+              <ShieldAlert className="w-4 h-4 text-[#FFED00]" />
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
                 QUICK EMERGENCY ACCESS
               </span>
             </div>
@@ -970,9 +970,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                       key={item.label}
                       className="inline-flex items-center gap-2 px-4 py-2 bg-[#1B1C1C] border border-[#1B1C1C] rounded-full text-sm font-bold text-white shadow-[0_6px_18px_rgba(0,0,0,0.25)]"
                     >
-                      <ItemIcon className="w-4 h-4 text-[#F2BA03]" />
+                      <ItemIcon className="w-4 h-4 text-[#FFED00]" />
                       {item.label}
-                      <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-[#F2BA03] text-[#1B1C1C] text-[9px] font-extrabold uppercase tracking-wide">
+                      <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-[#FFED00] text-[#1B1C1C] text-[9px] font-extrabold uppercase tracking-wide">
                         Only Here
                       </span>
                     </span>
@@ -981,7 +981,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                       key={item.label}
                       className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#E5E7EB] rounded-full text-sm font-semibold text-[#1B1C1C]"
                     >
-                      <ItemIcon className="w-4 h-4 text-[#F2BA03]" />
+                      <ItemIcon className="w-4 h-4 text-[#FFED00]" />
                       {item.label}
                     </span>
                   );
@@ -1003,8 +1003,8 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
               {/* Right Content — heading/copy first in DOM so mobile shows text before the poster image */}
               <div className="lg:col-span-6 lg:order-2 space-y-6">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-                  <Zap className="w-3.5 h-3.5 text-[#F2BA03]" />
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+                  <Zap className="w-3.5 h-3.5 text-[#FFED00]" />
                   <span className="font-['Inter'] font-bold text-xs tracking-[1.5px] text-[#B58500] uppercase">
                     DOWNLOAD THE APP
                   </span>
@@ -1082,7 +1082,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                   </div>
                   <div className="p-6 space-y-3">
                     <p className="text-xs font-bold uppercase tracking-wide text-neutral-400">{post.date}</p>
-                    <h3 className="text-xl font-black text-neutral-900 leading-snug group-hover:text-[#F2BA03] transition-colors">
+                    <h3 className="text-xl font-black text-neutral-900 leading-snug group-hover:text-[#FFED00] transition-colors">
                       {post.title}
                     </h3>
                     <p className="text-sm text-neutral-500 line-clamp-2">{post.excerpt}</p>
@@ -1109,9 +1109,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         {/* 10. ABOUT COMPANY SECTION */}
         <section className="py-20 bg-[#1B1C1C] text-white">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-5">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-              <Info className="w-3.5 h-3.5 text-[#F2BA03]" />
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+              <Info className="w-3.5 h-3.5 text-[#FFED00]" />
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
                 ABOUT COMPANY
               </span>
             </div>
@@ -1132,9 +1132,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="py-20 bg-[#FAFAFA]">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#FFED00]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
                   TRUSTED BY THOUSANDS OF VEHICLE OWNERS
                 </span>
               </div>
@@ -1149,17 +1149,17 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                   key={benefit.label}
                   className={`h-full rounded-xl p-5 flex items-center gap-3 transition-all ${
                     benefit.core
-                      ? 'bg-white border-2 border-[#F2BA03] shadow-[0_6px_20px_rgba(242,186,3,0.18)]'
+                      ? 'bg-white border-2 border-[#FFED00] shadow-[0_6px_20px_rgba(242,186,3,0.18)]'
                       : 'bg-white border border-[#E5E7EB] shadow-xs'
                   }`}
                 >
                   <div
                     className={`rounded-full flex items-center justify-center shrink-0 ${
-                      benefit.core ? 'w-7 h-7 bg-[#F2BA03]' : 'w-4 h-4'
+                      benefit.core ? 'w-7 h-7 bg-[#FFED00]' : 'w-4 h-4'
                     }`}
                   >
                     <Check
-                      className={benefit.core ? 'w-4 h-4 text-white stroke-[3]' : 'w-4 h-4 text-[#F2BA03] stroke-[3]'}
+                      className={benefit.core ? 'w-4 h-4 text-white stroke-[3]' : 'w-4 h-4 text-[#FFED00] stroke-[3]'}
                     />
                   </div>
                   <span
@@ -1179,9 +1179,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         {/* 13. LEFTOVER: ABOUT SCAN CONNECT SECTION */}
         <section className="py-20 bg-white">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
-              <Sparkles className="w-3.5 h-3.5 text-[#F2BA03]" />
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#F2BA03]">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+              <Sparkles className="w-3.5 h-3.5 text-[#FFED00]" />
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
                 ABOUT SCAN CONNECT
               </span>
             </div>
@@ -1215,7 +1215,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <button
                 onClick={() => { window.location.href = '/shop#products'; }}
-                className="btn-shimmer h-[56px] px-9 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                className="btn-shimmer h-[56px] px-9 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
               >
                 <span>Buy Now</span>
                 <ArrowRight className="w-4 h-4" />
@@ -1238,7 +1238,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
           <div className="bg-neutral-900 text-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative border border-neutral-800 space-y-5">
             <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#F2BA03] text-neutral-950 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#FFED00] text-neutral-950 flex items-center justify-center">
                   <Scan className="w-4 h-4 stroke-[2.5]" />
                 </div>
                 <h3 className="text-base font-black text-white uppercase tracking-wider font-mono">
@@ -1259,24 +1259,24 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             {!isScanSuccess ? (
               <div className="space-y-4">
                 {/* Simulated Camera Scanner Viewfinder */}
-                <div className="aspect-square bg-neutral-950 rounded-2xl relative flex flex-col items-center justify-center overflow-hidden border-2 border-dashed border-[#F2BA03]/50 p-6 text-center">
+                <div className="aspect-square bg-neutral-950 rounded-2xl relative flex flex-col items-center justify-center overflow-hidden border-2 border-dashed border-[#FFED00]/50 p-6 text-center">
                   {/* Animated Corner Reticles */}
-                  <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[#F2BA03]" />
-                  <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[#F2BA03]" />
-                  <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[#F2BA03]" />
-                  <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-[#F2BA03]" />
+                  <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[#FFED00]" />
+                  <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[#FFED00]" />
+                  <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[#FFED00]" />
+                  <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-[#FFED00]" />
 
                   {/* Laser Scanning Line */}
-                  <div className="absolute inset-x-0 h-1 bg-[#F2BA03] shadow-[0_0_15px_#F2BA03] animate-pulse top-1/3" />
+                  <div className="absolute inset-x-0 h-1 bg-[#FFED00] shadow-[0_0_15px_#FFED00] animate-pulse top-1/3" />
 
-                  <QrCode className="w-24 h-24 text-[#F2BA03]/80 mb-3 animate-pulse" />
+                  <QrCode className="w-24 h-24 text-[#FFED00]/80 mb-3 animate-pulse" />
                   <p className="text-xs text-neutral-300 font-mono">
                     Point camera at vehicle SCAN ME sticker tag...
                   </p>
 
                   <button
                     onClick={handleSimulateScan}
-                    className="mt-4 px-5 py-2.5 bg-[#F2BA03] text-neutral-950 rounded-xl font-extrabold text-xs uppercase tracking-wider hover:bg-amber-400 cursor-pointer shadow-lg transition-transform active:scale-95 flex items-center gap-2"
+                    className="mt-4 px-5 py-2.5 bg-[#FFED00] text-neutral-950 rounded-xl font-extrabold text-xs uppercase tracking-wider hover:bg-amber-400 cursor-pointer shadow-lg transition-transform active:scale-95 flex items-center gap-2"
                   >
                     <Sparkles className="w-4 h-4" /> Simulate QR Tag Detect
                   </button>
@@ -1292,7 +1292,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                       placeholder="e.g. SC-MH12-9881"
                       value={scannedTagId}
                       onChange={(e) => setScannedTagId(e.target.value)}
-                      className="flex-1 bg-neutral-950 border border-neutral-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#F2BA03]"
+                      className="flex-1 bg-neutral-950 border border-neutral-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#FFED00]"
                     />
                     <button
                       onClick={handleSimulateScan}
@@ -1377,7 +1377,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               const SvcIcon = svc.icon;
               return (
                 <>
-                  <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#F2BA03]">
+                  <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#FFED00]">
                     <SvcIcon className="w-6 h-6 stroke-[2.2]" />
                   </div>
                   <h3 className="text-2xl font-black text-neutral-900 tracking-tight">
@@ -1393,7 +1393,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                         alert(`Searching live location database for ${svc.title}...`);
                         setSelectedService(null);
                       }}
-                      className="flex-1 py-3 bg-[#F2BA03] hover:bg-amber-400 text-neutral-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-md cursor-pointer"
+                      className="flex-1 py-3 bg-[#FFED00] hover:bg-amber-400 text-neutral-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-md cursor-pointer"
                     >
                       SEARCH NEARBY
                     </button>
@@ -1419,7 +1419,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
             <div className="bg-neutral-900 text-white rounded-2xl max-w-3xl w-full p-4 sm:p-6 shadow-2xl relative border border-neutral-800 space-y-4">
               <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-                <h3 className="text-lg font-bold text-[#F2BA03] flex items-center gap-2">
+                <h3 className="text-lg font-bold text-[#FFED00] flex items-center gap-2">
                   <Play className="w-5 h-5 fill-current" />
                   {activeVideo.title}
                 </h3>
@@ -1433,14 +1433,14 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
               {/* Simulated Video Player */}
               <div className="aspect-video bg-black rounded-xl relative flex flex-col items-center justify-center text-center p-8 space-y-4 border border-neutral-800 overflow-hidden">
-                <div className="w-16 h-16 rounded-full bg-[#F2BA03] text-neutral-950 flex items-center justify-center animate-pulse">
+                <div className="w-16 h-16 rounded-full bg-[#FFED00] text-neutral-950 flex items-center justify-center animate-pulse">
                   <Play className="w-8 h-8 fill-current ml-1" />
                 </div>
                 <p className="text-neutral-300 text-sm max-w-md font-mono">
                   [ {activeVideo.caption} ]
                 </p>
                 <div className="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-[#F2BA03] h-full w-2/3 animate-pulse" />
+                  <div className="bg-[#FFED00] h-full w-2/3 animate-pulse" />
                 </div>
               </div>
 

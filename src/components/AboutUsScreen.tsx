@@ -70,7 +70,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
             {/* Mission Badge */}
             <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
+              <ShieldCheck className="w-3.5 h-3.5 text-[#FFED00]" />
               <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
                 OUR MISSION
               </span>
@@ -88,7 +88,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <button
                 onClick={() => onNavigate('shop')}
-                className="btn-shimmer h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                className="btn-shimmer h-[52px] px-8 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
               >
                 <span>GET YOUR TAG</span>
                 <ArrowRight className="w-4 h-4" />
@@ -177,22 +177,22 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                     className={`group relative overflow-hidden rounded-2xl p-6 flex flex-col gap-4 transition-all hover:-translate-y-1 sm:col-span-1 lg:col-span-3 ${
                       pillar.featured
                         ? 'bg-[#1B1C1C] text-white shadow-[0_16px_40px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]'
-                        : 'bg-white border border-neutral-200 shadow-xs hover:shadow-lg hover:border-[#F2BA03]/50'
+                        : 'bg-white border border-neutral-200 shadow-xs hover:shadow-lg hover:border-[#FFED00]/50'
                     }`}
                   >
                     {/* Decorative oversized watermark icon for visual variety */}
                     <PillarIcon
                       className={`absolute -right-4 -bottom-4 w-28 h-28 rotate-12 pointer-events-none transition-transform group-hover:rotate-6 ${
-                        pillar.featured ? 'text-white/[0.06]' : 'text-[#F2BA03]/[0.08]'
+                        pillar.featured ? 'text-white/[0.06]' : 'text-[#FFED00]/[0.08]'
                       }`}
                     />
 
                     <div
                       className={`relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
-                        pillar.featured ? 'bg-[#F2BA03]' : 'bg-[#1B1C1C]'
+                        pillar.featured ? 'bg-[#FFED00]' : 'bg-[#1B1C1C]'
                       }`}
                     >
-                      <PillarIcon className={`w-7 h-7 ${pillar.featured ? 'text-[#1B1C1C]' : 'text-[#F2BA03]'}`} />
+                      <PillarIcon className={`w-7 h-7 ${pillar.featured ? 'text-[#1B1C1C]' : 'text-[#FFED00]'}`} />
                     </div>
                     <h3 className={`relative z-10 text-xl font-bold ${pillar.featured ? 'text-white' : 'text-[#0F0F0F]'}`}>
                       {pillar.title}
@@ -223,7 +223,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
               {/* Solution 1: Housing Societies */}
               <div className="p-8 flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
-                  <Building2 className="w-6 h-6 text-[#F2BA03]" />
+                  <Building2 className="w-6 h-6 text-[#FFED00]" />
                   <h3 className="text-xl font-bold text-[#0F0F0F]">
                     Housing Societies
                   </h3>
@@ -238,7 +238,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
               {/* Solution 2: Garages & Workshops */}
               <div className="p-8 flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
-                  <Home className="w-6 h-6 text-[#F2BA03]" />
+                  <Home className="w-6 h-6 text-[#FFED00]" />
                   <h3 className="text-xl font-bold text-[#0F0F0F]">
                     Garages &amp; Workshops
                   </h3>
@@ -249,7 +249,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
 
                 <button
                   onClick={() => alert('Garage Co-branding Inquiry sent!')}
-                  className="text-sm font-bold text-[#F2BA03] hover:text-[#d19d00] tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                  className="text-sm font-bold text-[#FFED00] hover:text-[#d19d00] tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <span>PARTNER NOW</span> <ArrowRight className="w-4 h-4" />
                 </button>
@@ -258,7 +258,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
               {/* Solution 3: Commercial Parking Hubs */}
               <div className="p-8 flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
-                  <ParkingSquare className="w-6 h-6 text-[#F2BA03]" />
+                  <ParkingSquare className="w-6 h-6 text-[#FFED00]" />
                   <h3 className="text-xl font-bold text-[#0F0F0F]">
                     Commercial Parking Hubs
                   </h3>
@@ -269,7 +269,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
 
                 <button
                   onClick={() => alert('Parking Hubs Demo Request sent!')}
-                  className="text-sm font-bold text-[#F2BA03] hover:text-[#d19d00] tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                  className="text-sm font-bold text-[#FFED00] hover:text-[#d19d00] tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <span>VIEW DEMO</span> <ArrowRight className="w-4 h-4" />
                 </button>

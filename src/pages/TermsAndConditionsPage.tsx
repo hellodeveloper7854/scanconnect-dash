@@ -441,7 +441,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
         <p>
           For full details, eligibility criteria, and step-by-step return instructions, please visit our complete
           policy page:{' '}
-          <a href="/refund-returns" className="text-[#F2BA03] font-semibold hover:underline">
+          <a href="/refund-returns" className="text-[#FFED00] font-semibold hover:underline">
             Refund &amp; Returns Policy
           </a>
           .
@@ -457,13 +457,13 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
         <p className="font-bold text-[#1B1C1C]">Creative Frameworks / Scan Connect</p>
         <p>
           Email:{' '}
-          <a href="mailto:support@scanconnect.com" className="text-[#F2BA03] font-semibold hover:underline">
+          <a href="mailto:support@scanconnect.com" className="text-[#FFED00] font-semibold hover:underline">
             support@scanconnect.com
           </a>
         </p>
         <p>
           Phone:{' '}
-          <a href="tel:08047359856" className="text-[#F2BA03] font-semibold hover:underline">
+          <a href="tel:08047359856" className="text-[#FFED00] font-semibold hover:underline">
             080-473-59856
           </a>
         </p>

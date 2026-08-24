@@ -358,7 +358,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
         modal: {
           ondismiss: () => setIsProcessingPayment(false),
         },
-        theme: { color: '#F2BA03' },
+        theme: { color: '#FFED00' },
       });
 
       razorpay.open();
@@ -398,7 +398,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
             <div
               className={`flex flex-row justify-center items-center w-[40px] h-[40px] rounded-full transition-all ${
                 step === 1
-                  ? 'bg-[#F2BA03] shadow-[0px_1px_2px_rgba(0,0,0,0.05)]'
+                  ? 'bg-[#FFED00] shadow-[0px_1px_2px_rgba(0,0,0,0.05)]'
                   : 'bg-[#E9E8E7] shadow-[0px_1px_2px_rgba(0,0,0,0.05)]'
               }`}
             >
@@ -426,7 +426,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
             <div
               className={`flex flex-row justify-center items-center w-[40px] h-[40px] rounded-full transition-all ${
                 step === 2
-                  ? 'bg-[#F2BA03]'
+                  ? 'bg-[#FFED00]'
                   : 'bg-[#E9E8E7]'
               }`}
             >
@@ -451,7 +451,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
             <div
               className={`flex flex-row justify-center items-center w-[40px] h-[40px] rounded-full transition-all ${
                 step === 3
-                  ? 'bg-[#F2BA03]'
+                  ? 'bg-[#FFED00]'
                   : 'bg-[#E9E8E7]'
               }`}
             >
@@ -506,7 +506,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="John Doe"
-                        className="w-full h-[42px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#F2BA03]"
+                        className="w-full h-[42px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00]"
                       />
                     </div>
 
@@ -521,7 +521,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="+91 98765 43210"
-                        className="w-full h-[42px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#F2BA03]"
+                        className="w-full h-[42px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00]"
                       />
                     </div>
 
@@ -536,7 +536,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         placeholder="Mumbai"
-                        className="w-full h-[42px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#F2BA03]"
+                        className="w-full h-[42px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00]"
                       />
                     </div>
 
@@ -551,7 +551,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         value={pincode}
                         onChange={(e) => setPincode(e.target.value)}
                         placeholder="400001"
-                        className="w-full h-[42px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#F2BA03]"
+                        className="w-full h-[42px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00]"
                       />
                     </div>
                   </div>
@@ -567,7 +567,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
                       placeholder="House No, Street, Landmark..."
-                      className="w-full h-[57px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] py-[10px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#F2BA03] resize-none overflow-y-auto"
+                      className="w-full h-[57px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] py-[10px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00] resize-none overflow-y-auto"
                     />
                   </div>
                 </div>
@@ -579,7 +579,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                   )}
                   <button
                     onClick={handleContinueToPayment}
-                    className="w-full sm:w-[232.2px] h-[56px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-[8px] flex items-center justify-center font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#FFFFFF] shadow-xs transition-colors cursor-pointer active:scale-95"
+                    className="w-full sm:w-[232.2px] h-[56px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-[8px] flex items-center justify-center font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#FFFFFF] shadow-xs transition-colors cursor-pointer active:scale-95"
                   >
                     Continue to Payment
                   </button>
@@ -609,7 +609,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     <p className="font-['Hanken_Grotesk'] font-normal text-[14px] leading-[20px] text-[#5F5E5E]">
                       Premium Protection Plan x1
                     </p>
-                    <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#F2BA03] block">
+                    <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#FFED00] block">
                       {productPrice}
                     </span>
                   </div>
@@ -630,7 +630,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     <span className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
                       Shipping
                     </span>
-                    <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#F2BA03]">
+                    <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#FFED00]">
                       FREE
                     </span>
                   </div>
@@ -648,7 +648,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
 
                 {/* Overlay Alert Box */}
                 <div className="bg-[rgba(255,239,0,0.1)] border border-[rgba(103,96,0,0.2)] rounded-[8px] p-[16px] flex flex-row items-start gap-[12px]">
-                  <Info className="w-[20px] h-[20px] text-[#F2BA03] shrink-0 mt-[2px]" />
+                  <Info className="w-[20px] h-[20px] text-[#FFED00] shrink-0 mt-[2px]" />
                   <p className="font-['Hanken_Grotesk'] font-normal text-[12px] leading-[20px] text-[#736B00]">
                     Your payment is protected by end-to-end encryption. By clicking complete, you agree to our Terms of Service and Refund Policy.
                   </p>
@@ -661,21 +661,21 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
             {/* TRUST INDICATORS SECTION */}
             <div className="flex flex-wrap items-center justify-center gap-[32px] opacity-70 pt-[16px]">
               <div className="flex items-center gap-[8px]">
-                <Lock className="w-[16px] h-[20px] text-[#F2BA03]" />
+                <Lock className="w-[16px] h-[20px] text-[#FFED00]" />
                 <span className="font-['Hanken_Grotesk'] font-normal text-[12px] leading-[16px] text-[#1B1C1C]">
                   SSL SECURED CHECKOUT
                 </span>
               </div>
 
               <div className="flex items-center gap-[8px]">
-                <ShieldCheck className="w-[16px] h-[20px] text-[#F2BA03]" />
+                <ShieldCheck className="w-[16px] h-[20px] text-[#FFED00]" />
                 <span className="font-['Hanken_Grotesk'] font-normal text-[12px] leading-[16px] text-[#1B1C1C]">
                   PCI DSS COMPLIANT
                 </span>
               </div>
 
               <div className="flex items-center gap-[8px]">
-                <Check className="w-[22px] h-[22px] text-[#F2BA03]" />
+                <Check className="w-[22px] h-[22px] text-[#FFED00]" />
                 <span className="font-['Hanken_Grotesk'] font-normal text-[12px] leading-[16px] text-[#1B1C1C]">
                   MONEY BACK GUARANTEE
                 </span>
@@ -747,7 +747,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 <button
                   onClick={handlePayNow}
                   disabled={isProcessingPayment}
-                  className="w-full h-[68px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-[12px] flex items-center justify-center gap-[8px] font-['Hanken_Grotesk'] font-bold text-[18px] leading-[28px] text-[#736B00] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
+                  className="w-full h-[68px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-[12px] flex items-center justify-center gap-[8px] font-['Hanken_Grotesk'] font-bold text-[18px] leading-[28px] text-[#736B00] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
                 >
                   <span>{isProcessingPayment ? 'Processing...' : 'Pay Now'}</span>
                   {!isProcessingPayment && <ArrowRight className="w-[16px] h-[16px] text-[#736B00]" />}
@@ -769,7 +769,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
         {step === 3 && completedOrder && !completedOrder.qrToken && (
           <div className="max-w-[600px] mx-auto space-y-8 animate-fade-in px-2 sm:px-4 pt-2">
             <div className="text-center space-y-2">
-              <div className="w-16 h-16 rounded-full bg-[#F2BA03] flex items-center justify-center mx-auto">
+              <div className="w-16 h-16 rounded-full bg-[#FFED00] flex items-center justify-center mx-auto">
                 <Check className="w-8 h-8 text-white stroke-[3]" />
               </div>
               <h1 className="font-['Plus_Jakarta_Sans'] font-bold text-2xl sm:text-[28px] text-[#1B1C1C]">
@@ -794,7 +794,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                   <select
                     value={selectedVehicleId}
                     onChange={(e) => setSelectedVehicleId(e.target.value)}
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03] cursor-pointer"
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00] cursor-pointer"
                   >
                     <option value="">Select a vehicle</option>
                     {vehicles.map((v) => (
@@ -826,7 +826,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                   <select
                     value={selectedContactId}
                     onChange={(e) => setSelectedContactId(e.target.value)}
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03] cursor-pointer"
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00] cursor-pointer"
                   >
                     <option value="">Select a contact</option>
                     {contacts.map((c) => (
@@ -850,7 +850,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               <button
                 onClick={handleConfirmAssign}
                 disabled={isAssigning || !selectedVehicleId || !selectedContactId}
-                className="w-full h-[56px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-lg font-['Hanken_Grotesk'] font-bold text-base text-white shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+                className="w-full h-[56px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-['Hanken_Grotesk'] font-bold text-base text-white shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {isAssigning ? 'Generating QR...' : 'Generate My QR Tag'}
                 {!isAssigning && <ArrowRight className="w-4 h-4" />}
@@ -871,7 +871,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         value={newVehicleRegistration}
                         onChange={(e) => setNewVehicleRegistration(e.target.value)}
                         placeholder="e.g. MH12AB1234"
-                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                       />
                     </div>
                     <div className="space-y-1">
@@ -881,7 +881,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         value={newVehicleNickname}
                         onChange={(e) => setNewVehicleNickname(e.target.value)}
                         placeholder="e.g. My Sedan"
-                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
@@ -890,7 +890,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         <select
                           value={newVehicleType}
                           onChange={(e) => setNewVehicleType(e.target.value)}
-                          className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03] cursor-pointer"
+                          className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] cursor-pointer"
                         >
                           <option value="">Select type</option>
                           {VEHICLE_TYPES.map((t) => (
@@ -907,7 +907,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                           value={newVehicleFuelType}
                           onChange={(e) => setNewVehicleFuelType(e.target.value)}
                           placeholder="e.g. Petrol"
-                          className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                          className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                         />
                       </div>
                     </div>
@@ -919,7 +919,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                           value={newVehicleBrand}
                           onChange={(e) => setNewVehicleBrand(e.target.value)}
                           placeholder="e.g. Maruti Suzuki"
-                          className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                          className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                         />
                       </div>
                       <div className="space-y-1">
@@ -929,7 +929,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                           value={newVehicleModel}
                           onChange={(e) => setNewVehicleModel(e.target.value)}
                           placeholder="e.g. Swift"
-                          className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                          className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                         />
                       </div>
                     </div>
@@ -940,7 +940,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         value={newVehicleColor}
                         onChange={(e) => setNewVehicleColor(e.target.value)}
                         placeholder="e.g. White"
-                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                       />
                     </div>
 
@@ -960,7 +960,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       <button
                         type="submit"
                         disabled={isSavingVehicle}
-                        className="flex-1 py-2.5 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-extrabold text-xs uppercase rounded-lg cursor-pointer disabled:opacity-60"
+                        className="flex-1 py-2.5 bg-[#FFED00] hover:bg-[#e0ac00] text-white font-extrabold text-xs uppercase rounded-lg cursor-pointer disabled:opacity-60"
                       >
                         {isSavingVehicle ? 'Saving...' : 'Save Vehicle'}
                       </button>
@@ -984,7 +984,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         value={newContactName}
                         onChange={(e) => setNewContactName(e.target.value)}
                         placeholder="e.g. Alex Morgan"
-                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                       />
                     </div>
                     <div className="space-y-1">
@@ -994,7 +994,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         value={newContactRole}
                         onChange={(e) => setNewContactRole(e.target.value)}
                         placeholder="e.g. Security Supervisor"
-                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                       />
                     </div>
                     <div className="space-y-1">
@@ -1005,7 +1005,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         value={newContactPhone}
                         onChange={(e) => setNewContactPhone(e.target.value)}
                         placeholder="e.g. +91 98765 43210"
-                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                       />
                     </div>
                     <div className="space-y-1">
@@ -1015,7 +1015,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         value={newContactEmail}
                         onChange={(e) => setNewContactEmail(e.target.value)}
                         placeholder="e.g. alex@scanme.fleet"
-                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                       />
                     </div>
 
@@ -1035,7 +1035,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       <button
                         type="submit"
                         disabled={isSavingContact}
-                        className="flex-1 py-2.5 bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-extrabold text-xs uppercase rounded-lg cursor-pointer disabled:opacity-60"
+                        className="flex-1 py-2.5 bg-[#FFED00] hover:bg-[#e0ac00] text-white font-extrabold text-xs uppercase rounded-lg cursor-pointer disabled:opacity-60"
                       >
                         {isSavingContact ? 'Saving...' : 'Save Contact'}
                       </button>
@@ -1054,9 +1054,9 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
             {/* SUCCESS CELEBRATION SECTION */}
             <div className="flex flex-col items-center text-center gap-[16px] w-full">
               {/* Background badge icon with orbit ring */}
-              <div className="relative w-[96px] h-[88px] sm:w-[96px] sm:h-[96px] bg-[#F2BA03] rounded-full flex items-center justify-center shrink-0">
+              <div className="relative w-[96px] h-[88px] sm:w-[96px] sm:h-[96px] bg-[#FFED00] rounded-full flex items-center justify-center shrink-0">
                 <Check className="w-[40px] h-[40px] text-white stroke-[3]" />
-                <div className="absolute inset-0 border-2 border-[#F2BA03] opacity-20 rounded-full scale-105 pointer-events-none" />
+                <div className="absolute inset-0 border-2 border-[#FFED00] opacity-20 rounded-full scale-105 pointer-events-none" />
               </div>
 
               {/* Heading 1 */}
@@ -1204,7 +1204,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                           <Star
                             className={`w-[30px] h-[28.5px] ${
                               star <= rating
-                                ? 'fill-[#F2BA03] text-[#F2BA03]'
+                                ? 'fill-[#FFED00] text-[#FFED00]'
                                 : 'fill-[#E4E2E2] text-[#E4E2E2]'
                             }`}
                           />
@@ -1223,7 +1223,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       value={reviewComment}
                       onChange={(e) => setReviewComment(e.target.value)}
                       placeholder="Tell us more about your shopping experience..."
-                      className="w-full h-[96px] bg-[#FFFFFF] border border-[#E4E2E2] rounded-[8px] p-[16px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#F2BA03] resize-none"
+                      className="w-full h-[96px] bg-[#FFFFFF] border border-[#E4E2E2] rounded-[8px] p-[16px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00] resize-none"
                     />
                   </div>
 
@@ -1241,7 +1241,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                   </button>
                 </div>
               ) : (
-                <div className="bg-[#F2BA03]/10 border border-[#F2BA03]/30 rounded-[12px] p-[16px] font-['Hanken_Grotesk'] font-bold text-[14px] text-[#1B1C1C] flex items-center gap-[8px]">
+                <div className="bg-[#FFED00]/10 border border-[#FFED00]/30 rounded-[12px] p-[16px] font-['Hanken_Grotesk'] font-bold text-[14px] text-[#1B1C1C] flex items-center gap-[8px]">
                   <Check className="w-[18px] h-[18px] text-[#736B00]" />
                   <span>Thank you! Your feedback has been recorded.</span>
                 </div>
@@ -1253,7 +1253,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
             <div className="flex flex-col sm:flex-row items-center gap-[16px] pb-[32px]">
               <button
                 onClick={() => onNavigate('dashboard')}
-                className="w-full sm:w-[302px] flex-1 h-[60px] bg-[#F2BA03] hover:bg-[#e0ac00] rounded-[8px] flex items-center justify-center gap-[8px] font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#FFFFFF] shadow-xs transition-colors cursor-pointer active:scale-95"
+                className="w-full sm:w-[302px] flex-1 h-[60px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-[8px] flex items-center justify-center gap-[8px] font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#FFFFFF] shadow-xs transition-colors cursor-pointer active:scale-95"
               >
                 <span>View Dashboard</span>
                 <LayoutDashboard className="w-[18px] h-[18px] text-white" />

@@ -55,7 +55,7 @@ export const WhatsAppChatWidget: React.FC = () => {
                   href={buildWhatsAppLink(question)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full text-left bg-white hover:bg-[#F2BA03]/10 border border-neutral-200 hover:border-[#F2BA03] rounded-xl px-3.5 py-2.5 text-sm font-medium text-[#1B1C1C] transition-colors cursor-pointer"
+                  className="block w-full text-left bg-white hover:bg-[#FFED00]/10 border border-neutral-200 hover:border-[#FFED00] rounded-xl px-3.5 py-2.5 text-sm font-medium text-[#1B1C1C] transition-colors cursor-pointer"
                 >
                   {question}
                 </a>

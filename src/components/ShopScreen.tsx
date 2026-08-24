@@ -283,7 +283,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     'Made in India',
                   ].map((line) => (
                     <div key={line} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] shrink-0" />
+                      <Check className="w-4 h-4 text-[#FFED00] stroke-[3] shrink-0" />
                       <span className="text-[#1B1C1C] text-sm sm:text-base font-medium">{line}</span>
                     </div>
                   ))}
@@ -292,7 +292,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <button
                     onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="btn-shimmer h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+                    className="btn-shimmer h-[52px] px-8 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
                   >
                     <span>View Products</span>
                     <ArrowRight className="w-4 h-4" />
@@ -337,7 +337,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                       key={item.label}
                       className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-neutral-200 rounded-full text-xs font-bold text-[#0F0F0F] shadow-xs"
                     >
-                      <Icon className="w-3.5 h-3.5 text-[#F2BA03]" />
+                      <Icon className="w-3.5 h-3.5 text-[#FFED00]" />
                       <span>{item.label}</span>
                     </div>
                   );
@@ -351,7 +351,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         {/* 2. SCAN CONNECT TAG INTRO SECTION */}
         <section className="py-16 sm:py-20 bg-white border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
               <QrCode className="w-3.5 h-3.5 text-[#B58500]" />
               <span className="font-mono text-xs font-semibold tracking-wider text-[#B58500] uppercase">
                 SCAN CONNECT TAG
@@ -390,7 +390,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
             {/* Section Header */}
             <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-4">
               <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs">
-                <Package className="w-3.5 h-3.5 text-[#F2BA03]" />
+                <Package className="w-3.5 h-3.5 text-[#FFED00]" />
                 <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
                   CATALOGUE
                 </span>
@@ -413,16 +413,16 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                 return (
                 <div
                   key={prod.id}
-                  className="group bg-white border border-neutral-200 rounded-2xl shadow-xs hover:shadow-xl hover:border-[#F2BA03]/40 hover:-translate-y-1 transition-all flex flex-col overflow-hidden w-full h-full"
+                  className="group bg-white border border-neutral-200 rounded-2xl shadow-xs hover:shadow-xl hover:border-[#FFED00]/40 hover:-translate-y-1 transition-all flex flex-col overflow-hidden w-full h-full"
                 >
                   {/* Header — icon, badge, rating */}
                   <div className="p-6 pb-0 space-y-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/60 flex items-center justify-center ring-1 ring-amber-100 shrink-0 group-hover:scale-105 transition-transform">
-                        <ProductIcon className="w-6 h-6 text-[#F2BA03]" />
+                        <ProductIcon className="w-6 h-6 text-[#FFED00]" />
                       </div>
                       {prod.badge && (
-                        <span className="px-2.5 py-1 bg-[#F2BA03] text-[#1B1C1C] font-bold rounded-full text-[10px] uppercase tracking-wider whitespace-nowrap shrink-0">
+                        <span className="px-2.5 py-1 bg-[#FFED00] text-[#1B1C1C] font-bold rounded-full text-[10px] uppercase tracking-wider whitespace-nowrap shrink-0">
                           {prod.badge}
                         </span>
                       )}
@@ -435,7 +435,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                       {prod.rating && (
                         <div className="flex items-center gap-1 mt-1.5">
                           {[...Array(5)].map((_, i) => (
-                            <Star key={i} className="w-3 h-3 fill-[#F2BA03] text-[#F2BA03]" />
+                            <Star key={i} className="w-3 h-3 fill-[#FFED00] text-[#FFED00]" />
                           ))}
                           <span className="text-[#5D5F5F] font-medium text-[11px] ml-1">{prod.rating}</span>
                         </div>
@@ -452,7 +452,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     {hasMoreDetails && (
                       <button
                         onClick={() => setFeaturesModalProductId(prod.id)}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-[#0F0F0F] underline decoration-[#F2BA03] decoration-2 underline-offset-4 hover:text-[#F2BA03] cursor-pointer"
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[#0F0F0F] underline decoration-[#FFED00] decoration-2 underline-offset-4 hover:text-[#FFED00] cursor-pointer"
                       >
                         See all features
                         <ArrowRight className="w-3 h-3" />
@@ -488,7 +488,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                           price: prod.price && prod.price.startsWith('₹') ? prod.price : '₹499',
                         })
                       }
-                      className="btn-shimmer w-full h-[42px] bg-[#0F0F0F] hover:bg-[#F2BA03] hover:shadow-[0_8px_20px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#0F0F0F] font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95 shadow-xs"
+                      className="btn-shimmer w-full h-[42px] bg-[#0F0F0F] hover:bg-[#FFED00] hover:shadow-[0_8px_20px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#0F0F0F] font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95 shadow-xs"
                     >
                       <span>{prod.cta}</span>
                       <ArrowRight className="w-4 h-4" />
@@ -542,7 +542,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/60 flex items-center justify-center ring-1 ring-amber-100 shrink-0">
-                      <ProductIcon className="w-6 h-6 text-[#F2BA03]" />
+                      <ProductIcon className="w-6 h-6 text-[#FFED00]" />
                     </div>
                     <h3 className="text-lg font-extrabold text-[#0F0F0F] leading-snug">
                       {prod.title}
@@ -583,7 +583,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {prod.features.map((f) => (
                         <div key={f} className="flex items-center gap-2">
-                          <Check className="w-3.5 h-3.5 text-[#F2BA03] stroke-[3] shrink-0" />
+                          <Check className="w-3.5 h-3.5 text-[#FFED00] stroke-[3] shrink-0" />
                           <span className="text-[#1B1C1C] text-sm">{f}</span>
                         </div>
                       ))}
@@ -600,7 +600,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         <section className="py-16 sm:py-20 bg-white border-t border-neutral-100">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F2BA03]/15 border border-[#F2BA03]/40">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
                 <Package className="w-3.5 h-3.5 text-[#B58500]" />
                 <span className="font-mono text-xs font-bold tracking-wider text-[#B58500] uppercase">
                   WHAT'S IN THE BOX
@@ -616,8 +616,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
               {boxContents.map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="h-full bg-neutral-50/70 border border-neutral-200 rounded-2xl p-5 flex flex-col gap-3 hover:border-[#F2BA03]/50 hover:shadow-md transition-all">
-                  <div className="w-11 h-11 rounded-xl bg-[#F2BA03]/15 flex items-center justify-center shrink-0">
+                <div key={title} className="h-full bg-neutral-50/70 border border-neutral-200 rounded-2xl p-5 flex flex-col gap-3 hover:border-[#FFED00]/50 hover:shadow-md transition-all">
+                  <div className="w-11 h-11 rounded-xl bg-[#FFED00]/15 flex items-center justify-center shrink-0">
                     <Icon className="w-5 h-5 text-[#B58500]" />
                   </div>
                   <div className="space-y-1">
@@ -642,7 +642,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
             </p>
             <button
               onClick={() => onNavigate('contact')}
-              className="btn-shimmer inline-flex items-center gap-2 h-[52px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer active:scale-95"
+              className="btn-shimmer inline-flex items-center gap-2 h-[52px] px-8 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer active:scale-95"
             >
               <span>Explore More Products</span>
               <ArrowRight className="w-4 h-4" />

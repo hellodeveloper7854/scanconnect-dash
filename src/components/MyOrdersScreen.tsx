@@ -75,7 +75,7 @@ export const MyOrdersScreen: React.FC<MyOrdersScreenProps> = ({ userData, onLogo
       <main className="flex-1 py-10 sm:py-14">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="space-y-2">
-            <h1 className="text-4xl sm:text-5xl font-black text-[#F2BA03] tracking-[-0.4px]">My Orders</h1>
+            <h1 className="text-4xl sm:text-5xl font-black text-[#FFED00] tracking-[-0.4px]">My Orders</h1>
             <p className="text-[#5D5F5F] text-base sm:text-lg">Track everything you&apos;ve ordered from ScanConnect.</p>
           </div>
 
@@ -89,7 +89,7 @@ export const MyOrdersScreen: React.FC<MyOrdersScreenProps> = ({ userData, onLogo
               <p className="text-neutral-500">You haven&apos;t placed any orders yet.</p>
               <button
                 onClick={() => onNavigate('shop')}
-                className="px-6 py-2.5 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-sm rounded-lg cursor-pointer"
+                className="px-6 py-2.5 bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-sm rounded-lg cursor-pointer"
               >
                 Browse Shop
               </button>

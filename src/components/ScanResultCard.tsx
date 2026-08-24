@@ -37,7 +37,7 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({
       <div className="w-full max-w-sm bg-white border border-[#E4E2E2] shadow-[0px_4px_20px_-2px_rgba(0,0,0,0.08)] rounded-[16px] p-8 space-y-6">
         <div className="flex flex-col items-center gap-3 text-center">
           <img src={logo} alt="ScanConnect" className="h-10 w-auto object-contain" />
-          <div className="flex items-center gap-2 text-[#F2BA03]">
+          <div className="flex items-center gap-2 text-[#FFED00]">
             <ShieldCheck className="w-4 h-4" />
             <span className="font-['Rubik'] font-bold uppercase tracking-wide text-xs text-[#736B00]">{label}</span>
           </div>
@@ -51,7 +51,7 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({
 
           {owner.email && (
             <div className="flex items-center gap-2 text-[#5F5E5E]">
-              <Mail className="w-4 h-4 text-[#F2BA03]" />
+              <Mail className="w-4 h-4 text-[#FFED00]" />
               <a href={`mailto:${owner.email}`} className="hover:underline text-sm">
                 {owner.email}
               </a>
@@ -64,13 +64,13 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({
               onClick={() => onRequestCall({ kind: 'owner' })}
               className="flex items-center gap-2 text-[#736B00] hover:underline text-sm font-semibold cursor-pointer"
             >
-              <Lock className="w-3.5 h-3.5 text-[#F2BA03]" />
+              <Lock className="w-3.5 h-3.5 text-[#FFED00]" />
               Call Owner
             </button>
           ) : (
             owner.mobileNumber && (
               <div className="flex items-center gap-2 text-[#5F5E5E]">
-                <Phone className="w-4 h-4 text-[#F2BA03]" />
+                <Phone className="w-4 h-4 text-[#FFED00]" />
                 <a href={`tel:${owner.mobileNumber}`} className="hover:underline text-sm">
                   {owner.mobileNumber}
                 </a>
@@ -110,7 +110,7 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({
                       onClick={() => onRequestCall({ kind: 'contact', index: idx })}
                       className="flex items-center gap-2 text-[#736B00] hover:underline text-sm font-semibold cursor-pointer"
                     >
-                      <Lock className="w-3.5 h-3.5 text-[#F2BA03]" />
+                      <Lock className="w-3.5 h-3.5 text-[#FFED00]" />
                       Call
                     </button>
                   ) : (
@@ -119,7 +119,7 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({
                         href={`tel:${contact.phone}`}
                         className="flex items-center gap-2 text-[#5F5E5E] hover:underline text-sm"
                       >
-                        <Phone className="w-3.5 h-3.5 text-[#F2BA03]" />
+                        <Phone className="w-3.5 h-3.5 text-[#FFED00]" />
                         {contact.phone}
                       </a>
                     )

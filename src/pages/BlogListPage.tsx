@@ -38,7 +38,7 @@ export const BlogListPage: React.FC = () => {
                 </div>
                 <div className="p-6 space-y-3">
                   <p className="text-xs font-bold uppercase tracking-wide text-neutral-400">{post.date}</p>
-                  <h2 className="text-xl font-black text-neutral-900 leading-snug group-hover:text-[#F2BA03] transition-colors">
+                  <h2 className="text-xl font-black text-neutral-900 leading-snug group-hover:text-[#FFED00] transition-colors">
                     {post.title}
                   </h2>
                   <p className="text-sm text-neutral-500 line-clamp-2">{post.excerpt}</p>

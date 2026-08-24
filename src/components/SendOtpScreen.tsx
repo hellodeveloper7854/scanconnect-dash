@@ -134,7 +134,7 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
           {/* Header */}
           <div className="text-center mb-8 space-y-2">
             <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs mb-2">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
+              <ShieldCheck className="w-3.5 h-3.5 text-[#FFED00]" />
               <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
                 Verify Identity
               </span>
@@ -165,7 +165,7 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
                   value={mobileNumber}
                   onChange={(e) => setMobileNumber(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="w-full h-[52px] pl-12 pr-4 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] focus:border-transparent transition-all disabled:opacity-70 disabled:bg-neutral-50"
+                  className="w-full h-[52px] pl-12 pr-4 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-transparent transition-all disabled:opacity-70 disabled:bg-neutral-50"
                 />
               </div>
               {!isOtpSent && (
@@ -180,7 +180,7 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-[52px] bg-[#F2BA03] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isSubmitting ? (
                   <span>Sending SMS...</span>
@@ -208,7 +208,7 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
                         ref={(el) => (inputRefs.current[index] = el)}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                        className="w-full h-14 text-center text-xl font-bold bg-white border border-neutral-300 text-[#0F0F0F] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F2BA03] focus:border-transparent transition-all"
+                        className="w-full h-14 text-center text-xl font-bold bg-white border border-neutral-300 text-[#0F0F0F] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-transparent transition-all"
                       />
                     ))}
                   </div>
@@ -224,7 +224,7 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
                   type="button"
                   onClick={handleVerify}
                   disabled={isVerifying}
-                  className="w-full h-[52px] bg-[#F2BA03] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {isVerifying ? (
                     <span>Verifying code...</span>

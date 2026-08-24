@@ -403,7 +403,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           
           {/* HEADER TITLE */}
           <div className="space-y-2">
-            <h1 className="text-4xl sm:text-5xl sm:leading-[48px] font-black text-[#F2BA03] tracking-[-0.4px] font-sans">
+            <h1 className="text-4xl sm:text-5xl sm:leading-[48px] font-black text-[#FFED00] tracking-[-0.4px] font-sans">
               Profile
             </h1>
             <p className="text-[#5D5F5F] text-base sm:text-lg sm:leading-[26px] max-w-4xl font-normal">
@@ -425,7 +425,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   {profile && !isEditingIdentity && (
                     <button
                       onClick={startEditingIdentity}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#CCC7AA] text-xs font-bold text-[#1B1C1C] hover:border-[#F2BA03] transition-all cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#CCC7AA] text-xs font-bold text-[#1B1C1C] hover:border-[#FFED00] transition-all cursor-pointer"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                       Edit
@@ -448,7 +448,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     <button
                       onClick={handleAvatarChange}
                       title="Update profile picture"
-                      className="absolute -bottom-2 -right-2 w-[30px] h-[32px] rounded-lg bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] flex items-center justify-center shadow-md transition-transform active:scale-95 cursor-pointer border border-white"
+                      className="absolute -bottom-2 -right-2 w-[30px] h-[32px] rounded-lg bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] flex items-center justify-center shadow-md transition-transform active:scale-95 cursor-pointer border border-white"
                     >
                       <Camera className="w-3.5 h-3.5 stroke-[2.5]" />
                     </button>
@@ -468,7 +468,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                             value={draftFullName}
                             onChange={(e) => setDraftFullName(e.target.value)}
                             placeholder="Rahul Sharma"
-                            className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all"
+                            className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 focus:ring-[#FFED00] outline-none transition-all"
                           />
                         ) : (
                           <div className="w-full h-[50px] px-4 flex items-center bg-[#F8F8F8] border border-[#EEEEEE] rounded-lg text-[#1B1C1C] font-normal text-base">
@@ -486,7 +486,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                           {profile && !profile.mobileNumber && (
                             <button
                               onClick={() => setIsLinkMobileOpen(true)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] text-xs font-bold shrink-0 cursor-pointer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] text-xs font-bold shrink-0 cursor-pointer"
                             >
                               <Link2 className="w-3.5 h-3.5" />
                               Link
@@ -518,7 +518,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                         <button
                           onClick={saveIdentity}
                           disabled={isSavingIdentity || !draftFullName.trim()}
-                          className="flex-1 h-[46px] bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-xs cursor-pointer disabled:opacity-60"
+                          className="flex-1 h-[46px] bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-xs cursor-pointer disabled:opacity-60"
                         >
                           {isSavingIdentity ? 'Saving...' : 'Save'}
                         </button>
@@ -549,7 +549,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     <button
                       onClick={handlePasswordReset}
                       disabled={isSendingReset || !profile}
-                      className="w-full p-3.5 bg-white border border-[#CCC7AA] rounded-lg flex items-center justify-between text-left transition-all cursor-pointer group hover:border-[#F2BA03] disabled:opacity-60"
+                      className="w-full p-3.5 bg-white border border-[#CCC7AA] rounded-lg flex items-center justify-between text-left transition-all cursor-pointer group hover:border-[#FFED00] disabled:opacity-60"
                     >
                       <div>
                         <p className="text-sm font-bold text-[#1B1C1C]">Change Password</p>
@@ -570,7 +570,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       </div>
                       <span
                         className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                          profile?.mobileVerified ? 'bg-[#F2BA03] text-white' : 'bg-[#DBDAD9] text-[#5D5F5F]'
+                          profile?.mobileVerified ? 'bg-[#FFED00] text-white' : 'bg-[#DBDAD9] text-[#5D5F5F]'
                         }`}
                       >
                         {profile?.mobileVerified ? 'Enabled' : 'Disabled'}
@@ -595,7 +595,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold text-[#1B1C1C]">This device</span>
-                          <span className="px-2 py-0.5 bg-[#F2BA03] text-white font-bold text-[10px] tracking-wider rounded-full uppercase">
+                          <span className="px-2 py-0.5 bg-[#FFED00] text-white font-bold text-[10px] tracking-wider rounded-full uppercase">
                             CURRENT
                           </span>
                         </div>
@@ -653,7 +653,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                           <div className="flex justify-between items-start">
                             <span
                               className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-tight uppercase ${
-                                contact.isPrimary ? 'bg-[#F2BA03] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'
+                                contact.isPrimary ? 'bg-[#FFED00] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'
                               }`}
                             >
                               {contact.isPrimary ? 'PRIMARY RESPONDER' : 'SECONDARY'}
@@ -737,13 +737,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       value={vehicleSearch}
                       onChange={(e) => setVehicleSearch(e.target.value)}
                       placeholder="Search registration, nickname, brand, model"
-                      className="w-full h-[46px] pl-10 pr-4 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                      className="w-full h-[46px] pl-10 pr-4 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
                     />
                   </div>
                   <select
                     value={vehicleTypeFilter}
                     onChange={(e) => setVehicleTypeFilter(e.target.value)}
-                    className="h-[46px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03] cursor-pointer"
+                    className="h-[46px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00] cursor-pointer"
                   >
                     <option value="">All types</option>
                     {VEHICLE_TYPES.map((t) => (
@@ -769,7 +769,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                         <div className="flex justify-between items-start">
                           <span
                             className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-tight uppercase ${
-                              vehicle.isPrimary ? 'bg-[#F2BA03] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'
+                              vehicle.isPrimary ? 'bg-[#FFED00] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'
                             }`}
                           >
                             {vehicle.isPrimary ? 'PRIMARY VEHICLE' : vehicle.vehicleType || 'VEHICLE'}
@@ -805,7 +805,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                         </div>
 
                         {vehicle.qrCodeRecord && (
-                          <div className="flex items-center justify-between gap-2 px-3 py-2 bg-[#F2BA03]/10 border border-[#F2BA03]/30 rounded-lg">
+                          <div className="flex items-center justify-between gap-2 px-3 py-2 bg-[#FFED00]/10 border border-[#FFED00]/30 rounded-lg">
                             <div className="flex items-center gap-2 min-w-0">
                               <QrCodeIcon className="w-4 h-4 text-[#736B00] shrink-0" />
                               <div className="min-w-0">
@@ -826,7 +826,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                                 )
                               }
                               title="Download QR"
-                              className="p-1.5 text-[#736B00] hover:text-[#1B1C1C] hover:bg-[#F2BA03]/20 rounded-md cursor-pointer shrink-0"
+                              className="p-1.5 text-[#736B00] hover:text-[#1B1C1C] hover:bg-[#FFED00]/20 rounded-md cursor-pointer shrink-0"
                             >
                               <Download className="w-4 h-4" />
                             </button>
@@ -893,7 +893,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     value={preferences.systemLanguage}
                     onChange={(e) => savePreferences({ systemLanguage: e.target.value })}
                     disabled={!preferencesLoaded}
-                    className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 focus:ring-[#F2BA03] outline-none cursor-pointer"
+                    className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 focus:ring-[#FFED00] outline-none cursor-pointer"
                   >
                     <option value="English (United Kingdom)">English (United Kingdom)</option>
                     <option value="English (United States)">English (United States)</option>
@@ -918,7 +918,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       type="button"
                       onClick={() => savePreferences({ emailDigests: !preferences.emailDigests })}
                       className={`w-10 h-5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer ${
-                        preferences.emailDigests ? 'bg-[#F2BA03]' : 'bg-[#DBDAD9]'
+                        preferences.emailDigests ? 'bg-[#FFED00]' : 'bg-[#DBDAD9]'
                       }`}
                     >
                       <div
@@ -939,7 +939,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       type="button"
                       onClick={() => savePreferences({ smsCriticalAlerts: !preferences.smsCriticalAlerts })}
                       className={`w-10 h-5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer ${
-                        preferences.smsCriticalAlerts ? 'bg-[#F2BA03]' : 'bg-[#DBDAD9]'
+                        preferences.smsCriticalAlerts ? 'bg-[#FFED00]' : 'bg-[#DBDAD9]'
                       }`}
                     >
                       <div
@@ -960,7 +960,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       type="button"
                       onClick={() => savePreferences({ inAppPush: !preferences.inAppPush })}
                       className={`w-10 h-5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer ${
-                        preferences.inAppPush ? 'bg-[#F2BA03]' : 'bg-[#DBDAD9]'
+                        preferences.inAppPush ? 'bg-[#FFED00]' : 'bg-[#DBDAD9]'
                       }`}
                     >
                       <div
@@ -984,7 +984,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       onClick={() => savePreferences({ timeFormat: '24' })}
                       className={`h-[52px] px-2 text-center rounded-lg text-xs font-bold transition-all cursor-pointer ${
                         preferences.timeFormat === '24'
-                          ? 'bg-[rgba(255,239,0,0.1)] border-2 border-[#F2BA03] text-[#1B1C1C]'
+                          ? 'bg-[rgba(255,239,0,0.1)] border-2 border-[#FFED00] text-[#1B1C1C]'
                           : 'bg-white border border-[#CCC7AA] text-[#5D5F5F]'
                       }`}
                     >
@@ -996,7 +996,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       onClick={() => savePreferences({ timeFormat: '12' })}
                       className={`h-[52px] px-2 text-center rounded-lg text-xs font-bold transition-all cursor-pointer ${
                         preferences.timeFormat === '12'
-                          ? 'bg-[rgba(255,239,0,0.1)] border-2 border-[#F2BA03] text-[#1B1C1C]'
+                          ? 'bg-[rgba(255,239,0,0.1)] border-2 border-[#FFED00] text-[#1B1C1C]'
                           : 'bg-white border border-[#CCC7AA] text-[#5D5F5F]'
                       }`}
                     >
@@ -1013,7 +1013,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 
                 {/* Dot Badge */}
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#F2BA03]" />
+                  <span className="w-2 h-2 rounded-full bg-[#FFED00]" />
                   <span className="text-xs font-bold uppercase tracking-[1.2px] text-white">
                     ENTERPRISE ADMIN
                   </span>
@@ -1071,7 +1071,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   value={newContactName}
                   onChange={(e) => setNewContactName(e.target.value)}
                   placeholder="e.g. Alex Morgan"
-                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
                 />
               </div>
 
@@ -1082,7 +1082,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   value={newContactRole}
                   onChange={(e) => setNewContactRole(e.target.value)}
                   placeholder="e.g. Security Supervisor"
-                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
                 />
               </div>
 
@@ -1094,7 +1094,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   value={newContactPhone}
                   onChange={(e) => setNewContactPhone(e.target.value)}
                   placeholder="e.g. +44 7700 900888"
-                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
                 />
               </div>
 
@@ -1105,7 +1105,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   value={newContactEmail}
                   onChange={(e) => setNewContactEmail(e.target.value)}
                   placeholder="e.g. alex@scanme.fleet"
-                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
                 />
               </div>
 
@@ -1120,7 +1120,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <button
                   type="submit"
                   disabled={isSavingContact}
-                  className="flex-1 py-3 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-xs disabled:opacity-60"
+                  className="flex-1 py-3 bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-xs disabled:opacity-60"
                 >
                   {isSavingContact ? 'Saving...' : editingContactId ? 'Save Changes' : 'Save Contact'}
                 </button>
@@ -1155,7 +1155,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   value={vehicleRegistration}
                   onChange={(e) => setVehicleRegistration(e.target.value)}
                   placeholder="e.g. MH12AB1234"
-                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
                 />
               </div>
 
@@ -1166,7 +1166,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   value={vehicleNickname}
                   onChange={(e) => setVehicleNickname(e.target.value)}
                   placeholder="e.g. My Sedan"
-                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
                 />
               </div>
 
@@ -1176,7 +1176,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   <select
                     value={vehicleType}
                     onChange={(e) => setVehicleType(e.target.value)}
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03] cursor-pointer"
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00] cursor-pointer"
                   >
                     <option value="">Select type</option>
                     {VEHICLE_TYPES.map((t) => (
@@ -1193,7 +1193,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     value={vehicleFuelType}
                     onChange={(e) => setVehicleFuelType(e.target.value)}
                     placeholder="e.g. Petrol"
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
                   />
                 </div>
               </div>
@@ -1206,7 +1206,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     value={vehicleBrand}
                     onChange={(e) => setVehicleBrand(e.target.value)}
                     placeholder="e.g. Maruti Suzuki"
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
                   />
                 </div>
                 <div className="space-y-1">
@@ -1216,7 +1216,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     value={vehicleModel}
                     onChange={(e) => setVehicleModel(e.target.value)}
                     placeholder="e.g. Swift"
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
                   />
                 </div>
               </div>
@@ -1228,7 +1228,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   value={vehicleColor}
                   onChange={(e) => setVehicleColor(e.target.value)}
                   placeholder="e.g. White"
-                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#F2BA03]"
+                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
                 />
               </div>
 
@@ -1243,7 +1243,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <button
                   type="submit"
                   disabled={isSavingVehicle}
-                  className="flex-1 py-3 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-xs disabled:opacity-60"
+                  className="flex-1 py-3 bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-xs disabled:opacity-60"
                 >
                   {isSavingVehicle ? 'Saving...' : editingVehicleId ? 'Save Changes' : 'Save Vehicle'}
                 </button>

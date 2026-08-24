@@ -36,7 +36,7 @@ export const LoginWithOtpScreen: React.FC<LoginWithOtpScreenProps> = ({ onNaviga
           {/* Header */}
           <div className="text-center mb-8 space-y-2">
             <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs mb-2">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
+              <ShieldCheck className="w-3.5 h-3.5 text-[#FFED00]" />
               <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
                 Secure Sign In
               </span>
@@ -54,7 +54,7 @@ export const LoginWithOtpScreen: React.FC<LoginWithOtpScreenProps> = ({ onNaviga
             <button
               type="button"
               onClick={() => onNavigate('send-otp')}
-              className="w-full h-14 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-3 cursor-pointer"
+              className="w-full h-14 bg-[#FFED00] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-3 cursor-pointer"
             >
               <Phone className="w-5 h-5" />
               <span>Login with OTP</span>

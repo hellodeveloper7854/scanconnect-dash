@@ -57,7 +57,7 @@ const RevealTimelineBar: React.FC<{ className?: string }> = ({ className = '' })
   const { ref, isVisible } = useRevealOnScroll<HTMLDivElement>();
   return (
     <div ref={ref} className={className}>
-      <div className={`h-full bg-gradient-to-r from-[#F2BA03] to-[#e0ac00] ${isVisible ? 'animate-timeline-grow' : 'scale-x-0 origin-left'}`} />
+      <div className={`h-full bg-gradient-to-r from-[#FFED00] to-[#e0ac00] ${isVisible ? 'animate-timeline-grow' : 'scale-x-0 origin-left'}`} />
     </div>
   );
 };
@@ -143,7 +143,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                   Need to notify a vehicle owner about wrong parking, headlights left on, an accident, or any emergency? Simply scan the Scan Connect QR Tag and reach them instantly&mdash;without revealing your phone number or accessing theirs.
                 </p>
 
-                <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#F2BA03]">
+                <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#FFED00]">
                   Fast &bull; Secure &bull; Privacy-First &bull; No App Required
                 </p>
 
@@ -151,7 +151,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                 <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-4 pt-2">
                   <button
                     onClick={() => setIsQrScannerOpen(true)}
-                    className="btn-shimmer sm:hidden w-full h-[58px] px-8 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-bold text-base rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm active:scale-95"
+                    className="btn-shimmer sm:hidden w-full h-[58px] px-8 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-bold text-base rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm active:scale-95"
                   >
                     <QrCode className="w-5 h-5 text-white" />
                     <span>Scan a QR Tag</span>
@@ -211,7 +211,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                   desc: 'Use your smartphone camera to scan the Scan Connect QR Tag displayed on the vehicle. No app downloads, registrations, or complicated setup required.',
                   extra: (
                     <div className="flex items-center gap-2 pt-3">
-                      <Check className="w-4 h-4 text-[#F2BA03] stroke-[3]" />
+                      <Check className="w-4 h-4 text-[#FFED00] stroke-[3]" />
                       <span className="text-sm font-semibold text-[#1B1C1C]">Works with any smartphone</span>
                     </div>
                   ),
@@ -224,13 +224,13 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                   extra: (
                     <div className="space-y-2 pt-3">
                       <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
-                        <PhoneCall className="w-4 h-4 text-[#F2BA03]" /> Secure Call
+                        <PhoneCall className="w-4 h-4 text-[#FFED00]" /> Secure Call
                       </div>
                       <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
-                        <MessageCircle className="w-4 h-4 text-[#F2BA03]" /> WhatsApp Message
+                        <MessageCircle className="w-4 h-4 text-[#FFED00]" /> WhatsApp Message
                       </div>
                       <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
-                        <Mail className="w-4 h-4 text-[#F2BA03]" /> SMS
+                        <Mail className="w-4 h-4 text-[#FFED00]" /> SMS
                       </div>
                     </div>
                   ),
@@ -251,7 +251,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                     className="relative flex flex-col items-center text-center group h-full"
                   >
                     {/* Icon + step number badge */}
-                    <div className="relative z-10 w-[84px] h-[84px] rounded-full bg-gradient-to-br from-[#F2BA03] to-[#e0ac00] flex items-center justify-center shadow-[0_10px_30px_rgba(242,186,3,0.4)] mb-7 ring-8 ring-white group-hover:scale-105 transition-transform duration-300 shrink-0">
+                    <div className="relative z-10 w-[84px] h-[84px] rounded-full bg-gradient-to-br from-[#FFED00] to-[#e0ac00] flex items-center justify-center shadow-[0_10px_30px_rgba(242,186,3,0.4)] mb-7 ring-8 ring-white group-hover:scale-105 transition-transform duration-300 shrink-0">
                       <StepIcon className="w-9 h-9 text-white stroke-[1.75]" />
                       <span className="absolute -top-2 -right-1.5 w-8 h-8 rounded-full bg-[#1B1C1C] text-white font-['Inter'] font-extrabold text-xs flex items-center justify-center shadow-lg ring-2 ring-white">
                         {step.num}
@@ -259,7 +259,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                     </div>
 
                     {/* Card body — flex-1 + equal padding keeps every card the same height regardless of copy length */}
-                    <div className="w-full flex-1 bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.07)] flex flex-col gap-3 hover:shadow-[0_16px_40px_rgba(242,186,3,0.18)] hover:border-[#F2BA03]/50 hover:-translate-y-1.5 transition-all duration-300 text-left">
+                    <div className="w-full flex-1 bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.07)] flex flex-col gap-3 hover:shadow-[0_16px_40px_rgba(242,186,3,0.18)] hover:border-[#FFED00]/50 hover:-translate-y-1.5 transition-all duration-300 text-left">
                       <h3 className="font-['Poppins'] font-bold text-lg sm:text-xl text-[#111827] leading-snug">
                         {step.title}
                       </h3>
@@ -286,7 +286,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {trustPoints.map((point) => (
                 <div key={point} className="flex items-center gap-3 bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs">
-                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] shrink-0" />
+                  <Check className="w-4 h-4 text-[#FFED00] stroke-[3] shrink-0" />
                   <span className="font-['Hanken_Grotesk'] font-medium text-sm sm:text-base text-[#1B1C1C]">{point}</span>
                 </div>
               ))}
@@ -310,9 +310,9 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
               {useCases.map(({ icon: Icon, label }) => (
                 <div
                   key={label}
-                  className="h-full bg-white border border-[#E5E7EB] rounded-xl p-6 flex flex-col items-center justify-center text-center gap-3 shadow-xs hover:shadow-md hover:border-[#F2BA03] transition-all"
+                  className="h-full bg-white border border-[#E5E7EB] rounded-xl p-6 flex flex-col items-center justify-center text-center gap-3 shadow-xs hover:shadow-md hover:border-[#FFED00] transition-all"
                 >
-                  <Icon className="w-7 h-7 text-[#F2BA03] shrink-0" />
+                  <Icon className="w-7 h-7 text-[#FFED00] shrink-0" />
                   <span className="font-['Hanken_Grotesk'] font-semibold text-sm text-[#1B1C1C] leading-snug flex items-center min-h-[40px]">{label}</span>
                 </div>
               ))}
@@ -348,7 +348,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
               </button>
               <button
                 onClick={() => { window.location.href = '/shop#products'; }}
-                className="btn-shimmer h-[66px] px-10 w-full sm:flex-1 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-lg sm:text-[20px] rounded-[12px] transition-all cursor-pointer active:scale-95 inline-flex items-center justify-center gap-2"
+                className="btn-shimmer h-[66px] px-10 w-full sm:flex-1 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-lg sm:text-[20px] rounded-[12px] transition-all cursor-pointer active:scale-95 inline-flex items-center justify-center gap-2"
               >
                 <IndianRupee className="w-5 h-5" />
                 View Plans & Pricing

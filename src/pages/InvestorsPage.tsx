@@ -58,7 +58,7 @@ export const InvestorsPage: React.FC = () => {
                 </div>
                 <div>
                   <h2 className="text-xl font-black text-neutral-900">{person.name}</h2>
-                  <p className="text-sm font-semibold text-[#F2BA03]">{person.role}</p>
+                  <p className="text-sm font-semibold text-[#FFED00]">{person.role}</p>
                 </div>
                 <p className="text-sm text-neutral-600 leading-relaxed">{person.bio}</p>
                 <div className="flex items-center gap-3 pt-2">

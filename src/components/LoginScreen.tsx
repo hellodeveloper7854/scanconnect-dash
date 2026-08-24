@@ -91,7 +91,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
           {/* Header */}
           <div className="text-center mb-8 space-y-2">
             <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs mb-2">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#F2BA03]" />
+              <ShieldCheck className="w-3.5 h-3.5 text-[#FFED00]" />
               <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
                 Secure Login
               </span>
@@ -121,7 +121,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
                   value={vehicleEmail}
                   onChange={(e) => setVehicleEmail(e.target.value)}
                   placeholder="driver@scanme.com"
-                  className="w-full h-[52px] pl-12 pr-4 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] focus:border-transparent transition-all"
+                  className="w-full h-[52px] pl-12 pr-4 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -141,7 +141,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
                   value={accessKey}
                   onChange={(e) => setAccessKey(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full h-[52px] pl-12 pr-12 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#F2BA03] focus:border-transparent transition-all"
+                  className="w-full h-[52px] pl-12 pr-12 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-transparent transition-all"
                 />
                 <button
                   type="button"
@@ -161,7 +161,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded border-neutral-300 text-[#F2BA03] focus:ring-[#F2BA03] cursor-pointer"
+                  className="w-4 h-4 rounded border-neutral-300 text-[#FFED00] focus:ring-[#FFED00] cursor-pointer"
                 />
                 <span>Remember me</span>
               </label>
@@ -182,7 +182,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-[52px] mt-2 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full h-[52px] mt-2 bg-[#FFED00] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               {isSubmitting ? (
                 <span>Authenticating...</span>

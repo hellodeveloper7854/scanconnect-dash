@@ -60,7 +60,7 @@ export const ResellerModal: React.FC<ResellerModalProps> = ({ isOpen, onClose })
       <div className="relative w-full max-w-2xl bg-white border border-neutral-200 rounded-2xl p-6 sm:p-8 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
 
         {/* Top Accent */}
-        <div className="absolute top-0 inset-x-0 h-1 bg-[#F2BA03]" />
+        <div className="absolute top-0 inset-x-0 h-1 bg-[#FFED00]" />
 
         {/* Close Button */}
         <button
@@ -72,7 +72,7 @@ export const ResellerModal: React.FC<ResellerModalProps> = ({ isOpen, onClose })
 
         {isSubmitted ? (
           <div className="text-center space-y-4 py-6">
-            <div className="mx-auto w-14 h-14 rounded-full bg-[#F2BA03]/15 flex items-center justify-center text-[#B58500]">
+            <div className="mx-auto w-14 h-14 rounded-full bg-[#FFED00]/15 flex items-center justify-center text-[#B58500]">
               <Check className="w-7 h-7 stroke-[3]" />
             </div>
             <h3 className="text-xl font-black text-[#1B1C1C] tracking-tight">Request Received</h3>
@@ -89,7 +89,7 @@ export const ResellerModal: React.FC<ResellerModalProps> = ({ isOpen, onClose })
         ) : (
           <>
             <div className="text-center space-y-2 mb-6 pt-2">
-              <div className="mx-auto w-12 h-12 rounded-xl bg-[#F2BA03]/15 flex items-center justify-center text-[#B58500] mb-2">
+              <div className="mx-auto w-12 h-12 rounded-xl bg-[#FFED00]/15 flex items-center justify-center text-[#B58500] mb-2">
                 <Handshake className="w-6 h-6" />
               </div>
               <h3 className="text-2xl font-black text-[#1B1C1C] tracking-tight">Become a Reseller</h3>
@@ -109,7 +109,7 @@ export const ResellerModal: React.FC<ResellerModalProps> = ({ isOpen, onClose })
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Your full name"
-                    className="w-full h-12 px-4 bg-neutral-100 text-[#1B1C1C] border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F2BA03] focus:bg-white transition-all text-sm"
+                    className="w-full h-12 px-4 bg-neutral-100 text-[#1B1C1C] border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:bg-white transition-all text-sm"
                   />
                 </div>
 
@@ -122,7 +122,7 @@ export const ResellerModal: React.FC<ResellerModalProps> = ({ isOpen, onClose })
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full h-12 px-4 bg-neutral-100 text-[#1B1C1C] border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F2BA03] focus:bg-white transition-all text-sm"
+                    className="w-full h-12 px-4 bg-neutral-100 text-[#1B1C1C] border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:bg-white transition-all text-sm"
                   />
                 </div>
 
@@ -135,7 +135,7 @@ export const ResellerModal: React.FC<ResellerModalProps> = ({ isOpen, onClose })
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91 98765 43210"
-                    className="w-full h-12 px-4 bg-neutral-100 text-[#1B1C1C] border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F2BA03] focus:bg-white transition-all text-sm"
+                    className="w-full h-12 px-4 bg-neutral-100 text-[#1B1C1C] border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:bg-white transition-all text-sm"
                   />
                 </div>
 
@@ -148,7 +148,7 @@ export const ResellerModal: React.FC<ResellerModalProps> = ({ isOpen, onClose })
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     placeholder="City, State"
-                    className="w-full h-12 px-4 bg-neutral-100 text-[#1B1C1C] border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F2BA03] focus:bg-white transition-all text-sm"
+                    className="w-full h-12 px-4 bg-neutral-100 text-[#1B1C1C] border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:bg-white transition-all text-sm"
                   />
                 </div>
               </div>
@@ -162,7 +162,7 @@ export const ResellerModal: React.FC<ResellerModalProps> = ({ isOpen, onClose })
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Tell us about your business, region, or anything else relevant"
                   rows={3}
-                  className="w-full px-4 py-3 bg-neutral-100 text-[#1B1C1C] border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F2BA03] focus:bg-white transition-all text-sm resize-none"
+                  className="w-full px-4 py-3 bg-neutral-100 text-[#1B1C1C] border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:bg-white transition-all text-sm resize-none"
                 />
               </div>
 
@@ -171,7 +171,7 @@ export const ResellerModal: React.FC<ResellerModalProps> = ({ isOpen, onClose })
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-12 bg-[#F2BA03] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-sm uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer disabled:opacity-60"
+                className="w-full h-12 bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-sm uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer disabled:opacity-60"
               >
                 {isSubmitting ? 'Submitting...' : 'Submit'}
               </button>

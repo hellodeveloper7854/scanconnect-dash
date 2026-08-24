@@ -165,7 +165,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
           
           {/* SECTION 1: TITLE & SUBTITLE */}
           <div className="space-y-4">
-            <h1 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-black text-4xl sm:text-5xl text-[#F2BA03] tracking-tight">
+            <h1 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-black text-4xl sm:text-5xl text-[#FFED00] tracking-tight">
               Contact Us
             </h1>
             <p className="font-['Hanken_Grotesk'] font-bold text-xl sm:text-2xl text-[#1B1C1C]">
@@ -184,7 +184,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
             
             {/* Card 1: Email Module */}
             <div className="bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 flex flex-col space-y-6">
-              <div className="w-10 h-10 bg-[#F2BA03] rounded-lg text-white flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 bg-[#FFED00] rounded-lg text-white flex items-center justify-center shrink-0">
                 <Mail className="w-5 h-5 text-white stroke-[2.2]" />
               </div>
 
@@ -201,7 +201,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
                       General Enquiries
                     </span>
-                    <a href="mailto:info@scanconnect.com" className="block hover:text-[#F2BA03] transition-colors text-base">
+                    <a href="mailto:info@scanconnect.com" className="block hover:text-[#FFED00] transition-colors text-base">
                       info@scanconnect.com
                     </a>
                   </div>
@@ -209,7 +209,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
                       Customer Support
                     </span>
-                    <a href="mailto:support@scanconnect.com" className="block hover:text-[#F2BA03] transition-colors text-base">
+                    <a href="mailto:support@scanconnect.com" className="block hover:text-[#FFED00] transition-colors text-base">
                       support@scanconnect.com
                     </a>
                   </div>
@@ -217,7 +217,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
                       Sales &amp; Business Partnerships
                     </span>
-                    <a href="mailto:sales@scanconnect.com" className="block hover:text-[#F2BA03] transition-colors text-base">
+                    <a href="mailto:sales@scanconnect.com" className="block hover:text-[#FFED00] transition-colors text-base">
                       sales@scanconnect.com
                     </a>
                   </div>
@@ -227,7 +227,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
             {/* Card 2: WhatsApp Support Module */}
             <div className="bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 flex flex-col space-y-6">
-              <div className="w-10 h-10 bg-[#F2BA03] rounded-lg text-white flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 bg-[#FFED00] rounded-lg text-white flex items-center justify-center shrink-0">
                 <MessageCircle className="w-5 h-5 text-white stroke-[2.2]" />
               </div>
 
@@ -237,7 +237,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 </h3>
 
                 <div className="space-y-2 font-['Manrope',sans-serif]">
-                  <a href="https://wa.me/919973878399" target="_blank" rel="noopener noreferrer" className="text-lg font-semibold text-[#1B1C1C] block hover:text-[#F2BA03] transition-colors">
+                  <a href="https://wa.me/919973878399" target="_blank" rel="noopener noreferrer" className="text-lg font-semibold text-[#1B1C1C] block hover:text-[#FFED00] transition-colors">
                     +91 99738 78399
                   </a>
                   <div className="pt-1">
@@ -258,7 +258,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
             {/* Card 3: Connect Module (sits in row 1 beside Email Us and WhatsApp Support) */}
             <div className="bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 flex flex-col items-center lg:items-start space-y-6">
-              <div className="w-10 h-10 bg-[#F2BA03] rounded-lg text-white flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 bg-[#FFED00] rounded-lg text-white flex items-center justify-center shrink-0">
                 <Share2 className="w-5 h-5 text-white stroke-[2.2]" />
               </div>
 
@@ -278,7 +278,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     type="button"
                     onClick={() => alert('Launching Scan Connect WhatsApp Live Assistant...')}
                     title="Live Support Chat"
-                    className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
+                    className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <MessageSquare className="w-5 h-5 stroke-[1.8]" />
                   </button>
@@ -287,7 +287,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     type="button"
                     onClick={() => alert('Redirecting to official web portal https://scanconnect.com')}
                     title="Web Portal"
-                    className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
+                    className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <Globe className="w-5 h-5 stroke-[1.8]" />
                   </button>
@@ -296,7 +296,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     type="button"
                     onClick={() => alert('Social Handles: @scanconnect')}
                     title="Email & Social Tag"
-                    className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
+                    className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <AtSign className="w-5 h-5 stroke-[1.8]" />
                   </button>
@@ -304,7 +304,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                   <a
                     href="/terms"
                     title="Terms & Conditions"
-                    className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
+                    className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <FileText className="w-5 h-5 stroke-[1.8]" />
                   </a>
@@ -314,7 +314,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
             {/* Card 4: Our Offices Module (Spans 2 columns on desktop matching Image 4 & CSS) */}
             <div className="lg:col-span-2 bg-white border border-[#1B1C1C]/5 shadow-[0px_10px_40px_rgba(212,175,55,0.05)] rounded-2xl p-8 flex flex-col space-y-6">
-              <div className="w-10 h-10 bg-[#F2BA03] rounded-lg text-white flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 bg-[#FFED00] rounded-lg text-white flex items-center justify-center shrink-0">
                 <MapPin className="w-5 h-5 text-white stroke-[2.2]" />
               </div>
 
@@ -357,7 +357,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                       href="https://maps.google.com/?q=Tech+Zone+4+Greater+Noida+U.P.+201308"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm font-bold text-[#F2BA03] hover:text-[#d19d00] transition-colors"
+                      className="inline-flex items-center gap-1.5 text-sm font-bold text-[#FFED00] hover:text-[#d19d00] transition-colors"
                     >
                       <MapPin className="w-3.5 h-3.5" />
                       <span>View on Google Maps</span>
@@ -398,7 +398,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 {/* Full Name */}
                 <div className="space-y-2">
                   <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
-                    Full Name <span className="text-[#F2BA03]">*</span>
+                    Full Name <span className="text-[#FFED00]">*</span>
                   </label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
@@ -408,7 +408,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Enter your full name"
-                      className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all rounded-none"
+                      className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none transition-all rounded-none"
                     />
                   </div>
                 </div>
@@ -416,7 +416,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 {/* Email Address */}
                 <div className="space-y-2">
                   <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
-                    Email Address <span className="text-[#F2BA03]">*</span>
+                    Email Address <span className="text-[#FFED00]">*</span>
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
@@ -426,7 +426,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                       value={email}
                       placeholder="Enter your email address"
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all rounded-none"
+                      className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none transition-all rounded-none"
                     />
                   </div>
                 </div>
@@ -444,7 +444,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="Enter your contact number"
-                    className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none transition-all rounded-none"
+                    className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none transition-all rounded-none"
                   />
                 </div>
               </div>
@@ -452,14 +452,14 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               {/* Subject Dropdown */}
               <div className="space-y-2">
                 <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
-                  Subject <span className="text-[#F2BA03]">*</span>
+                  Subject <span className="text-[#FFED00]">*</span>
                 </label>
                 <div className="relative">
                   <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
                   <select
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none cursor-pointer transition-all rounded-none appearance-none"
+                    className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none cursor-pointer transition-all rounded-none appearance-none"
                   >
                     <option value="General Enquiry">General Enquiry</option>
                     <option value="Product Information">Product Information</option>
@@ -480,7 +480,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               {/* Message Textarea */}
               <div className="space-y-2">
                 <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
-                  Message <span className="text-[#F2BA03]">*</span>
+                  Message <span className="text-[#FFED00]">*</span>
                 </label>
                 <p className="font-['Manrope',sans-serif] text-xs text-[#5F5E5E]">
                   Tell us how we can help you. Please provide as much detail as possible so our team can assist you efficiently.
@@ -492,7 +492,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     required
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="w-full h-[147px] bg-[#F5F3F3] pl-11 pr-4 py-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#F2BA03] outline-none resize-none transition-all rounded-none"
+                    className="w-full h-[147px] bg-[#F5F3F3] pl-11 pr-4 py-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none resize-none transition-all rounded-none"
                   />
                 </div>
               </div>
@@ -504,7 +504,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                   id="consent-check"
                   checked={agreeTerms}
                   onChange={(e) => setAgreeTerms(e.target.checked)}
-                  className="w-4 h-4 bg-white border border-[#E3E2E2] rounded-xs accent-[#F2BA03] cursor-pointer"
+                  className="w-4 h-4 bg-white border border-[#E3E2E2] rounded-xs accent-[#FFED00] cursor-pointer"
                 />
                 <label htmlFor="consent-check" className="font-['Manrope',sans-serif] font-medium text-xs text-[#5F5E5E] cursor-pointer select-none">
                   I agree to receive communications from Scan Connect regarding my request.
@@ -519,7 +519,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitted || isSubmitting}
-                className="btn-shimmer w-full h-12 bg-[#F2BA03] hover:bg-[#e0ac00] hover:shadow-[0_8px_20px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-['Manrope',sans-serif] font-semibold text-sm uppercase tracking-[1.4px] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] disabled:opacity-50"
+                className="btn-shimmer w-full h-12 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_20px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-['Manrope',sans-serif] font-semibold text-sm uppercase tracking-[1.4px] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] disabled:opacity-50"
               >
                 <Send className="w-4.5 h-4.5 text-white stroke-[2.2]" />
                 <span>{isSubmitting || isSubmitted ? 'SENDING INQUIRY...' : 'SEND INQUIRY'}</span>
@@ -551,7 +551,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {whyContact.map((item) => (
                 <div key={item} className="flex items-center gap-3 bg-neutral-50/70 border border-[#E3E2E2] rounded-xl p-4">
-                  <Check className="w-4 h-4 text-[#F2BA03] stroke-[3] shrink-0" />
+                  <Check className="w-4 h-4 text-[#FFED00] stroke-[3] shrink-0" />
                   <span className="font-['Hanken_Grotesk'] font-medium text-sm text-[#1B1C1C]">{item}</span>
                 </div>
               ))}
@@ -564,11 +564,11 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
         <section className="py-16 bg-[#FAFAFA] border-t border-[#E3E2E2]">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
             <div className="w-16 h-16 mx-auto rounded-2xl bg-[#1B1C1C] flex items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
-              <ShieldCheck className="w-8 h-8 text-[#F2BA03]" />
+              <ShieldCheck className="w-8 h-8 text-[#FFED00]" />
             </div>
 
             <div className="space-y-3">
-              <span className="font-bold text-xs tracking-wider uppercase text-[#F2BA03] block">Your Privacy Matters</span>
+              <span className="font-bold text-xs tracking-wider uppercase text-[#FFED00] block">Your Privacy Matters</span>
               <p className="text-[#6B7280] text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
                 Every inquiry is handled with the highest level of confidentiality. Your personal information is securely protected and used only to respond to your request&mdash;we never share your data with third parties.
               </p>
@@ -584,7 +584,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                   key={point}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 rounded-full text-xs sm:text-sm font-semibold text-[#1B1C1C] shadow-xs"
                 >
-                  <Check className="w-3.5 h-3.5 text-[#F2BA03] stroke-[3]" />
+                  <Check className="w-3.5 h-3.5 text-[#FFED00] stroke-[3]" />
                   {point}
                 </span>
               ))}
@@ -602,7 +602,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
             <p className="text-[#5F5E5E] text-base sm:text-lg leading-relaxed">
               Whether you&apos;re looking to secure a single vehicle or implement intelligent parking solutions for your organization, Scan Connect is here to help.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-['Hanken_Grotesk'] font-bold text-lg text-[#F2BA03]">
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-['Hanken_Grotesk'] font-bold text-lg text-[#FFED00]">
               <span className="inline-flex items-center gap-1.5"><Phone className="w-4 h-4" /> Call Us</span>
               <span className="text-[#5F5E5E]">&bull;</span>
               <span className="inline-flex items-center gap-1.5"><Mail className="w-4 h-4" /> Email Us</span>

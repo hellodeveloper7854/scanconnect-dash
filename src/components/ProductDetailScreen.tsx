@@ -270,7 +270,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-[16px] pt-2">
               <button
                 onClick={handleBuyNow}
-                className="h-[59px] bg-[#F2BA03] hover:bg-[#e0ac00] text-white font-['Rubik'] font-semibold text-[18px] leading-[27px] rounded-[8px] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-all cursor-pointer flex items-center justify-center gap-[8px] active:scale-95"
+                className="h-[59px] bg-[#FFED00] hover:bg-[#e0ac00] text-white font-['Rubik'] font-semibold text-[18px] leading-[27px] rounded-[8px] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-all cursor-pointer flex items-center justify-center gap-[8px] active:scale-95"
               >
                 <span>Buy Now</span>
                 <ArrowRight className="w-[16px] h-[16px] text-white" />
@@ -330,8 +330,8 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
               <div className="space-y-[24px]">
                 {/* Item 1 */}
                 <div className="flex items-start gap-[16px]">
-                  <div className="w-[20px] h-[20px] text-[#F2BA03] shrink-0 mt-[4px]">
-                    <Layers className="w-[18px] h-[19px] fill-[#F2BA03] text-[#F2BA03]" />
+                  <div className="w-[20px] h-[20px] text-[#FFED00] shrink-0 mt-[4px]">
+                    <Layers className="w-[18px] h-[19px] fill-[#FFED00] text-[#FFED00]" />
                   </div>
                   <div className="space-y-[4px]">
                     <h3 className="font-['Hanken_Grotesk'] font-bold text-[18px] leading-[29px] text-[#1B1C1C]">
@@ -345,8 +345,8 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
                 {/* Item 2 */}
                 <div className="flex items-start gap-[16px]">
-                  <div className="w-[20px] h-[20px] text-[#F2BA03] shrink-0 mt-[4px]">
-                    <Thermometer className="w-[18px] h-[18px] fill-[#F2BA03] text-[#F2BA03]" />
+                  <div className="w-[20px] h-[20px] text-[#FFED00] shrink-0 mt-[4px]">
+                    <Thermometer className="w-[18px] h-[18px] fill-[#FFED00] text-[#FFED00]" />
                   </div>
                   <div className="space-y-[4px]">
                     <h3 className="font-['Hanken_Grotesk'] font-bold text-[18px] leading-[29px] text-[#1B1C1C]">
@@ -360,8 +360,8 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
                 {/* Item 3 */}
                 <div className="flex items-start gap-[16px]">
-                  <div className="w-[20px] h-[20px] text-[#F2BA03] shrink-0 mt-[4px]">
-                    <Sparkles className="w-[18px] h-[18px] fill-[#F2BA03] text-[#F2BA03]" />
+                  <div className="w-[20px] h-[20px] text-[#FFED00] shrink-0 mt-[4px]">
+                    <Sparkles className="w-[18px] h-[18px] fill-[#FFED00] text-[#FFED00]" />
                   </div>
                   <div className="space-y-[4px]">
                     <h3 className="font-['Hanken_Grotesk'] font-bold text-[18px] leading-[29px] text-[#1B1C1C]">
@@ -417,7 +417,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
                 
                 <div className="space-y-[20px] relative z-10 max-w-xl">
                   {/* Yellow Circle Badge with Phone Icon */}
-                  <div className="w-[48px] h-[48px] bg-[#F2BA03] rounded-full text-[#1F1C00] flex items-center justify-center">
+                  <div className="w-[48px] h-[48px] bg-[#FFED00] rounded-full text-[#1F1C00] flex items-center justify-center">
                     <Phone className="w-[20px] h-[20px] fill-[#1F1C00]" />
                   </div>
 
@@ -432,12 +432,12 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
                 {/* Inset Live Simulation Box */}
                 <div className="bg-[rgba(228,226,226,0.1)] border border-[rgba(255,255,255,0.1)] backdrop-blur-[6px] rounded-[8px] p-[16px] max-w-[320px] relative z-10 space-y-[8px] mt-[24px]">
-                  <span className="font-['Hanken_Grotesk'] font-normal text-[12px] leading-[18px] text-[#F2BA03] block uppercase">
+                  <span className="font-['Hanken_Grotesk'] font-normal text-[12px] leading-[18px] text-[#FFED00] block uppercase">
                     LIVE SIMULATION
                   </span>
                   <div className="flex items-center justify-between font-mono text-[16px] leading-[24px] text-white tracking-[1.6px]">
                     <span>+91 &bull;&bull;&bull;&bull;&bull; &bull;&bull;492</span>
-                    <span className="bg-[#F2BA03] text-[#1F1C00] font-['Hanken_Grotesk'] font-normal text-[10px] uppercase px-[8px] py-[2px] rounded-[4px]">
+                    <span className="bg-[#FFED00] text-[#1F1C00] font-['Hanken_Grotesk'] font-normal text-[10px] uppercase px-[8px] py-[2px] rounded-[4px]">
                       CONNECTED
                     </span>
                   </div>
@@ -452,8 +452,8 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
                 
                 {/* Card 1: Instant Setup */}
                 <div className="bg-[#FAFAFA] border border-[#CCC7AA] rounded-[12px] p-[32px] flex-1 flex flex-col items-center justify-center text-center space-y-[12px] shadow-xs">
-                  <div className="w-[24px] h-[40px] flex items-center justify-center text-[#F2BA03]">
-                    <Zap className="w-[28px] h-[28px] fill-[#F2BA03] text-[#F2BA03]" />
+                  <div className="w-[24px] h-[40px] flex items-center justify-center text-[#FFED00]">
+                    <Zap className="w-[28px] h-[28px] fill-[#FFED00] text-[#FFED00]" />
                   </div>
                   <h4 className="font-['Rubik'] font-semibold text-[22px] sm:text-[24px] leading-[31px] text-[#1B1C1C]">
                     Instant Setup
@@ -465,8 +465,8 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
                 {/* Card 2: Smart Alerts */}
                 <div className="bg-[#FFFFFF] border border-[#CCC7AA] rounded-[12px] p-[32px] flex-1 flex flex-col items-center justify-center text-center space-y-[12px] shadow-xs">
-                  <div className="w-[40px] h-[32px] flex items-center justify-center text-[#F2BA03]">
-                    <RefreshCw className="w-[28px] h-[28px] text-[#F2BA03]" />
+                  <div className="w-[40px] h-[32px] flex items-center justify-center text-[#FFED00]">
+                    <RefreshCw className="w-[28px] h-[28px] text-[#FFED00]" />
                   </div>
                   <h4 className="font-['Rubik'] font-semibold text-[22px] sm:text-[24px] leading-[31px] text-[#1B1C1C]">
                     Smart Alerts
@@ -489,17 +489,17 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-[20px] font-['Hanken_Grotesk']">
                 <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
-                  <ShieldCheck className="w-[24px] h-[24px] text-[#F2BA03]" />
+                  <ShieldCheck className="w-[24px] h-[24px] text-[#FFED00]" />
                   <h4 className="font-bold text-[16px] text-[#1B1C1C]">256-Bit Masking</h4>
                   <p className="text-[#5F5E5E] text-[14px]">Every call routed through intermediate proxy nodes so phone numbers stay 100% confidential.</p>
                 </div>
                 <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
-                  <Lock className="w-[24px] h-[24px] text-[#F2BA03]" />
+                  <Lock className="w-[24px] h-[24px] text-[#FFED00]" />
                   <h4 className="font-bold text-[16px] text-[#1B1C1C]">Spam Protection</h4>
                   <p className="text-[#5F5E5E] text-[14px]">AI-powered filtering prevents nuisance calls and telemarketers from reaching your vehicle line.</p>
                 </div>
                 <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
-                  <Zap className="w-[24px] h-[24px] text-[#F2BA03]" />
+                  <Zap className="w-[24px] h-[24px] text-[#FFED00]" />
                   <h4 className="font-bold text-[16px] text-[#1B1C1C]">Instant Kill Switch</h4>
                   <p className="text-[#5F5E5E] text-[14px]">Temporarily disable calls or mute alerts anytime directly from your ScanConnect dashboard.</p>
                 </div>
@@ -516,7 +516,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
               <h3 className="font-['Rubik'] font-semibold text-[24px] sm:text-[28px] text-[#1B1C1C]">
                 Customer Reviews (4.8 / 5.0)
               </h3>
-              <span className="font-['Hanken_Grotesk'] font-bold text-[12px] text-[#1B1C1C] bg-[#F2BA03] px-[12px] py-[4px] rounded-full uppercase">
+              <span className="font-['Hanken_Grotesk'] font-bold text-[12px] text-[#1B1C1C] bg-[#FFED00] px-[12px] py-[4px] rounded-full uppercase">
                 Verified Owners
               </span>
             </div>
@@ -548,7 +548,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
                 type="button"
                 onClick={() => scrollReviews('left')}
                 aria-label="Scroll reviews left"
-                className="hidden sm:flex absolute left-[-16px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-[#E4E2E2] shadow-md items-center justify-center text-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] transition-colors cursor-pointer"
+                className="hidden sm:flex absolute left-[-16px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-[#E4E2E2] shadow-md items-center justify-center text-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -556,7 +556,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
                 type="button"
                 onClick={() => scrollReviews('right')}
                 aria-label="Scroll reviews right"
-                className="hidden sm:flex absolute right-[-16px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-[#E4E2E2] shadow-md items-center justify-center text-[#1B1C1C] hover:bg-[#F2BA03] hover:border-[#F2BA03] transition-colors cursor-pointer"
+                className="hidden sm:flex absolute right-[-16px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-[#E4E2E2] shadow-md items-center justify-center text-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] transition-colors cursor-pointer"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
