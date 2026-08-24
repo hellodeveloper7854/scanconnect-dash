@@ -6,6 +6,34 @@ import logoImg from '../../assets/images/logo.png';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
+export type StickerLang = 'en' | 'hi';
+export type StickerSize = 'bike' | 'car';
+
+// Physical label sizes at 300 DPI. Car keeps the bike's 8:5 aspect ratio, doubled.
+const STICKER_DIMENSIONS_PX: Record<StickerSize, { width: number; height: number }> = {
+  bike: { width: 1200, height: 750 }, // 4in x 2.5in
+  car: { width: 2400, height: 1500 }, // 8in x 5in
+};
+
+const STICKER_TEXT: Record<StickerLang, {
+  headline: string;
+  subline: string;
+  iconCaption: string;
+}> = {
+  en: {
+    headline: 'Scan the code to contact the vehicle owner.',
+    subline: 'Scan using phone camera and Google Lens.',
+    iconCaption: 'Wrong Parking, Emergency Contact, any issue with the vehicle, Scan the QR',
+  },
+  hi: {
+    headline: 'वाहन मालिक से संपर्क करने के लिए कोड स्कैन करें।',
+    subline: 'फ़ोन कैमरा और Google Lens से स्कैन करें।',
+    iconCaption: 'गलत पार्किंग, आपातकालीन संपर्क, वाहन संबंधी कोई भी समस्या, QR स्कैन करें',
+  },
+};
+
+const STICKER_YELLOW = '#FFED00';
+
 // Fetched and decoded once, then reused for every QR tile. createImageBitmap
 // gives a definite decoded-and-paintable result (unlike HTMLImageElement,
 // whose onload/decode() can resolve before it is actually safe to draw from
@@ -21,57 +49,217 @@ function loadLogoBitmap(): Promise<ImageBitmap> {
   return cachedLogoBitmap;
 }
 
-/** Shrinks the font size until `text` fits within `maxWidth`, then draws it centered at (x, y). */
-function fitTextToWidth(
+/** Shrinks the font size until `text` fits within `maxWidth` (single line), returning the fitted size. */
+function fitFontSize(
   ctx: CanvasRenderingContext2D,
   text: string,
   maxWidth: number,
   startFontSize: number,
   fontWeight: string,
+  fontFamily = 'sans-serif',
 ): number {
   let fontSize = startFontSize;
   do {
-    ctx.font = `${fontWeight} ${fontSize}px sans-serif`;
+    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
     fontSize -= 1;
   } while (ctx.measureText(text).width > maxWidth && fontSize > 8);
   return fontSize + 1;
 }
 
+/** Wraps `text` to fit within `maxWidth` at the given font, splitting on spaces; returns each line. */
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let current = '';
+  for (const word of words) {
+    const attempt = current ? `${current} ${word}` : word;
+    if (ctx.measureText(attempt).width > maxWidth && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = attempt;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+// Raw path data straight from lucide-react (24x24 viewBox, stroke-based icons),
+// so the sticker's icons are pixel-faithful to the ones used across the rest
+// of the app instead of hand-drawn approximations.
+const LUCIDE_ICON_PATHS: { paths: string[]; stroke: string }[] = [
+  {
+    // Siren
+    stroke: '#1B1C1C',
+    paths: [
+      'M7 18v-6a5 5 0 1 1 10 0v6',
+      'M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z',
+      'M21 12h1',
+      'M18.5 4.5 18 5',
+      'M2 12h1',
+      'M12 2v1',
+      'm4.929 4.929.707.707',
+      'M12 12v6',
+    ],
+  },
+  {
+    // CircleParkingOff
+    stroke: '#D6272C',
+    paths: [
+      'M12.656 7H13a3 3 0 0 1 2.984 3.307',
+      'M13 13H9',
+      'M19.071 19.071A1 1 0 0 1 4.93 4.93',
+      'm2 2 20 20',
+      'M8.357 2.687a10 10 0 0 1 12.956 12.956',
+      'M9 17V9',
+    ],
+  },
+  {
+    // TriangleAlert
+    stroke: '#1B1C1C',
+    paths: [
+      'm21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3',
+      'M12 9v4',
+      'M12 17h.01',
+    ],
+  },
+  {
+    // Phone
+    stroke: '#1B1C1C',
+    paths: [
+      'M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384',
+    ],
+  },
+];
+
+/** Draws one lucide-react icon (by its raw 24x24 path data) centered at (cx, cy), scaled to size `s`. */
+function drawLucideIcon(
+  ctx: CanvasRenderingContext2D,
+  icon: { paths: string[]; stroke: string },
+  cx: number,
+  cy: number,
+  s: number,
+) {
+  ctx.save();
+  ctx.translate(cx - s / 2, cy - s / 2);
+  ctx.scale(s / 24, s / 24);
+  ctx.strokeStyle = icon.stroke;
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  for (const d of icon.paths) {
+    ctx.stroke(new Path2D(d));
+  }
+  ctx.restore();
+}
+
+const STICKER_ICONS = LUCIDE_ICON_PATHS.map(
+  (icon) => (ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) => drawLucideIcon(ctx, icon, cx, cy, s),
+);
+
 /**
- * Composites the bare server-generated QR PNG onto a taller canvas with the
- * Scan Connect logo above it and a caption below, so tags printed or
- * downloaded from this page are self-branded on the sticker itself.
+ * Composites the bare server-generated QR PNG into a print-ready two-panel
+ * vehicle tag: left panel carries the Scan Connect logo and instructions,
+ * right panel (brand yellow) carries the QR code plus emergency/parking icons.
+ * Sized in real device pixels at 300 DPI for the requested physical label size.
  */
-async function drawBrandedQrCanvas(qrBlob: Blob): Promise<HTMLCanvasElement> {
+async function drawBrandedQrCanvas(
+  qrBlob: Blob,
+  opts: { lang: StickerLang; size: StickerSize } = { lang: 'en', size: 'bike' },
+): Promise<HTMLCanvasElement> {
   const [qrImage, logo] = await Promise.all([createImageBitmap(qrBlob), loadLogoBitmap()]);
+  const { width, height } = STICKER_DIMENSIONS_PX[opts.size];
+  const text = STICKER_TEXT[opts.lang];
 
-  const size = qrImage.width;
-  const topPad = Math.round(size * 0.18);
-  const bottomPad = Math.round(size * 0.22);
-  const maxTextWidth = size * 0.94;
   const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size + topPad + bottomPad;
-
+  canvas.width = width;
+  canvas.height = height;
   const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#0F0F0F';
 
-  const logoMaxWidth = maxTextWidth;
-  const logoMaxHeight = topPad * 0.8;
+  const pad = Math.round(height * 0.07);
+  const leftWidth = Math.round(width * 0.52);
+  const rightWidth = width - leftWidth;
+
+  // Left panel — white background with logo + instructions.
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, leftWidth, height);
+
+  const logoMaxWidth = leftWidth - pad * 2;
+  const logoMaxHeight = height * 0.28;
   const logoScale = Math.min(logoMaxWidth / logo.width, logoMaxHeight / logo.height);
   const logoWidth = logo.width * logoScale;
   const logoHeight = logo.height * logoScale;
-  ctx.drawImage(logo, (canvas.width - logoWidth) / 2, (topPad - logoHeight) / 2, logoWidth, logoHeight);
+  ctx.drawImage(logo, pad, pad, logoWidth, logoHeight);
 
-  ctx.drawImage(qrImage, 0, topPad, size, size);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#0F0F0F';
+  const headlineMaxWidth = leftWidth - pad * 2;
+  const sublineFontSize = Math.round(height * 0.05);
+  const headlineTop = pad + logoHeight * 1.3;
+  // Reserve room below the headline for the subline (2 lines worst-case) before
+  // deciding how large the headline itself is allowed to grow.
+  const headlineMaxHeight = height - headlineTop - pad - sublineFontSize * 1.35 * 2;
+
+  const headlineFontFamily = "'Arial Rounded MT Bold', 'Arial Rounded MT', sans-serif";
+  let headlineFontSize = Math.round(height * 0.11);
+  let headlineLines: string[] = [];
+  let headlineLineHeight = 0;
+  while (headlineFontSize > 10) {
+    ctx.font = `bold ${headlineFontSize}px ${headlineFontFamily}`;
+    headlineLines = wrapText(ctx, text.headline, headlineMaxWidth);
+    headlineLineHeight = headlineFontSize * 1.15;
+    if (headlineLines.length * headlineLineHeight <= headlineMaxHeight) break;
+    headlineFontSize -= 2;
+  }
+  ctx.font = `bold ${headlineFontSize}px ${headlineFontFamily}`;
+  let headlineY = headlineTop + headlineLineHeight * 0.85;
+  for (const line of headlineLines) {
+    ctx.fillText(line, pad, headlineY);
+    headlineY += headlineLineHeight;
+  }
+
+  const sublineFontSizeFitted = Math.round(sublineFontSize * 0.8);
+  ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
+  ctx.fillStyle = '#5F5E5E';
+  const sublineLines = wrapText(ctx, text.subline, headlineMaxWidth);
+  let sublineY = headlineY + sublineFontSizeFitted * 0.7;
+  for (const line of sublineLines) {
+    ctx.fillText(line, pad, sublineY);
+    sublineY += sublineFontSizeFitted * 1.35;
+  }
+
+  // Right panel — brand yellow background with QR code + icon row.
+  ctx.fillStyle = STICKER_YELLOW;
+  ctx.fillRect(leftWidth, 0, rightWidth, height);
+
+  const qrBoxSize = Math.min(rightWidth - pad * 2, height * 0.58);
+  const qrX = leftWidth + (rightWidth - qrBoxSize) / 2;
+  const qrY = pad * 0.8;
+  ctx.fillStyle = '#ffffff';
+  const qrFramePad = qrBoxSize * 0.06;
+  ctx.fillRect(qrX - qrFramePad, qrY - qrFramePad, qrBoxSize + qrFramePad * 2, qrBoxSize + qrFramePad * 2);
+  ctx.drawImage(qrImage, qrX, qrY, qrBoxSize, qrBoxSize);
   qrImage.close();
 
-  const caption = 'Scan to connect the vehicle owner';
-  fitTextToWidth(ctx, caption, maxTextWidth, Math.round(size * 0.07), 'normal');
-  ctx.fillText(caption, canvas.width / 2, topPad + size + bottomPad * 0.6);
+  const iconRowY = qrY + qrBoxSize + qrFramePad * 2 + pad * 0.9;
+  const iconSize = height * 0.075;
+  const iconGap = rightWidth / (STICKER_ICONS.length + 1);
+  STICKER_ICONS.forEach((draw, i) => {
+    const cx = leftWidth + iconGap * (i + 1);
+    draw(ctx, cx, iconRowY, iconSize);
+  });
+
+  ctx.fillStyle = '#1B1C1C';
+  ctx.textAlign = 'center';
+  const captionMaxWidth = rightWidth - pad;
+  const captionFontSize = Math.round(height * 0.03);
+  ctx.font = `bold ${captionFontSize}px sans-serif`;
+  const captionLines = wrapText(ctx, text.iconCaption, captionMaxWidth);
+  let captionY = iconRowY + iconSize * 1.5;
+  for (const line of captionLines) {
+    ctx.fillText(line, leftWidth + rightWidth / 2, captionY);
+    captionY += captionFontSize * 1.3;
+  }
 
   return canvas;
 }
@@ -97,8 +285,10 @@ const AuthedQrImage: React.FC<{
   alt: string;
   className?: string;
   branded?: boolean;
+  lang?: StickerLang;
+  size?: StickerSize;
   onReady?: () => void;
-}> = ({ id, alt, className, branded, onReady }) => {
+}> = ({ id, alt, className, branded, lang = 'en', size = 'bike', onReady }) => {
   const [src, setSrc] = useState('');
 
   useEffect(() => {
@@ -110,7 +300,7 @@ const AuthedQrImage: React.FC<{
         headers: idToken ? { Authorization: `Bearer ${idToken}` } : {},
       });
       const rawBlob = await res.blob();
-      const blob = branded ? await canvasToBlob(await drawBrandedQrCanvas(rawBlob)) : rawBlob;
+      const blob = branded ? await canvasToBlob(await drawBrandedQrCanvas(rawBlob, { lang, size })) : rawBlob;
       if (cancelled) return;
       objectUrl = URL.createObjectURL(blob);
       setSrc(objectUrl);
@@ -120,7 +310,7 @@ const AuthedQrImage: React.FC<{
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [id, branded]);
+  }, [id, branded, lang, size]);
 
   if (!src) {
     return <div className={`${className ?? ''} bg-neutral-100 animate-pulse`} />;
@@ -184,6 +374,8 @@ export const AdminQrCodes: React.FC = () => {
   const [printBatchId, setPrintBatchId] = useState<string | null>(null);
   const [printCodes, setPrintCodes] = useState<QrCodeRow[] | null>(null);
   const [readyTileCount, setReadyTileCount] = useState(0);
+  const [stickerLang, setStickerLang] = useState<StickerLang>('en');
+  const [stickerSize, setStickerSize] = useState<StickerSize>('bike');
 
   const load = () => {
     const params = buildFilterParams({ statusFilter, batchFilter, nameFilter, dateFrom, dateTo });
@@ -232,12 +424,12 @@ export const AdminQrCodes: React.FC = () => {
         headers: idToken ? { Authorization: `Bearer ${idToken}` } : {},
       });
       const rawBlob = await res.blob();
-      const canvas = await drawBrandedQrCanvas(rawBlob);
+      const canvas = await drawBrandedQrCanvas(rawBlob, { lang: stickerLang, size: stickerSize });
       const blob = await canvasToBlob(canvas);
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `qr-${code}.png`;
+      link.download = `qr-${code}-${stickerSize}-${stickerLang}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -274,6 +466,42 @@ export const AdminQrCodes: React.FC = () => {
     <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black text-white uppercase tracking-wide">QR Code Management</h1>
+      </div>
+
+      {/* Sticker language & vehicle size — applies to all branded downloads/prints below */}
+      <div className="bg-white/5 border border-white/10 rounded-xl p-5 flex flex-wrap items-end gap-6">
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-white/50 uppercase">Sticker Language</label>
+          <div className="flex rounded-md overflow-hidden border border-white/10">
+            {(['en', 'hi'] as const).map((l) => (
+              <button
+                key={l}
+                onClick={() => setStickerLang(l)}
+                className={`h-10 px-4 text-xs font-bold uppercase cursor-pointer ${
+                  stickerLang === l ? 'bg-amber-400 text-neutral-950' : 'bg-white/10 text-white/70 hover:bg-white/15'
+                }`}
+              >
+                {l === 'en' ? 'English' : 'हिन्दी'}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-white/50 uppercase">Sticker Size</label>
+          <div className="flex rounded-md overflow-hidden border border-white/10">
+            {(['bike', 'car'] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => setStickerSize(s)}
+                className={`h-10 px-4 text-xs font-bold uppercase cursor-pointer ${
+                  stickerSize === s ? 'bg-amber-400 text-neutral-950' : 'bg-white/10 text-white/70 hover:bg-white/15'
+                }`}
+              >
+                {s === 'bike' ? 'Bike (4×2.5in)' : 'Car (8×5in)'}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Bulk generate */}
@@ -503,10 +731,10 @@ export const AdminQrCodes: React.FC = () => {
             {!printCodes ? (
               <p className="text-neutral-500 text-sm">Loading codes...</p>
             ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {printCodes.map((c, index) => {
-                  // 4 columns x 4 rows = 16 tiles per printed page.
-                  const isLastOnPage = (index + 1) % 16 === 0 && index !== printCodes.length - 1;
+                  // 3 columns x 4 rows = 12 wide (8:5) tiles per printed page.
+                  const isLastOnPage = (index + 1) % 12 === 0 && index !== printCodes.length - 1;
                   return (
                     <div
                       key={c.id}
@@ -517,8 +745,10 @@ export const AdminQrCodes: React.FC = () => {
                       <AuthedQrImage
                         id={c.id}
                         alt={c.code}
-                        className="w-28 h-auto"
+                        className="w-full h-auto"
                         branded
+                        lang={stickerLang}
+                        size={stickerSize}
                         onReady={() => setReadyTileCount((prev) => prev + 1)}
                       />
                       <span className="text-[10px] font-mono text-neutral-700">{c.code}</span>
