@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import JSZip from 'jszip';
-import { Download, Printer, X, Search, FileArchive } from 'lucide-react';
+import { Download, Printer, X, Search, FileArchive, Trash2, AlertTriangle } from 'lucide-react';
 import { api, downloadFile } from '../../lib/api';
 import { auth } from '../../lib/firebase';
 import {
@@ -137,6 +137,12 @@ export const AdminQrCodes: React.FC = () => {
   const [readyTileCount, setReadyTileCount] = useState(0);
   const [stickerLang, setStickerLang] = useState<StickerLang>('en');
   const [stickerSize, setStickerSize] = useState<StickerSize>('bike');
+  const [deleteTarget, setDeleteTarget] = useState<
+    | { kind: 'code'; id: string; code: string }
+    | { kind: 'batch'; batchId: string; batchName: string; total: number; activated: number }
+    | null
+  >(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const load = () => {
     const params = buildFilterParams({ statusFilter, batchFilter, nameFilter, dateFrom, dateTo });
@@ -237,7 +243,25 @@ export const AdminQrCodes: React.FC = () => {
     setPrintCodes(res.codes);
   };
 
-  if (error) return <div className="p-8 text-rose-400">{error}</div>;
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    setError('');
+    try {
+      if (deleteTarget.kind === 'code') {
+        await api.delete(`/api/admin/qr-codes/${deleteTarget.id}`);
+      } else {
+        await api.delete(`/api/admin/qr-codes/batch/${deleteTarget.batchId}`);
+        if (batchFilter === deleteTarget.batchId) setBatchFilter('');
+      }
+      setDeleteTarget(null);
+      load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="p-8 space-y-6 print:p-0 print:space-y-0">
@@ -245,6 +269,19 @@ export const AdminQrCodes: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black text-white uppercase tracking-wide">QR Code Management</h1>
       </div>
+
+      {error && (
+        <div className="flex items-center justify-between gap-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm rounded-xl px-4 py-3">
+          <span>{error}</span>
+          <button
+            type="button"
+            onClick={() => setError('')}
+            className="text-rose-400 hover:text-rose-300 cursor-pointer shrink-0"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Sticker language & vehicle size — applies to all branded downloads/prints below */}
       <div className="bg-white/5 border border-white/10 rounded-xl p-5 flex flex-wrap items-end gap-6">
@@ -401,6 +438,21 @@ export const AdminQrCodes: React.FC = () => {
             >
               <Printer className="w-3.5 h-3.5" /> Print Batch
             </button>
+            {(() => {
+              const selectedBatch = batches.find((b) => b.batchId === batchFilter);
+              if (!selectedBatch) return null;
+              const hasActive = selectedBatch.activated > 0;
+              return (
+                <button
+                  onClick={() => setDeleteTarget({ kind: 'batch', ...selectedBatch })}
+                  disabled={hasActive}
+                  title={hasActive ? 'Deactivate every code in this batch before deleting it' : 'Delete this entire batch'}
+                  className="inline-flex items-center gap-1.5 h-10 px-4 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold rounded-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Delete Batch
+                </button>
+              );
+            })()}
           </>
         )}
       </div>
@@ -458,7 +510,7 @@ export const AdminQrCodes: React.FC = () => {
                       <span className="text-white/20">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-right whitespace-nowrap">
                     <button
                       type="button"
                       onClick={() => downloadBrandedQrPng(c.id, c.code)}
@@ -466,6 +518,15 @@ export const AdminQrCodes: React.FC = () => {
                       title="Download PNG"
                     >
                       <Download className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeleteTarget({ kind: 'code', id: c.id, code: c.code })}
+                      disabled={c.status === 'ACTIVE'}
+                      className="p-1.5 text-white/50 hover:text-rose-400 cursor-pointer inline-block disabled:opacity-30 disabled:cursor-not-allowed"
+                      title={c.status === 'ACTIVE' ? 'Deactivate this code before deleting it' : 'Delete this code'}
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>
@@ -516,6 +577,56 @@ export const AdminQrCodes: React.FC = () => {
         </div>
       )}
       </div>
+
+      {/* Delete confirmation modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-neutral-900 border border-white/10 rounded-xl max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-rose-500/15 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-rose-400" />
+              </div>
+              <h2 className="font-black text-lg text-white">
+                {deleteTarget.kind === 'code' ? 'Delete this QR code?' : 'Delete this batch?'}
+              </h2>
+            </div>
+
+            <p className="text-sm text-white/70">
+              {deleteTarget.kind === 'code' ? (
+                <>
+                  This will permanently delete code <span className="font-mono text-white">{deleteTarget.code}</span>.
+                  This cannot be undone.
+                </>
+              ) : (
+                <>
+                  This will permanently delete all <span className="font-bold text-white">{deleteTarget.total}</span>{' '}
+                  codes in batch <span className="font-bold text-white">{deleteTarget.batchName}</span>. This cannot
+                  be undone.
+                </>
+              )}
+            </p>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className="h-10 px-4 text-white/70 hover:text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                disabled={isDeleting}
+                className="h-10 px-4 bg-rose-500 hover:bg-rose-400 text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Print modal */}
       {printBatchId && (

@@ -231,6 +231,48 @@ adminQrCodesRouter.get('/:id/qr.png', async (req, res) => {
 });
 
 /**
+ * Deletes a single QR code. Refuses if it's ACTIVE (linked to a live vehicle)
+ * — it must be deactivated/unlinked first so a vehicle's safety tag can never
+ * be silently removed out from under its owner.
+ */
+adminQrCodesRouter.delete('/:id', async (req, res) => {
+  const code = await prisma.qrCode.findUnique({ where: { id: req.params.id } });
+  if (!code) {
+    return res.status(404).json({ error: 'QR code not found' });
+  }
+  if (code.status === 'ACTIVE') {
+    return res.status(409).json({ error: 'This QR code is active — deactivate it before deleting' });
+  }
+
+  await prisma.qrCode.delete({ where: { id: code.id } });
+  res.status(204).send();
+});
+
+/**
+ * Deletes every QR code in a batch ("lot"). Refuses the whole batch if ANY
+ * code in it is still ACTIVE, for the same reason as the single-code delete.
+ */
+adminQrCodesRouter.delete('/batch/:batchId', async (req, res) => {
+  const { batchId } = req.params;
+  const [total, activeCount] = await Promise.all([
+    prisma.qrCode.count({ where: { batchId } }),
+    prisma.qrCode.count({ where: { batchId, status: 'ACTIVE' } }),
+  ]);
+
+  if (total === 0) {
+    return res.status(404).json({ error: 'Batch not found' });
+  }
+  if (activeCount > 0) {
+    return res.status(409).json({
+      error: `This batch has ${activeCount} active code${activeCount === 1 ? '' : 's'} — deactivate ${activeCount === 1 ? 'it' : 'them'} before deleting the batch`,
+    });
+  }
+
+  await prisma.qrCode.deleteMany({ where: { batchId } });
+  res.status(204).send();
+});
+
+/**
  * Public + authenticated scan/activation flow. Mounted at /api/qr.
  */
 export const qrCodesRouter = Router();
