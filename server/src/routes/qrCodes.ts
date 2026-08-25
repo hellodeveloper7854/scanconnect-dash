@@ -13,6 +13,11 @@ import type { Prisma } from '@prisma/client';
 // printed/handwritten codes on physical stickers can't be misread.
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
+// Matches the max batch size a single bulk-generate call can create, so an
+// admin can always list/zip/print an entire batch in one request regardless
+// of size, while still bounding worst-case query/response size.
+const MAX_ADMIN_PAGE_SIZE = 5000;
+
 function generateCode(length = 10): string {
   const bytes = randomBytes(length);
   let out = '';
@@ -113,7 +118,7 @@ function buildQrCodeWhere(query: Record<string, unknown>): Prisma.QrCodeWhereInp
 
 adminQrCodesRouter.get('/', async (req, res) => {
   const page = Math.max(1, Number(req.query.page ?? 1));
-  const pageSize = Math.min(100, Number(req.query.pageSize ?? 25));
+  const pageSize = Math.min(MAX_ADMIN_PAGE_SIZE, Number(req.query.pageSize ?? 25));
   const where = buildQrCodeWhere(req.query as Record<string, unknown>);
 
   const [codes, total, batchGroups] = await Promise.all([
@@ -174,8 +179,6 @@ adminQrCodesRouter.get('/:batchId/download.csv', async (req, res) => {
   res.send(csv);
 });
 
-const MAX_ZIP_CODES = 5000;
-
 /**
  * Streams a ZIP of every QR PNG matching the currently applied filters
  * (status, batch, name search, date range) — a plain query-filtered export
@@ -188,7 +191,7 @@ adminQrCodesRouter.get('/download.zip', async (req, res) => {
   const codes = await prisma.qrCode.findMany({
     where,
     orderBy: { createdAt: 'asc' },
-    take: MAX_ZIP_CODES,
+    take: MAX_ADMIN_PAGE_SIZE,
   });
 
   if (codes.length === 0) {
