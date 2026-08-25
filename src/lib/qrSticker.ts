@@ -310,11 +310,13 @@ export async function drawBrandedQrCanvas(
   const sublineFontSizeFitted = Math.round(height * 0.05 * 0.6);
   const headlineTop = pad + wordmarkHeight * 1.6;
   // Reserve room below the headline for the subline's *actual* wrapped line
-  // count (not a hardcoded guess) so a long subline can never be pushed off
-  // the bottom of the canvas by an oversized headline.
+  // count at its full/preferred font size (not shrunk), with extra breathing
+  // room added, so the subline always renders at full size instead of being
+  // squeezed smaller to fit whatever space the headline happened to leave.
   ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
   const sublineLineCount = wrapText(ctx, text.subline, headlineMaxWidth).length;
-  const headlineMaxHeight = height - headlineTop - pad - sublineFontSizeFitted * 1.35 * sublineLineCount;
+  const headlineMaxHeight =
+    height - headlineTop - pad - sublineFontSizeFitted * 1.35 * sublineLineCount - sublineFontSizeFitted * 1.5;
 
   const headlineFontFamily = "'Poppins', sans-serif";
   let headlineFontSize = Math.round(height * 0.11);
@@ -354,13 +356,27 @@ export async function drawBrandedQrCanvas(
     headlineY += headlineLineHeight;
   }
 
-  ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
+  // Fit the subline into whatever vertical space is actually left below the
+  // headline (not the earlier estimate) — shrinking the font if needed —
+  // so it can never render past the sticker's bottom edge regardless of how
+  // many lines a given language wraps to (Hindi text is visibly wider per
+  // character than English at the same pixel size, so it wraps to more lines
+  // and was previously getting clipped off the bottom of the canvas).
+  const sublineAvailableHeight = height - pad - headlineY;
+  let sublineFontSize = sublineFontSizeFitted;
+  let sublineLines = wrapText(ctx, text.subline, headlineMaxWidth);
+  while (sublineFontSize > 8) {
+    ctx.font = `normal ${sublineFontSize}px sans-serif`;
+    sublineLines = wrapText(ctx, text.subline, headlineMaxWidth);
+    if (sublineLines.length * sublineFontSize * 1.35 <= sublineAvailableHeight) break;
+    sublineFontSize -= 1;
+  }
+  ctx.font = `normal ${sublineFontSize}px sans-serif`;
   ctx.fillStyle = '#5F5E5E';
-  const sublineLines = wrapText(ctx, text.subline, headlineMaxWidth);
-  let sublineY = headlineY + sublineFontSizeFitted * 0.7;
+  let sublineY = headlineY + sublineFontSize * 0.7;
   for (const line of sublineLines) {
     ctx.fillText(line, pad, sublineY);
-    sublineY += sublineFontSizeFitted * 1.35;
+    sublineY += sublineFontSize * 1.35;
   }
 
   // Right panel — brand yellow background with QR code + icon row.
