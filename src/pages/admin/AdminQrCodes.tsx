@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import JSZip from 'jszip';
-import { Download, Printer, X, Search, FileArchive, Trash2, AlertTriangle } from 'lucide-react';
+import { Download, Printer, X, Search, FileArchive, Trash2, AlertTriangle, ShieldOff, ShieldCheck } from 'lucide-react';
 import { api, downloadFile } from '../../lib/api';
 import { auth } from '../../lib/firebase';
 import {
@@ -71,7 +71,7 @@ const AuthedQrImage: React.FC<{
 interface QrCodeRow {
   id: string;
   code: string;
-  status: 'INACTIVE' | 'ACTIVE';
+  status: 'INACTIVE' | 'ACTIVE' | 'DISABLED';
   batchId: string;
   batchName: string;
   createdAt: string;
@@ -143,6 +143,8 @@ export const AdminQrCodes: React.FC = () => {
     | null
   >(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [disableTarget, setDisableTarget] = useState<{ id: string; code: string; disabling: boolean } | null>(null);
+  const [isTogglingDisable, setIsTogglingDisable] = useState(false);
 
   const load = () => {
     const params = buildFilterParams({ statusFilter, batchFilter, nameFilter, dateFrom, dateTo });
@@ -263,6 +265,21 @@ export const AdminQrCodes: React.FC = () => {
     }
   };
 
+  const confirmToggleDisable = async () => {
+    if (!disableTarget) return;
+    setIsTogglingDisable(true);
+    setError('');
+    try {
+      await api.patch(`/api/admin/qr-codes/${disableTarget.id}/status`, { disabled: disableTarget.disabling });
+      setDisableTarget(null);
+      load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update QR code status');
+    } finally {
+      setIsTogglingDisable(false);
+    }
+  };
+
   return (
     <div className="p-8 space-y-6 print:p-0 print:space-y-0">
       <div className="print:hidden space-y-6">
@@ -374,6 +391,7 @@ export const AdminQrCodes: React.FC = () => {
           <option value="" className="bg-neutral-900 text-white">All statuses</option>
           <option value="INACTIVE" className="bg-neutral-900 text-white">Inactive</option>
           <option value="ACTIVE" className="bg-neutral-900 text-white">Active</option>
+          <option value="DISABLED" className="bg-neutral-900 text-white">Disabled</option>
         </select>
         <select
           value={batchFilter}
@@ -483,7 +501,11 @@ export const AdminQrCodes: React.FC = () => {
                   <td className="px-4 py-3">
                     <span
                       className={`text-xs font-bold uppercase px-2 py-1 rounded ${
-                        c.status === 'ACTIVE' ? 'text-emerald-400 bg-emerald-400/10' : 'text-white/50 bg-white/5'
+                        c.status === 'ACTIVE'
+                          ? 'text-emerald-400 bg-emerald-400/10'
+                          : c.status === 'DISABLED'
+                            ? 'text-rose-400 bg-rose-400/10'
+                            : 'text-white/50 bg-white/5'
                       }`}
                     >
                       {c.status}
@@ -518,6 +540,16 @@ export const AdminQrCodes: React.FC = () => {
                       title="Download PNG"
                     >
                       <Download className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDisableTarget({ id: c.id, code: c.code, disabling: c.status !== 'DISABLED' })}
+                      className={`p-1.5 cursor-pointer inline-block ${
+                        c.status === 'DISABLED' ? 'text-rose-400 hover:text-emerald-400' : 'text-white/50 hover:text-rose-400'
+                      }`}
+                      title={c.status === 'DISABLED' ? 'Re-enable this QR code' : 'Disable this QR code'}
+                    >
+                      {c.status === 'DISABLED' ? <ShieldCheck className="w-4 h-4" /> : <ShieldOff className="w-4 h-4" />}
                     </button>
                     <button
                       type="button"
@@ -622,6 +654,66 @@ export const AdminQrCodes: React.FC = () => {
                 className="h-10 px-4 bg-rose-500 hover:bg-rose-400 text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Disable/enable confirmation modal */}
+      {disableTarget && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-neutral-900 border border-white/10 rounded-xl max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                  disableTarget.disabling ? 'bg-rose-500/15' : 'bg-emerald-500/15'
+                }`}
+              >
+                {disableTarget.disabling ? (
+                  <ShieldOff className="w-5 h-5 text-rose-400" />
+                ) : (
+                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                )}
+              </div>
+              <h2 className="font-black text-lg text-white">
+                {disableTarget.disabling ? 'Disable this QR code?' : 'Re-enable this QR code?'}
+              </h2>
+            </div>
+
+            <p className="text-sm text-white/70">
+              {disableTarget.disabling ? (
+                <>
+                  Scanning code <span className="font-mono text-white">{disableTarget.code}</span> will show a
+                  &quot;this QR is disabled, please contact support&quot; message until it&apos;s re-enabled. The
+                  linked vehicle and contact details are kept, not deleted.
+                </>
+              ) : (
+                <>
+                  Code <span className="font-mono text-white">{disableTarget.code}</span> will resume working exactly
+                  as it did before it was disabled.
+                </>
+              )}
+            </p>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setDisableTarget(null)}
+                disabled={isTogglingDisable}
+                className="h-10 px-4 text-white/70 hover:text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmToggleDisable}
+                disabled={isTogglingDisable}
+                className={`h-10 px-4 text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                  disableTarget.disabling ? 'bg-rose-500 hover:bg-rose-400' : 'bg-emerald-500 hover:bg-emerald-400'
+                }`}
+              >
+                {isTogglingDisable ? 'Saving...' : disableTarget.disabling ? 'Disable' : 'Re-enable'}
               </button>
             </div>
           </div>

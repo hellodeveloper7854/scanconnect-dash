@@ -248,6 +248,49 @@ adminQrCodesRouter.delete('/:id', async (req, res) => {
   res.status(204).send();
 });
 
+const disableSchema = z.object({
+  disabled: z.boolean(),
+});
+
+/**
+ * Disables (or re-enables) a QR code without deleting it — the record, its
+ * linked vehicle, and its emergency contacts are all left intact so it can
+ * be re-enabled later. A disabled code stops resolving to its usual
+ * active/inactive scan flow: /:code reports DISABLED so the scan-facing UI
+ * shows a "contact support" message instead of vehicle/owner details.
+ */
+adminQrCodesRouter.patch('/:id/status', async (req, res) => {
+  const parsed = disableSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const code = await prisma.qrCode.findUnique({ where: { id: req.params.id } });
+  if (!code) {
+    return res.status(404).json({ error: 'QR code not found' });
+  }
+
+  if (parsed.data.disabled) {
+    if (code.status === 'DISABLED') {
+      return res.status(409).json({ error: 'This QR code is already disabled' });
+    }
+    const updated = await prisma.qrCode.update({
+      where: { id: code.id },
+      data: { status: 'DISABLED', previousStatus: code.status },
+    });
+    return res.json({ code: updated });
+  }
+
+  if (code.status !== 'DISABLED') {
+    return res.status(409).json({ error: 'This QR code is not disabled' });
+  }
+  const updated = await prisma.qrCode.update({
+    where: { id: code.id },
+    data: { status: code.previousStatus ?? 'INACTIVE', previousStatus: null },
+  });
+  res.json({ code: updated });
+});
+
 /**
  * Deletes every QR code in a batch ("lot"). Refuses the whole batch if ANY
  * code in it is still ACTIVE, for the same reason as the single-code delete.
@@ -431,6 +474,9 @@ qrCodesRouter.post('/:code/activate', requireAuth, async (req, res) => {
   const qrCode = await prisma.qrCode.findUnique({ where: { code: req.params.code } });
   if (!qrCode) {
     return res.status(404).json({ error: 'This QR code is not recognized' });
+  }
+  if (qrCode.status === 'DISABLED') {
+    return res.status(409).json({ error: 'This QR code has been disabled. Please contact support.' });
   }
   if (qrCode.status !== 'INACTIVE') {
     return res.status(409).json({ error: 'This QR code has already been activated' });

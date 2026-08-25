@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { QrCode as QrCodeIcon, ArrowRight, ArrowLeft, Check, Plus, User, Phone, Car, Mail, Lock } from 'lucide-react';
+import { QrCode as QrCodeIcon, ArrowRight, ArrowLeft, Check, Plus, User, Phone, Car, Mail, Lock, ShieldOff } from 'lucide-react';
 import { auth } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
 import { ScanResultCard } from '../components/ScanResultCard';
@@ -8,7 +8,7 @@ import logo from '../assets/images/logo.png';
 
 const VEHICLE_TYPES = ['Car', 'Bike', 'Scooter', 'Truck', 'Bus', 'Other'];
 
-type Stage = 'loading' | 'invalid' | 'inactive-prompt' | 'login-gate' | 'wizard' | 'details';
+type Stage = 'loading' | 'invalid' | 'disabled' | 'inactive-prompt' | 'login-gate' | 'wizard' | 'details';
 
 interface VehicleOption {
   id: string;
@@ -719,8 +719,13 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
 
   useEffect(() => {
     api
-      .get<{ status: 'INACTIVE' | 'ACTIVE' }>(`/api/qr/${code}`)
+      .get<{ status: 'INACTIVE' | 'ACTIVE' | 'DISABLED' }>(`/api/qr/${code}`)
       .then((res) => {
+        if (res.status === 'DISABLED') {
+          setPendingStage('disabled');
+          setStatusChecked(true);
+          return;
+        }
         if (res.status === 'ACTIVE') {
           return api.get<DetailsData>(`/api/qr/${code}/details`).then((details) => {
             setDetailsData(details);
@@ -760,6 +765,18 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
           <p className="text-sm text-[#5F5E5E]">
             This code isn&apos;t registered in our system. If you believe this is an error, please contact support.
           </p>
+        </div>
+      </CardShell>
+    );
+  }
+
+  if (stage === 'disabled') {
+    return (
+      <CardShell>
+        <div className="text-center space-y-2">
+          <ShieldOff className="w-10 h-10 text-[#D6272C] mx-auto" />
+          <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">This QR is Disabled</h1>
+          <p className="text-sm text-[#5F5E5E]">Please contact the support team.</p>
         </div>
       </CardShell>
     );
