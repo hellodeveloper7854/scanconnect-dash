@@ -120,6 +120,8 @@ export const AdminQrCodes: React.FC = () => {
   const [codes, setCodes] = useState<QrCodeRow[] | null>(null);
   const [batches, setBatches] = useState<BatchSummary[]>([]);
   const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
   const [statusFilter, setStatusFilter] = useState('');
   const [batchFilter, setBatchFilter] = useState('');
   const [nameFilter, setNameFilter] = useState('');
@@ -138,6 +140,8 @@ export const AdminQrCodes: React.FC = () => {
 
   const load = () => {
     const params = buildFilterParams({ statusFilter, batchFilter, nameFilter, dateFrom, dateTo });
+    params.set('page', String(page));
+    params.set('pageSize', String(pageSize));
     api
       .get<{ codes: QrCodeRow[]; total: number; batches: BatchSummary[] }>(`/api/admin/qr-codes?${params}`)
       .then((res) => {
@@ -148,11 +152,19 @@ export const AdminQrCodes: React.FC = () => {
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load QR codes'));
   };
 
+  // Filter changes should always jump back to page 1 — otherwise a narrower
+  // filter can leave the user stranded on a page number that no longer has
+  // any results.
+  useEffect(() => {
+    setPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter, batchFilter, nameFilter, dateFrom, dateTo, pageSize]);
+
   useEffect(() => {
     const handle = setTimeout(load, 300);
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, batchFilter, nameFilter, dateFrom, dateTo]);
+  }, [statusFilter, batchFilter, nameFilter, dateFrom, dateTo, page, pageSize]);
 
   const handleGenerate = async () => {
     if (!batchName.trim()) {
@@ -462,7 +474,47 @@ export const AdminQrCodes: React.FC = () => {
           </table>
         </div>
       )}
-      <p className="text-white/30 text-xs">{total} total codes</p>
+
+      {/* Pagination */}
+      {total > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-white/30 text-xs">
+            Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} of {total} codes
+          </p>
+          <div className="flex items-center gap-3">
+            <select
+              value={pageSize}
+              onChange={(e) => setPageSize(Number(e.target.value))}
+              className="h-9 px-2 bg-white/10 border border-white/10 text-white text-xs rounded-md cursor-pointer"
+            >
+              {[25, 50, 100].map((size) => (
+                <option key={size} value={size} className="bg-neutral-900 text-white">
+                  {size} / page
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="h-9 px-3 bg-white/10 hover:bg-white/15 text-white text-xs font-bold rounded-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <span className="text-white/50 text-xs">
+              Page {page} of {Math.max(1, Math.ceil(total / pageSize))}
+            </span>
+            <button
+              type="button"
+              onClick={() => setPage((p) => (p * pageSize < total ? p + 1 : p))}
+              disabled={page * pageSize >= total}
+              className="h-9 px-3 bg-white/10 hover:bg-white/15 text-white text-xs font-bold rounded-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
       </div>
 
       {/* Print modal */}
