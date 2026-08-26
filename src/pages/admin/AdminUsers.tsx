@@ -49,7 +49,7 @@ export const AdminUsers: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search name, email, mobile"
-            className="pl-9 pr-3 h-10 bg-white/10 border border-white/10 text-white text-sm rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="pl-9 pr-3 h-10 bg-white/10 border border-white/10 text-white text-sm rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
           />
         </div>
       </div>
@@ -87,7 +87,7 @@ export const AdminUsers: React.FC = () => {
                   <td className="px-4 py-3">
                     <span
                       className={`text-xs font-bold uppercase px-2 py-1 rounded ${
-                        u.role === 'ADMIN' ? 'text-amber-400 bg-amber-400/10' : 'text-white/60 bg-white/5'
+                        u.role === 'ADMIN' ? 'text-[#FFED00] bg-[#FFED00]/10' : 'text-white/60 bg-white/5'
                       }`}
                     >
                       {u.role}

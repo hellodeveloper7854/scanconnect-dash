@@ -42,7 +42,7 @@ export const BlogListPage: React.FC = () => {
                     {post.title}
                   </h2>
                   <p className="text-sm text-neutral-500 line-clamp-2">{post.excerpt}</p>
-                  <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4">
+                  <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-[#FFED00] decoration-2 underline-offset-4">
                     Read article
                     <ArrowRight className="w-4 h-4" />
                   </span>

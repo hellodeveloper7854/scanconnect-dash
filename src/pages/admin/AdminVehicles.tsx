@@ -46,7 +46,7 @@ export const AdminVehicles: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search registration, QR code"
-            className="pl-9 pr-3 h-10 bg-white/10 border border-white/10 text-white text-sm rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="pl-9 pr-3 h-10 bg-white/10 border border-white/10 text-white text-sm rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
           />
         </div>
       </div>

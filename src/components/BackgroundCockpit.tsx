@@ -5,7 +5,7 @@ export const BackgroundCockpit: React.FC<{ children: React.ReactNode }> = ({ chi
   const cockpitBg = typeof cockpitBgAsset === 'string' ? cockpitBgAsset : '/src/assets/images/luxury_cockpit_bg_1785132622178.jpg';
 
   return (
-    <div className="relative min-h-screen w-full bg-neutral-950 text-white font-sans overflow-x-hidden selection:bg-amber-400 selection:text-black">
+    <div className="relative min-h-screen w-full bg-neutral-950 text-white font-sans overflow-x-hidden selection:bg-[#FFED00] selection:text-black">
       {/* Background Image Container */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <img

@@ -128,7 +128,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
       <div className="relative w-full max-w-md bg-neutral-900/90 border border-white/15 rounded-2xl p-6 sm:p-8 shadow-2xl overflow-hidden text-white">
 
         {/* Top Glow Accent */}
-        <div className="absolute top-0 inset-x-0 h-1 bg-amber-400 shadow-[0_0_10px_#f5b800]" />
+        <div className="absolute top-0 inset-x-0 h-1 bg-[#FFED00] shadow-[0_0_10px_#f5b800]" />
 
         {/* Close Button */}
         <button
@@ -142,7 +142,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
           <>
             {/* Modal Header - collect mobile number */}
             <div className="text-center space-y-2 mb-6 pt-2">
-              <div className="mx-auto w-12 h-12 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-2">
+              <div className="mx-auto w-12 h-12 rounded-xl bg-[#FFED00]/20 border border-[#FFED00]/40 flex items-center justify-center text-[#FFED00] mb-2">
                 <Phone className="w-6 h-6" />
               </div>
               <h3 className="text-2xl font-black text-white tracking-tight uppercase">Link Your Mobile</h3>
@@ -157,7 +157,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+91 98765 43210"
-                className="w-full h-14 px-4 text-center text-base font-bold bg-neutral-200 text-neutral-950 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all"
+                className="w-full h-14 px-4 text-center text-base font-bold bg-neutral-200 text-neutral-950 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFED00] transition-all"
               />
 
               <div id={RECAPTCHA_CONTAINER_ID} />
@@ -167,7 +167,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
               <button
                 onClick={sendOtp}
                 disabled={isSending}
-                className="w-full py-3.5 px-4 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs sm:text-sm uppercase tracking-widest rounded-lg shadow-lg shadow-amber-400/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 px-4 bg-[#FFED00] hover:bg-[#e0ac00] text-neutral-950 font-black text-xs sm:text-sm uppercase tracking-widest rounded-lg shadow-lg shadow-[#FFED00]/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isSending ? (
                   <span>SENDING CODE...</span>
@@ -191,13 +191,13 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
           <>
             {/* Modal Header - verify OTP */}
             <div className="text-center space-y-2 mb-6 pt-2">
-              <div className="mx-auto w-12 h-12 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-2">
+              <div className="mx-auto w-12 h-12 rounded-xl bg-[#FFED00]/20 border border-[#FFED00]/40 flex items-center justify-center text-[#FFED00] mb-2">
                 <Smartphone className="w-6 h-6" />
               </div>
               <h3 className="text-2xl font-black text-white tracking-tight uppercase">ENTER OTP CODE</h3>
               <p className="text-neutral-400 text-xs">
                 We sent a 6-digit verification code to{' '}
-                <span className="text-amber-400 font-mono font-bold">{phone}</span>
+                <span className="text-[#FFED00] font-mono font-bold">{phone}</span>
               </p>
             </div>
 
@@ -213,7 +213,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
                     ref={(el) => (inputRefs.current[index] = el)}
                     onChange={(e) => handleChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
-                    className="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold font-mono bg-neutral-200 text-neutral-950 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all"
+                    className="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold font-mono bg-neutral-200 text-neutral-950 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFED00] transition-all"
                   />
                 ))}
               </div>
@@ -224,7 +224,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
               <button
                 onClick={handleVerify}
                 disabled={isVerifying}
-                className="w-full py-3.5 px-4 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs sm:text-sm uppercase tracking-widest rounded-lg shadow-lg shadow-amber-400/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 px-4 bg-[#FFED00] hover:bg-[#e0ac00] text-neutral-950 font-black text-xs sm:text-sm uppercase tracking-widest rounded-lg shadow-lg shadow-[#FFED00]/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isVerifying ? (
                   <span>VERIFYING CODE...</span>
@@ -240,12 +240,12 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
               <div className="flex items-center justify-between text-xs text-neutral-400 pt-3 border-t border-white/10">
                 <span>Didn&apos;t receive code?</span>
                 {timer > 0 ? (
-                  <span className="font-mono text-amber-400 font-bold">Resend in {timer}s</span>
+                  <span className="font-mono text-[#FFED00] font-bold">Resend in {timer}s</span>
                 ) : (
                   <button
                     onClick={sendOtp}
                     disabled={isSending}
-                    className="flex items-center gap-1 text-amber-400 font-bold hover:underline cursor-pointer"
+                    className="flex items-center gap-1 text-[#FFED00] font-bold hover:underline cursor-pointer"
                   >
                     <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
                   </button>

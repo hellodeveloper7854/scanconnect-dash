@@ -58,7 +58,7 @@ export const AdminReviews: React.FC = () => {
                         <Star
                           key={star}
                           className={`w-4 h-4 ${
-                            star <= review.rating ? 'fill-amber-400 text-amber-400' : 'fill-white/10 text-white/10'
+                            star <= review.rating ? 'fill-[#FFED00] text-[#FFED00]' : 'fill-white/10 text-white/10'
                           }`}
                         />
                       ))}

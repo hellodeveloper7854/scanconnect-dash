@@ -14,7 +14,7 @@ const StatCard: React.FC<{ label: string; value: string; icon: React.ElementType
   <div className="bg-white/5 border border-white/10 rounded-xl p-6">
     <div className="flex items-center justify-between mb-3">
       <span className="text-xs font-bold uppercase tracking-wide text-white/50">{label}</span>
-      <Icon className="w-5 h-5 text-amber-400" />
+      <Icon className="w-5 h-5 text-[#FFED00]" />
     </div>
     <div className="text-3xl font-black text-white">{value}</div>
   </div>

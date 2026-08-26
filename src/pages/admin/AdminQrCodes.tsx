@@ -310,7 +310,7 @@ export const AdminQrCodes: React.FC = () => {
                 key={l}
                 onClick={() => setStickerLang(l)}
                 className={`h-10 px-4 text-xs font-bold uppercase cursor-pointer ${
-                  stickerLang === l ? 'bg-amber-400 text-neutral-950' : 'bg-white/10 text-white/70 hover:bg-white/15'
+                  stickerLang === l ? 'bg-[#FFED00] text-neutral-950' : 'bg-white/10 text-white/70 hover:bg-white/15'
                 }`}
               >
                 {l === 'en' ? 'English' : 'हिन्दी'}
@@ -326,7 +326,7 @@ export const AdminQrCodes: React.FC = () => {
                 key={s}
                 onClick={() => setStickerSize(s)}
                 className={`h-10 px-4 text-xs font-bold uppercase cursor-pointer ${
-                  stickerSize === s ? 'bg-amber-400 text-neutral-950' : 'bg-white/10 text-white/70 hover:bg-white/15'
+                  stickerSize === s ? 'bg-[#FFED00] text-neutral-950' : 'bg-white/10 text-white/70 hover:bg-white/15'
                 }`}
               >
                 {s === 'bike' ? 'Bike (4×2.5in)' : 'Car (8×5in)'}
@@ -345,7 +345,7 @@ export const AdminQrCodes: React.FC = () => {
             value={batchName}
             onChange={(e) => setBatchName(e.target.value)}
             placeholder="e.g. Mall Parking Lot A"
-            className="w-56 h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="w-56 h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
           />
         </div>
         <div className="space-y-1">
@@ -356,13 +356,13 @@ export const AdminQrCodes: React.FC = () => {
             max={5000}
             value={quantity}
             onChange={(e) => setQuantity(Math.max(1, Math.min(5000, Number(e.target.value) || 1)))}
-            className="w-32 h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="w-32 h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
           />
         </div>
         <button
           onClick={handleGenerate}
           disabled={isGenerating}
-          className="h-10 px-5 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs uppercase tracking-wide rounded-md disabled:opacity-60 cursor-pointer"
+          className="h-10 px-5 bg-[#FFED00] hover:bg-[#e0ac00] text-neutral-950 font-black text-xs uppercase tracking-wide rounded-md disabled:opacity-60 cursor-pointer"
         >
           {isGenerating ? 'Generating...' : 'Generate Batch'}
         </button>
@@ -379,7 +379,7 @@ export const AdminQrCodes: React.FC = () => {
               value={nameFilter}
               onChange={(e) => setNameFilter(e.target.value)}
               placeholder="Search batch name"
-              className="pl-9 pr-3 h-10 bg-white/10 border border-white/10 text-white text-sm rounded-md w-56 focus:outline-none focus:ring-2 focus:ring-amber-400"
+              className="pl-9 pr-3 h-10 bg-white/10 border border-white/10 text-white text-sm rounded-md w-56 focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
             />
           </div>
         </div>
@@ -437,7 +437,7 @@ export const AdminQrCodes: React.FC = () => {
         <button
           onClick={handleDownloadZip}
           disabled={isDownloadingZip || total === 0}
-          className="inline-flex items-center gap-1.5 h-10 px-4 bg-amber-400/15 hover:bg-amber-400/25 text-amber-400 text-xs font-bold rounded-md cursor-pointer disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 h-10 px-4 bg-[#FFED00]/15 hover:bg-[#FFED00]/25 text-[#FFED00] text-xs font-bold rounded-md cursor-pointer disabled:opacity-50"
           title="Download every QR code matching the current filters as a ZIP of PNGs"
         >
           <FileArchive className="w-3.5 h-3.5" /> {isDownloadingZip ? 'Zipping...' : `Download ZIP (${total})`}
@@ -536,7 +536,7 @@ export const AdminQrCodes: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => downloadBrandedQrPng(c.id, c.code)}
-                      className="p-1.5 text-white/50 hover:text-amber-400 cursor-pointer inline-block"
+                      className="p-1.5 text-white/50 hover:text-[#FFED00] cursor-pointer inline-block"
                       title="Download PNG"
                     >
                       <Download className="w-4 h-4" />
@@ -735,7 +735,7 @@ export const AdminQrCodes: React.FC = () => {
                 <button
                   onClick={() => window.print()}
                   disabled={!printCodes || readyTileCount < printCodes.length}
-                  className="px-4 py-2 bg-amber-400 text-neutral-950 font-bold text-xs rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-[#FFED00] text-neutral-950 font-bold text-xs rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Print
                 </button>

@@ -1111,7 +1111,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               </h2>
               <a
                 href="/blog"
-                className="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4"
+                className="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-[#FFED00] decoration-2 underline-offset-4"
               >
                 View more
                 <ArrowRight className="w-4 h-4" />
@@ -1134,7 +1134,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                       {post.title}
                     </h3>
                     <p className="text-sm text-neutral-500 line-clamp-2">{post.excerpt}</p>
-                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4">
+                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-[#FFED00] decoration-2 underline-offset-4">
                       Read article
                       <ArrowRight className="w-4 h-4" />
                     </span>
@@ -1145,7 +1145,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
             <a
               href="/blog"
-              className="sm:hidden inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-amber-400 decoration-2 underline-offset-4"
+              className="sm:hidden inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-[#FFED00] decoration-2 underline-offset-4"
             >
               View more
               <ArrowRight className="w-4 h-4" />
@@ -1276,7 +1276,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
                   <button
                     onClick={handleSimulateScan}
-                    className="mt-4 px-5 py-2.5 bg-[#FFED00] text-neutral-950 rounded-xl font-extrabold text-xs uppercase tracking-wider hover:bg-amber-400 cursor-pointer shadow-lg transition-transform active:scale-95 flex items-center gap-2"
+                    className="mt-4 px-5 py-2.5 bg-[#FFED00] text-neutral-950 rounded-xl font-extrabold text-xs uppercase tracking-wider hover:bg-[#FFED00] cursor-pointer shadow-lg transition-transform active:scale-95 flex items-center gap-2"
                   >
                     <Sparkles className="w-4 h-4" /> Simulate QR Tag Detect
                   </button>
@@ -1296,7 +1296,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     />
                     <button
                       onClick={handleSimulateScan}
-                      className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-bold text-xs rounded-xl cursor-pointer"
+                      className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-[#FFED00] font-bold text-xs rounded-xl cursor-pointer"
                     >
                       Connect
                     </button>
@@ -1325,7 +1325,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 <div className="bg-neutral-950 p-4 rounded-2xl border border-neutral-800 space-y-3 text-left">
                   <div className="flex items-center justify-between text-xs text-neutral-300">
                     <span className="font-bold">Contact Channel:</span>
-                    <span className="text-amber-400 font-mono">Private Proxy Bridge</span>
+                    <span className="text-[#FFED00] font-mono">Private Proxy Bridge</span>
                   </div>
                   <div className="flex items-center justify-between text-xs text-neutral-300">
                     <span className="font-bold">Your Number Exposed:</span>
@@ -1336,7 +1336,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <button
                     onClick={() => alert('📞 Initiating Privacy-Masked Voice Call to Vehicle Owner...')}
-                    className="py-3 bg-amber-400 text-neutral-950 font-black text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 cursor-pointer hover:bg-amber-300"
+                    className="py-3 bg-[#FFED00] text-neutral-950 font-black text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 cursor-pointer hover:bg-[#e0ac00]"
                   >
                     <PhoneCall className="w-4 h-4" /> Masked Call
                   </button>
@@ -1393,7 +1393,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                         alert(`Searching live location database for ${svc.title}...`);
                         setSelectedService(null);
                       }}
-                      className="flex-1 py-3 bg-[#FFED00] hover:bg-amber-400 text-neutral-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-md cursor-pointer"
+                      className="flex-1 py-3 bg-[#FFED00] hover:bg-[#FFED00] text-neutral-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-md cursor-pointer"
                     >
                       SEARCH NEARBY
                     </button>

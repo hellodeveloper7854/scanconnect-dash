@@ -24,15 +24,15 @@ export const Navbar: React.FC<NavbarProps> = ({ activeScreen, onSelectScreen }) 
           onClick={() => onSelectScreen('register')}
           className="flex items-center gap-2.5 cursor-pointer group"
         >
-          <div className="w-9 h-9 rounded-lg bg-amber-400 text-neutral-950 flex items-center justify-center font-black text-lg shadow-[0_0_15px_rgba(245,184,0,0.4)] group-hover:scale-105 transition-transform">
+          <div className="w-9 h-9 rounded-lg bg-[#FFED00] text-neutral-950 flex items-center justify-center font-black text-lg shadow-[0_0_15px_rgba(245,184,0,0.4)] group-hover:scale-105 transition-transform">
             SC
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="font-extrabold text-lg tracking-wider text-white uppercase font-mono">
-                SCAN<span className="text-amber-400">CONNECT</span>
+                SCAN<span className="text-[#FFED00]">CONNECT</span>
               </span>
-              <span className="bg-amber-400/20 text-amber-300 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase tracking-widest">
+              <span className="bg-[#FFED00]/20 text-[#e0ac00] text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#FFED00]/40 uppercase tracking-widest">
                 PRO
               </span>
             </div>
@@ -52,7 +52,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeScreen, onSelectScreen }) 
                 onClick={() => onSelectScreen(item.id)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all whitespace-nowrap cursor-pointer ${
                   isActive
-                    ? 'bg-amber-400 text-neutral-950 shadow-[0_0_12px_rgba(245,184,0,0.3)] font-bold'
+                    ? 'bg-[#FFED00] text-neutral-950 shadow-[0_0_12px_rgba(245,184,0,0.3)] font-bold'
                     : 'text-neutral-300 hover:text-white hover:bg-white/5'
                 }`}
               >

@@ -12,7 +12,7 @@ interface PaymentRow {
 }
 
 const statusColor: Record<PaymentRow['status'], string> = {
-  PENDING: 'text-amber-400 bg-amber-400/10',
+  PENDING: 'text-[#FFED00] bg-[#FFED00]/10',
   PAID: 'text-emerald-400 bg-emerald-400/10',
   FAILED: 'text-rose-400 bg-rose-400/10',
   CANCELLED: 'text-white/50 bg-white/5',
@@ -65,7 +65,7 @@ export const AdminPayments: React.FC = () => {
           <div className="bg-white/5 border border-white/10 rounded-xl p-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold uppercase tracking-wide text-white/50">Total Revenue</span>
-              <IndianRupee className="w-4 h-4 text-amber-400" />
+              <IndianRupee className="w-4 h-4 text-[#FFED00]" />
             </div>
             <div className="text-2xl font-black text-white">{formatMoney(summary.totalRevenueInPaise)}</div>
           </div>

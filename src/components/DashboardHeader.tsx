@@ -61,7 +61,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#EFCE1F] text-white shadow-md">
+    <header className="sticky top-0 z-50 bg-[#FFED00] text-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           
@@ -119,7 +119,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             >
               <Bell className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
               {notificationsCount > 0 && (
-                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 border-2 border-[#EFCE1F] rounded-full" />
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 border-2 border-[#FFED00] rounded-full" />
               )}
             </button>
 
@@ -212,9 +212,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               <button
                 onClick={() => handleNav('Profile')}
                 title="Login or Register Account"
-                className="hidden md:inline-flex px-3.5 py-1.5 sm:px-4 sm:py-2 bg-neutral-950 hover:bg-neutral-800 text-amber-400 font-extrabold text-xs sm:text-sm rounded-full shadow-md transition-all cursor-pointer items-center gap-1.5 border border-amber-400/30"
+                className="hidden md:inline-flex px-3.5 py-1.5 sm:px-4 sm:py-2 bg-neutral-950 hover:bg-neutral-800 text-[#FFED00] font-extrabold text-xs sm:text-sm rounded-full shadow-md transition-all cursor-pointer items-center gap-1.5 border border-[#FFED00]/30"
               >
-                <User className="w-3.5 h-3.5 text-amber-400" />
+                <User className="w-3.5 h-3.5 text-[#FFED00]" />
                 <span>Login / Register</span>
               </button>
             )}
@@ -233,7 +233,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#EFCE1F] border-t border-black/10 px-4 pt-2 pb-4 space-y-2 font-['Rubik',sans-serif] font-bold text-[#1B1C1C]">
+        <div className="md:hidden bg-[#FFED00] border-t border-black/10 px-4 pt-2 pb-4 space-y-2 font-['Rubik',sans-serif] font-bold text-[#1B1C1C]">
           {navItems.map((item) => {
             const isActive = activeNav === item;
             return (
@@ -307,7 +307,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             ) : (
               <button
                 onClick={() => handleNav('Profile')}
-                className="block w-full text-left py-2 px-3 rounded-lg bg-neutral-950 text-amber-400 font-extrabold hover:bg-neutral-900"
+                className="block w-full text-left py-2 px-3 rounded-lg bg-neutral-950 text-[#FFED00] font-extrabold hover:bg-neutral-900"
               >
                 Login / Register
               </button>

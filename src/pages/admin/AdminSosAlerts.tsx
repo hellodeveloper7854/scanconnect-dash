@@ -80,7 +80,7 @@ export const AdminSosAlerts: React.FC = () => {
                         href={`https://www.google.com/maps?q=${alert.latitude},${alert.longitude}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-amber-400 hover:underline"
+                        className="inline-flex items-center gap-1 text-[#FFED00] hover:underline"
                       >
                         <MapPin className="w-3.5 h-3.5" />
                         View on map
@@ -105,7 +105,7 @@ export const AdminSosAlerts: React.FC = () => {
                     {alert.status === 'ACTIVE' && (
                       <button
                         onClick={() => resolveAlert(alert.id)}
-                        className="text-xs font-bold text-amber-400 hover:underline cursor-pointer"
+                        className="text-xs font-bold text-[#FFED00] hover:underline cursor-pointer"
                       >
                         Mark Resolved
                       </button>

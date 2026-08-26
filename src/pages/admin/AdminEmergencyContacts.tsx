@@ -57,7 +57,7 @@ export const AdminEmergencyContacts: React.FC = () => {
                   <td className="px-4 py-3 text-white/70 font-mono">{c.phone}</td>
                   <td className="px-4 py-3">
                     {c.isPrimary && (
-                      <span className="text-xs font-bold uppercase px-2 py-1 rounded text-amber-400 bg-amber-400/10">
+                      <span className="text-xs font-bold uppercase px-2 py-1 rounded text-[#FFED00] bg-[#FFED00]/10">
                         Primary
                       </span>
                     )}

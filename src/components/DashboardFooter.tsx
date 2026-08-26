@@ -8,7 +8,7 @@ export const DashboardFooter: React.FC = () => {
 
   return (
     <>
-    <footer className="relative bg-[#EFCE1F] text-[#1B1C1C] font-['Rubik',sans-serif] pt-20 pb-12 overflow-hidden">
+    <footer className="relative bg-[#FFED00] text-[#1B1C1C] font-['Rubik',sans-serif] pt-20 pb-12 overflow-hidden">
       {/* Top Slanted Diagonal Border */}
       <div
         className="absolute top-0 inset-x-0 h-16 bg-white pointer-events-none"

@@ -19,7 +19,7 @@ interface OrderRow {
 const STATUS_OPTIONS: OrderRow['status'][] = ['PENDING', 'PAID', 'FAILED', 'CANCELLED', 'REFUNDED'];
 
 const statusColor: Record<OrderRow['status'], string> = {
-  PENDING: 'text-amber-400 bg-amber-400/10',
+  PENDING: 'text-[#FFED00] bg-[#FFED00]/10',
   PAID: 'text-emerald-400 bg-emerald-400/10',
   FAILED: 'text-rose-400 bg-rose-400/10',
   CANCELLED: 'text-white/50 bg-white/5',
@@ -142,7 +142,7 @@ export const AdminOrders: React.FC = () => {
                     {order.qrToken ? (
                       <button
                         onClick={() => setPreviewToken(order.qrToken)}
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:underline cursor-pointer"
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FFED00] hover:underline cursor-pointer"
                       >
                         <QrCode className="w-3.5 h-3.5" />
                         View QR

@@ -35,15 +35,15 @@ export const AdminReports: React.FC = () => {
         {REPORTS.map((report) => (
           <div key={report.key} className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-400/10 flex items-center justify-center">
-                <FileSpreadsheet className="w-5 h-5 text-amber-400" />
+              <div className="w-10 h-10 rounded-lg bg-[#FFED00]/10 flex items-center justify-center">
+                <FileSpreadsheet className="w-5 h-5 text-[#FFED00]" />
               </div>
               <span className="font-bold text-white">{report.label}</span>
             </div>
             <button
               onClick={() => handleDownload(report)}
               disabled={downloading === report.key}
-              className="w-full flex items-center justify-center gap-2 h-10 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold text-sm rounded-md transition-colors cursor-pointer disabled:opacity-60"
+              className="w-full flex items-center justify-center gap-2 h-10 bg-[#FFED00] hover:bg-[#e0ac00] text-neutral-950 font-bold text-sm rounded-md transition-colors cursor-pointer disabled:opacity-60"
             >
               <Download className="w-4 h-4" />
               {downloading === report.key ? 'Downloading...' : 'Download CSV'}
