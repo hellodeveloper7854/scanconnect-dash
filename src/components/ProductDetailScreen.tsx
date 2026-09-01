@@ -200,7 +200,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
               </div>
               <span className="text-[#5F5E5E] font-normal">4.8/5 Rating</span>
               <span className="w-1 h-1 bg-[#CCC7AA] rounded-full mx-1 inline-block" />
-              <span className="text-[#676000] font-bold">950,000+ Tags Active</span>
+              <span className="text-[#676000] font-bold">120,000+ Tags Active</span>
             </div>
 
             {/* Heading 1 Title */}
