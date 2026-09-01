@@ -315,7 +315,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                   <div className="w-12 h-12 rounded-full bg-[#FFED00] flex items-center justify-center shrink-0">
                     <Icon className="w-6 h-6 text-[#1B1C1C]" />
                   </div>
-                  <span className="font-['Hanken_Grotesk'] font-semibold text-sm text-[#1B1C1C] leading-snug flex items-center min-h-[40px]">{label}</span>
+                  <span className="font-['Hanken_Grotesk'] font-semibold text-base text-[#1B1C1C] leading-snug flex items-center min-h-[40px]">{label}</span>
                 </div>
               ))}
             </div>
