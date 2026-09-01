@@ -255,9 +255,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   <span>SHOP</span>
                 </div>
 
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200 shadow-xs">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#B58500]" />
-                  <span className="font-mono text-xs font-bold tracking-wider text-[#B58500] uppercase">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400] shadow-xs">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                  <span className="font-mono text-xs font-bold tracking-wider text-[#1B1C1C] uppercase">
                     OFFICIAL STORE
                   </span>
                 </div>
@@ -350,9 +350,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         {/* 2. SCAN CONNECT TAG INTRO SECTION */}
         <section className="py-16 sm:py-20 bg-white border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-              <QrCode className="w-3.5 h-3.5 text-[#B58500]" />
-              <span className="font-mono text-xs font-semibold tracking-wider text-[#B58500] uppercase">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
+              <QrCode className="w-3.5 h-3.5 text-[#1B1C1C]" />
+              <span className="font-mono text-xs font-semibold tracking-wider text-[#1B1C1C] uppercase">
                 SCAN CONNECT TAG
               </span>
             </div>
@@ -388,9 +388,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
             {/* Section Header */}
             <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-4">
-              <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs">
-                <Package className="w-3.5 h-3.5 text-[#FFED00]" />
-                <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
+              <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-[#E6D400] bg-[#FFED00] shadow-xs">
+                <Package className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                <span className="font-mono text-xs font-semibold tracking-wider text-[#1B1C1C] uppercase">
                   CATALOGUE
                 </span>
               </div>
@@ -599,9 +599,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         <section className="py-16 sm:py-20 bg-white border-t border-neutral-100">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-                <Package className="w-3.5 h-3.5 text-[#B58500]" />
-                <span className="font-mono text-xs font-bold tracking-wider text-[#B58500] uppercase">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
+                <Package className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                <span className="font-mono text-xs font-bold tracking-wider text-[#1B1C1C] uppercase">
                   WHAT'S IN THE BOX
                 </span>
               </div>

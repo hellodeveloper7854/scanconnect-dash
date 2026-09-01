@@ -126,9 +126,9 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
               {/* Left Content Column */}
               <div className="lg:col-span-6 space-y-8">
                 {/* Privacy Guaranteed Badge */}
-                <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white">
-                  <ShieldCheck className="w-3.5 h-3.5 text-black" />
-                  <span className="font-sans font-normal text-xs uppercase tracking-[1px] text-black">
+                <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-[#E6D400] bg-[#FFED00]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                  <span className="font-sans font-normal text-xs uppercase tracking-[1px] text-[#1B1C1C]">
                     PRIVACY GUARANTEED
                   </span>
                 </div>
@@ -143,7 +143,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                   Need to notify a vehicle owner about wrong parking, headlights left on, an accident, or any emergency? Simply scan the Scan Connect QR Tag and reach them instantly&mdash;without revealing your phone number or accessing theirs.
                 </p>
 
-                <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#FFED00]">
+                <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#B58500]">
                   Fast &bull; Secure &bull; Privacy-First &bull; No App Required
                 </p>
 
