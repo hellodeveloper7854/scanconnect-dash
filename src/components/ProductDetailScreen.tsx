@@ -263,10 +263,10 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             <div className="pt-2">
               <button
                 onClick={handleBuyNow}
-                className="w-full h-[59px] bg-[#FFED00] hover:bg-[#e0ac00] text-white font-['Rubik'] font-semibold text-[18px] leading-[27px] rounded-[8px] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-all cursor-pointer flex items-center justify-center gap-[8px] active:scale-95"
+                className="w-full h-[59px] bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] font-['Rubik'] font-semibold text-[18px] leading-[27px] rounded-[8px] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-all cursor-pointer flex items-center justify-center gap-[8px] active:scale-95"
               >
                 <span>Buy Now</span>
-                <ArrowRight className="w-[16px] h-[16px] text-white" />
+                <ArrowRight className="w-[16px] h-[16px] text-[#1B1C1C]" />
               </button>
             </div>
 
@@ -315,8 +315,8 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
               <div className="space-y-[24px]">
                 {/* Item 1 */}
                 <div className="flex items-start gap-[16px]">
-                  <div className="w-[20px] h-[20px] text-[#FFED00] shrink-0 mt-[4px]">
-                    <Layers className="w-[18px] h-[19px] fill-[#FFED00] text-[#FFED00]" />
+                  <div className="w-[20px] h-[20px] text-[#1B1C1C] shrink-0 mt-[4px]">
+                    <Layers className="w-[18px] h-[19px] fill-[#1B1C1C] text-[#1B1C1C]" />
                   </div>
                   <div className="space-y-[4px]">
                     <h3 className="font-['Hanken_Grotesk'] font-bold text-[18px] leading-[29px] text-[#1B1C1C]">
@@ -330,8 +330,8 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
                 {/* Item 2 */}
                 <div className="flex items-start gap-[16px]">
-                  <div className="w-[20px] h-[20px] text-[#FFED00] shrink-0 mt-[4px]">
-                    <Thermometer className="w-[18px] h-[18px] fill-[#FFED00] text-[#FFED00]" />
+                  <div className="w-[20px] h-[20px] text-[#1B1C1C] shrink-0 mt-[4px]">
+                    <Thermometer className="w-[18px] h-[18px] fill-[#1B1C1C] text-[#1B1C1C]" />
                   </div>
                   <div className="space-y-[4px]">
                     <h3 className="font-['Hanken_Grotesk'] font-bold text-[18px] leading-[29px] text-[#1B1C1C]">
@@ -345,8 +345,8 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
                 {/* Item 3 */}
                 <div className="flex items-start gap-[16px]">
-                  <div className="w-[20px] h-[20px] text-[#FFED00] shrink-0 mt-[4px]">
-                    <Sparkles className="w-[18px] h-[18px] fill-[#FFED00] text-[#FFED00]" />
+                  <div className="w-[20px] h-[20px] text-[#1B1C1C] shrink-0 mt-[4px]">
+                    <Sparkles className="w-[18px] h-[18px] fill-[#1B1C1C] text-[#1B1C1C]" />
                   </div>
                   <div className="space-y-[4px]">
                     <h3 className="font-['Hanken_Grotesk'] font-bold text-[18px] leading-[29px] text-[#1B1C1C]">
@@ -448,8 +448,8 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
                 
                 {/* Card 1: Instant Setup */}
                 <div className="bg-[#FAFAFA] border border-[#CCC7AA] rounded-[12px] p-[32px] flex-1 flex flex-col items-center justify-center text-center space-y-[12px] shadow-xs">
-                  <div className="w-[24px] h-[40px] flex items-center justify-center text-[#FFED00]">
-                    <Zap className="w-[28px] h-[28px] fill-[#FFED00] text-[#FFED00]" />
+                  <div className="w-[24px] h-[40px] flex items-center justify-center text-[#1B1C1C]">
+                    <Zap className="w-[28px] h-[28px] fill-[#1B1C1C] text-[#1B1C1C]" />
                   </div>
                   <h4 className="font-['Rubik'] font-semibold text-[22px] sm:text-[24px] leading-[31px] text-[#1B1C1C]">
                     Instant Setup
@@ -461,8 +461,8 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
                 {/* Card 2: Smart Alerts */}
                 <div className="bg-[#FFFFFF] border border-[#CCC7AA] rounded-[12px] p-[32px] flex-1 flex flex-col items-center justify-center text-center space-y-[12px] shadow-xs">
-                  <div className="w-[40px] h-[32px] flex items-center justify-center text-[#FFED00]">
-                    <RefreshCw className="w-[28px] h-[28px] text-[#FFED00]" />
+                  <div className="w-[40px] h-[32px] flex items-center justify-center text-[#1B1C1C]">
+                    <RefreshCw className="w-[28px] h-[28px] text-[#1B1C1C]" />
                   </div>
                   <h4 className="font-['Rubik'] font-semibold text-[22px] sm:text-[24px] leading-[31px] text-[#1B1C1C]">
                     Smart Alerts
@@ -485,17 +485,17 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-[20px] font-['Hanken_Grotesk']">
                 <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
-                  <ShieldCheck className="w-[24px] h-[24px] text-[#FFED00]" />
+                  <ShieldCheck className="w-[24px] h-[24px] text-[#1B1C1C]" />
                   <h4 className="font-bold text-[16px] text-[#1B1C1C]">256-Bit Masking</h4>
                   <p className="text-[#5F5E5E] text-[14px]">Every call routed through intermediate proxy nodes so phone numbers stay 100% confidential.</p>
                 </div>
                 <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
-                  <Lock className="w-[24px] h-[24px] text-[#FFED00]" />
+                  <Lock className="w-[24px] h-[24px] text-[#1B1C1C]" />
                   <h4 className="font-bold text-[16px] text-[#1B1C1C]">Spam Protection</h4>
                   <p className="text-[#5F5E5E] text-[14px]">AI-powered filtering prevents nuisance calls and telemarketers from reaching your vehicle line.</p>
                 </div>
                 <div className="bg-white p-[20px] rounded-[12px] border border-[#E4E2E2] space-y-[8px]">
-                  <Zap className="w-[24px] h-[24px] text-[#FFED00]" />
+                  <Zap className="w-[24px] h-[24px] text-[#1B1C1C]" />
                   <h4 className="font-bold text-[16px] text-[#1B1C1C]">Instant Kill Switch</h4>
                   <p className="text-[#5F5E5E] text-[14px]">Temporarily disable calls or mute alerts anytime directly from your ScanConnect dashboard.</p>
                 </div>

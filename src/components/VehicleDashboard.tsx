@@ -458,8 +458,8 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
                 {whyChooseScenarios.map((item) => (
                   <div key={item} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-[#FFED00]/15 flex items-center justify-center shrink-0">
-                      <Check className="w-3.5 h-3.5 text-[#FFED00] stroke-[3]" />
+                    <div className="w-6 h-6 rounded-full bg-[#FFED00] flex items-center justify-center shrink-0">
+                      <Check className="w-3.5 h-3.5 text-[#1B1C1C] stroke-[3]" />
                     </div>
                     <span className="font-['Hanken_Grotesk'] font-medium text-base text-[#1B1C1C]">{item}</span>
                   </div>
@@ -669,7 +669,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {customerBenefits.map((benefit) => (
                 <div key={benefit} className="flex items-center gap-3 bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs">
-                  <Check className="w-4 h-4 text-[#FFED00] stroke-[3] shrink-0" />
+                  <Check className="w-4 h-4 text-[#1B1C1C] stroke-[3] shrink-0" />
                   <span className="font-['Hanken_Grotesk'] font-medium text-sm sm:text-base text-[#1B1C1C]">{benefit}</span>
                 </div>
               ))}
@@ -702,7 +702,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     className="bg-white border border-[#E5E7EB] rounded-2xl p-7 hover:shadow-lg transition-all flex flex-col justify-between space-y-5"
                   >
                     <div className="space-y-4">
-                      <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#FFED00]">
+                      <div className="w-14 h-14 rounded-full bg-[#FFED00] flex items-center justify-center text-[#1B1C1C]">
                         <IconComp className="w-6 h-6 stroke-[2.2]" />
                       </div>
                       <h3 className="font-['Plus_Jakarta_Sans'] font-semibold text-lg text-[#1B1C1C] leading-snug">
@@ -717,7 +717,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                         </span>
                         {ind.benefits.map((b) => (
                           <div key={b} className="flex items-center gap-2">
-                            <Check className="w-3.5 h-3.5 text-[#FFED00] stroke-[3] shrink-0" />
+                            <Check className="w-3.5 h-3.5 text-[#1B1C1C] stroke-[3] shrink-0" />
                             <span className="font-['Hanken_Grotesk'] text-[#1B1C1C] text-sm">{b}</span>
                           </div>
                         ))}
@@ -809,7 +809,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                                   className="h-full bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-xs hover:shadow-md hover:border-[#FFED00] transition-all flex flex-col items-center text-center group cursor-pointer"
                                 >
                                   <div className="flex-1 flex items-center justify-center">
-                                    <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#FFED00] group-hover:scale-110 transition-transform">
+                                    <div className="w-14 h-14 rounded-full bg-[#FFED00] flex items-center justify-center text-[#1B1C1C] group-hover:scale-110 transition-transform">
                                       <SvcIcon className="w-6 h-6 stroke-[2.2]" />
                                     </div>
                                   </div>
@@ -981,7 +981,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                       key={item.label}
                       className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#E5E7EB] rounded-full text-sm font-semibold text-[#1B1C1C]"
                     >
-                      <ItemIcon className="w-4 h-4 text-[#FFED00]" />
+                      <ItemIcon className="w-4 h-4 text-[#1B1C1C]" />
                       {item.label}
                     </span>
                   );
@@ -1027,7 +1027,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     }`}
                   >
                     <Check
-                      className={benefit.core ? 'w-4 h-4 text-white stroke-[3]' : 'w-4 h-4 text-[#FFED00] stroke-[3]'}
+                      className={benefit.core ? 'w-4 h-4 text-white stroke-[3]' : 'w-4 h-4 text-[#1B1C1C] stroke-[3]'}
                     />
                   </div>
                   <span
@@ -1377,7 +1377,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               const SvcIcon = svc.icon;
               return (
                 <>
-                  <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center text-[#FFED00]">
+                  <div className="w-14 h-14 rounded-full bg-[#FFED00] flex items-center justify-center text-[#1B1C1C]">
                     <SvcIcon className="w-6 h-6 stroke-[2.2]" />
                   </div>
                   <h3 className="text-2xl font-black text-neutral-900 tracking-tight">

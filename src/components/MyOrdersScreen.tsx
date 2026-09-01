@@ -77,7 +77,7 @@ export const MyOrdersScreen: React.FC<MyOrdersScreenProps> = ({ userData, onLogo
       <main className="flex-1 py-10 sm:py-14">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="space-y-2">
-            <h1 className="text-4xl sm:text-5xl font-black text-[#FFED00] tracking-[-0.4px]">My Orders</h1>
+            <h1 className="text-4xl sm:text-5xl font-black text-[#1B1C1C] tracking-[-0.4px]">My Orders</h1>
             <p className="text-[#5D5F5F] text-base sm:text-lg">Track everything you&apos;ve ordered from ScanConnect.</p>
           </div>
 

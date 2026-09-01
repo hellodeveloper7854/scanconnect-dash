@@ -282,7 +282,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     'Made in India',
                   ].map((line) => (
                     <div key={line} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-[#FFED00] stroke-[3] shrink-0" />
+                      <Check className="w-4 h-4 text-[#1B1C1C] stroke-[3] shrink-0" />
                       <span className="text-[#1B1C1C] text-sm sm:text-base font-medium">{line}</span>
                     </div>
                   ))}
@@ -417,8 +417,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   {/* Header — icon, badge, rating */}
                   <div className="p-6 pb-0 space-y-4">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/60 flex items-center justify-center ring-1 ring-amber-100 shrink-0 group-hover:scale-105 transition-transform">
-                        <ProductIcon className="w-6 h-6 text-[#FFED00]" />
+                      <div className="w-14 h-14 rounded-2xl bg-[#FFED00] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <ProductIcon className="w-6 h-6 text-[#1B1C1C]" />
                       </div>
                       {prod.badge && (
                         <span className="px-2.5 py-1 bg-[#FFED00] text-[#1B1C1C] font-bold rounded-full text-[10px] uppercase tracking-wider whitespace-nowrap shrink-0">
@@ -540,8 +540,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/60 flex items-center justify-center ring-1 ring-amber-100 shrink-0">
-                      <ProductIcon className="w-6 h-6 text-[#FFED00]" />
+                    <div className="w-14 h-14 rounded-2xl bg-[#FFED00] flex items-center justify-center shrink-0">
+                      <ProductIcon className="w-6 h-6 text-[#1B1C1C]" />
                     </div>
                     <h3 className="text-lg font-extrabold text-[#0F0F0F] leading-snug">
                       {prod.title}
@@ -582,7 +582,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {prod.features.map((f) => (
                         <div key={f} className="flex items-center gap-2">
-                          <Check className="w-3.5 h-3.5 text-[#FFED00] stroke-[3] shrink-0" />
+                          <Check className="w-3.5 h-3.5 text-[#1B1C1C] stroke-[3] shrink-0" />
                           <span className="text-[#1B1C1C] text-sm">{f}</span>
                         </div>
                       ))}

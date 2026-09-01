@@ -406,7 +406,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           
           {/* HEADER TITLE */}
           <div className="space-y-2">
-            <h1 className="text-4xl sm:text-5xl sm:leading-[48px] font-black text-[#FFED00] tracking-[-0.4px] font-sans">
+            <h1 className="text-4xl sm:text-5xl sm:leading-[48px] font-black text-[#1B1C1C] tracking-[-0.4px] font-sans">
               Profile
             </h1>
             <p className="text-[#5D5F5F] text-base sm:text-lg sm:leading-[26px] max-w-4xl font-normal">
@@ -573,7 +573,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       </div>
                       <span
                         className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                          profile?.mobileVerified ? 'bg-[#FFED00] text-white' : 'bg-[#DBDAD9] text-[#5D5F5F]'
+                          profile?.mobileVerified ? 'bg-[#FFED00] text-[#1B1C1C]' : 'bg-[#DBDAD9] text-[#5D5F5F]'
                         }`}
                       >
                         {profile?.mobileVerified ? 'Enabled' : 'Disabled'}
@@ -598,7 +598,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold text-[#1B1C1C]">This device</span>
-                          <span className="px-2 py-0.5 bg-[#FFED00] text-white font-bold text-[10px] tracking-wider rounded-full uppercase">
+                          <span className="px-2 py-0.5 bg-[#FFED00] text-[#1B1C1C] font-bold text-[10px] tracking-wider rounded-full uppercase">
                             CURRENT
                           </span>
                         </div>
@@ -656,7 +656,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                           <div className="flex justify-between items-start">
                             <span
                               className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-tight uppercase ${
-                                contact.isPrimary ? 'bg-[#FFED00] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'
+                                contact.isPrimary ? 'bg-[#FFED00] text-[#1B1C1C]' : 'bg-[#EFEDED] text-[#5D5F5F]'
                               }`}
                             >
                               {contact.isPrimary ? 'PRIMARY RESPONDER' : 'SECONDARY'}
@@ -772,7 +772,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                         <div className="flex justify-between items-start">
                           <span
                             className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-tight uppercase ${
-                              vehicle.isPrimary ? 'bg-[#FFED00] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'
+                              vehicle.isPrimary ? 'bg-[#FFED00] text-[#1B1C1C]' : 'bg-[#EFEDED] text-[#5D5F5F]'
                             }`}
                           >
                             {vehicle.isPrimary ? 'PRIMARY VEHICLE' : vehicle.vehicleType || 'VEHICLE'}

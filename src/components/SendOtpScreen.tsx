@@ -133,9 +133,9 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
 
           {/* Header */}
           <div className="text-center mb-8 space-y-2">
-            <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-neutral-200 bg-white shadow-xs mb-2">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#FFED00]" />
-              <span className="font-mono text-xs font-semibold tracking-wider text-[#0F0F0F] uppercase">
+            <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-[#E6D400] bg-[#FFED00] shadow-xs mb-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#1B1C1C]" />
+              <span className="font-mono text-xs font-semibold tracking-wider text-[#1B1C1C] uppercase">
                 Verify Identity
               </span>
             </div>

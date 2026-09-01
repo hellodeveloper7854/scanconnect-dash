@@ -579,7 +579,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                   )}
                   <button
                     onClick={handleContinueToPayment}
-                    className="w-full sm:w-[232.2px] h-[56px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-[8px] flex items-center justify-center font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#FFFFFF] shadow-xs transition-colors cursor-pointer active:scale-95"
+                    className="w-full sm:w-[232.2px] h-[56px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-[8px] flex items-center justify-center font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95"
                   >
                     Continue to Payment
                   </button>
@@ -609,7 +609,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     <p className="font-['Hanken_Grotesk'] font-normal text-[14px] leading-[20px] text-[#5F5E5E]">
                       Premium Protection Plan x1
                     </p>
-                    <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#FFED00] block">
+                    <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#B58500] block">
                       {productPrice}
                     </span>
                   </div>
@@ -630,7 +630,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     <span className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
                       Shipping
                     </span>
-                    <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#FFED00]">
+                    <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#B58500]">
                       FREE
                     </span>
                   </div>
@@ -647,8 +647,8 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 </div>
 
                 {/* Overlay Alert Box */}
-                <div className="bg-[rgba(255,239,0,0.1)] border border-[rgba(103,96,0,0.2)] rounded-[8px] p-[16px] flex flex-row items-start gap-[12px]">
-                  <Info className="w-[20px] h-[20px] text-[#FFED00] shrink-0 mt-[2px]" />
+                <div className="bg-[#FFED00] border border-[#E6D400] rounded-[8px] p-[16px] flex flex-row items-start gap-[12px]">
+                  <Info className="w-[20px] h-[20px] text-[#1B1C1C] shrink-0 mt-[2px]" />
                   <p className="font-['Hanken_Grotesk'] font-normal text-[12px] leading-[20px] text-[#736B00]">
                     Your payment is protected by end-to-end encryption. By clicking complete, you agree to our Terms of Service and Refund Policy.
                   </p>
@@ -661,21 +661,21 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
             {/* TRUST INDICATORS SECTION */}
             <div className="flex flex-wrap items-center justify-center gap-[32px] opacity-70 pt-[16px]">
               <div className="flex items-center gap-[8px]">
-                <Lock className="w-[16px] h-[20px] text-[#FFED00]" />
+                <Lock className="w-[16px] h-[20px] text-[#1B1C1C]" />
                 <span className="font-['Hanken_Grotesk'] font-normal text-[12px] leading-[16px] text-[#1B1C1C]">
                   SSL SECURED CHECKOUT
                 </span>
               </div>
 
               <div className="flex items-center gap-[8px]">
-                <ShieldCheck className="w-[16px] h-[20px] text-[#FFED00]" />
+                <ShieldCheck className="w-[16px] h-[20px] text-[#1B1C1C]" />
                 <span className="font-['Hanken_Grotesk'] font-normal text-[12px] leading-[16px] text-[#1B1C1C]">
                   PCI DSS COMPLIANT
                 </span>
               </div>
 
               <div className="flex items-center gap-[8px]">
-                <Check className="w-[22px] h-[22px] text-[#FFED00]" />
+                <Check className="w-[22px] h-[22px] text-[#1B1C1C]" />
                 <span className="font-['Hanken_Grotesk'] font-normal text-[12px] leading-[16px] text-[#1B1C1C]">
                   MONEY BACK GUARANTEE
                 </span>
@@ -770,7 +770,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
           <div className="max-w-[600px] mx-auto space-y-8 animate-fade-in px-2 sm:px-4 pt-2">
             <div className="text-center space-y-2">
               <div className="w-16 h-16 rounded-full bg-[#FFED00] flex items-center justify-center mx-auto">
-                <Check className="w-8 h-8 text-white stroke-[3]" />
+                <Check className="w-8 h-8 text-[#1B1C1C] stroke-[3]" />
               </div>
               <h1 className="font-['Plus_Jakarta_Sans'] font-bold text-2xl sm:text-[28px] text-[#1B1C1C]">
                 Payment Successful
@@ -850,7 +850,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               <button
                 onClick={handleConfirmAssign}
                 disabled={isAssigning || !selectedVehicleId || !selectedContactId}
-                className="w-full h-[56px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-['Hanken_Grotesk'] font-bold text-base text-white shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+                className="w-full h-[56px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-['Hanken_Grotesk'] font-bold text-base text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {isAssigning ? 'Generating QR...' : 'Generate My QR Tag'}
                 {!isAssigning && <ArrowRight className="w-4 h-4" />}
@@ -960,7 +960,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       <button
                         type="submit"
                         disabled={isSavingVehicle}
-                        className="flex-1 py-2.5 bg-[#FFED00] hover:bg-[#e0ac00] text-white font-extrabold text-xs uppercase rounded-lg cursor-pointer disabled:opacity-60"
+                        className="flex-1 py-2.5 bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-xs uppercase rounded-lg cursor-pointer disabled:opacity-60"
                       >
                         {isSavingVehicle ? 'Saving...' : 'Save Vehicle'}
                       </button>
@@ -1035,7 +1035,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       <button
                         type="submit"
                         disabled={isSavingContact}
-                        className="flex-1 py-2.5 bg-[#FFED00] hover:bg-[#e0ac00] text-white font-extrabold text-xs uppercase rounded-lg cursor-pointer disabled:opacity-60"
+                        className="flex-1 py-2.5 bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] font-extrabold text-xs uppercase rounded-lg cursor-pointer disabled:opacity-60"
                       >
                         {isSavingContact ? 'Saving...' : 'Save Contact'}
                       </button>
@@ -1055,7 +1055,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
             <div className="flex flex-col items-center text-center gap-[16px] w-full">
               {/* Background badge icon with orbit ring */}
               <div className="relative w-[96px] h-[88px] sm:w-[96px] sm:h-[96px] bg-[#FFED00] rounded-full flex items-center justify-center shrink-0">
-                <Check className="w-[40px] h-[40px] text-white stroke-[3]" />
+                <Check className="w-[40px] h-[40px] text-[#1B1C1C] stroke-[3]" />
                 <div className="absolute inset-0 border-2 border-[#FFED00] opacity-20 rounded-full scale-105 pointer-events-none" />
               </div>
 
@@ -1253,7 +1253,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
             <div className="flex flex-col sm:flex-row items-center gap-[16px] pb-[32px]">
               <button
                 onClick={() => onNavigate('dashboard')}
-                className="w-full sm:w-[302px] flex-1 h-[60px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-[8px] flex items-center justify-center gap-[8px] font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#FFFFFF] shadow-xs transition-colors cursor-pointer active:scale-95"
+                className="w-full sm:w-[302px] flex-1 h-[60px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-[8px] flex items-center justify-center gap-[8px] font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95"
               >
                 <span>View Dashboard</span>
                 <LayoutDashboard className="w-[18px] h-[18px] text-white" />

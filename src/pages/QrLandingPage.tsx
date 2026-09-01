@@ -149,7 +149,7 @@ const LoginGate: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-white shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+          className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
         >
           {isSubmitting ? 'Please wait...' : mode === 'login' ? 'Log In' : 'Register'}
         </button>
@@ -214,7 +214,7 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="text-center space-y-1">
-            <Car className="w-8 h-8 text-[#FFED00] mx-auto" />
+            <Car className="w-8 h-8 text-[#1B1C1C] mx-auto" />
             <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Verify Vehicle</h1>
             <p className="text-sm text-[#5F5E5E]">
               Enter the last 4 digits of the vehicle&apos;s registration number to place this call.
@@ -248,7 +248,7 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
             <button
               type="submit"
               disabled={isSubmitting || last4.length !== 4}
-              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-white shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
+              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
             >
               {isSubmitting ? 'Checking...' : 'Call'}
             </button>
@@ -399,7 +399,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
           <React.Fragment key={n}>
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                step === n ? 'bg-[#FFED00] text-white' : step > n ? 'bg-[#FFED00]/30 text-[#736B00]' : 'bg-[#E9E8E7] text-[#6B7280]'
+                step === n ? 'bg-[#FFED00] text-[#1B1C1C]' : step > n ? 'bg-[#FFED00]/30 text-[#736B00]' : 'bg-[#E9E8E7] text-[#6B7280]'
               }`}
             >
               {step > n ? <Check className="w-4 h-4" /> : n}
@@ -447,7 +447,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
           <button
             onClick={() => setStep(2)}
             disabled={!step1Valid}
-            className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-white transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+            className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
           >
             Next <ArrowRight className="w-4 h-4" />
           </button>
@@ -559,7 +559,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 <button
                   type="button"
                   onClick={handleAddContact}
-                  className="flex-1 py-2 bg-[#FFED00] text-white font-bold text-xs rounded-lg cursor-pointer"
+                  className="flex-1 py-2 bg-[#FFED00] text-[#1B1C1C] font-bold text-xs rounded-lg cursor-pointer"
                 >
                   Add
                 </button>
@@ -577,7 +577,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             <button
               onClick={() => setStep(3)}
               disabled={!step2Valid}
-              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-white transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
             >
               Next <ArrowRight className="w-4 h-4" />
             </button>
@@ -597,14 +597,14 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
               <button
                 type="button"
                 onClick={() => setUseNewVehicle(false)}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold cursor-pointer ${!useNewVehicle ? 'bg-[#FFED00] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'}`}
+                className={`flex-1 py-2 rounded-lg text-xs font-bold cursor-pointer ${!useNewVehicle ? 'bg-[#FFED00] text-[#1B1C1C]' : 'bg-[#EFEDED] text-[#5D5F5F]'}`}
               >
                 Use Existing
               </button>
               <button
                 type="button"
                 onClick={() => setUseNewVehicle(true)}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold cursor-pointer ${useNewVehicle ? 'bg-[#FFED00] text-white' : 'bg-[#EFEDED] text-[#5D5F5F]'}`}
+                className={`flex-1 py-2 rounded-lg text-xs font-bold cursor-pointer ${useNewVehicle ? 'bg-[#FFED00] text-[#1B1C1C]' : 'bg-[#EFEDED] text-[#5D5F5F]'}`}
               >
                 Add New
               </button>
@@ -689,7 +689,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             <button
               onClick={handleFinish}
               disabled={!step3Valid || isSubmitting}
-              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-white transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {isSubmitting ? 'Activating...' : 'Activate Tag'}
             </button>
@@ -787,7 +787,7 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
       <CardShell>
         <div className="text-center space-y-4">
           <div className="w-14 h-14 rounded-full bg-[#FFED00] flex items-center justify-center mx-auto">
-            <QrCodeIcon className="w-7 h-7 text-white" />
+            <QrCodeIcon className="w-7 h-7 text-[#1B1C1C]" />
           </div>
           <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Activate This QR Tag?</h1>
           <p className="text-sm text-[#5F5E5E]">
@@ -796,7 +796,7 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
           </p>
           <button
             onClick={() => setStage(isLoggedIn ? 'wizard' : 'login-gate')}
-            className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-white shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+            className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
           >
             Yes, Activate <ArrowRight className="w-4 h-4" />
           </button>

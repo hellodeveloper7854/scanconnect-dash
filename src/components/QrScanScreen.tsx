@@ -151,9 +151,9 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                 <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-4 pt-2">
                   <button
                     onClick={() => setIsQrScannerOpen(true)}
-                    className="btn-shimmer sm:hidden w-full h-[58px] px-8 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-white font-bold text-base rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm active:scale-95"
+                    className="btn-shimmer sm:hidden w-full h-[58px] px-8 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-base rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm active:scale-95"
                   >
-                    <QrCode className="w-5 h-5 text-white" />
+                    <QrCode className="w-5 h-5 text-[#1B1C1C]" />
                     <span>Scan a QR Tag</span>
                   </button>
 
@@ -211,7 +211,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                   desc: 'Use your smartphone camera to scan the Scan Connect QR Tag displayed on the vehicle. No app downloads, registrations, or complicated setup required.',
                   extra: (
                     <div className="flex items-center gap-2 pt-3">
-                      <Check className="w-4 h-4 text-[#FFED00] stroke-[3]" />
+                      <Check className="w-4 h-4 text-[#1B1C1C] stroke-[3]" />
                       <span className="text-sm font-semibold text-[#1B1C1C]">Works with any smartphone</span>
                     </div>
                   ),
@@ -286,7 +286,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {trustPoints.map((point) => (
                 <div key={point} className="flex items-center gap-3 bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs">
-                  <Check className="w-4 h-4 text-[#FFED00] stroke-[3] shrink-0" />
+                  <Check className="w-4 h-4 text-[#1B1C1C] stroke-[3] shrink-0" />
                   <span className="font-['Hanken_Grotesk'] font-medium text-sm sm:text-base text-[#1B1C1C]">{point}</span>
                 </div>
               ))}
@@ -312,7 +312,9 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                   key={label}
                   className="h-full bg-white border border-[#E5E7EB] rounded-xl p-6 flex flex-col items-center justify-center text-center gap-3 shadow-xs hover:shadow-md hover:border-[#FFED00] transition-all"
                 >
-                  <Icon className="w-7 h-7 text-[#FFED00] shrink-0" />
+                  <div className="w-12 h-12 rounded-full bg-[#FFED00] flex items-center justify-center shrink-0">
+                    <Icon className="w-6 h-6 text-[#1B1C1C]" />
+                  </div>
                   <span className="font-['Hanken_Grotesk'] font-semibold text-sm text-[#1B1C1C] leading-snug flex items-center min-h-[40px]">{label}</span>
                 </div>
               ))}
