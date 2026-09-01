@@ -51,7 +51,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   product
 }) => {
   const [activeNav, setActiveNav] = useState('Shop');
-  const [activeTab, setActiveTab] = useState<'how' | 'security' | 'reviews'>('how');
+  const [activeTab, setActiveTab] = useState<'how' | 'security' | 'reviews'>('reviews');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const reviewsTrackRef = React.useRef<HTMLDivElement>(null);
 
@@ -371,6 +371,17 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
           {/* Sticky Tab Navigation Header */}
           <div className="border-b border-[#E4E2E2] flex items-center gap-[16px] sm:gap-[32px] mb-[32px] overflow-x-auto">
             <button
+              onClick={() => setActiveTab('reviews')}
+              className={`pb-[16px] px-[8px] cursor-pointer transition-colors relative whitespace-nowrap font-['Hanken_Grotesk'] font-bold text-[18px] sm:text-[20px] leading-[24px] ${
+                activeTab === 'reviews'
+                  ? 'text-[#676000] border-b-2 border-[#676000]'
+                  : 'text-[#5F5E5E] hover:text-[#1B1C1C]'
+              }`}
+            >
+              Customer Reviews
+            </button>
+
+            <button
               onClick={() => setActiveTab('how')}
               className={`pb-[16px] px-[8px] cursor-pointer transition-colors relative whitespace-nowrap font-['Hanken_Grotesk'] font-bold text-[18px] sm:text-[20px] leading-[24px] ${
                 activeTab === 'how'
@@ -390,17 +401,6 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
               }`}
             >
               Security Features
-            </button>
-
-            <button
-              onClick={() => setActiveTab('reviews')}
-              className={`pb-[16px] px-[8px] cursor-pointer transition-colors relative whitespace-nowrap font-['Hanken_Grotesk'] font-bold text-[18px] sm:text-[20px] leading-[24px] ${
-                activeTab === 'reviews'
-                  ? 'text-[#676000] border-b-2 border-[#676000]'
-                  : 'text-[#5F5E5E] hover:text-[#1B1C1C]'
-              }`}
-            >
-              Customer Reviews
             </button>
           </div>
 
