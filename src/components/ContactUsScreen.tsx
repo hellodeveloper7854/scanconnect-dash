@@ -384,7 +384,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 {/* Full Name */}
                 <div className="space-y-2">
                   <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
-                    Full Name <span className="text-[#B58500]">*</span>
+                    Full Name <span className="text-[#B58500] text-base font-bold">*</span>
                   </label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
@@ -402,7 +402,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 {/* Email Address */}
                 <div className="space-y-2">
                   <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
-                    Email Address <span className="text-[#B58500]">*</span>
+                    Email Address <span className="text-[#B58500] text-base font-bold">*</span>
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
@@ -438,7 +438,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               {/* Subject Dropdown */}
               <div className="space-y-2">
                 <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
-                  Subject <span className="text-[#B58500]">*</span>
+                  Subject <span className="text-[#B58500] text-base font-bold">*</span>
                 </label>
                 <div className="relative">
                   <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
@@ -466,7 +466,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               {/* Message Textarea */}
               <div className="space-y-2">
                 <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
-                  Message <span className="text-[#B58500]">*</span>
+                  Message <span className="text-[#B58500] text-base font-bold">*</span>
                 </label>
                 <p className="font-['Manrope',sans-serif] text-xs text-[#5F5E5E]">
                   Tell us how we can help you. Please provide as much detail as possible so our team can assist you efficiently.
