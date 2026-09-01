@@ -39,7 +39,7 @@ const STICKER_TEXT: Record<StickerLang, {
   en: {
     headline: 'Scan to connect with the vehicle owner',
     headlineUnderlineFrom: 2, // underlines "connect with the vehicle owner"
-    subline: 'SCAN USING PHONE CAMERA, GOOGLE LENS OR ANY QR SCANNER APP. VISIT SCANCONNECT.CO.IN FOR MORE INFO',
+    subline: 'SCAN USING PHONE CAMERA, GOOGLE LENS OR ANY QR SCANNER APP. VISIT SCANCONNECT.CO.IN FOR MORE',
     iconCaption: 'Wrong Parking, Emergency Contact, any issue with the vehicle, Scan the QR',
   },
   hi: {
@@ -61,7 +61,7 @@ const STICKER_YELLOW = '#FFED00';
  */
 function drawWordmark(ctx: CanvasRenderingContext2D, x: number, y: number, maxWidth: number): number {
   const wordmarkFontFamily = "'Roboto Condensed', sans-serif";
-  const fontSize = fitFontSize(ctx, 'SCAN CONNECT', maxWidth, maxWidth * 0.22, '700', wordmarkFontFamily);
+  const fontSize = fitFontSize(ctx, 'SCAN CONNECT', maxWidth, maxWidth * 0.25, '700', wordmarkFontFamily);
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
 
@@ -190,18 +190,6 @@ const LUCIDE_ICON_PATHS: { paths: string[]; stroke: string }[] = [
     ],
   },
   {
-    // CircleParkingOff
-    stroke: '#D6272C',
-    paths: [
-      'M12.656 7H13a3 3 0 0 1 2.984 3.307',
-      'M13 13H9',
-      'M19.071 19.071A1 1 0 0 1 4.93 4.93',
-      'm2 2 20 20',
-      'M8.357 2.687a10 10 0 0 1 12.956 12.956',
-      'M9 17V9',
-    ],
-  },
-  {
     // TriangleAlert
     stroke: '#1B1C1C',
     paths: [
@@ -235,6 +223,55 @@ function drawSosBadge(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: 
   ctx.restore();
 }
 
+/** Raw path data for lucide-react's "Car" icon (24x24 viewBox), reused to draw a white car silhouette inside the no-parking badge below. */
+const CAR_ICON_PATHS = [
+  'M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2',
+  'M9 17h6',
+];
+const CAR_ICON_WHEELS: { cx: number; cy: number; r: number }[] = [
+  { cx: 7, cy: 17, r: 2 },
+  { cx: 17, cy: 17, r: 2 },
+];
+
+/** Draws a filled red circular "No Parking" badge — a white car silhouette with a diagonal slash through it, matching the standard no-parking road-sign style rather than the stroked "P"-based lucide icon. */
+function drawNoParkingBadge(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) {
+  ctx.save();
+  ctx.fillStyle = '#D6272C';
+  ctx.beginPath();
+  ctx.arc(cx, cy, s / 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  const carScale = (s * 0.62) / 24;
+  ctx.save();
+  ctx.translate(cx - (24 * carScale) / 2, cy - (24 * carScale) / 2);
+  ctx.scale(carScale, carScale);
+  ctx.strokeStyle = '#ffffff';
+  ctx.fillStyle = 'none';
+  ctx.lineWidth = 2.6;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  for (const d of CAR_ICON_PATHS) {
+    ctx.stroke(new Path2D(d));
+  }
+  for (const wheel of CAR_ICON_WHEELS) {
+    ctx.beginPath();
+    ctx.arc(wheel.cx, wheel.cy, wheel.r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  const slashR = s * 0.44;
+  const angle = -Math.PI / 4;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = Math.max(2, s * 0.09);
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(cx + slashR * Math.cos(angle), cy + slashR * Math.sin(angle));
+  ctx.lineTo(cx - slashR * Math.cos(angle), cy - slashR * Math.sin(angle));
+  ctx.stroke();
+  ctx.restore();
+}
+
 /** Draws one lucide-react icon (by its raw 24x24 path data) centered at (cx, cy), scaled to size `s`. */
 function drawLucideIcon(
   ctx: CanvasRenderingContext2D,
@@ -257,9 +294,10 @@ function drawLucideIcon(
 }
 
 const STICKER_ICONS: ((ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) => void)[] = [
-  ...LUCIDE_ICON_PATHS.map(
-    (icon) => (ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) => drawLucideIcon(ctx, icon, cx, cy, s),
-  ),
+  (ctx, cx, cy, s) => drawLucideIcon(ctx, LUCIDE_ICON_PATHS[0], cx, cy, s), // Siren
+  drawNoParkingBadge,
+  (ctx, cx, cy, s) => drawLucideIcon(ctx, LUCIDE_ICON_PATHS[1], cx, cy, s), // TriangleAlert
+  (ctx, cx, cy, s) => drawLucideIcon(ctx, LUCIDE_ICON_PATHS[2], cx, cy, s), // Phone
   drawSosBadge,
 ];
 
@@ -307,7 +345,7 @@ export async function drawBrandedQrCanvas(
   ctx.fillStyle = '#0F0F0F';
   const headlineTextColor = '#000000';
   const headlineMaxWidth = leftWidth - pad * 2;
-  const sublineFontSizeFitted = Math.round(height * 0.05 * 0.6);
+  const sublineFontSizeFitted = Math.round(height * 0.05 * 0.72);
   const headlineTop = pad + wordmarkHeight * 1.6;
   // Reserve room below the headline for the subline's *actual* wrapped line
   // count at its full/preferred font size (not shrunk), with extra breathing
@@ -319,7 +357,7 @@ export async function drawBrandedQrCanvas(
     height - headlineTop - pad - sublineFontSizeFitted * 1.35 * sublineLineCount - sublineFontSizeFitted * 1.5;
 
   const headlineFontFamily = "'Poppins', sans-serif";
-  let headlineFontSize = Math.round(height * 0.11);
+  let headlineFontSize = Math.round(height * 0.125);
   let headlineLines: { text: string; startWordIndex: number; wordCount: number }[] = [];
   let headlineLineHeight = 0;
   while (headlineFontSize > 10) {
@@ -383,11 +421,14 @@ export async function drawBrandedQrCanvas(
   ctx.fillStyle = STICKER_YELLOW;
   ctx.fillRect(leftWidth, 0, rightWidth, height);
 
-  const qrBoxSize = Math.min(rightWidth - pad * 2, height * 0.58);
-  const qrX = leftWidth + (rightWidth - qrBoxSize) / 2;
-  const qrY = pad * 0.8;
-  const qrFramePad = qrBoxSize * 0.06;
-  const qrFrameRadius = qrBoxSize * 0.06;
+  // Sized so the white frame's outer edge sits `pad` from the right panel's left/right edges —
+  // the same margin used everywhere else — keeping the yellow gap equal on all sides, including the top.
+  const qrOuterSize = rightWidth - pad * 2;
+  const qrFramePad = qrOuterSize * 0.035;
+  const qrBoxSize = qrOuterSize - qrFramePad * 2;
+  const qrX = leftWidth + pad + qrFramePad;
+  const qrY = pad + qrFramePad;
+  const qrFrameRadius = qrOuterSize * 0.05;
 
   ctx.fillStyle = '#ffffff';
   ctx.beginPath();
@@ -409,7 +450,7 @@ export async function drawBrandedQrCanvas(
   qrImage.close();
 
   const iconRowY = qrY + qrBoxSize + qrFramePad * 2 + pad * 0.9;
-  const iconSize = height * 0.075;
+  const iconSize = height * 0.085;
   const iconGap = rightWidth / (STICKER_ICONS.length + 1);
   STICKER_ICONS.forEach((draw, i) => {
     const cx = leftWidth + iconGap * (i + 1);
@@ -419,7 +460,8 @@ export async function drawBrandedQrCanvas(
   ctx.fillStyle = '#1B1C1C';
   ctx.textAlign = 'center';
   const captionMaxWidth = rightWidth - pad;
-  const captionFontSize = Math.round(height * 0.03);
+  // Matches the left panel's footer subline size (`sublineFontSizeFitted`) so both footer texts render at the same size.
+  const captionFontSize = sublineFontSizeFitted;
   ctx.font = `bold ${captionFontSize}px sans-serif`;
   const captionLines = wrapText(ctx, text.iconCaption, captionMaxWidth);
   let captionY = iconRowY + iconSize * 1.5;
