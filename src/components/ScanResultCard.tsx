@@ -65,7 +65,7 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({
               className="flex items-center gap-2 text-[#736B00] hover:underline text-sm font-semibold cursor-pointer"
             >
               <Lock className="w-3.5 h-3.5 text-[#1B1C1C]" />
-              Call Owner
+              Contact Owner
             </button>
           ) : (
             owner.mobileNumber && (
@@ -111,7 +111,7 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({
                       className="flex items-center gap-2 text-[#736B00] hover:underline text-sm font-semibold cursor-pointer"
                     >
                       <Lock className="w-3.5 h-3.5 text-[#1B1C1C]" />
-                      Call
+                      Contact
                     </button>
                   ) : (
                     contact.phone && (

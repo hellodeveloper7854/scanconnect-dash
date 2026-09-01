@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { QrCode as QrCodeIcon, ArrowRight, ArrowLeft, Check, Plus, User, Phone, Car, Mail, Lock, ShieldOff } from 'lucide-react';
+import { QrCode as QrCodeIcon, ArrowRight, ArrowLeft, Check, Plus, User, Phone, Car, Mail, Lock, ShieldOff, MessageCircle } from 'lucide-react';
 import { auth } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
 import { ScanResultCard } from '../components/ScanResultCard';
@@ -189,6 +189,7 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
   const [last4, setLast4] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verifiedPhone, setVerifiedPhone] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,15 +200,57 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
       const phone =
         target.kind === 'owner' ? result.owner.mobileNumber : result.emergencyContacts[target.index]?.phone;
       if (phone) {
-        window.location.href = `tel:${phone}`;
+        setVerifiedPhone(phone);
+      } else {
+        onClose();
       }
-      onClose();
     } catch (err) {
       setErrorMsg(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (verifiedPhone) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+          <div className="text-center space-y-1">
+            <Car className="w-8 h-8 text-[#1B1C1C] mx-auto" />
+            <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Vehicle Verified</h1>
+            <p className="text-sm text-[#5F5E5E]">Choose how you&apos;d like to reach out.</p>
+          </div>
+
+          <div className="flex gap-3">
+            <a
+              href={`tel:${verifiedPhone}`}
+              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+            >
+              <Phone className="w-4 h-4" />
+              Call
+            </a>
+            <a
+              href={`https://wa.me/${verifiedPhone.replace(/\D/g, '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 h-[48px] bg-[#25D366] hover:bg-[#1fb855] rounded-lg font-bold text-white shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+            >
+              <MessageCircle className="w-4 h-4" />
+              WhatsApp
+            </a>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full h-[44px] bg-[#EFEDED] text-[#5D5F5F] font-bold rounded-lg cursor-pointer"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
@@ -217,7 +260,7 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
             <Car className="w-8 h-8 text-[#1B1C1C] mx-auto" />
             <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Verify Vehicle</h1>
             <p className="text-sm text-[#5F5E5E]">
-              Enter the last 4 digits of the vehicle&apos;s registration number to place this call.
+              Enter the last 4 digits of the vehicle&apos;s registration number to contact the owner.
             </p>
           </div>
 
@@ -250,7 +293,7 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
               disabled={isSubmitting || last4.length !== 4}
               className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
             >
-              {isSubmitting ? 'Checking...' : 'Call'}
+              {isSubmitting ? 'Checking...' : 'Continue'}
             </button>
           </div>
         </form>
