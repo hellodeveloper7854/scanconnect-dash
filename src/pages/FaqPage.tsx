@@ -22,7 +22,7 @@ const FAQS = [
   {
     question: 'How does a Scan Connect Tag protect my privacy?',
     answer:
-      'When someone scans your tag, they can call, SMS, or WhatsApp you through a masked number. Your real phone number is never shown to the person scanning, and theirs is never shown to you.',
+      'When someone scans your tag, they can call or WhatsApp you through a masked number. Your real phone number is never shown to the person scanning, and theirs is never shown to you.',
   },
   {
     question: 'What happens if my Scan Connect Tag is lost or damaged?',

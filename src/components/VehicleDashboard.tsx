@@ -152,7 +152,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
       num: '02',
       icon: Scan,
       title: 'Anyone Scans & Connects',
-      desc: 'Using any smartphone camera—no app, no registration—they simply scan and choose to Call, SMS, or WhatsApp you instantly.',
+      desc: 'Using any smartphone camera—no app, no registration—they simply scan and choose to Call or WhatsApp you instantly.',
     },
     {
       num: '03',
@@ -1192,7 +1192,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               Your vehicle is often left unattended&mdash;in parking lots, offices, shopping malls, railway stations, hospitals, or on the roadside. Unexpected situations can happen anytime.
             </p>
             <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
-              With Scan Connect, anyone can safely reach you by simply scanning the QR code attached to your vehicle. Your phone number always remains private while you receive instant calls, SMS, or WhatsApp notifications.
+              With Scan Connect, anyone can safely reach you by simply scanning the QR code attached to your vehicle. Your phone number always remains private while you receive instant calls or WhatsApp notifications.
             </p>
             <p className="font-['Hanken_Grotesk'] font-bold text-lg sm:text-xl text-[#1B1C1C] leading-[30px] pt-2">
               No complicated setup. No app required for the person scanning.

@@ -210,7 +210,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
             {/* Description */}
             <p className="font-['Hanken_Grotesk'] font-normal text-[18px] leading-[29px] text-[#5F5E5E]">
-              Secure your vehicle with digital-physical bridges. Masked calls, SMS, and WhatsApp alerts without revealing your phone number to strangers.
+              Secure your vehicle with digital-physical bridges. Masked calls and WhatsApp alerts without revealing your phone number to strangers.
             </p>
 
             {/* Price Row */}

@@ -210,7 +210,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
   const boxContents = [
     { icon: Package, title: '1x Premium QR Tag', desc: 'Waterproof, UV-resistant tag pre-printed with your unique secure QR code.' },
     { icon: Zap, title: 'Lifetime Activation', desc: 'One-time setup linking the tag to your mobile number — no renewals, ever.' },
-    { icon: Lock, title: 'Privacy-First Routing', desc: 'Calls, SMS & WhatsApp reach you without revealing your real number.' },
+    { icon: Lock, title: 'Privacy-First Routing', desc: 'Calls & WhatsApp reach you without revealing your real number.' },
     { icon: Truck, title: 'Free Express Delivery', desc: 'Shipped across India at no extra cost, typically within 3-5 business days.' },
     { icon: PhoneCall, title: 'Quick-Start Guide', desc: 'Simple instructions to activate and attach your tag in under a minute.' },
     { icon: MapPin, title: 'Priority Support Access', desc: 'Dedicated help for setup, replacements, or activation issues.' },

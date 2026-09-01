@@ -17,8 +17,7 @@ import {
   Check,
   MessageSquare,
   PhoneCall,
-  MessageCircle,
-  Mail
+  MessageCircle
 } from 'lucide-react';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
@@ -88,7 +87,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
     'Personal Phone Numbers Stay Hidden',
     'Instant Communication During Emergencies',
     'No App Required for the Scanner',
-    'Secure Call, SMS & WhatsApp Routing',
+    'Secure Call & WhatsApp Routing',
     'Fast & Easy QR Scanning',
     'End-to-End Privacy Protection',
     'Works Anywhere, Anytime',
@@ -228,9 +227,6 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                       </div>
                       <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
                         <MessageCircle className="w-4 h-4 text-[#FFED00]" /> WhatsApp Message
-                      </div>
-                      <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
-                        <Mail className="w-4 h-4 text-[#FFED00]" /> SMS
                       </div>
                     </div>
                   ),
