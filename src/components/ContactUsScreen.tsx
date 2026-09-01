@@ -320,7 +320,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
               <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
                 {/* Office Addresses */}
-                <div className="lg:col-span-2 space-y-6 flex flex-col justify-between">
+                <div className="lg:col-span-2 space-y-6 flex flex-col">
                   <h3 className="font-['Noto_Serif',serif] font-semibold text-2xl text-[#1B1C1C]">
                     Visit Our Offices
                   </h3>
