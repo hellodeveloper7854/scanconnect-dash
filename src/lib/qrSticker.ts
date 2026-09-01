@@ -233,19 +233,22 @@ const CAR_ICON_WHEELS: { cx: number; cy: number; r: number }[] = [
   { cx: 17, cy: 17, r: 2 },
 ];
 
-/** Draws a filled red circular "No Parking" badge — a white car silhouette with a diagonal slash through it, matching the standard no-parking road-sign style rather than the stroked "P"-based lucide icon. */
+/** Draws a white-filled "No Parking" badge with a red circle border — a black car silhouette with a red diagonal slash through it, matching the standard no-parking road-sign style rather than the stroked "P"-based lucide icon. */
 function drawNoParkingBadge(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) {
   ctx.save();
-  ctx.fillStyle = '#D6272C';
+  ctx.fillStyle = '#ffffff';
   ctx.beginPath();
   ctx.arc(cx, cy, s / 2, 0, Math.PI * 2);
   ctx.fill();
+  ctx.strokeStyle = '#D6272C';
+  ctx.lineWidth = Math.max(2, s * 0.09);
+  ctx.stroke();
 
   const carScale = (s * 0.62) / 24;
   ctx.save();
   ctx.translate(cx - (24 * carScale) / 2, cy - (24 * carScale) / 2);
   ctx.scale(carScale, carScale);
-  ctx.strokeStyle = '#ffffff';
+  ctx.strokeStyle = '#1B1C1C';
   ctx.fillStyle = 'none';
   ctx.lineWidth = 2.6;
   ctx.lineCap = 'round';
@@ -262,7 +265,7 @@ function drawNoParkingBadge(ctx: CanvasRenderingContext2D, cx: number, cy: numbe
 
   const slashR = s * 0.44;
   const angle = -Math.PI / 4;
-  ctx.strokeStyle = '#ffffff';
+  ctx.strokeStyle = '#D6272C';
   ctx.lineWidth = Math.max(2, s * 0.09);
   ctx.lineCap = 'round';
   ctx.beginPath();
@@ -424,7 +427,7 @@ export async function drawBrandedQrCanvas(
   // Sized so the white frame's outer edge sits `pad` from the right panel's left/right edges —
   // the same margin used everywhere else — keeping the yellow gap equal on all sides, including the top.
   const qrOuterSize = rightWidth - pad * 2;
-  const qrFramePad = qrOuterSize * 0.035;
+  const qrFramePad = qrOuterSize * 0.018;
   const qrBoxSize = qrOuterSize - qrFramePad * 2;
   const qrX = leftWidth + pad + qrFramePad;
   const qrY = pad + qrFramePad;
