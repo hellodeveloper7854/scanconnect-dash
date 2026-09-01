@@ -414,9 +414,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
           <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-5">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#FFED00]" />
-                  <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                  <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                     WHY CHOOSE SCAN CONNECT?
                   </span>
                 </div>
@@ -477,9 +477,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section id="how-it-works" className="py-20 bg-gradient-to-b from-[#FFFBF0] to-white">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
             <RevealCard className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-                <Workflow className="w-3.5 h-3.5 text-[#FFED00]" />
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
+                <Workflow className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                   HOW IT WORKS
                 </span>
               </div>
@@ -537,9 +537,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               return (
                 <>
                   <div className="text-center max-w-3xl mx-auto mb-8 space-y-3">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-                      <Play className="w-3.5 h-3.5 text-[#FFED00]" />
-                      <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
+                      <Play className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                      <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                         VIDEO SECTION
                       </span>
                     </div>
@@ -655,9 +655,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-                <Gift className="w-3.5 h-3.5 text-[#FFED00]" />
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
+                <Gift className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                   CUSTOMER BENEFITS
                 </span>
               </div>
@@ -682,9 +682,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-                <Building2 className="w-3.5 h-3.5 text-[#FFED00]" />
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
+                <Building2 className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                   INDUSTRIES WE SERVE
                 </span>
               </div>
@@ -743,9 +743,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 <>
                   <div className="flex items-center justify-between mb-4">
                     <div className="space-y-2">
-                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-                        <Car className="w-3.5 h-3.5 text-[#FFED00]" />
-                        <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
+                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
+                        <Car className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                        <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                           SMART VEHICLE SERVICES
                         </span>
                       </div>
@@ -943,9 +943,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         {/* 7b. SOS EMERGENCY ASSISTANCE SECTION (SECOND) */}
         <section className="py-20 bg-[#FAFAFA] border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-              <ShieldAlert className="w-4 h-4 text-[#FFED00]" />
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
+              <ShieldAlert className="w-4 h-4 text-[#1B1C1C]" />
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                 QUICK EMERGENCY ACCESS
               </span>
             </div>
@@ -1000,9 +1000,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="py-20 bg-[#FAFAFA]">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#FFED00]" />
-                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                   TRUSTED BY THOUSANDS OF VEHICLE OWNERS
                 </span>
               </div>
@@ -1051,9 +1051,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
               {/* Right Content — heading/copy first in DOM so mobile shows text before the poster image */}
               <div className="lg:col-span-6 lg:order-2 space-y-6">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-                  <Zap className="w-3.5 h-3.5 text-[#FFED00]" />
-                  <span className="font-['Inter'] font-bold text-xs tracking-[1.5px] text-[#B58500] uppercase">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
+                  <Zap className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                  <span className="font-['Inter'] font-bold text-xs tracking-[1.5px] text-[#1B1C1C] uppercase">
                     DOWNLOAD THE APP
                   </span>
                 </div>
@@ -1179,9 +1179,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         {/* 13. LEFTOVER: ABOUT SCAN CONNECT SECTION */}
         <section className="py-20 bg-white">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-              <Sparkles className="w-3.5 h-3.5 text-[#FFED00]" />
-              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
+              <Sparkles className="w-3.5 h-3.5 text-[#1B1C1C]" />
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                 ABOUT SCAN CONNECT
               </span>
             </div>
