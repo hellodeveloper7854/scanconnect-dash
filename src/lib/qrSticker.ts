@@ -61,7 +61,7 @@ const STICKER_YELLOW = '#FFED00';
  */
 function drawWordmark(ctx: CanvasRenderingContext2D, x: number, y: number, maxWidth: number): number {
   const wordmarkFontFamily = "'Roboto Condensed', sans-serif";
-  const fontSize = fitFontSize(ctx, 'SCAN CONNECT', maxWidth, maxWidth * 0.34, '700', wordmarkFontFamily);
+  const fontSize = fitFontSize(ctx, 'SCAN CONNECT', maxWidth, maxWidth * 0.25, '700', wordmarkFontFamily);
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
 
@@ -223,6 +223,16 @@ function drawSosBadge(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: 
   ctx.restore();
 }
 
+/** Raw path data for lucide-react's "Car" icon (24x24 viewBox), reused to draw a white car silhouette inside the no-parking badge below. */
+const CAR_ICON_PATHS = [
+  'M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2',
+  'M9 17h6',
+];
+const CAR_ICON_WHEELS: { cx: number; cy: number; r: number }[] = [
+  { cx: 7, cy: 17, r: 2 },
+  { cx: 17, cy: 17, r: 2 },
+];
+
 /** Draws a white-filled "No Parking" badge with a red circle border — a bold black "P" with a red diagonal slash through it, matching the standard no-parking road-sign style. */
 function drawNoParkingBadge(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) {
   ctx.save();
@@ -318,11 +328,7 @@ export async function drawBrandedQrCanvas(
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, leftWidth, height);
 
-  // Wider than the headline/subline's text column (which stays inset by `pad` on both sides for
-  // alignment) — the wordmark alone is allowed to run closer to the panel's right edge so growing
-  // its font size ratio actually has room to take effect instead of being re-shrunk straight back
-  // down to fit the narrower column.
-  const wordmarkMaxWidth = leftWidth - pad * 1.3;
+  const wordmarkMaxWidth = leftWidth - pad * 2;
   const wordmarkHeight = drawWordmark(ctx, pad, pad, wordmarkMaxWidth);
 
   ctx.textAlign = 'left';
@@ -330,7 +336,7 @@ export async function drawBrandedQrCanvas(
   const headlineTextColor = '#000000';
   const headlineMaxWidth = leftWidth - pad * 2;
   const sublineFontSizeFitted = Math.round(height * 0.05 * 0.72);
-  const headlineTop = pad + wordmarkHeight * 1.35;
+  const headlineTop = pad + wordmarkHeight * 1.6;
   // Reserve room below the headline for the subline's *actual* wrapped line
   // count at its full/preferred font size (not shrunk), with extra breathing
   // room added, so the subline always renders at full size instead of being
@@ -338,23 +344,17 @@ export async function drawBrandedQrCanvas(
   ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
   const sublineLineCount = wrapText(ctx, text.subline, headlineMaxWidth).length;
   const headlineMaxHeight =
-    height - headlineTop - pad - sublineFontSizeFitted * 1.35 * sublineLineCount - sublineFontSizeFitted * 0.3;
+    height - headlineTop - pad - sublineFontSizeFitted * 1.35 * sublineLineCount - sublineFontSizeFitted * 1.5;
 
   const headlineFontFamily = "'Poppins', sans-serif";
-  // Devanagari matras (vowel signs stacked above/below the base letter) need more vertical
-  // clearance than Latin text at the same line-height multiplier, or consecutive lines overlap.
-  const headlineLineHeightMult = opts.lang === 'hi' ? 1.4 : 1.15;
-  let headlineFontSize = Math.round(height * 0.15);
+  let headlineFontSize = Math.round(height * 0.125);
   let headlineLines: { text: string; startWordIndex: number; wordCount: number }[] = [];
   let headlineLineHeight = 0;
   while (headlineFontSize > 10) {
     ctx.font = `800 ${headlineFontSize}px ${headlineFontFamily}`;
     headlineLines = wrapTextWithWordIndex(ctx, text.headline, headlineMaxWidth);
-    headlineLineHeight = headlineFontSize * headlineLineHeightMult;
-    // Matches the true consumed height: headlineY starts at `headlineLineHeight * 0.85` past
-    // headlineTop, then advances by `headlineLineHeight` once per line (including the last) —
-    // so the block is (lines + 0.85) line-heights tall, not just `lines`.
-    if ((headlineLines.length + 0.85) * headlineLineHeight <= headlineMaxHeight) break;
+    headlineLineHeight = headlineFontSize * 1.15;
+    if (headlineLines.length * headlineLineHeight <= headlineMaxHeight) break;
     headlineFontSize -= 2;
   }
   ctx.font = `800 ${headlineFontSize}px ${headlineFontFamily}`;
@@ -401,12 +401,7 @@ export async function drawBrandedQrCanvas(
   }
   ctx.font = `normal ${sublineFontSize}px sans-serif`;
   ctx.fillStyle = '#5F5E5E';
-  // Anchored from the bottom edge (last line's baseline sits `pad` above the panel's bottom edge,
-  // matching the `pad` margin used on the top/left/right sides) rather than flowing immediately
-  // below the headline, so the bottom white margin doesn't end up larger than the other three sides
-  // whenever the headline doesn't use its full reserved height.
-  const sublineBlockHeight = (sublineLines.length - 1) * sublineFontSize * 1.35;
-  let sublineY = Math.max(headlineY + sublineFontSize * 0.7, height - pad - sublineBlockHeight);
+  let sublineY = headlineY + sublineFontSize * 0.7;
   for (const line of sublineLines) {
     ctx.fillText(line, pad, sublineY);
     sublineY += sublineFontSize * 1.35;
@@ -419,7 +414,7 @@ export async function drawBrandedQrCanvas(
   // Sized so the white frame's outer edge sits `pad` from the right panel's left/right edges —
   // the same margin used everywhere else — keeping the yellow gap equal on all sides, including the top.
   const qrOuterSize = rightWidth - pad * 2;
-  const qrFramePad = qrOuterSize * 0.012;
+  const qrFramePad = qrOuterSize * 0.018;
   const qrBoxSize = qrOuterSize - qrFramePad * 2;
   const qrX = leftWidth + pad + qrFramePad;
   const qrY = pad + qrFramePad;
@@ -444,30 +439,22 @@ export async function drawBrandedQrCanvas(
   ctx.restore();
   qrImage.close();
 
+  const iconRowY = qrY + qrBoxSize + qrFramePad * 2 + pad * 0.9;
   const iconSize = height * 0.085;
   const iconGap = rightWidth / (STICKER_ICONS.length + 1);
-
-  ctx.textAlign = 'center';
-  const captionMaxWidth = rightWidth - pad;
-  // Matches the left panel's footer subline size (`sublineFontSizeFitted`) so both footer texts render at the same size.
-  const captionFontSize = sublineFontSizeFitted;
-  ctx.font = `bold ${captionFontSize}px sans-serif`;
-  const captionLines = wrapText(ctx, text.iconCaption, captionMaxWidth);
-
-  // Anchored from the bottom edge (last caption line's descender sits `pad` above the panel's
-  // bottom edge) rather than stacked down from the QR/icons, so the bottom yellow margin always
-  // matches the `pad` margin used on the top/left/right sides instead of drifting with content height.
-  const captionBlockHeight = (captionLines.length - 1) * captionFontSize * 1.3;
-  const firstCaptionY = height - pad - captionBlockHeight;
-  const iconRowY = firstCaptionY - iconSize * 1.5;
-
   STICKER_ICONS.forEach((draw, i) => {
     const cx = leftWidth + iconGap * (i + 1);
     draw(ctx, cx, iconRowY, iconSize);
   });
 
   ctx.fillStyle = '#1B1C1C';
-  let captionY = firstCaptionY;
+  ctx.textAlign = 'center';
+  const captionMaxWidth = rightWidth - pad;
+  // Matches the left panel's footer subline size (`sublineFontSizeFitted`) so both footer texts render at the same size.
+  const captionFontSize = sublineFontSizeFitted;
+  ctx.font = `bold ${captionFontSize}px sans-serif`;
+  const captionLines = wrapText(ctx, text.iconCaption, captionMaxWidth);
+  let captionY = iconRowY + iconSize * 1.5;
   for (const line of captionLines) {
     ctx.fillText(line, leftWidth + rightWidth / 2, captionY);
     captionY += captionFontSize * 1.3;
