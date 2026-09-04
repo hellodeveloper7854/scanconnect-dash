@@ -339,17 +339,18 @@ export async function drawBrandedQrCanvas(
   // Hindi's footer text (subline + matching icon caption) renders smaller than English's, since
   // the headline above it is now much bigger and needs more of the panel's vertical budget.
   const sublineFontSizeFitted = Math.round(height * 0.05 * (isHindi ? 0.5 : 0.72));
-  const headlineTop = pad + wordmarkHeight * 1.6;
+  const headlineTop = pad + wordmarkHeight * (isHindi ? 1.9 : 1.4);
   // Reserve room below the headline for the subline's *actual* wrapped line
   // count at its full/preferred font size (not shrunk), with extra breathing
   // room added, so the subline always renders at full size instead of being
   // squeezed smaller to fit whatever space the headline happened to leave.
-  // (Hindi reserves less breathing room — its headline needs the space more.)
+  // (Both languages reserve minimal breathing room here — the headline needs
+  // the space more, and the subline still fits comfortably below it.)
   ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
   const sublineLineCount = wrapText(ctx, text.subline, headlineMaxWidth).length;
   const headlineMaxHeight =
     height - headlineTop - pad - sublineFontSizeFitted * 1.35 * sublineLineCount -
-    sublineFontSizeFitted * (isHindi ? 0 : 1.5);
+    sublineFontSizeFitted * 0;
 
   // Hindi keeps the headline in the same plain sans-serif family as the subline (Poppins has no
   // Devanagari glyphs, so it was always silently falling back anyway) at a bigger starting size
@@ -414,7 +415,7 @@ export async function drawBrandedQrCanvas(
   }
   ctx.font = `normal ${sublineFontSize}px sans-serif`;
   ctx.fillStyle = '#5F5E5E';
-  let sublineY = headlineY + sublineFontSize * 0.7;
+  let sublineY = headlineY + sublineFontSize * (isHindi ? 1.4 : 0.7);
   for (const line of sublineLines) {
     ctx.fillText(line, pad, sublineY);
     sublineY += sublineFontSize * 1.35;
