@@ -338,8 +338,8 @@ export async function drawBrandedQrCanvas(
   const isHindi = opts.lang === 'hi';
   // Hindi's footer text (subline + matching icon caption) renders smaller than English's, since
   // the headline above it is now much bigger and needs more of the panel's vertical budget.
-  const sublineFontSizeFitted = Math.round(height * 0.05 * (isHindi ? 0.5 : 0.72));
-  const headlineTop = pad + wordmarkHeight * (isHindi ? 1.9 : 1.4);
+  const sublineFontSizeFitted = Math.round(height * 0.05 * (isHindi ? 0.5 : 0.6));
+  const headlineTop = pad + wordmarkHeight * (isHindi ? 1.9 : 1.35);
   // Reserve room below the headline for the subline's *actual* wrapped line
   // count at its full/preferred font size (not shrunk), with extra breathing
   // room added, so the subline always renders at full size instead of being
