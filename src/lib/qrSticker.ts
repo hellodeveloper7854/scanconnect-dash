@@ -335,29 +335,42 @@ export async function drawBrandedQrCanvas(
   ctx.fillStyle = '#0F0F0F';
   const headlineTextColor = '#000000';
   const headlineMaxWidth = leftWidth - pad * 2;
-  const sublineFontSizeFitted = Math.round(height * 0.05 * 0.72);
+  const isHindi = opts.lang === 'hi';
+  // Hindi's footer text (subline + matching icon caption) renders smaller than English's, since
+  // the headline above it is now much bigger and needs more of the panel's vertical budget.
+  const sublineFontSizeFitted = Math.round(height * 0.05 * (isHindi ? 0.5 : 0.72));
   const headlineTop = pad + wordmarkHeight * 1.6;
   // Reserve room below the headline for the subline's *actual* wrapped line
   // count at its full/preferred font size (not shrunk), with extra breathing
   // room added, so the subline always renders at full size instead of being
   // squeezed smaller to fit whatever space the headline happened to leave.
+  // (Hindi reserves less breathing room — its headline needs the space more.)
   ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
   const sublineLineCount = wrapText(ctx, text.subline, headlineMaxWidth).length;
   const headlineMaxHeight =
-    height - headlineTop - pad - sublineFontSizeFitted * 1.35 * sublineLineCount - sublineFontSizeFitted * 1.5;
+    height - headlineTop - pad - sublineFontSizeFitted * 1.35 * sublineLineCount -
+    sublineFontSizeFitted * (isHindi ? 0 : 1.5);
 
-  const headlineFontFamily = "'Poppins', sans-serif";
-  let headlineFontSize = Math.round(height * 0.125);
+  // Hindi keeps the headline in the same plain sans-serif family as the subline (Poppins has no
+  // Devanagari glyphs, so it was always silently falling back anyway) at a bigger starting size
+  // and heavier weight, with taller line spacing so the larger glyphs + matras don't overlap.
+  const headlineFontFamily = isHindi ? 'sans-serif' : "'Poppins', sans-serif";
+  const headlineFontWeight = isHindi ? '900' : '800';
+  const headlineLineHeightMult = isHindi ? 1.05 : 1.15;
+  let headlineFontSize = Math.round(height * (isHindi ? 0.1 : 0.125));
   let headlineLines: { text: string; startWordIndex: number; wordCount: number }[] = [];
   let headlineLineHeight = 0;
   while (headlineFontSize > 10) {
-    ctx.font = `800 ${headlineFontSize}px ${headlineFontFamily}`;
+    ctx.font = `${headlineFontWeight} ${headlineFontSize}px ${headlineFontFamily}`;
     headlineLines = wrapTextWithWordIndex(ctx, text.headline, headlineMaxWidth);
-    headlineLineHeight = headlineFontSize * 1.15;
-    if (headlineLines.length * headlineLineHeight <= headlineMaxHeight) break;
+    headlineLineHeight = headlineFontSize * headlineLineHeightMult;
+    // Matches the true consumed height: headlineY starts at `headlineLineHeight * 0.85` past
+    // headlineTop, then advances by `headlineLineHeight` once per line (including the last) —
+    // so the block is (lines + 0.85) line-heights tall, not just `lines`.
+    if ((headlineLines.length + 0.85) * headlineLineHeight <= headlineMaxHeight) break;
     headlineFontSize -= 2;
   }
-  ctx.font = `800 ${headlineFontSize}px ${headlineFontFamily}`;
+  ctx.font = `${headlineFontWeight} ${headlineFontSize}px ${headlineFontFamily}`;
   ctx.fillStyle = headlineTextColor;
   let headlineY = headlineTop + headlineLineHeight * 0.85;
   const underlineFrom = text.headlineUnderlineFrom;
