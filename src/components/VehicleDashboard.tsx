@@ -589,8 +589,10 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     </button>
                   </div>
 
-                  {/* Sliding carousel track — width driven by number of pages, offset by currentVideoPage */}
-                  <div className="overflow-hidden max-w-6xl mx-auto">
+                  {/* Sliding carousel track — width driven by number of pages, offset by currentVideoPage.
+                      overflow-hidden clips shadows on the cards inside, so we pad the track on all sides
+                      and cancel that padding with a negative margin to give shadows room without shifting layout. */}
+                  <div className="overflow-hidden max-w-6xl mx-auto p-4 -m-4">
                     <div
                       className="flex transition-transform duration-500 ease-out"
                       style={{ transform: `translateX(-${currentVideoPage * 100}%)` }}
@@ -598,7 +600,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                       {Array.from({ length: totalVideoPages }).map((_, pageIdx) => (
                         <div
                           key={pageIdx}
-                          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch shrink-0 w-full"
+                          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 items-stretch shrink-0 w-full box-border ${
+                            pageIdx > 0 ? 'pl-6' : ''
+                          }`}
                         >
                           {videoLibrary
                             .slice(pageIdx * videosPerView, pageIdx * videosPerView + videosPerView)
@@ -606,31 +610,33 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                               <button
                                 key={video.id}
                                 onClick={() => setActiveVideoId(video.id)}
-                                className="relative rounded-2xl overflow-hidden border border-neutral-200 shadow-lg hover:shadow-2xl hover:-translate-y-1 group bg-white block w-full text-left cursor-pointer transition-all"
+                                className="relative rounded-2xl hover:-translate-y-1.5 group bg-white block w-full text-left cursor-pointer transition-all duration-300 shadow-[0_10px_18px_-8px_rgba(0,0,0,0.18)] hover:shadow-[0_16px_26px_-8px_rgba(0,0,0,0.24)]"
                               >
-                                <div className="relative aspect-video overflow-hidden">
-                                  <img
-                                    src={video.thumbnail}
-                                    alt={video.title}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                  />
-                                  <div className="absolute inset-0 bg-[#1B1C1C]/30 group-hover:bg-[#1B1C1C]/40 transition-colors" />
-                                  <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="w-14 h-14 rounded-full bg-[#FFED00] flex items-center justify-center shadow-[0_6px_18px_rgba(0,0,0,0.35)] group-hover:scale-110 transition-transform">
-                                      <Play className="w-6 h-6 text-[#1B1C1C] fill-current ml-0.5" />
+                                <div className="rounded-2xl overflow-hidden">
+                                  <div className="relative aspect-video overflow-hidden">
+                                    <img
+                                      src={video.thumbnail}
+                                      alt={video.title}
+                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                    <div className="absolute inset-0 bg-[#1B1C1C]/30 group-hover:bg-[#1B1C1C]/40 transition-colors" />
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                      <div className="w-14 h-14 rounded-full bg-[#FFED00] flex items-center justify-center shadow-[0_6px_18px_rgba(0,0,0,0.35)] group-hover:scale-110 transition-transform">
+                                        <Play className="w-6 h-6 text-[#1B1C1C] fill-current ml-0.5" />
+                                      </div>
                                     </div>
+                                    <span className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-md bg-black/70 text-white text-xs font-semibold font-['Inter']">
+                                      {video.duration}
+                                    </span>
                                   </div>
-                                  <span className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-md bg-black/70 text-white text-xs font-semibold font-['Inter']">
-                                    {video.duration}
-                                  </span>
-                                </div>
-                                <div className="p-4 space-y-1">
-                                  <h3 className="font-['Hanken_Grotesk'] font-bold text-base text-[#1B1C1C] leading-snug">
-                                    {video.title}
-                                  </h3>
-                                  <p className="font-['Hanken_Grotesk'] font-normal text-sm text-[#5F5E5E] leading-snug">
-                                    {video.description}
-                                  </p>
+                                  <div className="p-4 space-y-1">
+                                    <h3 className="font-['Hanken_Grotesk'] font-bold text-base text-[#1B1C1C] leading-snug">
+                                      {video.title}
+                                    </h3>
+                                    <p className="font-['Hanken_Grotesk'] font-normal text-sm text-[#5F5E5E] leading-snug">
+                                      {video.description}
+                                    </p>
+                                  </div>
                                 </div>
                               </button>
                             ))}
