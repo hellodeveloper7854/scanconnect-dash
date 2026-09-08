@@ -597,7 +597,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 {/* Item Card Container */}
                 <div className="flex flex-row items-center gap-[16px] w-full">
                   {/* Thumbnail */}
-                  <div className="w-[80px] h-[80px] bg-[#F5F3F3] rounded-[8px] overflow-hidden shrink-0">
+                  <div className="w-[80px] h-[80px]  rounded-[8px] overflow-hidden shrink-0">
                     <img src={qrImage} alt={productTitle} className="w-full  object-cover" />
                   </div>
 
@@ -1089,7 +1089,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               {/* Product item row */}
               <div className="flex flex-row items-center gap-[24px] pb-[24px] border-b border-[#EFEDED]">
                 {/* Thumbnail Background */}
-                <div className="w-[80px] h-[80px] bg-[#F5F3F3] rounded-[8px] overflow-hidden shrink-0">
+                <div className="w-[80px] h-[80px] rounded-[8px] overflow-hidden shrink-0">
                   <img src={qrImage} alt={productTitle} className="w-full  object-cover" />
                 </div>
 
@@ -1146,7 +1146,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 <img
                   src={`${API_BASE_URL}/api/order-contact/${completedOrder.qrToken}/qr.png`}
                   alt="Your Scan Connect QR tag"
-                  className="w-40 h-40 shrink-0 border border-[#E4E2E2] rounded-lg"
+                  className="w-40 h-40 shrink-0 rounded-lg"
                 />
                 <div className="flex-1 space-y-3 text-center sm:text-left">
                   <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-xl text-[#1B1C1C]">

@@ -108,7 +108,7 @@ export const MyOrdersScreen: React.FC<MyOrdersScreenProps> = ({ userData, onLogo
                       <img
                         src={`${API_BASE_URL}/api/order-contact/${order.qrToken}/qr.png`}
                         alt="Order QR tag"
-                        className="w-11 h-11 rounded-lg border border-[#EEEEEE] shrink-0"
+                        className="w-11 h-11 rounded-lg shrink-0"
                       />
                     ) : (
                       <div className="w-11 h-11 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
