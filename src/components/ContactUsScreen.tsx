@@ -29,6 +29,12 @@ interface ContactUsScreenProps {
   isLoggedIn?: boolean;
 }
 
+// Mirrors server/src/routes/contact.ts exactly so the backend never rejects
+// something the frontend already accepted.
+const NAME_PATTERN = /^[A-Za-z][A-Za-z .'-]{1,79}$/;
+const PHONE_PATTERN = /^[6-9]\d{9}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // Interactive Embedded Google Map for Jamshedpur Head Office
 const GoogleMapEmbed = () => (
   <div className="w-full h-full min-h-[420px] rounded-xl border border-[#E3E2E2] overflow-hidden relative shadow-sm group bg-neutral-100 flex flex-col">
@@ -82,6 +88,16 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [inquiryTouched, setInquiryTouched] = useState<Record<string, boolean>>({});
+
+  const inquiryFieldErrors = {
+    fullName: NAME_PATTERN.test(fullName.trim()) ? '' : 'Enter a valid full name (letters only, at least 2 characters)',
+    email: EMAIL_PATTERN.test(email.trim()) ? '' : 'Enter a valid email address',
+    phone: !phone.trim() || PHONE_PATTERN.test(phone.trim()) ? '' : 'Enter a valid 10-digit mobile number',
+    message: message.trim().length >= 10 ? '' : 'Message must be at least 10 characters',
+  };
+  const isInquiryFormValid = Object.values(inquiryFieldErrors).every((e) => !e) && agreeTerms;
+  const markInquiryTouched = (field: string) => setInquiryTouched((t) => ({ ...t, [field]: true }));
 
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
@@ -106,8 +122,13 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
   const handleSubmitInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
+    setInquiryTouched({ fullName: true, email: true, phone: true, message: true });
     if (!agreeTerms) {
-      alert('Please agree to receive communications regarding your request.');
+      setSubmitError('Please agree to receive communications regarding your request.');
+      return;
+    }
+    if (!isInquiryFormValid) {
+      setSubmitError('Please fix the highlighted fields before continuing.');
       return;
     }
 
@@ -115,11 +136,11 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
     setSubmitError('');
     try {
       await api.post('/api/contact', {
-        fullName,
-        email,
+        fullName: fullName.trim(),
+        email: email.trim(),
         phone: phone.trim() || undefined,
         subject,
-        message,
+        message: message.trim(),
       });
       setIsSubmitted(true);
       setTimeout(() => {
@@ -392,11 +413,17 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                       type="text"
                       required
                       value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      onChange={(e) => setFullName(e.target.value.replace(/[^A-Za-z .'-]/g, ''))}
+                      onBlur={() => markInquiryTouched('fullName')}
                       placeholder="Enter your full name"
-                      className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none transition-all rounded-none"
+                      className={`w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none transition-all rounded-none border ${
+                        inquiryTouched.fullName && inquiryFieldErrors.fullName ? 'border-rose-500' : 'border-transparent'
+                      }`}
                     />
                   </div>
+                  {inquiryTouched.fullName && inquiryFieldErrors.fullName && (
+                    <p className="text-xs font-semibold text-rose-500">{inquiryFieldErrors.fullName}</p>
+                  )}
                 </div>
 
                 {/* Email Address */}
@@ -412,9 +439,15 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                       value={email}
                       placeholder="Enter your email address"
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none transition-all rounded-none"
+                      onBlur={() => markInquiryTouched('email')}
+                      className={`w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none transition-all rounded-none border ${
+                        inquiryTouched.email && inquiryFieldErrors.email ? 'border-rose-500' : 'border-transparent'
+                      }`}
                     />
                   </div>
+                  {inquiryTouched.email && inquiryFieldErrors.email && (
+                    <p className="text-xs font-semibold text-rose-500">{inquiryFieldErrors.email}</p>
+                  )}
                 </div>
               </div>
 
@@ -428,11 +461,17 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                   <input
                     type="tel"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Enter your contact number"
-                    className="w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none transition-all rounded-none"
+                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    onBlur={() => markInquiryTouched('phone')}
+                    placeholder="Enter your 10-digit contact number"
+                    className={`w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none transition-all rounded-none border ${
+                      inquiryTouched.phone && inquiryFieldErrors.phone ? 'border-rose-500' : 'border-transparent'
+                    }`}
                   />
                 </div>
+                {inquiryTouched.phone && inquiryFieldErrors.phone && (
+                  <p className="text-xs font-semibold text-rose-500">{inquiryFieldErrors.phone}</p>
+                )}
               </div>
 
               {/* Subject Dropdown */}
@@ -478,9 +517,15 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     required
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="w-full h-[147px] bg-[#F5F3F3] pl-11 pr-4 py-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none resize-none transition-all rounded-none"
+                    onBlur={() => markInquiryTouched('message')}
+                    className={`w-full h-[147px] bg-[#F5F3F3] pl-11 pr-4 py-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none resize-none transition-all rounded-none border ${
+                      inquiryTouched.message && inquiryFieldErrors.message ? 'border-rose-500' : 'border-transparent'
+                    }`}
                   />
                 </div>
+                {inquiryTouched.message && inquiryFieldErrors.message && (
+                  <p className="text-xs font-semibold text-rose-500">{inquiryFieldErrors.message}</p>
+                )}
               </div>
 
               {/* Consent Checkbox */}
@@ -504,8 +549,8 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               {/* Send Inquiry Button */}
               <button
                 type="submit"
-                disabled={isSubmitted || isSubmitting}
-                className="btn-shimmer w-full h-12 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_20px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-['Manrope',sans-serif] font-semibold text-sm uppercase tracking-[1.4px] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] disabled:opacity-50"
+                disabled={isSubmitted || isSubmitting || !isInquiryFormValid}
+                className="btn-shimmer w-full h-12 bg-[#FFED00] hover:enabled:bg-[#e0ac00] hover:enabled:shadow-[0_8px_20px_rgba(242,186,3,0.45)] hover:enabled:-translate-y-0.5 text-[#1B1C1C] font-['Manrope',sans-serif] font-semibold text-sm uppercase tracking-[1.4px] flex items-center justify-center gap-2 transition-all cursor-pointer active:enabled:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Send className="w-4.5 h-4.5 text-[#1B1C1C] stroke-[2.2]" />
                 <span>{isSubmitting || isSubmitted ? 'SENDING INQUIRY...' : 'SEND INQUIRY'}</span>
