@@ -1067,7 +1067,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               <div className="lg:col-span-6 lg:order-2 space-y-6">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                   <Zap className="w-3.5 h-3.5 text-[#1B1C1C]" />
-                  <span className="font-['Inter'] font-bold text-xs tracking-[1.5px] text-[#1B1C1C] uppercase">
+                  <span className="font-['Inter'] font-bold text-xs tracking-[2px] text-[#1B1C1C] uppercase">
                     DOWNLOAD THE APP
                   </span>
                 </div>

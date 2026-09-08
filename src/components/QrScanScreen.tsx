@@ -125,9 +125,9 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
               {/* Left Content Column */}
               <div className="lg:col-span-6 space-y-8">
                 {/* Privacy Guaranteed Badge */}
-                <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-[#E6D400] bg-[#FFED00]">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#1B1C1C]" />
-                  <span className="font-sans font-normal text-xs uppercase tracking-[1px] text-[#1B1C1C]">
+                  <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                     PRIVACY GUARANTEED
                   </span>
                 </div>

@@ -255,9 +255,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   <span>SHOP</span>
                 </div>
 
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400] shadow-xs">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#1B1C1C]" />
-                  <span className="font-mono text-xs font-bold tracking-wider text-[#1B1C1C] uppercase">
+                  <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                     OFFICIAL STORE
                   </span>
                 </div>
@@ -352,7 +352,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
               <QrCode className="w-3.5 h-3.5 text-[#1B1C1C]" />
-              <span className="font-mono text-xs font-semibold tracking-wider text-[#1B1C1C] uppercase">
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                 SCAN CONNECT TAG
               </span>
             </div>
@@ -388,9 +388,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
             {/* Section Header */}
             <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-4">
-              <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-[#E6D400] bg-[#FFED00] shadow-xs">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                 <Package className="w-3.5 h-3.5 text-[#1B1C1C]" />
-                <span className="font-mono text-xs font-semibold tracking-wider text-[#1B1C1C] uppercase">
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                   CATALOGUE
                 </span>
               </div>
@@ -601,7 +601,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                 <Package className="w-3.5 h-3.5 text-[#1B1C1C]" />
-                <span className="font-mono text-xs font-bold tracking-wider text-[#1B1C1C] uppercase">
+                <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                   WHAT'S IN THE BOX
                 </span>
               </div>

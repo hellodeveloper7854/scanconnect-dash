@@ -69,9 +69,9 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
         <section className="py-12 sm:py-16 lg:py-20 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
             {/* Mission Badge */}
-            <div className="inline-flex items-center gap-2 py-1 px-3.5 rounded-full border border-[#E6D400] bg-[#FFED00] shadow-xs">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
               <ShieldCheck className="w-3.5 h-3.5 text-[#1B1C1C]" />
-              <span className="font-mono text-xs font-semibold tracking-wider text-[#1B1C1C] uppercase">
+              <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                 OUR MISSION
               </span>
             </div>
