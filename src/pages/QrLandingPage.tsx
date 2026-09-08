@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { QrCode as QrCodeIcon, ArrowRight, ArrowLeft, Check, Plus, User, Phone, Car, Mail, Lock, ShieldOff, MessageCircle } from 'lucide-react';
+import { QrCode as QrCodeIcon, ArrowRight, ArrowLeft, Check, Plus, User, Phone, Car, Mail, Lock, ShieldOff } from 'lucide-react';
 import { auth } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
-import { ScanResultCard } from '../components/ScanResultCard';
+import { ScanResultCard, type CallTarget } from '../components/ScanResultCard';
 import logo from '../assets/images/logo.png';
 
 const VEHICLE_TYPES = ['Car', 'Bike', 'Scooter', 'Truck', 'Bus', 'Other'];
@@ -45,8 +45,6 @@ interface VerifiedData {
   vehicle: VehicleData;
   emergencyContacts: { name: string; role: string | null; phone: string }[];
 }
-
-type CallTarget = { kind: 'owner' } | { kind: 'contact'; index: number };
 
 const CardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="min-h-screen bg-[#FAFAF9] flex items-center justify-center p-4 font-['Hanken_Grotesk']">
@@ -176,22 +174,48 @@ const LoginGate: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
   );
 };
 
+/** Response shape of POST /:code/masked-call. */
+interface MaskedCallResult {
+  virtualNumber: string;
+  isMasked: boolean;
+}
+
 /**
- * Shown when someone clicks "Call" on the details page — verifies the last 4
- * digits of the vehicle registration before revealing/dialing the specific
- * phone number they asked for, rather than gating the whole details page.
+ * Shown once someone has already picked a contact method (Masked Call or
+ * Message) from the inline choice on the details card. Two internal screens:
+ *  1. "verify" — enter the last 4 registration digits, plus (for a masked
+ *     call only) the caller's own phone number, so a future Knowlarity
+ *     SR-number/click-to-call integration has a real request to connect.
+ *  2. "call" — a 90-second countdown and a "Call <number>" button that opens
+ *     the phone's own dialer. Until Knowlarity is wired up server-side, the
+ *     number dialed is the real destination number (see masked-call route).
+ * Message (WhatsApp) skips the caller-phone field and the call screen,
+ * verifying then opening wa.me directly.
  */
-const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () => void }> = ({
+const CallVerifyModal: React.FC<{ code: string; target: CallTarget; method: 'call' | 'message'; onClose: () => void }> = ({
   code,
   target,
+  method,
   onClose,
 }) => {
   const [last4, setLast4] = useState('');
+  const [callerPhone, setCallerPhone] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [verifiedPhone, setVerifiedPhone] = useState<string | null>(null);
+  const [maskedCall, setMaskedCall] = useState<MaskedCallResult | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState(90);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!maskedCall) return;
+    if (secondsLeft <= 0) {
+      onClose();
+      return;
+    }
+    const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [maskedCall, secondsLeft, onClose]);
+
+  const handleVerifyForMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setIsSubmitting(true);
@@ -200,7 +224,8 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
       const phone =
         target.kind === 'owner' ? result.owner.mobileNumber : result.emergencyContacts[target.index]?.phone;
       if (phone) {
-        setVerifiedPhone(phone);
+        window.open(`https://wa.me/${phone.replace(/\D/g, '')}`, '_blank', 'noopener,noreferrer');
+        onClose();
       } else {
         onClose();
       }
@@ -211,57 +236,73 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
     }
   };
 
-  if (verifiedPhone) {
+  const handleSetupMaskedCall = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+    setIsSubmitting(true);
+    try {
+      const result = await api.post<MaskedCallResult>(`/api/qr/${code}/masked-call`, {
+        last4,
+        callerPhone,
+        target,
+      });
+      setMaskedCall(result);
+      setSecondsLeft(90);
+    } catch (err) {
+      setErrorMsg(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Screen 3: countdown + call button, after a masked call has been set up.
+  if (maskedCall) {
     return (
       <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
           <div className="text-center space-y-1">
-            <Car className="w-8 h-8 text-[#1B1C1C] mx-auto" />
-            <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Vehicle Verified</h1>
-            <p className="text-sm text-[#5F5E5E]">Choose how you&apos;d like to reach out.</p>
+            <Phone className="w-8 h-8 text-[#1B1C1C] mx-auto" />
+            <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Call the Vehicle Owner</h1>
+            <p className="text-sm text-[#5F5E5E]">
+              You have {secondsLeft} seconds. Abuse will block your number.
+            </p>
           </div>
 
-          <div className="flex gap-3">
-            <a
-              href={`tel:${verifiedPhone}`}
-              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
-            >
-              <Phone className="w-4 h-4" />
-              Call
-            </a>
-            <a
-              href={`https://wa.me/${verifiedPhone.replace(/\D/g, '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 h-[48px] bg-[#25D366] hover:bg-[#1fb855] rounded-lg font-bold text-white shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
-            >
-              <MessageCircle className="w-4 h-4" />
-              WhatsApp
-            </a>
-          </div>
+          <ul className="text-xs text-[#5F5E5E] space-y-1 list-disc list-inside">
+            <li>Do not use this for theft, harassment, or stalking.</li>
+            <li>Do not use this for spam or marketing calls.</li>
+            <li>Do not use this to buy, sell, or rent the vehicle.</li>
+          </ul>
+
+          <a
+            href={`tel:${maskedCall.virtualNumber}`}
+            className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+          >
+            <Phone className="w-4 h-4" />
+            Call {maskedCall.virtualNumber}
+          </a>
 
           <button
             type="button"
             onClick={onClose}
             className="w-full h-[44px] bg-[#EFEDED] text-[#5D5F5F] font-bold rounded-lg cursor-pointer"
           >
-            Close
+            Cancel
           </button>
         </div>
       </div>
     );
   }
 
+  // Verify last-4 digits (+ caller's phone for a masked call).
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={method === 'call' ? handleSetupMaskedCall : handleVerifyForMessage} className="space-y-4">
           <div className="text-center space-y-1">
             <Car className="w-8 h-8 text-[#1B1C1C] mx-auto" />
-            <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Verify Vehicle</h1>
-            <p className="text-sm text-[#5F5E5E]">
-              Enter the last 4 digits of the vehicle&apos;s registration number to contact the owner.
-            </p>
+            <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Verify the Plate Number</h1>
+            <p className="text-sm text-[#5F5E5E]">Enter the last 4 digits of the vehicle&apos;s plate.</p>
           </div>
 
           <input
@@ -278,6 +319,25 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
             className="w-full h-[54px] text-center text-lg font-mono tracking-[6px] bg-white border border-[#CCC7AA] rounded-lg outline-none focus:ring-2 focus:ring-[#FFED00]"
           />
 
+          {method === 'call' && (
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#5D5F5F]">
+                Your phone (needed for a masked call)
+              </label>
+              <input
+                type="tel"
+                required
+                value={callerPhone}
+                onChange={(e) => {
+                  setCallerPhone(e.target.value);
+                  setErrorMsg('');
+                }}
+                placeholder="+91 98765 43210"
+                className="w-full h-[48px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+            </div>
+          )}
+
           {errorMsg && <p className="text-sm font-semibold text-red-600 text-center">{errorMsg}</p>}
 
           <div className="flex gap-3">
@@ -290,10 +350,10 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; onClose: () 
             </button>
             <button
               type="submit"
-              disabled={isSubmitting || last4.length !== 4}
+              disabled={isSubmitting || last4.length !== 4 || (method === 'call' && !callerPhone.trim())}
               className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
             >
-              {isSubmitting ? 'Checking...' : 'Continue'}
+              {isSubmitting ? 'Checking...' : method === 'call' ? 'Setup Masked Call' : 'Continue'}
             </button>
           </div>
         </form>
@@ -750,7 +810,7 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
   const [statusChecked, setStatusChecked] = useState(false);
   const [pendingStage, setPendingStage] = useState<'inactive-prompt' | 'details' | null>(null);
   const [detailsData, setDetailsData] = useState<DetailsData | null>(null);
-  const [callTarget, setCallTarget] = useState<CallTarget | null>(null);
+  const [callChoice, setCallChoice] = useState<{ target: CallTarget; method: 'call' | 'message' } | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -878,10 +938,15 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
           owner={detailsData.owner}
           vehicle={detailsData.vehicle}
           emergencyContacts={detailsData.emergencyContacts}
-          onRequestCall={(target) => setCallTarget(target)}
+          onChooseMethod={(target, method) => setCallChoice({ target, method })}
         />
-        {callTarget && (
-          <CallVerifyModal code={code} target={callTarget} onClose={() => setCallTarget(null)} />
+        {callChoice && (
+          <CallVerifyModal
+            code={code}
+            target={callChoice.target}
+            method={callChoice.method}
+            onClose={() => setCallChoice(null)}
+          />
         )}
       </>
     );

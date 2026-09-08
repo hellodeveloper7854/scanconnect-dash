@@ -429,6 +429,74 @@ qrCodesRouter.post('/:code/verify', async (req, res) => {
   });
 });
 
+const maskedCallSchema = z.object({
+  last4: z.string().length(4),
+  callerPhone: z.string().min(6).max(20),
+  target: z.union([
+    z.object({ kind: z.literal('owner') }),
+    z.object({ kind: z.literal('contact'), index: z.number().int().min(0) }),
+  ]),
+});
+
+/**
+ * Re-verifies the last-4 digits (never trust a client-held verification
+ * result across a second request) and logs a masked-call setup request —
+ * this is the same target-number lookup as /verify, but also records the
+ * caller's own phone number so a future Knowlarity SR-number / click-to-call
+ * integration has a real request to act on. Until that's wired up,
+ * `virtualNumber` is null and the frontend falls back to dialing the real
+ * destination number directly.
+ */
+qrCodesRouter.post('/:code/masked-call', async (req, res) => {
+  const parsed = maskedCallSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const qrCode = await prisma.qrCode.findUnique({
+    where: { code: req.params.code },
+    include: {
+      vehicle: { include: { user: { select: { fullName: true, mobileNumber: true } } } },
+      emergencyContacts: true,
+    },
+  });
+
+  if (!qrCode || qrCode.status !== 'ACTIVE' || !qrCode.vehicle) {
+    return res.status(404).json({ error: 'This QR code is not active' });
+  }
+
+  const last4 = qrCode.vehicle.registration.slice(-4).toUpperCase();
+  if (last4 !== parsed.data.last4.toUpperCase()) {
+    return res.status(400).json({ error: 'Incorrect digits. Please try again.' });
+  }
+
+  const { target } = parsed.data;
+  const destinationPhone =
+    target.kind === 'owner' ? qrCode.vehicle.user.mobileNumber : qrCode.emergencyContacts[target.index]?.phone;
+
+  if (!destinationPhone) {
+    return res.status(404).json({ error: 'No phone number available for this contact.' });
+  }
+
+  await prisma.maskedCallRequest.create({
+    data: {
+      qrCodeId: qrCode.id,
+      targetKind: target.kind,
+      targetIndex: target.kind === 'contact' ? target.index : null,
+      callerPhone: parsed.data.callerPhone,
+      // virtualNumber intentionally left null until Knowlarity (or another
+      // masking provider) is connected — see model doc comment.
+    },
+  });
+
+  res.json({
+    // TODO: replace with the Knowlarity SR/virtual number once that
+    // integration is wired up; falls back to the real number for now.
+    virtualNumber: destinationPhone,
+    isMasked: false,
+  });
+});
+
 const activateSchema = z.object({
   personal: z.object({
     fullName: z.string().min(1).max(120),

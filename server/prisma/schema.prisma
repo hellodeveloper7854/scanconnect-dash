@@ -118,10 +118,30 @@ model QrCode {
   updatedAt      DateTime      @updatedAt
 
   emergencyContacts EmergencyContact[]
+  maskedCallRequests MaskedCallRequest[]
 
   @@index([batchId])
   @@index([status])
   @@index([batchName])
+}
+
+/// One row per "masked call" setup a scanner completes after passing the
+/// last-4-digit verification — records who asked to be connected (their own
+/// phone number) and to whom, so a future Knowlarity click-to-call/SR-number
+/// integration has an audit trail and a request to act on. `virtualNumber`
+/// is filled in once a real masking provider is wired up; until then it's
+/// null and the UI falls back to dialing the real destination number.
+model MaskedCallRequest {
+  id            String   @id @default(uuid())
+  qrCodeId      String
+  qrCode        QrCode   @relation(fields: [qrCodeId], references: [id], onDelete: Cascade)
+  targetKind    String   // 'owner' | 'contact'
+  targetIndex   Int?     // emergency contact index, when targetKind is 'contact'
+  callerPhone   String
+  virtualNumber String?
+  createdAt     DateTime @default(now())
+
+  @@index([qrCodeId])
 }
 
 model Product {
