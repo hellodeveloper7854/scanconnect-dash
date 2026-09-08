@@ -62,7 +62,7 @@ export const DashboardFooter: React.FC = () => {
             </h4>
             <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
               {[
-                { label: 'Bike tag', href: '/shop?product=2' },
+                { label: 'Bike tag', href: '/shop?product=3' },
                 { label: 'Scan Connect Car Tag', href: '/shop?product=1' },
                 { label: 'How it works', href: '/' },
                 { label: 'eTag', href: '/shop#products' },
