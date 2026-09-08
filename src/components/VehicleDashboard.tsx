@@ -358,13 +358,21 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
       {/* MAIN DASHBOARD CONTENT */}
       <main className="flex-1">
 
-        {/* 1. HERO SECTION */}
-        <section className="relative bg-[#1B1C1C] text-white flex items-center overflow-hidden">
+        {/* 1. HERO SECTION — width is always 100% (plain block, no aspect-ratio
+             on the section itself, since combining `aspect-ratio` with
+             `max-height` lets the browser shrink the box's *width* instead of
+             cropping height, leaving empty space on wide/short windows).
+             Height instead comes from a plain `h-[..vh]` clamp that
+             approximates the banner's aspect ratio at common viewport widths;
+             `object-cover` then fills that box edge-to-edge with no empty
+             space, cropping a little on very wide/short windows as a
+             deliberate tradeoff. */}
+        <section className="relative w-full bg-[#1B1C1C] text-white flex items-center overflow-hidden h-[58vw] min-h-[420px] max-h-[100svh]">
           <div className="absolute inset-0 z-0">
             <img
               src={banner}
               alt="Scan Connect Vehicle Protection"
-              className="w-full h-full object-cover object-[85%_15%]"
+              className="w-full h-full object-cover object-[75%_20%]"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#1B1C1C] via-[#1B1C1C]/85 to-transparent" />
           </div>
@@ -372,19 +380,19 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 sm:py-20 lg:py-24 relative z-10 w-full">
             <div className="grid grid-cols-1 items-center">
               <div className="max-w-xl space-y-5">
-                <h1 className="font-['Rubik'] font-bold text-3xl sm:text-4xl lg:text-[46px] tracking-[-1px] leading-[1.15] text-white">
+                <h1 className="font-['Rubik'] font-bold text-3xl sm:text-5xl lg:text-[56px] tracking-[-1px] leading-[1.15] text-white">
                   Protect Your Privacy. <br></br><span className="text-[#FFED00]">Stay Reachable.</span>
                 </h1>
-                <p className="font-['Rubik'] font-semibold text-lg sm:text-xl text-white leading-[1.3]">
+                <p className="font-['Rubik'] font-semibold text-xl sm:text-2xl text-white leading-[1.3]">
                   The Smart QR Tag for Every Vehicle.
                 </p>
 
-                <p className="font-['Rubik'] font-normal text-xs sm:text-sm text-[#D1D5DB] leading-[24px] max-w-md pt-1">
+                <p className="font-['Rubik'] font-normal text-sm sm:text-base text-[#D1D5DB] leading-[26px] max-w-md pt-1">
                   Whether it&apos;s a blocked driveway, headlights left on, or an <span className="text-[#FFED00] font-semibold">accidental emergency</span>, anyone can contact you or your <span className="text-[#FFED00] font-semibold">family members</span> instantly&mdash;without ever seeing
                   your phone number.
                 </p>
 
-                <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#FFED00]">
+                <p className="font-['Inter'] font-bold text-sm tracking-[1.5px] uppercase text-[#FFED00]">
                   Privacy-First &bull; Instant Contact &bull; No App Required &bull; Lifetime Access &bull; No Monthly Subscription
                 </p>
 
