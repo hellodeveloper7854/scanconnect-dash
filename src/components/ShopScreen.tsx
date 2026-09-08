@@ -618,8 +618,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
               {boxContents.map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="h-full bg-neutral-50/70 border border-neutral-200 rounded-2xl p-5 flex flex-col gap-3 hover:border-[#FFED00]/50 hover:shadow-md transition-all">
-                  <div className="w-11 h-11 rounded-xl bg-[#FFED00]/15 flex items-center justify-center shrink-0">
-                    <Icon className="w-5 h-5 text-[#B58500]" />
+                  <div className="w-11 h-11 rounded-xl bg-[#FFED00] flex items-center justify-center shrink-0">
+                    <Icon className="w-5 h-5 text-[#1B1C1C]" />
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-sm font-bold text-[#0F0F0F] leading-snug">{title}</h3>
