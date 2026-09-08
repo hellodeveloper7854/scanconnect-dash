@@ -22,7 +22,7 @@ import {
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { UserFormData } from '../types';
-import scanBannerImg from '../assets/images/scanbanner.png';
+import scanBannerImg from '../assets/images/scanbanner.jpeg';
 import { useQrScanner } from '../lib/useQrScanner';
 import { useRevealOnScroll } from '../lib/useRevealOnScroll';
 
