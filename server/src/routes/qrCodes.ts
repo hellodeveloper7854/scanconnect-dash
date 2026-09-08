@@ -494,6 +494,12 @@ qrCodesRouter.post('/:code/masked-call', async (req, res) => {
     // integration is wired up; falls back to the real number for now.
     virtualNumber: destinationPhone,
     isMasked: false,
+    // Included explicitly (not just folded into virtualNumber) so whoever
+    // wires up Knowlarity has both legs of the bridge — callerPhone (from
+    // the request) and destinationPhone — without having to look anything
+    // else up to create the actual masked-call/click-to-call request.
+    destinationPhone,
+    callerPhone: parsed.data.callerPhone,
   });
 });
 

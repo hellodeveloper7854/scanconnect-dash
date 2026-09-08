@@ -178,6 +178,8 @@ const LoginGate: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
 interface MaskedCallResult {
   virtualNumber: string;
   isMasked: boolean;
+  destinationPhone: string;
+  callerPhone: string;
 }
 
 /**
