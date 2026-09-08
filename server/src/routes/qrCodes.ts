@@ -18,6 +18,11 @@ const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 // of size, while still bounding worst-case query/response size.
 const MAX_ADMIN_PAGE_SIZE = 5000;
 
+/** Formats the sequential displaySeq as a human-readable ID, e.g. SCANCONNECT000001. */
+function formatDisplayId(displaySeq: number): string {
+  return `SCANCONNECT${String(displaySeq).padStart(6, '0')}`;
+}
+
 function generateCode(length = 10): string {
   const bytes = randomBytes(length);
   let out = '';
@@ -89,6 +94,14 @@ adminQrCodesRouter.post('/bulk', async (req, res) => {
   res.status(500).json({ error: 'Failed to generate unique codes, please retry' });
 });
 
+/** Parses a SCANCONNECT000001-style search term back into its numeric displaySeq, or undefined if it doesn't look like one. */
+function parseDisplayIdSearch(term: string): number | undefined {
+  const match = term.trim().match(/^(?:SCANCONNECT)?0*(\d+)$/i);
+  if (!match) return undefined;
+  const n = Number(match[1]);
+  return Number.isFinite(n) && n > 0 ? n : undefined;
+}
+
 function buildQrCodeWhere(query: Record<string, unknown>): Prisma.QrCodeWhereInput {
   const status = typeof query.status === 'string' ? query.status : undefined;
   const batchId = typeof query.batchId === 'string' ? query.batchId : undefined;
@@ -108,10 +121,16 @@ function buildQrCodeWhere(query: Record<string, unknown>): Prisma.QrCodeWhereInp
         }
       : {};
 
+  const displaySeq = name ? parseDisplayIdSearch(name) : undefined;
+
   return {
     ...(status ? { status: status as never } : {}),
     ...(batchId ? { batchId } : {}),
-    ...(name ? { batchName: { contains: name, mode: 'insensitive' } } : {}),
+    ...(name
+      ? displaySeq !== undefined
+        ? { OR: [{ batchName: { contains: name, mode: 'insensitive' } }, { displaySeq }, { code: { equals: name, mode: 'insensitive' } }] }
+        : { OR: [{ batchName: { contains: name, mode: 'insensitive' } }, { code: { equals: name, mode: 'insensitive' } }] }
+      : {}),
     ...createdAtFilter,
   };
 }
@@ -167,12 +186,13 @@ adminQrCodesRouter.get('/:batchId/download.csv', async (req, res) => {
   }
 
   const rows = codes.map((c) => ({
+    displayId: formatDisplayId(c.displaySeq),
     code: c.code,
     url: `${env.corsOrigin}/qr/${c.code}`,
     status: c.status,
     createdAt: c.createdAt.toISOString(),
   }));
-  const csv = toCsv(rows, ['code', 'url', 'status', 'createdAt']);
+  const csv = toCsv(rows, ['displayId', 'code', 'url', 'status', 'createdAt']);
 
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', `attachment; filename="qr-batch-${req.params.batchId.slice(0, 8)}.csv"`);

@@ -104,6 +104,12 @@ enum QrCodeStatus {
 model QrCode {
   id             String        @id @default(uuid())
   code           String        @unique
+  /// Sequential, human-readable identifier (e.g. SCANCONNECT000001), shown to
+  /// admin staff for quick lookup — never used in the scan URL, which stays
+  /// on the random `code` for security. Backed by a DB sequence
+  /// (autoincrement) so bulk-inserts assign gapless-per-request, unique
+  /// numbers without a race condition.
+  displaySeq     Int           @unique @default(autoincrement())
   status         QrCodeStatus  @default(INACTIVE)
   /// Status to restore when this code is re-enabled from DISABLED (ACTIVE if
   /// it was a live vehicle tag, INACTIVE if it had never been claimed yet).

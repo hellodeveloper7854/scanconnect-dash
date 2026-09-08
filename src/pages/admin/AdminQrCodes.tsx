@@ -68,9 +68,15 @@ const AuthedQrImage: React.FC<{
   return <img src={src} alt={alt} className={className} onLoad={onReady} />;
 };
 
+/** Formats the sequential displaySeq as a human-readable ID, e.g. SCANCONNECT000001. */
+function formatDisplayId(displaySeq: number): string {
+  return `SCANCONNECT${String(displaySeq).padStart(6, '0')}`;
+}
+
 interface QrCodeRow {
   id: string;
   code: string;
+  displaySeq: number;
   status: 'INACTIVE' | 'ACTIVE' | 'DISABLED';
   batchId: string;
   batchName: string;
@@ -372,13 +378,13 @@ export const AdminQrCodes: React.FC = () => {
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3">
         <div className="space-y-1">
-          <label className="text-[10px] font-bold text-white/40 uppercase">Name</label>
+          <label className="text-[10px] font-bold text-white/40 uppercase">Search</label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
             <input
               value={nameFilter}
               onChange={(e) => setNameFilter(e.target.value)}
-              placeholder="Search batch name"
+              placeholder="Batch name, ID, or code"
               className="pl-9 pr-3 h-10 bg-white/10 border border-white/10 text-white text-sm rounded-md w-56 focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
             />
           </div>
@@ -485,6 +491,7 @@ export const AdminQrCodes: React.FC = () => {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-white/50 uppercase text-xs border-b border-white/10">
+                <th className="px-4 py-3">ID</th>
                 <th className="px-4 py-3">Code</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Vehicle Owner</th>
@@ -497,6 +504,7 @@ export const AdminQrCodes: React.FC = () => {
             <tbody>
               {codes.map((c) => (
                 <tr key={c.id} className="border-b border-white/5">
+                  <td className="px-4 py-3 text-[#FFED00] font-mono text-xs whitespace-nowrap">{formatDisplayId(c.displaySeq)}</td>
                   <td className="px-4 py-3 text-white font-mono">{c.code}</td>
                   <td className="px-4 py-3">
                     <span
