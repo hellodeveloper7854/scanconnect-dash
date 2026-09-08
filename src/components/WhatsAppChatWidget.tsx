@@ -22,19 +22,19 @@ export const WhatsAppChatWidget: React.FC = () => {
       {isOpen && (
         <div className="w-[320px] max-w-[calc(100vw-2.5rem)] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] border border-neutral-200 overflow-hidden animate-fade-in">
           {/* Header */}
-          <div className="bg-[#25D366] px-4 py-3.5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-              <MessageCircle className="w-5 h-5 text-white" />
+          <div className="bg-[#FFED00] px-4 py-3.5 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#1B1C1C]/10 flex items-center justify-center shrink-0">
+              <MessageCircle className="w-5 h-5 text-[#1B1C1C]" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-sm leading-tight">Scan Connect Support</p>
-              <p className="text-white/80 text-xs leading-tight">Typically replies within minutes</p>
+              <p className="text-[#1B1C1C] font-bold text-sm leading-tight">Scan Connect Support</p>
+              <p className="text-[#1B1C1C]/70 text-xs leading-tight">Typically replies within minutes</p>
             </div>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
               aria-label="Close chat widget"
-              className="text-white/90 hover:text-white cursor-pointer shrink-0"
+              className="text-[#1B1C1C]/80 hover:text-[#1B1C1C] cursor-pointer shrink-0"
             >
               <X className="w-5 h-5" />
             </button>
@@ -69,7 +69,7 @@ export const WhatsAppChatWidget: React.FC = () => {
               href={buildWhatsAppLink('Hi, I need help with Scan Connect.')}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-shimmer w-full h-[44px] bg-[#25D366] hover:bg-[#1fbd5a] text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="btn-shimmer w-full h-[44px] bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <Send className="w-4 h-4" />
               <span>Start WhatsApp Chat</span>
@@ -83,12 +83,12 @@ export const WhatsAppChatWidget: React.FC = () => {
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         aria-label={isOpen ? 'Close WhatsApp chat' : 'Open WhatsApp chat'}
-        className="btn-shimmer w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#1fbd5a] shadow-[0_10px_30px_rgba(37,211,102,0.5)] hover:-translate-y-0.5 flex items-center justify-center transition-all cursor-pointer active:scale-95"
+        className="btn-shimmer w-14 h-14 rounded-full bg-[#FFED00] hover:bg-[#e0ac00] shadow-[0_10px_30px_rgba(242,186,3,0.5)] hover:-translate-y-0.5 flex items-center justify-center transition-all cursor-pointer active:scale-95"
       >
         {isOpen ? (
-          <X className="w-6 h-6 text-white" />
+          <X className="w-6 h-6 text-[#1B1C1C]" />
         ) : (
-          <MessageCircle className="w-7 h-7 text-white" />
+          <MessageCircle className="w-7 h-7 text-[#1B1C1C]" />
         )}
       </button>
     </div>

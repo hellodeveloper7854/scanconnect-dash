@@ -53,10 +53,49 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [featuresModalProductId, setFeaturesModalProductId] = useState<number | null>(null);
 
+  // Set when "Back to Shop" is used to close a product, so the effect below
+  // scrolls to the catalogue instead of the top once selectedProduct clears —
+  // covers both the direct-close and the async history.back()/popstate path.
+  const scrollToCatalogueRef = React.useRef(false);
+
   React.useEffect(() => {
+    if (selectedProduct) return;
+    if (scrollToCatalogueRef.current) {
+      scrollToCatalogueRef.current = false;
+      document.getElementById('products')?.scrollIntoView({ block: 'start' });
+      return;
+    }
     if (window.location.hash) return;
     window.scrollTo(0, 0);
   }, [selectedProduct]);
+
+  // Opening a product pushes a history entry (depth 1 in the shop -> product
+  // -> checkout -> payment nesting) so the browser Back button closes the
+  // product detail view instead of leaving the shop entirely. Every level in
+  // this chain (see the matching depth-2 wiring in ProductDetailScreen and
+  // depth-3 wiring in CheckoutFlowScreen) only reacts to popstate when history
+  // has unwound to BELOW its own depth — otherwise a single Back press would
+  // fire every mounted level's listener at once and they'd all try to close.
+  const openProduct = (p: any) => {
+    setSelectedProduct(p);
+    window.history.pushState({ scDepth: 1 }, '', `${window.location.pathname}?product=${p.id}`);
+  };
+  const closeProduct = () => {
+    scrollToCatalogueRef.current = true;
+    if ((window.history.state?.scDepth ?? 0) >= 1) {
+      window.history.back();
+    } else {
+      setSelectedProduct(null);
+    }
+  };
+
+  React.useEffect(() => {
+    const handlePopState = () => {
+      if ((window.history.state?.scDepth ?? 0) < 1) setSelectedProduct(null);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Deep-link support: /shop#products (footer "eTag" link) scrolls straight
   // to the product catalogue instead of landing at the top of the page.
@@ -224,7 +263,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         onLogout={onLogout}
         onNavigate={onNavigate}
         isLoggedIn={isLoggedIn}
-        onBackToShop={() => setSelectedProduct(null)}
+        onBackToShop={closeProduct}
       />
     );
   }
@@ -480,7 +519,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
                     <button
                       onClick={() =>
-                        setSelectedProduct({
+                        openProduct({
                           id: prod.id,
                           tag: prod.badge || 'SCAN CONNECT',
                           rating: '4.8',

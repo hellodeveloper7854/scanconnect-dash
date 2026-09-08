@@ -36,6 +36,13 @@ const REGISTRATION_PATTERN = /^[A-Za-z0-9 -]{4,}$/;
 const PHONE_PATTERN = /^\+?[0-9 ()-]{6,20}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Shipping fields — must mirror server/src/routes/orders.ts exactly so the
+// backend never rejects something the frontend already accepted.
+const SHIPPING_NAME_PATTERN = /^[A-Za-z][A-Za-z .'-]{1,79}$/;
+const SHIPPING_PHONE_PATTERN = /^[6-9]\d{9}$/;
+const SHIPPING_CITY_PATTERN = /^[A-Za-z][A-Za-z .'-]{1,79}$/;
+const SHIPPING_PINCODE_PATTERN = /^\d{6}$/;
+
 declare global {
   interface Window {
     Razorpay: new (options: Record<string, unknown>) => { open: () => void };
@@ -91,6 +98,32 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
     window.scrollTo(0, 0);
   }, [step]);
 
+  // Moving from Shipping to Payment pushes a history entry at depth 3 (see the
+  // matching depth-1 wiring in ShopScreen and depth-2 wiring in
+  // ProductDetailScreen — depth, not a boolean flag, so a single Back press
+  // only closes the deepest-open level instead of every mounted level at
+  // once). Step 3 (post-payment review) intentionally does NOT get a history
+  // entry — once payment succeeds there is no "back" to a pre-payment state.
+  const goToPayment = () => {
+    setStep(2);
+    window.history.pushState({ scDepth: 3 }, '', `${window.location.pathname}${window.location.search}#payment`);
+  };
+  const backToShipping = () => {
+    if ((window.history.state?.scDepth ?? 0) >= 3) {
+      window.history.back();
+    } else {
+      setStep(1);
+    }
+  };
+
+  React.useEffect(() => {
+    const handlePopState = () => {
+      if ((window.history.state?.scDepth ?? 0) < 3) setStep((s) => (s === 2 ? 1 : s));
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   // Form states for Shipping (Step 1)
   const [fullName, setFullName] = useState(userData.fullName || '');
   const [phone, setPhone] = useState(userData.mobileNumber || '');
@@ -98,14 +131,27 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   const [pincode, setPincode] = useState(userData.pincode || '');
   const [address, setAddress] = useState(userData.address || '');
   const [shippingError, setShippingError] = useState('');
+  const [shippingTouched, setShippingTouched] = useState<Record<string, boolean>>({});
+
+  const shippingFieldErrors = {
+    fullName: SHIPPING_NAME_PATTERN.test(fullName.trim()) ? '' : 'Enter a valid full name (letters only, at least 2 characters)',
+    phone: SHIPPING_PHONE_PATTERN.test(phone.trim()) ? '' : 'Enter a valid 10-digit mobile number',
+    city: SHIPPING_CITY_PATTERN.test(city.trim()) ? '' : 'Enter a valid city name (letters only)',
+    pincode: SHIPPING_PINCODE_PATTERN.test(pincode.trim()) ? '' : 'Enter a valid 6-digit pincode',
+    address: address.trim().length >= 10 ? '' : 'Address must be at least 10 characters',
+  };
+  const isShippingFormValid = Object.values(shippingFieldErrors).every((e) => !e);
+
+  const markShippingTouched = (field: string) => setShippingTouched((t) => ({ ...t, [field]: true }));
 
   const handleContinueToPayment = () => {
-    if (!fullName.trim() || !phone.trim() || !city.trim() || !pincode.trim() || !address.trim()) {
-      setShippingError('Please fill in your phone number, city, pincode, and delivery address before continuing.');
+    setShippingTouched({ fullName: true, phone: true, city: true, pincode: true, address: true });
+    if (!isShippingFormValid) {
+      setShippingError('Please fix the highlighted fields before continuing.');
       return;
     }
     setShippingError('');
-    setStep(2);
+    goToPayment();
   };
 
   // Payment (Step 2) — Razorpay handles the actual payment method selection
@@ -326,7 +372,16 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
         razorpayKeyId: string;
         amount: number;
         currency: string;
-      }>('/api/orders', { items: [{ productId: CHECKOUT_PRODUCT_ID, quantity: 1 }] });
+      }>('/api/orders', {
+        items: [{ productId: CHECKOUT_PRODUCT_ID, quantity: 1 }],
+        shipping: {
+          name: fullName.trim(),
+          phone: phone.trim(),
+          city: city.trim(),
+          pincode: pincode.trim(),
+          address: address.trim(),
+        },
+      });
 
       const razorpay = new window.Razorpay({
         key: created.razorpayKeyId,
@@ -391,9 +446,9 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
         <div className="flex flex-row justify-center items-center w-full max-w-[672px] h-[72px] mx-auto px-2">
           
           {/* STEP 1: SHIPPING */}
-          <div 
+          <div
             className="flex flex-col items-center gap-[8px] w-[94px] h-[72px] shrink-0 cursor-pointer"
-            onClick={() => step > 1 && setStep(1)}
+            onClick={() => step === 2 ? backToShipping() : step > 1 && setStep(1)}
           >
             <div
               className={`flex flex-row justify-center items-center w-[40px] h-[40px] rounded-full transition-all ${
@@ -419,9 +474,9 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
           </div>
 
           {/* STEP 2: PAYMENT */}
-          <div 
+          <div
             className="flex flex-col items-center gap-[8px] w-[93px] h-[72px] shrink-0 cursor-pointer"
-            onClick={() => step > 2 && setStep(2)}
+            onClick={() => step > 2 && goToPayment()}
           >
             <div
               className={`flex flex-row justify-center items-center w-[40px] h-[40px] rounded-full transition-all ${
@@ -504,10 +559,16 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         type="text"
                         required
                         value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        onChange={(e) => setFullName(e.target.value.replace(/[^A-Za-z .'-]/g, ''))}
+                        onBlur={() => markShippingTouched('fullName')}
                         placeholder="John Doe"
-                        className="w-full h-[42px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00]"
+                        className={`w-full h-[42px] bg-[#FFFFFF] border rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00] ${
+                          shippingTouched.fullName && shippingFieldErrors.fullName ? 'border-red-500' : 'border-[#6B7280]'
+                        }`}
                       />
+                      {shippingTouched.fullName && shippingFieldErrors.fullName && (
+                        <p className="text-xs font-semibold text-red-600">{shippingFieldErrors.fullName}</p>
+                      )}
                     </div>
 
                     {/* Frame 50: Phone Number */}
@@ -516,13 +577,19 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         Phone Number <span className="text-red-500">*</span>
                       </label>
                       <input
-                        type="text"
+                        type="tel"
                         required
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+91 98765 43210"
-                        className="w-full h-[42px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00]"
+                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                        onBlur={() => markShippingTouched('phone')}
+                        placeholder="9876543210"
+                        className={`w-full h-[42px] bg-[#FFFFFF] border rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00] ${
+                          shippingTouched.phone && shippingFieldErrors.phone ? 'border-red-500' : 'border-[#6B7280]'
+                        }`}
                       />
+                      {shippingTouched.phone && shippingFieldErrors.phone && (
+                        <p className="text-xs font-semibold text-red-600">{shippingFieldErrors.phone}</p>
+                      )}
                     </div>
 
                     {/* Frame 51: City */}
@@ -534,10 +601,16 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         type="text"
                         required
                         value={city}
-                        onChange={(e) => setCity(e.target.value)}
+                        onChange={(e) => setCity(e.target.value.replace(/[^A-Za-z .'-]/g, ''))}
+                        onBlur={() => markShippingTouched('city')}
                         placeholder="Mumbai"
-                        className="w-full h-[42px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00]"
+                        className={`w-full h-[42px] bg-[#FFFFFF] border rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00] ${
+                          shippingTouched.city && shippingFieldErrors.city ? 'border-red-500' : 'border-[#6B7280]'
+                        }`}
                       />
+                      {shippingTouched.city && shippingFieldErrors.city && (
+                        <p className="text-xs font-semibold text-red-600">{shippingFieldErrors.city}</p>
+                      )}
                     </div>
 
                     {/* Frame 52: Pincode */}
@@ -547,12 +620,19 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       </label>
                       <input
                         type="text"
+                        inputMode="numeric"
                         required
                         value={pincode}
-                        onChange={(e) => setPincode(e.target.value)}
+                        onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        onBlur={() => markShippingTouched('pincode')}
                         placeholder="400001"
-                        className="w-full h-[42px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00]"
+                        className={`w-full h-[42px] bg-[#FFFFFF] border rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00] ${
+                          shippingTouched.pincode && shippingFieldErrors.pincode ? 'border-red-500' : 'border-[#6B7280]'
+                        }`}
                       />
+                      {shippingTouched.pincode && shippingFieldErrors.pincode && (
+                        <p className="text-xs font-semibold text-red-600">{shippingFieldErrors.pincode}</p>
+                      )}
                     </div>
                   </div>
 
@@ -566,9 +646,15 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       rows={2}
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
+                      onBlur={() => markShippingTouched('address')}
                       placeholder="House No, Street, Landmark..."
-                      className="w-full h-[57px] bg-[#FFFFFF] border border-[#6B7280] rounded-[5px] px-[13px] py-[10px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00] resize-none overflow-y-auto"
+                      className={`w-full h-[57px] bg-[#FFFFFF] border rounded-[5px] px-[13px] py-[10px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00] resize-none overflow-y-auto ${
+                        shippingTouched.address && shippingFieldErrors.address ? 'border-red-500' : 'border-[#6B7280]'
+                      }`}
                     />
+                    {shippingTouched.address && shippingFieldErrors.address && (
+                      <p className="text-xs font-semibold text-red-600">{shippingFieldErrors.address}</p>
+                    )}
                   </div>
                 </div>
 
@@ -579,7 +665,8 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                   )}
                   <button
                     onClick={handleContinueToPayment}
-                    className="w-full sm:w-[232.2px] h-[56px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-[8px] flex items-center justify-center font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95"
+                    disabled={!isShippingFormValid}
+                    className="w-full sm:w-[232.2px] h-[56px] bg-[#FFED00] hover:enabled:bg-[#e0ac00] rounded-[8px] flex items-center justify-center font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:enabled:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Continue to Payment
                   </button>
@@ -689,9 +776,17 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
         {step === 2 && (
           <div className="space-y-8 animate-fade-in">
             <div className="space-y-1">
-              <h2 className="font-['Plus_Jakarta_Sans'] font-normal text-[24px] sm:text-[28px] leading-[32px] text-[#1B1C1C]">
-                Complete Your Payment
-              </h2>
+              <div className="flex items-center justify-between">
+                <h2 className="font-['Plus_Jakarta_Sans'] font-normal text-[24px] sm:text-[28px] leading-[32px] text-[#1B1C1C]">
+                  Complete Your Payment
+                </h2>
+                <button
+                  onClick={backToShipping}
+                  className="text-xs font-bold text-[#5F5E5E] hover:text-[#1B1C1C] flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back
+                </button>
+              </div>
               <p className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
                 All transactions are encrypted and secure. You&apos;ll choose your payment method on the next screen.
               </p>

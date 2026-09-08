@@ -59,6 +59,30 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
     window.scrollTo(0, 0);
   }, [isCheckoutOpen]);
 
+  // Opening checkout pushes a history entry at depth 2 (see the matching
+  // depth-1 wiring in ShopScreen and depth-3 wiring in CheckoutFlowScreen —
+  // depth, not a boolean flag, so a single Back press only closes the
+  // deepest-open level instead of every mounted level at once).
+  const openCheckout = () => {
+    setIsCheckoutOpen(true);
+    window.history.pushState({ scDepth: 2 }, '', `${window.location.pathname}${window.location.search}#checkout`);
+  };
+  const closeCheckout = () => {
+    if ((window.history.state?.scDepth ?? 0) >= 2) {
+      window.history.back();
+    } else {
+      setIsCheckoutOpen(false);
+    }
+  };
+
+  React.useEffect(() => {
+    const handlePopState = () => {
+      if ((window.history.state?.scDepth ?? 0) < 2) setIsCheckoutOpen(false);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const scrollReviews = (direction: 'left' | 'right') => {
     const track = reviewsTrackRef.current;
     if (!track) return;
@@ -121,7 +145,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   const productPrice = product?.price || '₹499';
 
   const handleBuyNow = () => {
-    setIsCheckoutOpen(true);
+    openCheckout();
   };
 
   if (isCheckoutOpen) {
@@ -131,7 +155,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
         onLogout={onLogout}
         onNavigate={onNavigate}
         isLoggedIn={isLoggedIn}
-        onBackToProduct={() => setIsCheckoutOpen(false)}
+        onBackToProduct={closeCheckout}
         product={{
           id: product?.id || 1,
           title: productTitle,

@@ -8,8 +8,22 @@ import { requireAuth } from '../middleware/auth.js';
 
 export const ordersRouter = Router();
 
+const NAME_PATTERN = /^[A-Za-z][A-Za-z .'-]{1,79}$/;
+const PHONE_PATTERN = /^[6-9]\d{9}$/;
+const CITY_PATTERN = /^[A-Za-z][A-Za-z .'-]{1,79}$/;
+const PINCODE_PATTERN = /^\d{6}$/;
+
+const shippingSchema = z.object({
+  name: z.string().regex(NAME_PATTERN, 'Enter a valid full name (letters only)'),
+  phone: z.string().regex(PHONE_PATTERN, 'Enter a valid 10-digit Indian mobile number'),
+  city: z.string().regex(CITY_PATTERN, 'Enter a valid city name (letters only)'),
+  pincode: z.string().regex(PINCODE_PATTERN, 'Enter a valid 6-digit pincode'),
+  address: z.string().trim().min(10, 'Address must be at least 10 characters').max(500),
+});
+
 const createOrderSchema = z.object({
   items: z.array(z.object({ productId: z.string().uuid(), quantity: z.number().int().min(1) })).min(1),
+  shipping: shippingSchema,
 });
 
 ordersRouter.post('/', requireAuth, async (req, res) => {
@@ -31,11 +45,17 @@ ordersRouter.post('/', requireAuth, async (req, res) => {
   });
   const totalInPaise = items.reduce((sum, i) => sum + i.priceInPaise * i.quantity, 0);
 
+  const { shipping } = parsed.data;
   const order = await prisma.order.create({
     data: {
       userId: req.user!.id,
       totalInPaise,
       items: { create: items },
+      shippingName: shipping.name,
+      shippingPhone: shipping.phone,
+      shippingCity: shipping.city,
+      shippingPincode: shipping.pincode,
+      shippingAddress: shipping.address,
     },
     include: { items: true },
   });

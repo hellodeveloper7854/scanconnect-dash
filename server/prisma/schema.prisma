@@ -169,6 +169,11 @@ model Order {
   vehicle             Vehicle?          @relation(fields: [vehicleId], references: [id])
   emergencyContactId  String?
   emergencyContact    EmergencyContact? @relation(fields: [emergencyContactId], references: [id])
+  shippingName        String?
+  shippingPhone       String?
+  shippingCity        String?
+  shippingPincode     String?
+  shippingAddress     String?
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 
