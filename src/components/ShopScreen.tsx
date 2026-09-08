@@ -336,7 +336,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                       key={item.label}
                       className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-neutral-200 rounded-full text-xs font-bold text-[#0F0F0F] shadow-xs"
                     >
-                      <Icon className="w-3.5 h-3.5 text-[#FFED00]" />
+                      <span className="w-5 h-5 rounded-full bg-[#FFED00] flex items-center justify-center shrink-0">
+                        <Icon className="w-3 h-3 text-[#1B1C1C]" />
+                      </span>
                       <span>{item.label}</span>
                     </div>
                   );
