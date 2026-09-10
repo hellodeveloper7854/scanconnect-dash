@@ -1,6 +1,22 @@
 export type StickerLang = 'en' | 'hi';
 export type StickerSize = 'bike' | 'car';
 
+/** Lowercases and strips a batch name down to URL/print-safe [a-z0-9-] characters, for use in a display ID. Mirrors server/src/routes/qrCodes.ts. */
+function slugifyBatchName(batchName: string): string {
+  return (
+    batchName
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'batch'
+  );
+}
+
+/** Formats a QR code's human-readable ID as SC-{BATCHNAME}-0001 (batchSeq is 1-indexed within its batch). Mirrors server/src/routes/qrCodes.ts. */
+export function formatQrDisplayId(batchName: string, batchSeq: number): string {
+  return `sc-${slugifyBatchName(batchName)}-${String(batchSeq).padStart(4, '0')}`.toUpperCase();
+}
+
 // Physical label sizes at 300 DPI. Car keeps the bike's 8:5 aspect ratio, doubled.
 export const STICKER_DIMENSIONS_PX: Record<StickerSize, { width: number; height: number }> = {
   bike: { width: 1200, height: 750 }, // 4in x 2.5in
@@ -304,7 +320,7 @@ const STICKER_ICONS: ((ctx: CanvasRenderingContext2D, cx: number, cy: number, s:
  */
 export async function drawBrandedQrCanvas(
   qrBlob: Blob,
-  opts: { lang: StickerLang; size: StickerSize } = { lang: 'en', size: 'bike' },
+  opts: { lang: StickerLang; size: StickerSize; displayId?: string } = { lang: 'en', size: 'bike' },
 ): Promise<HTMLCanvasElement> {
   const [qrImage] = await Promise.all([
     createImageBitmap(qrBlob),
@@ -403,7 +419,10 @@ export async function drawBrandedQrCanvas(
   // so it can never render past the sticker's bottom edge regardless of how
   // many lines a given language wraps to (Hindi text is visibly wider per
   // character than English at the same pixel size, so it wraps to more lines
-  // and was previously getting clipped off the bottom of the canvas).
+  // and was previously getting clipped off the bottom of the canvas). The
+  // display ID (e.g. SC-MALLPARKING-0001) is drawn after the subline without
+  // reserving its own budget here, so the subline's size is unaffected by it.
+  const displayIdFontSize = Math.round(sublineFontSizeFitted * 0.8);
   const sublineAvailableHeight = height - pad - headlineY;
   let sublineFontSize = sublineFontSizeFitted;
   let sublineLines = wrapText(ctx, text.subline, headlineMaxWidth);
@@ -419,6 +438,13 @@ export async function drawBrandedQrCanvas(
   for (const line of sublineLines) {
     ctx.fillText(line, pad, sublineY);
     sublineY += sublineFontSize * 1.35;
+  }
+
+  // Display ID — lighter and smaller than the subline, directly beneath it.
+  if (opts.displayId) {
+    ctx.font = `normal ${displayIdFontSize}px sans-serif`;
+    ctx.fillStyle = '#9CA3AF';
+    ctx.fillText(opts.displayId, pad, sublineY);
   }
 
   // Right panel — brand yellow background with QR code + icon row.
@@ -488,7 +514,7 @@ export function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 export async function fetchBrandedQrPngBlob(
   url: string,
   idToken: string | undefined,
-  opts: { lang: StickerLang; size: StickerSize },
+  opts: { lang: StickerLang; size: StickerSize; displayId?: string },
 ): Promise<Blob> {
   const res = await fetch(url, { headers: idToken ? { Authorization: `Bearer ${idToken}` } : {} });
   const rawBlob = await res.blob();

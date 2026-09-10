@@ -11,6 +11,7 @@ import {
   canvasToBlob,
   fetchBrandedQrPngBlob,
   triggerBlobDownload,
+  formatQrDisplayId,
 } from '../../lib/qrSticker';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
@@ -32,8 +33,9 @@ const AuthedQrImage: React.FC<{
   branded?: boolean;
   lang?: StickerLang;
   size?: StickerSize;
+  displayId?: string;
   onReady?: () => void;
-}> = ({ id, alt, className, branded, lang = 'en' as StickerLang, size = 'bike' as StickerSize, onReady }) => {
+}> = ({ id, alt, className, branded, lang = 'en' as StickerLang, size = 'bike' as StickerSize, displayId, onReady }) => {
   const [src, setSrc] = useState('');
 
   useEffect(() => {
@@ -43,7 +45,7 @@ const AuthedQrImage: React.FC<{
     auth.currentUser?.getIdToken().then(async (idToken) => {
       const qrUrl = `${API_BASE_URL}/api/admin/qr-codes/${id}/qr.png`;
       const blob = branded
-        ? await fetchBrandedQrPngBlob(qrUrl, idToken, { lang, size })
+        ? await fetchBrandedQrPngBlob(qrUrl, idToken, { lang, size, displayId })
         : await fetch(qrUrl, { headers: idToken ? { Authorization: `Bearer ${idToken}` } : {} }).then((r) => r.blob());
       if (cancelled) return;
       objectUrl = URL.createObjectURL(blob);
@@ -54,7 +56,7 @@ const AuthedQrImage: React.FC<{
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [id, branded, lang, size]);
+  }, [id, branded, lang, size, displayId]);
 
   if (!src) {
     const { width, height } = STICKER_DIMENSIONS_PX[size];
@@ -68,15 +70,11 @@ const AuthedQrImage: React.FC<{
   return <img src={src} alt={alt} className={className} onLoad={onReady} />;
 };
 
-/** Formats the sequential displaySeq as a human-readable ID, e.g. SCANCONNECT000001. */
-function formatDisplayId(displaySeq: number): string {
-  return `SCANCONNECT${String(displaySeq).padStart(6, '0')}`;
-}
-
 interface QrCodeRow {
   id: string;
   code: string;
   displaySeq: number;
+  batchSeq: number;
   status: 'INACTIVE' | 'ACTIVE' | 'DISABLED';
   batchId: string;
   batchName: string;
@@ -202,15 +200,15 @@ export const AdminQrCodes: React.FC = () => {
     }
   };
 
-  const downloadBrandedQrPng = async (id: string, code: string) => {
+  const downloadBrandedQrPng = async (row: QrCodeRow) => {
     try {
       const idToken = await auth.currentUser?.getIdToken();
       const blob = await fetchBrandedQrPngBlob(
-        `${API_BASE_URL}/api/admin/qr-codes/${id}/qr.png`,
+        `${API_BASE_URL}/api/admin/qr-codes/${row.id}/qr.png`,
         idToken,
-        { lang: stickerLang, size: stickerSize },
+        { lang: stickerLang, size: stickerSize, displayId: formatQrDisplayId(row.batchName, row.batchSeq) },
       );
-      triggerBlobDownload(blob, `qr-${code}-${stickerSize}-${stickerLang}.png`);
+      triggerBlobDownload(blob, `qr-${row.code}-${stickerSize}-${stickerLang}.png`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to download PNG');
     }
@@ -230,7 +228,7 @@ export const AdminQrCodes: React.FC = () => {
         const blob = await fetchBrandedQrPngBlob(
           `${API_BASE_URL}/api/admin/qr-codes/${c.id}/qr.png`,
           idToken,
-          { lang: stickerLang, size: stickerSize },
+          { lang: stickerLang, size: stickerSize, displayId: formatQrDisplayId(c.batchName, c.batchSeq) },
         );
         zip.file(`qr-${c.code}-${stickerSize}-${stickerLang}.png`, blob);
       }
@@ -504,7 +502,7 @@ export const AdminQrCodes: React.FC = () => {
             <tbody>
               {codes.map((c) => (
                 <tr key={c.id} className="border-b border-white/5">
-                  <td className="px-4 py-3 text-[#FFED00] font-mono text-xs whitespace-nowrap">{formatDisplayId(c.displaySeq)}</td>
+                  <td className="px-4 py-3 text-[#FFED00] font-mono text-xs whitespace-nowrap">{formatQrDisplayId(c.batchName, c.batchSeq)}</td>
                   <td className="px-4 py-3 text-white font-mono">{c.code}</td>
                   <td className="px-4 py-3">
                     <span
@@ -543,7 +541,7 @@ export const AdminQrCodes: React.FC = () => {
                   <td className="px-4 py-3 text-right whitespace-nowrap">
                     <button
                       type="button"
-                      onClick={() => downloadBrandedQrPng(c.id, c.code)}
+                      onClick={() => downloadBrandedQrPng(c)}
                       className="p-1.5 text-white/50 hover:text-[#FFED00] cursor-pointer inline-block"
                       title="Download PNG"
                     >
@@ -778,6 +776,7 @@ export const AdminQrCodes: React.FC = () => {
                           branded
                           lang={stickerLang}
                           size={stickerSize}
+                          displayId={formatQrDisplayId(c.batchName, c.batchSeq)}
                           onReady={() => setReadyTileCount((prev) => prev + 1)}
                         />
                         <span className="text-[10px] font-mono text-neutral-700">{c.code}</span>

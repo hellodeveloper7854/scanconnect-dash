@@ -18,9 +18,20 @@ const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 // of size, while still bounding worst-case query/response size.
 const MAX_ADMIN_PAGE_SIZE = 5000;
 
-/** Formats the sequential displaySeq as a human-readable ID, e.g. SCANCONNECT000001. */
-function formatDisplayId(displaySeq: number): string {
-  return `SCANCONNECT${String(displaySeq).padStart(6, '0')}`;
+/** Lowercases and strips a batch name down to URL/print-safe [a-z0-9-] characters, for use in a display ID. */
+function slugifyBatchName(batchName: string): string {
+  return (
+    batchName
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'batch'
+  );
+}
+
+/** Formats a QR code's human-readable ID as sc-{batchname}-0001 (batchSeq is 1-indexed within its batch). */
+function formatDisplayId(batchName: string, batchSeq: number): string {
+  return `sc-${slugifyBatchName(batchName)}-${String(batchSeq).padStart(4, '0')}`.toUpperCase();
 }
 
 function generateCode(length = 10): string {
@@ -63,14 +74,18 @@ adminQrCodesRouter.post('/bulk', async (req, res) => {
   const batchCreatedAt = new Date();
 
   let candidates = await createUniqueCodes(quantity);
-  const rows: { id: string; code: string }[] = candidates.map((code) => ({ id: randomUUID(), code }));
+  const rows: { id: string; code: string; batchSeq: number }[] = candidates.map((code, i) => ({
+    id: randomUUID(),
+    code,
+    batchSeq: i + 1,
+  }));
 
   // Insert with a retry loop in case of a (statistically negligible) unique
   // collision against codes already present in the database.
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
       await prisma.qrCode.createMany({
-        data: rows.map((r) => ({ id: r.id, code: r.code, batchId, batchName: name, batchCreatedAt })),
+        data: rows.map((r) => ({ id: r.id, code: r.code, batchSeq: r.batchSeq, batchId, batchName: name, batchCreatedAt })),
       });
       return res.status(201).json({ batchId, batchName: name, quantity, codes: rows });
     } catch (err) {
@@ -94,15 +109,55 @@ adminQrCodesRouter.post('/bulk', async (req, res) => {
   res.status(500).json({ error: 'Failed to generate unique codes, please retry' });
 });
 
-/** Parses a SCANCONNECT000001-style search term back into its numeric displaySeq, or undefined if it doesn't look like one. */
-function parseDisplayIdSearch(term: string): number | undefined {
-  const match = term.trim().match(/^(?:SCANCONNECT)?0*(\d+)$/i);
-  if (!match) return undefined;
-  const n = Number(match[1]);
-  return Number.isFinite(n) && n > 0 ? n : undefined;
+/**
+ * Resolves a free-text search term against the display ID (SC-{batchname}-0001)
+ * as-you-type — any partial prefix of the final ID should already match, not
+ * just a complete one — by reconstructing every distinct batch's ID prefix
+ * (sc-{slug}-) and checking it against the search term in both directions:
+ * either the term is a prefix of a real ID (typing "sc-first-lo" mid-word),
+ * or a real ID's batch prefix is a prefix of the term (typing "sc-first-lot-"
+ * or further into the sequence number). When digits have been typed past the
+ * prefix, they further narrow matches to codes whose zero-padded batchSeq
+ * starts with those digits (e.g. "...-00" matches batchSeq 1-9, "...-03"
+ * matches only batchSeq 3). Case-insensitive throughout. Batch names are few
+ * enough (one row per distinct batch, not per QR code) that this is cheap
+ * even at scale — no SQL equivalent for slugifyBatchName exists, so this has
+ * to run in application code.
+ */
+async function buildDisplayIdSearchWhere(term: string): Promise<Prisma.QrCodeWhereInput | undefined> {
+  const normalized = term.trim().toLowerCase();
+  if (!normalized) return undefined;
+
+  const batches = await prisma.qrCode.findMany({
+    distinct: ['batchId'],
+    select: { batchId: true, batchName: true },
+  });
+
+  const clauses: Prisma.QrCodeWhereInput[] = [];
+  for (const { batchId, batchName } of batches) {
+    const idPrefix = `sc-${slugifyBatchName(batchName)}-`;
+    if (idPrefix.startsWith(normalized)) {
+      // Not enough typed yet to reach the sequence number — every code in this batch matches so far.
+      clauses.push({ batchId });
+    } else if (normalized.startsWith(idPrefix)) {
+      const digitsTyped = normalized.slice(idPrefix.length);
+      if (!digitsTyped) {
+        clauses.push({ batchId });
+      } else if (/^\d+$/.test(digitsTyped)) {
+        // String-prefix match on the zero-padded 4-digit sequence number (e.g. "03"
+        // must match only batchSeq 3 → "0003", not the numeric range 300-399).
+        const matchingSeqs: number[] = [];
+        for (let seq = 1; seq <= 9999; seq++) {
+          if (String(seq).padStart(4, '0').startsWith(digitsTyped)) matchingSeqs.push(seq);
+        }
+        if (matchingSeqs.length) clauses.push({ batchId, batchSeq: { in: matchingSeqs } });
+      }
+    }
+  }
+  return clauses.length ? { OR: clauses } : undefined;
 }
 
-function buildQrCodeWhere(query: Record<string, unknown>): Prisma.QrCodeWhereInput {
+async function buildQrCodeWhere(query: Record<string, unknown>): Promise<Prisma.QrCodeWhereInput> {
   const status = typeof query.status === 'string' ? query.status : undefined;
   const batchId = typeof query.batchId === 'string' ? query.batchId : undefined;
   const name = typeof query.name === 'string' ? query.name : undefined;
@@ -121,15 +176,19 @@ function buildQrCodeWhere(query: Record<string, unknown>): Prisma.QrCodeWhereInp
         }
       : {};
 
-  const displaySeq = name ? parseDisplayIdSearch(name) : undefined;
+  const idSearchWhere = name ? await buildDisplayIdSearchWhere(name) : undefined;
 
   return {
     ...(status ? { status: status as never } : {}),
     ...(batchId ? { batchId } : {}),
     ...(name
-      ? displaySeq !== undefined
-        ? { OR: [{ batchName: { contains: name, mode: 'insensitive' } }, { displaySeq }, { code: { equals: name, mode: 'insensitive' } }] }
-        : { OR: [{ batchName: { contains: name, mode: 'insensitive' } }, { code: { equals: name, mode: 'insensitive' } }] }
+      ? {
+          OR: [
+            { batchName: { contains: name, mode: 'insensitive' } },
+            { code: { contains: name, mode: 'insensitive' } },
+            ...(idSearchWhere ? [idSearchWhere] : []),
+          ],
+        }
       : {}),
     ...createdAtFilter,
   };
@@ -138,7 +197,7 @@ function buildQrCodeWhere(query: Record<string, unknown>): Prisma.QrCodeWhereInp
 adminQrCodesRouter.get('/', async (req, res) => {
   const page = Math.max(1, Number(req.query.page ?? 1));
   const pageSize = Math.min(MAX_ADMIN_PAGE_SIZE, Number(req.query.pageSize ?? 25));
-  const where = buildQrCodeWhere(req.query as Record<string, unknown>);
+  const where = await buildQrCodeWhere(req.query as Record<string, unknown>);
 
   const [codes, total, batchGroups] = await Promise.all([
     prisma.qrCode.findMany({
@@ -186,7 +245,7 @@ adminQrCodesRouter.get('/:batchId/download.csv', async (req, res) => {
   }
 
   const rows = codes.map((c) => ({
-    displayId: formatDisplayId(c.displaySeq),
+    displayId: formatDisplayId(c.batchName, c.batchSeq),
     code: c.code,
     url: `${env.corsOrigin}/qr/${c.code}`,
     status: c.status,
@@ -206,7 +265,7 @@ adminQrCodesRouter.get('/:batchId/download.csv', async (req, res) => {
  * code named "Mall Parking" regardless of which batch(es) it spans.
  */
 adminQrCodesRouter.get('/download.zip', async (req, res) => {
-  const where = buildQrCodeWhere(req.query as Record<string, unknown>);
+  const where = await buildQrCodeWhere(req.query as Record<string, unknown>);
 
   const codes = await prisma.qrCode.findMany({
     where,
