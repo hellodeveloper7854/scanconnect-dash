@@ -39,6 +39,7 @@ model User {
   preferences       UserPreferences?
   reviews           Review[]
   sosAlerts         SosAlert[]
+  notifications     Notification[]
 
   @@index([email])
   @@index([mobileNumber])
@@ -279,6 +280,30 @@ model SosAlert {
 
   @@index([userId])
   @@index([status])
+}
+
+enum NotificationType {
+  ORDER_PAID
+  MASKED_CALL
+}
+
+/// Real per-user notification, shown in the header bell — only ever created
+/// server-side from a genuine event (order paid, someone tried to contact a
+/// vehicle owner), never client-supplied.
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String
+  /// Optional deep-link path the frontend can navigate to on click (e.g. "/orders").
+  linkPath  String?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@index([userId, isRead])
 }
 
 model Reseller {

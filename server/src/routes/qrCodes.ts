@@ -7,6 +7,7 @@ import { prisma } from '../lib/prisma.js';
 import { env } from '../lib/env.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
 import { toCsv } from '../lib/csv.js';
+import { notify } from '../lib/notify.js';
 import type { Prisma } from '@prisma/client';
 
 // Crockford-ish base32 alphabet, ambiguous characters (0/O, 1/I) removed so
@@ -592,7 +593,7 @@ qrCodesRouter.post('/:code/masked-call', async (req, res) => {
   const qrCode = await prisma.qrCode.findUnique({
     where: { code: req.params.code },
     include: {
-      vehicle: { include: { user: { select: { fullName: true, mobileNumber: true } } } },
+      vehicle: { include: { user: { select: { id: true, fullName: true, mobileNumber: true } } } },
       emergencyContacts: true,
     },
   });
@@ -623,6 +624,14 @@ qrCodesRouter.post('/:code/masked-call', async (req, res) => {
       // virtualNumber intentionally left null until Knowlarity (or another
       // masking provider) is connected — see model doc comment.
     },
+  });
+
+  await notify({
+    userId: qrCode.vehicle.user.id,
+    type: 'MASKED_CALL',
+    title: 'Someone tried to contact you',
+    body: `A scan of your QR tag requested a call ${target.kind === 'owner' ? 'with you' : 'with an emergency contact'}.`,
+    linkPath: '/profile',
   });
 
   res.json({

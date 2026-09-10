@@ -5,6 +5,7 @@ import { prisma } from '../lib/prisma.js';
 import { razorpay } from '../lib/razorpay.js';
 import { env } from '../lib/env.js';
 import { requireAuth } from '../middleware/auth.js';
+import { notify } from '../lib/notify.js';
 
 export const ordersRouter = Router();
 
@@ -274,9 +275,9 @@ async function markOrderPaidAndRedeemCoupon(
   razorpayOrderId: string,
   paymentFields: { razorpayPaymentId?: string; razorpaySignature?: string },
 ) {
-  return prisma.$transaction(async (tx) => {
+  const { order, wasAlreadyPaid } = await prisma.$transaction(async (tx) => {
     const existing = await tx.order.findUnique({ where: { razorpayOrderId } });
-    if (!existing) return null;
+    if (!existing) return { order: null, wasAlreadyPaid: false };
 
     const wasAlreadyPaid = existing.status === 'PAID';
     const order = await tx.order.update({
@@ -288,8 +289,20 @@ async function markOrderPaidAndRedeemCoupon(
       await tx.coupon.update({ where: { id: order.couponId }, data: { usedCount: { increment: 1 } } });
     }
 
-    return order;
+    return { order, wasAlreadyPaid };
   });
+
+  if (order && !wasAlreadyPaid) {
+    await notify({
+      userId: order.userId,
+      type: 'ORDER_PAID',
+      title: 'Payment successful',
+      body: `Your payment of ${(order.totalInPaise / 100).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} was received. Your order is being prepared.`,
+      linkPath: '/orders',
+    });
+  }
+
+  return order;
 }
 
 const verifySchema = z.object({

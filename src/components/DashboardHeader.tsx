@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Bell, HelpCircle, LogOut, ShieldAlert, User, Menu, X, ChevronDown, Package } from 'lucide-react';
 import { UserFormData } from '../types';
 import { api, ApiError } from '../lib/api';
@@ -12,6 +12,16 @@ interface DashboardHeaderProps {
   isLoggedIn?: boolean;
 }
 
+interface NotificationItem {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  linkPath: string | null;
+  isRead: boolean;
+  createdAt: string;
+}
+
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   userData,
   onLogout,
@@ -22,7 +32,62 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [sosActive, setSosActive] = useState(false);
-  const [notificationsCount, setNotificationsCount] = useState(2);
+
+  // Real, per-user notifications — only ever fetched while signed in. Signing
+  // out clears everything back to empty so a stale badge/list from the
+  // previous session can never leak into a logged-out header.
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notificationsLoaded, setNotificationsLoaded] = useState(false);
+
+  const loadNotifications = () => {
+    api
+      .get<{ notifications: NotificationItem[]; unreadCount: number }>('/api/notifications')
+      .then((res) => {
+        setNotifications(res.notifications);
+        setUnreadCount(res.unreadCount);
+        setNotificationsLoaded(true);
+      })
+      .catch(() => setNotificationsLoaded(true));
+  };
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setNotifications([]);
+      setUnreadCount(0);
+      setNotificationsOpen(false);
+      setNotificationsLoaded(false);
+      return;
+    }
+    loadNotifications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoggedIn]);
+
+  const toggleNotifications = () => {
+    const opening = !notificationsOpen;
+    setNotificationsOpen(opening);
+    if (opening) {
+      if (!notificationsLoaded) loadNotifications();
+      if (unreadCount > 0) {
+        api
+          .patch('/api/notifications/read-all')
+          .then(() => {
+            setUnreadCount(0);
+            setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+          })
+          .catch(() => {});
+      }
+    }
+  };
+
+  const handleNotificationClick = (n: NotificationItem) => {
+    setNotificationsOpen(false);
+    if (n.linkPath) {
+      const target = n.linkPath.replace(/^\//, '');
+      handleNav(target === 'orders' ? 'My Orders' : target === 'profile' ? 'Profile' : target);
+    }
+  };
 
   const navItems = ['How it works', 'Shop', 'About', 'QR Scan', 'Contact'];
 
@@ -111,17 +176,48 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               <span className="relative z-10">SOS</span>
             </button>
 
-            {/* Notification Bell — desktop only, moved into hamburger drawer on mobile */}
-            <button
-              onClick={() => alert(`Notifications (2):\n• Parking ping from SC-MH12-9881\n• Shield security scan complete`)}
-              className="hidden md:inline-flex relative p-2 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
-              title="Notifications"
-            >
-              <Bell className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
-              {notificationsCount > 0 && (
-                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 border-2 border-[#FFED00] rounded-full" />
-              )}
-            </button>
+            {/* Notification Bell — signed-in users only, desktop (mobile drawer has its own copy below) */}
+            {isLoggedIn && (
+              <div className="hidden md:block relative">
+                <button
+                  onClick={toggleNotifications}
+                  className="relative p-2 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
+                  title="Notifications"
+                >
+                  <Bell className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 border-2 border-[#FFED00] rounded-full" />
+                  )}
+                </button>
+
+                {notificationsOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-80 max-h-[420px] overflow-y-auto bg-white rounded-xl shadow-xl border border-neutral-200 py-2 text-neutral-800 z-50 animate-fade-in">
+                    <div className="px-4 py-2 border-b border-neutral-100">
+                      <p className="text-xs font-bold text-neutral-900 uppercase">Notifications</p>
+                    </div>
+                    {!notificationsLoaded ? (
+                      <p className="px-4 py-6 text-sm text-neutral-400 text-center">Loading...</p>
+                    ) : notifications.length === 0 ? (
+                      <p className="px-4 py-6 text-sm text-neutral-400 text-center">No notifications yet.</p>
+                    ) : (
+                      notifications.map((n) => (
+                        <button
+                          key={n.id}
+                          onClick={() => handleNotificationClick(n)}
+                          className={`w-full text-left px-4 py-3 border-b border-neutral-50 last:border-b-0 hover:bg-amber-50/60 cursor-pointer transition-colors ${
+                            !n.isRead ? 'bg-amber-50/40' : ''
+                          }`}
+                        >
+                          <p className="text-xs font-bold text-neutral-900">{n.title}</p>
+                          <p className="text-xs text-neutral-500 mt-0.5">{n.body}</p>
+                          <p className="text-[10px] text-neutral-400 mt-1">{new Date(n.createdAt).toLocaleString()}</p>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Help / FAQ Icon — desktop only, moved into hamburger drawer on mobile */}
             <button
@@ -253,21 +349,45 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
           {/* Secondary icons moved out of the top bar to reduce mobile crowding */}
           <div className="border-t border-black/10 pt-2 space-y-1">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                alert(`Notifications (2):\n• Parking ping from SC-MH12-9881\n• Shield security scan complete`);
-              }}
-              className="w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 flex items-center gap-2.5"
-            >
-              <span className="relative inline-flex">
-                <Bell className="w-4.5 h-4.5 stroke-[2.2]" />
-                {notificationsCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-600 border border-[#e0a800] rounded-full" />
+            {isLoggedIn && (
+              <div>
+                <button
+                  onClick={toggleNotifications}
+                  className="w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 flex items-center gap-2.5"
+                >
+                  <span className="relative inline-flex">
+                    <Bell className="w-4.5 h-4.5 stroke-[2.2]" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-600 border border-[#e0a800] rounded-full" />
+                    )}
+                  </span>
+                  Notifications
+                </button>
+                {notificationsOpen && (
+                  <div className="ml-3 mr-1 mb-2 max-h-[300px] overflow-y-auto bg-white/95 rounded-lg border border-black/10 divide-y divide-black/5">
+                    {!notificationsLoaded ? (
+                      <p className="px-3 py-4 text-xs text-neutral-500 text-center">Loading...</p>
+                    ) : notifications.length === 0 ? (
+                      <p className="px-3 py-4 text-xs text-neutral-500 text-center">No notifications yet.</p>
+                    ) : (
+                      notifications.map((n) => (
+                        <button
+                          key={n.id}
+                          onClick={() => {
+                            handleNotificationClick(n);
+                            setMobileMenuOpen(false);
+                          }}
+                          className="w-full text-left px-3 py-2.5 hover:bg-amber-50/60 cursor-pointer"
+                        >
+                          <p className="text-xs font-bold text-neutral-900">{n.title}</p>
+                          <p className="text-[11px] text-neutral-500 mt-0.5">{n.body}</p>
+                        </button>
+                      ))
+                    )}
+                  </div>
                 )}
-              </span>
-              Notifications
-            </button>
+              </div>
+            )}
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
