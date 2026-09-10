@@ -207,43 +207,6 @@ export const AdminSubscriptionPlans: React.FC = () => {
   );
 };
 
-interface Coupon {
-  id: string;
-  code: string;
-  type: string;
-  value: number;
-  usageLimit: number;
-  usedCount: number;
-  expiresAt: string;
-}
-
-export const AdminCoupons: React.FC = () => {
-  const coupons = useDemoData<Coupon[]>('/api/admin/demo/coupons', 'coupons');
-  return (
-    <div className="p-8 space-y-6">
-      <h1 className="text-2xl font-black text-white uppercase tracking-wide">Coupon Management</h1>
-      <DemoBanner note="No coupon engine wired into checkout yet." />
-      {!coupons ? (
-        <div className="text-white/60">Loading...</div>
-      ) : (
-        <Table headers={['Code', 'Type', 'Value', 'Used', 'Expires']}>
-          {coupons.map((c) => (
-            <tr key={c.id} className="border-b border-white/5">
-              <td className="px-4 py-3 text-white font-mono">{c.code}</td>
-              <td className="px-4 py-3 text-white/70">{c.type}</td>
-              <td className="px-4 py-3 text-white/70">{c.value}</td>
-              <td className="px-4 py-3 text-white/70">
-                {c.usedCount}/{c.usageLimit}
-              </td>
-              <td className="px-4 py-3 text-white/50 text-xs">{c.expiresAt}</td>
-            </tr>
-          ))}
-        </Table>
-      )}
-    </div>
-  );
-};
-
 interface NotificationCampaign {
   id: string;
   title: string;

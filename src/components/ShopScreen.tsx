@@ -519,14 +519,16 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
                     <button
                       onClick={() =>
-                        openProduct({
-                          id: prod.id,
-                          tag: prod.badge || 'SCAN CONNECT',
-                          rating: '4.8',
-                          title: prod.title,
-                          desc: prod.desc,
-                          price: prod.price && prod.price.startsWith('₹') ? prod.price : '₹499',
-                        })
+                        prod.price && prod.price.startsWith('₹')
+                          ? openProduct({
+                              id: prod.id,
+                              tag: prod.badge || 'SCAN CONNECT',
+                              rating: '4.8',
+                              title: prod.title,
+                              desc: prod.desc,
+                              price: prod.price,
+                            })
+                          : onNavigate('contact')
                       }
                       className="btn-shimmer w-full h-[42px] bg-[#0F0F0F] hover:bg-[#FFED00] hover:shadow-[0_8px_20px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#0F0F0F] font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95 shadow-xs"
                     >

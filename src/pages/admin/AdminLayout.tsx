@@ -62,6 +62,7 @@ const SECTIONS: NavSection[] = [
       { to: '/admin/sos-alerts', label: 'SOS Alerts', icon: Siren },
       { to: '/admin/resellers', label: 'Resellers', icon: Handshake },
       { to: '/admin/contact-requests', label: 'Contact Requests', icon: Mail },
+      { to: '/admin/coupons', label: 'Coupons', icon: Ticket },
     ],
   },
   {
@@ -72,7 +73,6 @@ const SECTIONS: NavSection[] = [
       { to: '/admin/ivr', label: 'IVR Numbers', icon: Headset },
       { to: '/admin/call-logs', label: 'Call Logs', icon: PhoneCall },
       { to: '/admin/subscription-plans', label: 'Subscription Plans', icon: CreditCard },
-      { to: '/admin/coupons', label: 'Coupons', icon: Ticket },
       { to: '/admin/notifications', label: 'Notifications', icon: Bell },
       { to: '/admin/cms', label: 'CMS Pages', icon: FileText },
       { to: '/admin/banners', label: 'Banners', icon: Image },

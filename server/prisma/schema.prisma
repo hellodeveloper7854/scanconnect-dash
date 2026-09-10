@@ -177,7 +177,12 @@ model Order {
   userId              String
   user                User              @relation(fields: [userId], references: [id])
   status              OrderStatus       @default(PENDING)
+  subtotalInPaise     Int               @default(0)
+  discountInPaise     Int               @default(0)
   totalInPaise        Int
+  couponId            String?
+  coupon              Coupon?           @relation(fields: [couponId], references: [id])
+  couponCode          String?
   razorpayOrderId     String?           @unique
   razorpayPaymentId   String?
   razorpaySignature   String?
@@ -199,6 +204,37 @@ model Order {
 
   @@index([userId])
   @@index([status])
+  @@index([couponId])
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED
+}
+
+/// Live, checkout-facing coupon — distinct from the unused DemoCoupon demo
+/// model. percentageValue (0-100) is set for PERCENTAGE coupons,
+/// fixedValueInPaise for FIXED coupons, so the meaning of the discount never
+/// depends on reading `type` first.
+model Coupon {
+  id                 String     @id @default(uuid())
+  code               String     @unique
+  type               CouponType
+  percentageValue    Int?
+  fixedValueInPaise  Int?
+  /// Optional floor — order subtotal must be at least this much for the
+  /// coupon to apply. Null means no minimum.
+  minOrderInPaise    Int?
+  usageLimit         Int?
+  usedCount          Int        @default(0)
+  isActive           Boolean    @default(true)
+  expiresAt          DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  orders Order[]
+
+  @@index([code])
 }
 
 model Review {

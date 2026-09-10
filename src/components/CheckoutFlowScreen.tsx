@@ -24,9 +24,19 @@ import {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
-// Temporary: checkout always charges this seeded product until the Shop
-// catalog is wired up to real backend products with matching UUIDs.
-const CHECKOUT_PRODUCT_ID = '5ab6e299-8795-4cfa-8293-d315bb75e98a';
+// Maps ShopScreen's static catalog (its numeric `product.id`, 1-5 — see the
+// `products` array in ShopScreen.tsx) to the matching real backend Product
+// row, so checkout charges the price for whatever the customer actually
+// clicked "Buy Now" on instead of always charging the same one product.
+// Product #4 ("Fleet & Commercial Tags") isn't sold through checkout at all
+// — its CTA routes to Contact Sales — so it has no entry here.
+const PRODUCT_ID_BY_SHOP_ID: Record<number, string> = {
+  1: '5ab6e299-8795-4cfa-8293-d315bb75e98a', // Scan Connect Car Tag (Pack of 2) — ₹899
+  2: '77e2f59e-da2e-4b44-acf6-b87202f900f1', // Scan Connect Car Tag (Single Pack) — ₹599
+  3: 'fcda4e93-2c5f-4925-a199-82e8550e41bb', // Scan Connect Bike Tag — ₹399
+  5: '8eefe311-750b-4e5b-8110-b040695b9bf7', // Home & Society QR Tags — ₹349
+};
+const DEFAULT_CHECKOUT_PRODUCT_ID = PRODUCT_ID_BY_SHOP_ID[1];
 
 const VEHICLE_TYPES = ['Car', 'Bike', 'Scooter', 'Truck', 'Bus', 'Other'];
 
@@ -63,10 +73,23 @@ interface ContactOption {
 
 interface OrderRecord {
   id: string;
+  subtotalInPaise: number;
+  discountInPaise: number;
   totalInPaise: number;
+  couponCode: string | null;
   status: string;
   qrToken: string | null;
   items: { quantity: number; product: { name: string; priceInPaise: number } }[];
+}
+
+interface AvailableCoupon {
+  code: string;
+  type: 'PERCENTAGE' | 'FIXED';
+  percentageValue: number | null;
+  fixedValueInPaise: number | null;
+  minOrderInPaise: number | null;
+  expiresAt: string | null;
+  discountInPaise: number;
 }
 
 interface CheckoutFlowScreenProps {
@@ -152,6 +175,63 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
     }
     setShippingError('');
     goToPayment();
+  };
+
+  // Live pricing + coupon (Step 1 & 2 Order/Payment Summary) — subtotal comes
+  // from the real product price server-side, never a hardcoded placeholder,
+  // so the discount shown here is always correct and matches what POST
+  // /api/orders will actually charge.
+  const [subtotalInPaise, setSubtotalInPaise] = useState<number | null>(null);
+  const [pricingError, setPricingError] = useState('');
+  const [availableCoupons, setAvailableCoupons] = useState<AvailableCoupon[] | null>(null);
+  const [couponCodeInput, setCouponCodeInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountInPaise: number } | null>(null);
+  const [couponError, setCouponError] = useState('');
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
+  const checkoutProductId =
+    (product?.id != null ? PRODUCT_ID_BY_SHOP_ID[product.id] : undefined) ?? DEFAULT_CHECKOUT_PRODUCT_ID;
+  const orderItems = React.useMemo(
+    () => [{ productId: checkoutProductId, quantity: 1 }],
+    [checkoutProductId],
+  );
+
+  React.useEffect(() => {
+    api
+      .post<{ subtotalInPaise: number }>('/api/orders/pricing', { items: orderItems })
+      .then((res) => setSubtotalInPaise(res.subtotalInPaise))
+      .catch((err) => setPricingError(err instanceof ApiError ? err.message : 'Failed to load pricing'));
+    api
+      .post<{ coupons: AvailableCoupon[] }>('/api/orders/available-coupons', { items: orderItems })
+      .then((res) => setAvailableCoupons(res.coupons))
+      .catch(() => setAvailableCoupons([]));
+  }, [orderItems]);
+
+  const discountInPaise = appliedCoupon?.discountInPaise ?? 0;
+  const totalInPaise = subtotalInPaise != null ? Math.max(0, subtotalInPaise - discountInPaise) : null;
+
+  const applyCoupon = async (code: string) => {
+    const trimmed = code.trim();
+    if (!trimmed) return;
+    setIsApplyingCoupon(true);
+    setCouponError('');
+    try {
+      const res = await api.post<{ code: string; discountInPaise: number }>('/api/orders/apply-coupon', {
+        code: trimmed,
+        items: orderItems,
+      });
+      setAppliedCoupon({ code: res.code, discountInPaise: res.discountInPaise });
+      setCouponCodeInput('');
+    } catch (err) {
+      setCouponError(err instanceof ApiError ? err.message : 'Failed to apply coupon');
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponError('');
   };
 
   // Payment (Step 2) — Razorpay handles the actual payment method selection
@@ -373,7 +453,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
         amount: number;
         currency: string;
       }>('/api/orders', {
-        items: [{ productId: CHECKOUT_PRODUCT_ID, quantity: 1 }],
+        items: orderItems,
         shipping: {
           name: fullName.trim(),
           phone: phone.trim(),
@@ -381,6 +461,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
           pincode: pincode.trim(),
           address: address.trim(),
         },
+        couponCode: appliedCoupon?.code,
       });
 
       const razorpay = new window.Razorpay({
@@ -424,10 +505,13 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   };
 
   const productTitle = product?.title || 'SCAN CONNECT Tag';
-  const productPrice = product?.price || '₹499';
-  const orderTotalDisplay = completedOrder
-    ? (completedOrder.totalInPaise / 100).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })
-    : productPrice;
+  const formatPaise = (paise: number) => (paise / 100).toLocaleString('en-IN', { style: 'currency', currency: 'INR' });
+  // Falls back to the product prop's price string only while pricing is still
+  // loading (or failed to load) — once subtotalInPaise arrives, every display
+  // below uses the real server-computed number, never the placeholder.
+  const subtotalDisplay = subtotalInPaise != null ? formatPaise(subtotalInPaise) : product?.price || '—';
+  const totalDisplay = totalInPaise != null ? formatPaise(totalInPaise) : product?.price || '—';
+  const orderTotalDisplay = completedOrder ? formatPaise(completedOrder.totalInPaise) : totalDisplay;
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#1B1C1C] font-['Hanken_Grotesk'] antialiased">
@@ -697,9 +781,69 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       Premium Protection Plan x1
                     </p>
                     <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#B58500] block">
-                      {productPrice}
+                      {subtotalDisplay}
                     </span>
                   </div>
+                </div>
+
+                {/* Coupon */}
+                <div className="border-t border-[#CCC7AA] pt-[20px] space-y-3">
+                  {appliedCoupon ? (
+                    <div className="flex items-center justify-between gap-3 bg-[#FFFBF0] border border-[#E6D400] rounded-[8px] px-4 py-3">
+                      <div className="min-w-0">
+                        <p className="font-['Hanken_Grotesk'] font-bold text-sm text-[#1B1C1C] font-mono truncate">
+                          {appliedCoupon.code}
+                        </p>
+                        <p className="text-xs text-[#736B00]">Coupon applied — you saved {formatPaise(appliedCoupon.discountInPaise)}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removeCoupon}
+                        className="text-xs font-bold text-[#5F5E5E] hover:text-[#1B1C1C] cursor-pointer shrink-0"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCodeInput}
+                        onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
+                        placeholder="Enter coupon code"
+                        className="flex-1 h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-[8px] font-['Hanken_Grotesk'] text-sm text-[#1B1C1C] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#FFED00]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => applyCoupon(couponCodeInput)}
+                        disabled={isApplyingCoupon || !couponCodeInput.trim()}
+                        className="h-[44px] px-5 bg-[#1B1C1C] hover:enabled:bg-neutral-800 text-white font-bold text-sm rounded-[8px] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        {isApplyingCoupon ? 'Applying...' : 'Apply'}
+                      </button>
+                    </div>
+                  )}
+                  {couponError && <p className="text-xs font-semibold text-red-600">{couponError}</p>}
+
+                  {availableCoupons && availableCoupons.length > 0 && !appliedCoupon && (
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-bold text-[#5F5E5E] uppercase tracking-wide">Available Offers</p>
+                      {availableCoupons.map((c) => (
+                        <button
+                          key={c.code}
+                          type="button"
+                          onClick={() => applyCoupon(c.code)}
+                          disabled={isApplyingCoupon}
+                          className="w-full flex items-center justify-between gap-3 border border-dashed border-[#CCC7AA] hover:border-[#FFED00] rounded-[8px] px-3 py-2 text-left cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          <span className="font-mono font-bold text-xs text-[#1B1C1C]">{c.code}</span>
+                          <span className="text-xs text-[#736B00] font-semibold shrink-0">
+                            Save {formatPaise(c.discountInPaise)}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Horizontal Border Breakdown */}
@@ -709,9 +853,20 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       Subtotal
                     </span>
                     <span className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
-                      {productPrice}
+                      {subtotalDisplay}
                     </span>
                   </div>
+
+                  {discountInPaise > 0 && (
+                    <div className="flex justify-between items-center">
+                      <span className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
+                        Discount
+                      </span>
+                      <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-emerald-600">
+                        -{formatPaise(discountInPaise)}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="flex justify-between items-center">
                     <span className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#5F5E5E]">
@@ -729,7 +884,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     Total Amount
                   </span>
                   <span className="font-['Hanken_Grotesk'] font-bold text-[24px] leading-[32px] text-[#1B1C1C]">
-                    {productPrice}
+                    {totalDisplay}
                   </span>
                 </div>
 
@@ -804,8 +959,17 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 <div className="space-y-[16px] font-['Hanken_Grotesk'] text-[16px] leading-[24px]">
                   <div className="flex justify-between text-[#5F5E5E]">
                     <span>Subtotal</span>
-                    <span>{productPrice}</span>
+                    <span>{subtotalDisplay}</span>
                   </div>
+                  {appliedCoupon && (
+                    <div className="flex justify-between text-[#5F5E5E]">
+                      <span>
+                        Discount{' '}
+                        <span className="font-mono text-xs text-[#736B00]">({appliedCoupon.code})</span>
+                      </span>
+                      <span className="font-bold text-emerald-600">-{formatPaise(discountInPaise)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-[#5F5E5E]">
                     <span>Shipping</span>
                     <span className="font-bold text-[#676000]">FREE</span>
@@ -816,7 +980,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       Total Amount
                     </span>
                     <span className="font-['Plus_Jakarta_Sans'] font-semibold text-[16px] leading-[24px]">
-                      {productPrice}
+                      {totalDisplay}
                     </span>
                   </div>
                 </div>
@@ -1195,7 +1359,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       {productTitle}
                     </h3>
                     <span className="font-['Hanken_Grotesk'] font-bold text-[16px] leading-[24px] text-[#1B1C1C] shrink-0">
-                      {productPrice}
+                      {orderTotalDisplay}
                     </span>
                   </div>
                   <p className="font-['Hanken_Grotesk'] font-normal text-[14px] leading-[20px] text-[#5F5E5E] mt-[4px]">

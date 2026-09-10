@@ -403,3 +403,105 @@ adminRouter.get('/reports/reviews.csv', async (_req, res) => {
   const csv = toCsv(rows, ['id', 'userEmail', 'orderId', 'rating', 'comment', 'createdAt']);
   sendCsv(res, 'reviews.csv', csv);
 });
+
+/**
+ * Live coupon management — full CRUD, backing both the admin "Coupon
+ * Management" screen and the checkout page's apply-coupon flow
+ * (server/src/routes/orders.ts POST /apply-coupon and POST /).
+ */
+const couponBodySchema = z
+  .object({
+    code: z
+      .string()
+      .trim()
+      .min(3, 'Code must be at least 3 characters')
+      .max(40)
+      .regex(/^[A-Za-z0-9-]+$/, 'Code can only contain letters, numbers, and hyphens')
+      .transform((v) => v.toUpperCase()),
+    type: z.enum(['PERCENTAGE', 'FIXED']),
+    percentageValue: z.number().int().min(1).max(100).optional(),
+    fixedValueInPaise: z.number().int().min(1).optional(),
+    minOrderInPaise: z.number().int().min(0).optional(),
+    usageLimit: z.number().int().min(1).optional(),
+    isActive: z.boolean().optional(),
+    expiresAt: z.coerce.date().optional(),
+  })
+  .refine((v) => (v.type === 'PERCENTAGE' ? v.percentageValue != null : v.fixedValueInPaise != null), {
+    message: 'percentageValue is required for PERCENTAGE coupons, fixedValueInPaise for FIXED coupons',
+  });
+
+adminRouter.get('/coupons', async (_req, res) => {
+  const coupons = await prisma.coupon.findMany({ orderBy: { createdAt: 'desc' } });
+  res.json({ coupons });
+});
+
+adminRouter.post('/coupons', async (req, res) => {
+  const parsed = couponBodySchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const existing = await prisma.coupon.findUnique({ where: { code: parsed.data.code } });
+  if (existing) {
+    return res.status(409).json({ error: 'A coupon with this code already exists' });
+  }
+
+  const coupon = await prisma.coupon.create({
+    data: {
+      code: parsed.data.code,
+      type: parsed.data.type,
+      percentageValue: parsed.data.type === 'PERCENTAGE' ? parsed.data.percentageValue : null,
+      fixedValueInPaise: parsed.data.type === 'FIXED' ? parsed.data.fixedValueInPaise : null,
+      minOrderInPaise: parsed.data.minOrderInPaise,
+      usageLimit: parsed.data.usageLimit,
+      isActive: parsed.data.isActive ?? true,
+      expiresAt: parsed.data.expiresAt,
+    },
+  });
+  res.status(201).json({ coupon });
+});
+
+const couponUpdateSchema = couponBodySchema.innerType().partial();
+
+adminRouter.patch('/coupons/:id', async (req, res) => {
+  const parsed = couponUpdateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const coupon = await prisma.coupon.findUnique({ where: { id: req.params.id } });
+  if (!coupon) {
+    return res.status(404).json({ error: 'Coupon not found' });
+  }
+
+  if (parsed.data.code && parsed.data.code !== coupon.code) {
+    const existing = await prisma.coupon.findUnique({ where: { code: parsed.data.code } });
+    if (existing) {
+      return res.status(409).json({ error: 'A coupon with this code already exists' });
+    }
+  }
+
+  const nextType = parsed.data.type ?? coupon.type;
+  const updated = await prisma.coupon.update({
+    where: { id: coupon.id },
+    data: {
+      ...parsed.data,
+      // Keep the unused value field null'd out whenever the type changes, so a
+      // coupon switched from PERCENTAGE to FIXED (or back) can't keep a stale
+      // value from its previous type.
+      percentageValue: nextType === 'PERCENTAGE' ? (parsed.data.percentageValue ?? coupon.percentageValue) : null,
+      fixedValueInPaise: nextType === 'FIXED' ? (parsed.data.fixedValueInPaise ?? coupon.fixedValueInPaise) : null,
+    },
+  });
+  res.json({ coupon: updated });
+});
+
+adminRouter.delete('/coupons/:id', async (req, res) => {
+  const coupon = await prisma.coupon.findUnique({ where: { id: req.params.id } });
+  if (!coupon) {
+    return res.status(404).json({ error: 'Coupon not found' });
+  }
+
+  await prisma.coupon.delete({ where: { id: coupon.id } });
+  res.status(204).send();
+});

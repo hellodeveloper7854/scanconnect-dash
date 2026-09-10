@@ -8,6 +8,7 @@ import { AdminUsers } from './AdminUsers';
 import { AdminVehicles } from './AdminVehicles';
 import { AdminQrCodes } from './AdminQrCodes';
 import { AdminQrCodesTrash } from './AdminQrCodesTrash';
+import { AdminCoupons } from './AdminCoupons';
 import { AdminPayments } from './AdminPayments';
 import { AdminEmergencyContacts } from './AdminEmergencyContacts';
 import { AdminReports } from './AdminReports';
@@ -21,7 +22,6 @@ import {
   AdminIvr,
   AdminCallLogs,
   AdminSubscriptionPlans,
-  AdminCoupons,
   AdminNotifications,
   AdminCms,
   AdminBanners,
@@ -50,12 +50,12 @@ export const AdminApp: React.FC = () => (
           <Route path="contact-requests" element={<AdminContactRequests />} />
           <Route path="qr-codes" element={<AdminQrCodes />} />
           <Route path="qr-codes/recover" element={<AdminQrCodesTrash />} />
+          <Route path="coupons" element={<AdminCoupons />} />
           <Route path="qr-analytics" element={<AdminQrAnalytics />} />
           <Route path="stickers" element={<AdminStickers />} />
           <Route path="ivr" element={<AdminIvr />} />
           <Route path="call-logs" element={<AdminCallLogs />} />
           <Route path="subscription-plans" element={<AdminSubscriptionPlans />} />
-          <Route path="coupons" element={<AdminCoupons />} />
           <Route path="notifications" element={<AdminNotifications />} />
           <Route path="cms" element={<AdminCms />} />
           <Route path="banners" element={<AdminBanners />} />
