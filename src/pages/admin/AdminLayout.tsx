@@ -26,6 +26,7 @@ import {
   LogOut,
   Handshake,
   Mail,
+  Trash2,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -53,6 +54,7 @@ const SECTIONS: NavSection[] = [
       { to: '/admin/users', label: 'Users', icon: Users },
       { to: '/admin/vehicles', label: 'Vehicles', icon: Car },
       { to: '/admin/qr-codes', label: 'QR Codes', icon: QrCode },
+      { to: '/admin/qr-codes/recover', label: 'Recover QR Codes', icon: Trash2 },
       { to: '/admin/payments', label: 'Payments', icon: IndianRupee },
       { to: '/admin/emergency-contacts', label: 'Emergency Contacts', icon: Phone },
       { to: '/admin/reports', label: 'Reports', icon: FileSpreadsheet },

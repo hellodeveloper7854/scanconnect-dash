@@ -126,6 +126,12 @@ model QrCode {
   activatedAt    DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+  /// Soft-delete marker. Set instead of a real row delete when an admin
+  /// deletes a code from QR Code Management — it moves to the "Recover QR
+  /// Codes" trash view and is excluded from every normal list/search/count.
+  /// Only actually removed from the database when permanently deleted from
+  /// that trash view.
+  deletedAt      DateTime?
 
   emergencyContacts EmergencyContact[]
   maskedCallRequests MaskedCallRequest[]
@@ -133,6 +139,7 @@ model QrCode {
   @@index([batchId])
   @@index([status])
   @@index([batchName])
+  @@index([deletedAt])
 }
 
 /// One row per "masked call" setup a scanner completes after passing the

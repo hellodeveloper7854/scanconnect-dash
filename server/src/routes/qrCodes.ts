@@ -129,6 +129,7 @@ async function buildDisplayIdSearchWhere(term: string): Promise<Prisma.QrCodeWhe
   if (!normalized) return undefined;
 
   const batches = await prisma.qrCode.findMany({
+    where: { deletedAt: null },
     distinct: ['batchId'],
     select: { batchId: true, batchName: true },
   });
@@ -179,6 +180,7 @@ async function buildQrCodeWhere(query: Record<string, unknown>): Promise<Prisma.
   const idSearchWhere = name ? await buildDisplayIdSearchWhere(name) : undefined;
 
   return {
+    deletedAt: null,
     ...(status ? { status: status as never } : {}),
     ...(batchId ? { batchId } : {}),
     ...(name
@@ -212,6 +214,7 @@ adminQrCodesRouter.get('/', async (req, res) => {
     prisma.qrCode.count({ where }),
     prisma.qrCode.groupBy({
       by: ['batchId', 'batchName', 'batchCreatedAt'],
+      where: { deletedAt: null },
       _count: { _all: true },
       orderBy: { batchCreatedAt: 'desc' },
     }),
@@ -219,7 +222,7 @@ adminQrCodesRouter.get('/', async (req, res) => {
 
   const activatedCounts = await prisma.qrCode.groupBy({
     by: ['batchId'],
-    where: { status: 'ACTIVE' },
+    where: { status: 'ACTIVE', deletedAt: null },
     _count: { _all: true },
   });
   const activatedByBatch = new Map(activatedCounts.map((a) => [a.batchId, a._count._all]));
@@ -237,7 +240,7 @@ adminQrCodesRouter.get('/', async (req, res) => {
 
 adminQrCodesRouter.get('/:batchId/download.csv', async (req, res) => {
   const codes = await prisma.qrCode.findMany({
-    where: { batchId: req.params.batchId },
+    where: { batchId: req.params.batchId, deletedAt: null },
     orderBy: { createdAt: 'asc' },
   });
   if (codes.length === 0) {
@@ -310,17 +313,70 @@ adminQrCodesRouter.get('/:id/qr.png', async (req, res) => {
 });
 
 /**
- * Deletes a single QR code. Refuses if it's ACTIVE (linked to a live vehicle)
- * — it must be deactivated/unlinked first so a vehicle's safety tag can never
- * be silently removed out from under its owner.
+ * Soft-deletes a single QR code — marks it deletedAt instead of removing the
+ * row, so it moves to the "Recover QR Codes" trash view instead of being
+ * gone immediately. Refuses if it's ACTIVE (linked to a live vehicle) — it
+ * must be deactivated/unlinked first so a vehicle's safety tag can never be
+ * silently removed out from under its owner.
  */
 adminQrCodesRouter.delete('/:id', async (req, res) => {
   const code = await prisma.qrCode.findUnique({ where: { id: req.params.id } });
-  if (!code) {
+  if (!code || code.deletedAt) {
     return res.status(404).json({ error: 'QR code not found' });
   }
   if (code.status === 'ACTIVE') {
     return res.status(409).json({ error: 'This QR code is active — deactivate it before deleting' });
+  }
+
+  await prisma.qrCode.update({ where: { id: code.id }, data: { deletedAt: new Date() } });
+  res.status(204).send();
+});
+
+/**
+ * Trash view: lists soft-deleted QR codes (paginated), most recently deleted
+ * first, so an admin can review and either restore or permanently remove
+ * them.
+ */
+adminQrCodesRouter.get('/deleted', async (req, res) => {
+  const page = Math.max(1, Number(req.query.page ?? 1));
+  const pageSize = Math.min(MAX_ADMIN_PAGE_SIZE, Number(req.query.pageSize ?? 25));
+
+  const [codes, total] = await Promise.all([
+    prisma.qrCode.findMany({
+      where: { deletedAt: { not: null } },
+      include: {
+        vehicle: { include: { user: { select: { fullName: true, email: true, mobileNumber: true } } } },
+      },
+      orderBy: { deletedAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.qrCode.count({ where: { deletedAt: { not: null } } }),
+  ]);
+
+  res.json({ codes, total, page, pageSize });
+});
+
+/** Restores a soft-deleted QR code back to normal, clearing deletedAt. */
+adminQrCodesRouter.post('/:id/restore', async (req, res) => {
+  const code = await prisma.qrCode.findUnique({ where: { id: req.params.id } });
+  if (!code || !code.deletedAt) {
+    return res.status(404).json({ error: 'Deleted QR code not found' });
+  }
+
+  const restored = await prisma.qrCode.update({ where: { id: code.id }, data: { deletedAt: null } });
+  res.json({ code: restored });
+});
+
+/**
+ * Permanently deletes a QR code — only reachable from the trash view, and
+ * only for codes that are already soft-deleted, so a code can never be
+ * permanently removed in one step from QR Code Management.
+ */
+adminQrCodesRouter.delete('/:id/permanent', async (req, res) => {
+  const code = await prisma.qrCode.findUnique({ where: { id: req.params.id } });
+  if (!code || !code.deletedAt) {
+    return res.status(404).json({ error: 'Deleted QR code not found' });
   }
 
   await prisma.qrCode.delete({ where: { id: code.id } });
@@ -371,14 +427,15 @@ adminQrCodesRouter.patch('/:id/status', async (req, res) => {
 });
 
 /**
- * Deletes every QR code in a batch ("lot"). Refuses the whole batch if ANY
- * code in it is still ACTIVE, for the same reason as the single-code delete.
+ * Soft-deletes every QR code in a batch ("lot") — same trash/restore
+ * behavior as the single-code delete. Refuses the whole batch if ANY code in
+ * it is still ACTIVE, for the same reason as the single-code delete.
  */
 adminQrCodesRouter.delete('/batch/:batchId', async (req, res) => {
   const { batchId } = req.params;
   const [total, activeCount] = await Promise.all([
-    prisma.qrCode.count({ where: { batchId } }),
-    prisma.qrCode.count({ where: { batchId, status: 'ACTIVE' } }),
+    prisma.qrCode.count({ where: { batchId, deletedAt: null } }),
+    prisma.qrCode.count({ where: { batchId, status: 'ACTIVE', deletedAt: null } }),
   ]);
 
   if (total === 0) {
@@ -390,7 +447,7 @@ adminQrCodesRouter.delete('/batch/:batchId', async (req, res) => {
     });
   }
 
-  await prisma.qrCode.deleteMany({ where: { batchId } });
+  await prisma.qrCode.updateMany({ where: { batchId, deletedAt: null }, data: { deletedAt: new Date() } });
   res.status(204).send();
 });
 

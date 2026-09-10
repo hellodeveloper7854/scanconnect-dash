@@ -26,7 +26,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000
  * tile to finish — otherwise the browser can snapshot the page mid-render and
  * capture some tiles before their branding has been composited in.
  */
-const AuthedQrImage: React.FC<{
+export const AuthedQrImage: React.FC<{
   id: string;
   alt: string;
   className?: string;
@@ -70,7 +70,7 @@ const AuthedQrImage: React.FC<{
   return <img src={src} alt={alt} className={className} onLoad={onReady} />;
 };
 
-interface QrCodeRow {
+export interface QrCodeRow {
   id: string;
   code: string;
   displaySeq: number;
@@ -80,6 +80,7 @@ interface QrCodeRow {
   batchName: string;
   createdAt: string;
   activatedAt: string | null;
+  deletedAt?: string | null;
   vehicle: {
     registration: string;
     nickname: string | null;
@@ -632,14 +633,16 @@ export const AdminQrCodes: React.FC = () => {
             <p className="text-sm text-white/70">
               {deleteTarget.kind === 'code' ? (
                 <>
-                  This will permanently delete code <span className="font-mono text-white">{deleteTarget.code}</span>.
-                  This cannot be undone.
+                  This will move code <span className="font-mono text-white">{deleteTarget.code}</span> to the{' '}
+                  <span className="font-bold text-white">Recover QR Codes</span> trash, where it can be restored or
+                  permanently deleted later.
                 </>
               ) : (
                 <>
-                  This will permanently delete all <span className="font-bold text-white">{deleteTarget.total}</span>{' '}
-                  codes in batch <span className="font-bold text-white">{deleteTarget.batchName}</span>. This cannot
-                  be undone.
+                  This will move all <span className="font-bold text-white">{deleteTarget.total}</span> codes in
+                  batch <span className="font-bold text-white">{deleteTarget.batchName}</span> to the{' '}
+                  <span className="font-bold text-white">Recover QR Codes</span> trash, where they can be restored or
+                  permanently deleted later.
                 </>
               )}
             </p>
