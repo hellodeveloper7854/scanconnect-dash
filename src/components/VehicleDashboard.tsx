@@ -362,12 +362,17 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
              on the section itself, since combining `aspect-ratio` with
              `max-height` lets the browser shrink the box's *width* instead of
              cropping height, leaving empty space on wide/short windows).
-             Height instead comes from a plain `h-[..vh]` clamp that
+             Height instead comes from a plain `h-[..vw]` clamp that
              approximates the banner's aspect ratio at common viewport widths;
              `object-cover` then fills that box edge-to-edge with no empty
              space, cropping a little on very wide/short windows as a
-             deliberate tradeoff. */}
-        <section className="relative w-full bg-[#1B1C1C] text-white flex items-center overflow-hidden h-[58vw] min-h-[420px] max-h-[100svh]">
+             deliberate tradeoff. Mobile drops the fixed height entirely
+             (`h-auto`, `min-h-0`) so the section grows to fit its own text —
+             on short/narrow phones (e.g. iPhone SE) the stacked headline +
+             copy + buttons need more room than a rigid viewport-relative
+             height provides, and `overflow-hidden` was clipping the bottom of
+             the content instead of letting the section expand for it. */}
+        <section className="relative w-full bg-[#1B1C1C] text-white flex items-center overflow-hidden h-auto min-h-0 md:h-[58vw] md:min-h-[420px] md:max-h-[100svh]">
           <div className="absolute inset-0 z-0">
             <img
               src={banner}
