@@ -566,12 +566,14 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     </p>
                   </div>
 
-                  {/* Carousel controls */}
-                  <div className="hidden sm:flex items-center justify-center gap-3 mb-8">
+                  {/* Carousel controls — arrows sit side by side (not spread to the track's edges)
+                      on every breakpoint, with the page-dot row (landscape/horizontal pills, same
+                      style on mobile and desktop) between them. */}
+                  <div className="flex items-center justify-center gap-3 mb-8">
                     <button
                       onClick={() => goToVideoPage(currentVideoPage - 1)}
                       aria-label="Previous videos"
-                      className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs"
+                      className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs shrink-0"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -590,7 +592,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     <button
                       onClick={() => goToVideoPage(currentVideoPage + 1)}
                       aria-label="Next videos"
-                      className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs"
+                      className="w-9 h-9 rounded-full border border-[#CCC7AA] flex items-center justify-center text-[#1B1C1C] hover:bg-neutral-200 cursor-pointer shadow-xs shrink-0"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -668,19 +670,6 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     </div>
                   </div>
 
-                  {/* Mobile pagination dots — arrows are desktop-only, so mobile needs a visible page indicator too */}
-                  <div className="sm:hidden flex items-center justify-center gap-1.5 mt-6">
-                    {Array.from({ length: totalVideoPages }).map((_, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => goToVideoPage(idx)}
-                        aria-label={`Go to page ${idx + 1}`}
-                        className={`rounded-full transition-all cursor-pointer ${
-                          idx === currentVideoPage ? 'w-5 h-1.5 bg-[#FFED00]' : 'w-1.5 h-1.5 bg-[#E5E7EB]'
-                        }`}
-                      />
-                    ))}
-                  </div>
                 </>
               );
             })()}
