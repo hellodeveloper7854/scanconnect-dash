@@ -362,22 +362,22 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
              on the section itself, since combining `aspect-ratio` with
              `max-height` lets the browser shrink the box's *width* instead of
              cropping height, leaving empty space on wide/short windows).
-             Height instead comes from a plain `h-[..vw]` clamp that
-             approximates the banner's aspect ratio at common viewport widths;
-             `object-cover` then fills that box edge-to-edge with no empty
-             space, cropping a little on very wide/short windows as a
-             deliberate tradeoff. Mobile drops the fixed height entirely
-             (`h-auto`, `min-h-0`) so the section grows to fit its own text —
-             on short/narrow phones (e.g. iPhone SE) the stacked headline +
-             copy + buttons need more room than a rigid viewport-relative
-             height provides, and `overflow-hidden` was clipping the bottom of
-             the content instead of letting the section expand for it. */}
-        <section className="relative w-full bg-[#1B1C1C] text-white flex items-center overflow-hidden h-auto min-h-0 md:h-[58vw] md:min-h-[420px] md:max-h-[100svh]">
+             Mobile drops the fixed height entirely (`h-auto`, `min-h-0`) so
+             the section grows to fit its own text — on short/narrow phones
+             (e.g. iPhone SE) the stacked headline + copy + buttons need more
+             room than a rigid height provides, and `overflow-hidden` was
+             clipping the bottom of the content instead of letting the
+             section expand for it. Desktop/laptop (md+) is capped at 75% of
+             the actual browser viewport height (`h-[75vh]`), so the section
+             never dominates the whole screen regardless of window size —
+             `object-cover` then fills that box edge-to-edge, cropping a
+             little on very wide/short windows as a deliberate tradeoff. */}
+        <section className="relative w-full bg-[#1B1C1C] text-white flex items-center overflow-hidden h-auto min-h-0 md:h-[75vh] md:min-h-[315px]">
           <div className="absolute inset-0 z-0">
             <img
               src={banner}
               alt="Scan Connect Vehicle Protection"
-              className="w-full h-full object-cover object-[75%_20%]"
+              className="w-full h-full object-cover object-[75%_0%]"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#1B1C1C] via-[#1B1C1C]/85 to-transparent" />
           </div>
