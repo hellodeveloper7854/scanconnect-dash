@@ -103,6 +103,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
   const [servicesPage, setServicesPage] = useState(0);
   const [videosPerView, setVideosPerView] = useState(3);
   const [videosPage, setVideosPage] = useState(0);
+  const touchStartXRef = React.useRef<number | null>(null);
 
   // Cards-per-view tracks the same breakpoints as the services grid
   // (1 col on mobile, 2 on sm, 4 on lg) so the carousel paging matches what's visible.
@@ -597,8 +598,24 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
                   {/* Sliding carousel track — width driven by number of pages, offset by currentVideoPage.
                       overflow-hidden clips shadows on the cards inside, so we pad the track on all sides
-                      and cancel that padding with a negative margin to give shadows room without shifting layout. */}
-                  <div className="overflow-hidden max-w-6xl mx-auto p-4 -m-4">
+                      and cancel that padding with a negative margin to give shadows room without shifting layout.
+                      Touch handlers below add swipe-to-change-video on mobile (videosPerView is 1 there, so
+                      each page swipe moves exactly one video) — left/right swipe past a small distance
+                      threshold advances/rewinds the page, otherwise it's treated as a tap/scroll and ignored. */}
+                  <div
+                    className="overflow-hidden max-w-6xl mx-auto p-4 -m-4"
+                    onTouchStart={(e) => {
+                      touchStartXRef.current = e.touches[0].clientX;
+                    }}
+                    onTouchEnd={(e) => {
+                      if (touchStartXRef.current == null) return;
+                      const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+                      const SWIPE_THRESHOLD_PX = 40;
+                      if (deltaX <= -SWIPE_THRESHOLD_PX) goToVideoPage(currentVideoPage + 1);
+                      else if (deltaX >= SWIPE_THRESHOLD_PX) goToVideoPage(currentVideoPage - 1);
+                      touchStartXRef.current = null;
+                    }}
+                  >
                     <div
                       className="flex transition-transform duration-500 ease-out"
                       style={{ transform: `translateX(-${currentVideoPage * 100}%)` }}
