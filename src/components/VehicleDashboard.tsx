@@ -40,7 +40,8 @@ import {
   Flame,
   Workflow,
   Gift,
-  Info
+  Info,
+  Award
 } from 'lucide-react';
 import { BLOG_POSTS } from '../lib/blogPosts';
 import { useRevealOnScroll } from '../lib/useRevealOnScroll';
@@ -428,7 +429,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-5">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                  <Award className="w-3.5 h-3.5 text-[#1B1C1C]" />
                   <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                     WHY CHOOSE SCAN CONNECT?
                   </span>

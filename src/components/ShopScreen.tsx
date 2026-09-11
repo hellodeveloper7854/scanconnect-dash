@@ -19,8 +19,8 @@ import {
   Bike,
   Home,
   MapPin,
-  ShieldCheck,
-  QrCode
+  QrCode,
+  Store
 } from 'lucide-react';
 
 interface ShopScreenProps {
@@ -295,7 +295,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                 </div>
 
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                  <Store className="w-3.5 h-3.5 text-[#1B1C1C]" />
                   <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                     OFFICIAL STORE
                   </span>

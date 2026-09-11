@@ -16,6 +16,7 @@ import {
   BadgeCheck,
   Clock,
   PhoneCall,
+  Target,
 } from 'lucide-react';
 
 interface AboutUsScreenProps {
@@ -70,7 +71,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
             {/* Mission Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#1B1C1C]" />
+              <Target className="w-3.5 h-3.5 text-[#1B1C1C]" />
               <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
                 OUR MISSION
               </span>
