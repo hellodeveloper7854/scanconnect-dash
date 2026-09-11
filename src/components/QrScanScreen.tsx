@@ -142,7 +142,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                   Need to notify a vehicle owner about wrong parking, headlights left on, an accident, or any emergency? Simply scan the Scan Connect QR Tag and reach them instantly&mdash;without revealing your phone number or accessing theirs.
                 </p>
 
-                <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#B58500]">
+                <p className="font-['Inter'] font-bold text-xs tracking-[1.5px] uppercase text-[#1B1C1C]">
                   Fast &bull; Secure &bull; Privacy-First &bull; No App Required
                 </p>
 

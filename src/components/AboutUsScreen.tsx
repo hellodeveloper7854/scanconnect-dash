@@ -254,7 +254,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
 
                 <button
                   onClick={() => alert('Garage Co-branding Inquiry sent!')}
-                  className="text-sm font-bold text-[#B58500] hover:text-[#8a6600] tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                  className="text-sm font-bold text-[#1B1C1C] hover:text-neutral-700 tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <span>PARTNER NOW</span> <ArrowRight className="w-4 h-4" />
                 </button>
@@ -276,7 +276,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
 
                 <button
                   onClick={() => alert('Parking Hubs Demo Request sent!')}
-                  className="text-sm font-bold text-[#B58500] hover:text-[#8a6600] tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                  className="text-sm font-bold text-[#1B1C1C] hover:text-neutral-700 tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <span>VIEW DEMO</span> <ArrowRight className="w-4 h-4" />
                 </button>
