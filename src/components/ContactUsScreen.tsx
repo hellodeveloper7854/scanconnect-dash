@@ -364,7 +364,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                       href="https://maps.app.goo.gl/taLjuXVuYUhTaQ6aA"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm font-bold text-[#B58500] hover:text-[#d19d00] transition-colors"
+                      className="inline-flex items-center gap-1.5 text-sm font-bold text-[#1B1C1C] hover:text-neutral-700 transition-colors"
                     >
                       <MapPin className="w-3.5 h-3.5" />
                       <span>View on Google Maps</span>
