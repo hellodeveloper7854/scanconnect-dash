@@ -361,12 +361,19 @@ export async function drawBrandedQrCanvas(
   // room added, so the subline always renders at full size instead of being
   // squeezed smaller to fit whatever space the headline happened to leave.
   // (Both languages reserve minimal breathing room here — the headline needs
-  // the space more, and the subline still fits comfortably below it.)
+  // the space more, and the subline still fits comfortably below it.) The
+  // display ID's line also gets carved out of this same budget so it keeps
+  // an equal `pad` margin below it, matching the panel's other 3 sides —
+  // the headline (the flexible element) yields this room, never the
+  // subline, so the subline's own size is unaffected by whether a display
+  // ID is present.
+  const displayIdFontSizeEstimate = Math.round(sublineFontSizeFitted * 0.8);
+  const displayIdReservedHeight = opts.displayId ? displayIdFontSizeEstimate * 1.35 : 0;
   ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
   const sublineLineCount = wrapText(ctx, text.subline, headlineMaxWidth).length;
   const headlineMaxHeight =
     height - headlineTop - pad - sublineFontSizeFitted * 1.35 * sublineLineCount -
-    sublineFontSizeFitted * 0;
+    displayIdReservedHeight;
 
   // Hindi keeps the headline in the same plain sans-serif family as the subline (Poppins has no
   // Devanagari glyphs, so it was always silently falling back anyway) at a bigger starting size
@@ -420,9 +427,11 @@ export async function drawBrandedQrCanvas(
   // many lines a given language wraps to (Hindi text is visibly wider per
   // character than English at the same pixel size, so it wraps to more lines
   // and was previously getting clipped off the bottom of the canvas). The
-  // display ID (e.g. SC-MALLPARKING-0001) is drawn after the subline without
-  // reserving its own budget here, so the subline's size is unaffected by it.
-  const displayIdFontSize = Math.round(sublineFontSizeFitted * 0.8);
+  // display ID's line height was already carved out of headlineMaxHeight
+  // above (so the headline yields the room, not the subline — the subline's
+  // own size must stay exactly as it was before the display ID existed),
+  // so this budget only needs to fit the subline itself.
+  const displayIdFontSize = displayIdFontSizeEstimate;
   const sublineAvailableHeight = height - pad - headlineY;
   let sublineFontSize = sublineFontSizeFitted;
   let sublineLines = wrapText(ctx, text.subline, headlineMaxWidth);
