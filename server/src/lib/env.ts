@@ -26,4 +26,8 @@ export const env = {
     .split(',')
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean),
+  // Shared secret for server-to-server partner integrations (e.g. Knowlarity's
+  // get-destination-number lookup) — not a Firebase user token, since the
+  // caller here is another company's backend, not a signed-in app user.
+  partnerApiKey: process.env.PARTNER_API_KEY,
 };

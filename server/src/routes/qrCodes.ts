@@ -5,7 +5,7 @@ import { ZipArchive } from 'archiver';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { env } from '../lib/env.js';
-import { requireAuth, requireAdmin } from '../middleware/auth.js';
+import { requireAuth, requireAdmin, requirePartnerApiKey } from '../middleware/auth.js';
 import { toCsv } from '../lib/csv.js';
 import { notify } from '../lib/notify.js';
 import type { Prisma } from '@prisma/client';
@@ -646,6 +646,61 @@ qrCodesRouter.post('/:code/masked-call', async (req, res) => {
     destinationPhone,
     callerPhone: parsed.data.callerPhone,
   });
+});
+
+/**
+ * Partner-facing "get destination number" lookup for Knowlarity's IVR/masked
+ * calling setup — server-to-server, authenticated by a shared API key
+ * (requirePartnerApiKey), not a Firebase user token. Knowlarity sends the
+ * caller's number and expects the number to bridge them to in return.
+ *
+ * Maps caller_number to the most recent MaskedCallRequest row created for
+ * that number by our own POST /:code/masked-call endpoint (the app's normal
+ * scan -> verify -> "call the owner" flow already logs one there every time
+ * a scanner completes it) — so the destination is whatever that flow most
+ * recently resolved for this caller, not a fresh lookup from scratch.
+ */
+const getDestinationNumberSchema = z.object({
+  caller_number: z.string().trim().min(6).max(20),
+});
+
+qrCodesRouter.post('/partner/get-destination-number', requirePartnerApiKey, async (req, res) => {
+  const parsed = getDestinationNumberSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  // Match on the last 10 digits so +91/leading-0/spacing differences between
+  // what the app stored and what Knowlarity sends don't cause a false miss.
+  const normalizedCaller = parsed.data.caller_number.replace(/\D/g, '').slice(-10);
+
+  const requests = await prisma.maskedCallRequest.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 200,
+  });
+  const match = requests.find((r) => r.callerPhone.replace(/\D/g, '').slice(-10) === normalizedCaller);
+
+  if (!match) {
+    return res.status(404).json({ error: 'No pending call request found for this caller_number' });
+  }
+
+  const qrCode = await prisma.qrCode.findUnique({
+    where: { id: match.qrCodeId },
+    include: {
+      vehicle: { include: { user: { select: { mobileNumber: true } } } },
+      emergencyContacts: true,
+    },
+  });
+  const destinationPhone =
+    match.targetKind === 'owner'
+      ? qrCode?.vehicle?.user.mobileNumber
+      : qrCode?.emergencyContacts[match.targetIndex ?? -1]?.phone;
+
+  if (!destinationPhone) {
+    return res.status(404).json({ error: 'Destination number no longer available for this caller_number' });
+  }
+
+  res.json({ caller_number: parsed.data.caller_number, destination_number: destinationPhone });
 });
 
 const activateSchema = z.object({
