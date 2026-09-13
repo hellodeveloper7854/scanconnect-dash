@@ -599,7 +599,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
             </div>
 
             <div className="space-y-3">
-              <span className="font-bold text-xs tracking-wider uppercase text-[#B58500] block">Your Privacy Matters</span>
+              <span className="font-bold text-xs tracking-wider uppercase text-[#1B1C1C] block">Your Privacy Matters</span>
               <p className="text-[#6B7280] text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
                 Every inquiry is handled with the highest level of confidentiality. Your personal information is securely protected and used only to respond to your request&mdash;we never share your data with third parties.
               </p>
@@ -633,7 +633,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
             <p className="text-[#5F5E5E] text-base sm:text-lg leading-relaxed">
               Whether you&apos;re looking to secure a single vehicle or implement intelligent parking solutions for your organization, Scan Connect is here to help.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-['Hanken_Grotesk'] font-bold text-lg text-[#B58500]">
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-['Hanken_Grotesk'] font-bold text-lg text-[#1B1C1C]">
               <span className="inline-flex items-center gap-1.5"><Phone className="w-4 h-4" /> Call Us</span>
               <span className="text-[#5F5E5E]">&bull;</span>
               <span className="inline-flex items-center gap-1.5"><Mail className="w-4 h-4" /> Email Us</span>
