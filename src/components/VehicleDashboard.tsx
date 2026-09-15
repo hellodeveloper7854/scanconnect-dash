@@ -46,6 +46,7 @@ import {
 import { BLOG_POSTS } from '../lib/blogPosts';
 import { useRevealOnScroll } from '../lib/useRevealOnScroll';
 import banner from '../assets/images/howitworksbanner.png'
+import bannerMobile from '../assets/images/howitworksbannermobile.png'
 import sosEmergencyImg from '../assets/images/sosemmergencyimg.png'
 import videoWalkImg from '../assets/images/howitworks/videowalkimg.png'
 import tutorialVideoPreviewImg from '../assets/images/howitworks/tutorialvideopreview.png'
@@ -377,11 +378,17 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="relative w-full bg-[#1B1C1C] text-white flex items-center overflow-hidden h-auto min-h-0 md:h-[75vh] md:min-h-[315px]">
           <div className="absolute inset-0 z-0">
             <img
+              src={bannerMobile}
+              alt="Scan Connect Vehicle Protection"
+              className="md:hidden w-full h-full object-cover object-[75%_0%]"
+            />
+            <img
               src={banner}
               alt="Scan Connect Vehicle Protection"
-              className="w-full h-full object-cover object-[75%_0%]"
+              className="hidden md:block w-full h-full object-cover object-[75%_0%]"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#1B1C1C] via-[#1B1C1C]/85 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1B1C1C]/80 via-[#1B1C1C]/70 to-[#1B1C1C]/90 md:hidden" />
+            <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-[#1B1C1C] via-[#1B1C1C]/85 to-transparent" />
           </div>
 
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 sm:py-20 lg:py-24 relative z-10 w-full">
