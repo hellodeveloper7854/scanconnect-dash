@@ -223,10 +223,16 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                   extra: (
                     <div className="space-y-2 pt-3">
                       <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
-                        <PhoneCall className="w-4 h-4 text-[#FFED00]" /> Secure Call
+                        <span className="w-6 h-6 rounded-full bg-[#FFED00] flex items-center justify-center shrink-0">
+                          <PhoneCall className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                        </span>
+                        Secure Call
                       </div>
                       <div className="flex items-center gap-2 text-sm font-semibold text-[#1B1C1C]">
-                        <MessageCircle className="w-4 h-4 text-[#FFED00]" /> WhatsApp Message
+                        <span className="w-6 h-6 rounded-full bg-[#FFED00] flex items-center justify-center shrink-0">
+                          <MessageCircle className="w-3.5 h-3.5 text-[#1B1C1C]" />
+                        </span>
+                        WhatsApp Message
                       </div>
                     </div>
                   ),
@@ -246,6 +252,7 @@ export const QrScanScreen: React.FC<QrScanScreenProps> = ({
                     delayMs={idx * 350}
                     className="relative flex flex-col items-center text-center group h-full"
                   >
+
                     {/* Icon + step number badge */}
                     <div className="relative z-10 w-[84px] h-[84px] rounded-full bg-gradient-to-br from-[#FFED00] to-[#e0ac00] flex items-center justify-center shadow-[0_10px_30px_rgba(242,186,3,0.4)] mb-7 ring-8 ring-white group-hover:scale-105 transition-transform duration-300 shrink-0">
                       <StepIcon className="w-9 h-9 text-white stroke-[1.75]" />
