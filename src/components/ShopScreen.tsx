@@ -344,7 +344,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   ref={heroImageRef}
                   onMouseMove={handleHeroImageMove}
                   onMouseLeave={resetHeroTilt}
-                  className="relative w-full max-w-none sm:max-w-[240px] lg:max-w-[260px] [perspective:1000px]"
+                  className="relative w-full max-w-none sm:max-w-[240px] lg:max-w-[360px] [perspective:1000px]"
                 >
                   <img
                     src={shopBannerImg}
@@ -352,7 +352,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     style={{
                       transform: `rotateX(${heroTilt.x}deg) rotateY(${heroTilt.y}deg) scale(${heroTilt.x || heroTilt.y ? 1.03 : 1})`,
                     }}
-                    className="w-full h-[220px] sm:h-[280px] object-cover rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.15)] transition-transform duration-150 ease-out will-change-transform"
+                    className="w-full h-[220px] sm:h-[280px] lg:h-[380px] object-cover rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.15)] transition-transform duration-150 ease-out will-change-transform"
                   />
                 </div>
               </div>
