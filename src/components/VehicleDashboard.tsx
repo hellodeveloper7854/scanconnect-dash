@@ -820,8 +820,22 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     Access useful automotive services directly from the Scan Connect ecosystem.
                   </p>
 
-                  {/* Sliding carousel track — width driven by number of pages, offset by currentPage */}
-                  <div className="overflow-hidden">
+                  {/* Sliding carousel track — width driven by number of pages, offset by currentPage.
+                      Touch handlers add swipe-to-change-page on mobile, mirroring the video section's carousel. */}
+                  <div
+                    className="overflow-hidden"
+                    onTouchStart={(e) => {
+                      touchStartXRef.current = e.touches[0].clientX;
+                    }}
+                    onTouchEnd={(e) => {
+                      if (touchStartXRef.current == null) return;
+                      const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+                      const SWIPE_THRESHOLD_PX = 40;
+                      if (deltaX <= -SWIPE_THRESHOLD_PX) goToPage(currentPage + 1);
+                      else if (deltaX >= SWIPE_THRESHOLD_PX) goToPage(currentPage - 1);
+                      touchStartXRef.current = null;
+                    }}
+                  >
                     <div
                       className="flex transition-transform duration-500 ease-out"
                       style={{ transform: `translateX(-${currentPage * 100}%)` }}
