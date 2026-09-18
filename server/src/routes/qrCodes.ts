@@ -8,6 +8,7 @@ import { env } from '../lib/env.js';
 import { requireAuth, requireAdmin, requirePartnerApiKey } from '../middleware/auth.js';
 import { toCsv } from '../lib/csv.js';
 import { notify } from '../lib/notify.js';
+import { last10Digits, toE164India } from '../lib/phone.js';
 import type { Prisma } from '@prisma/client';
 
 // Crockford-ish base32 alphabet, ambiguous characters (0/O, 1/I) removed so
@@ -672,13 +673,13 @@ qrCodesRouter.post('/partner/get-destination-number', requirePartnerApiKey, asyn
 
   // Match on the last 10 digits so +91/leading-0/spacing differences between
   // what the app stored and what Knowlarity sends don't cause a false miss.
-  const normalizedCaller = parsed.data.caller_number.replace(/\D/g, '').slice(-10);
+  const normalizedCaller = last10Digits(parsed.data.caller_number);
 
   const requests = await prisma.maskedCallRequest.findMany({
     orderBy: { createdAt: 'desc' },
     take: 200,
   });
-  const match = requests.find((r) => r.callerPhone.replace(/\D/g, '').slice(-10) === normalizedCaller);
+  const match = requests.find((r) => last10Digits(r.callerPhone) === normalizedCaller);
 
   if (!match) {
     return res.status(404).json({ error: 'No pending call request found for this caller_number' });
@@ -700,7 +701,77 @@ qrCodesRouter.post('/partner/get-destination-number', requirePartnerApiKey, asyn
     return res.status(404).json({ error: 'Destination number no longer available for this caller_number' });
   }
 
-  res.json({ caller_number: parsed.data.caller_number, destination_number: destinationPhone });
+  // Response numbers are always E.164 (+91XXXXXXXXXX), regardless of the
+  // format Knowlarity sent caller_number in — this is the contract requested
+  // for the Knowlarity integration.
+  res.json({
+    caller_number: toE164India(parsed.data.caller_number),
+    destination_number: toE164India(destinationPhone),
+  });
+});
+
+/**
+ * Call-log push: Knowlarity calls this once a bridged call ends, giving us
+ * the CDR (call detail record) — duration, status, start/end times, their
+ * own call id. This is a push from their side, not something we poll for.
+ * Same shared-key auth as get-destination-number. Idempotent on
+ * provider_call_id (upsert) so a retried webhook delivery never creates a
+ * duplicate row.
+ *
+ * We try to link the log back to the MaskedCallRequest that originated the
+ * call (by matching caller_number, most-recent-first, same approach as
+ * get-destination-number) purely for our own reporting — the row is stored
+ * either way, matched or not.
+ */
+const callLogSchema = z.object({
+  provider_call_id: z.string().trim().min(1).max(120),
+  caller_number: z.string().trim().min(6).max(20),
+  destination_number: z.string().trim().min(6).max(20),
+  status: z.string().trim().min(1).max(40),
+  duration_seconds: z.number().int().min(0).optional(),
+  started_at: z.string().datetime().optional(),
+  ended_at: z.string().datetime().optional(),
+});
+
+qrCodesRouter.post('/partner/call-logs', requirePartnerApiKey, async (req, res) => {
+  const parsed = callLogSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const { provider_call_id, caller_number, destination_number, status, duration_seconds, started_at, ended_at } =
+    parsed.data;
+
+  const normalizedCaller = last10Digits(caller_number);
+  const requests = await prisma.maskedCallRequest.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 200,
+  });
+  const match = requests.find((r) => last10Digits(r.callerPhone) === normalizedCaller);
+
+  const callLog = await prisma.callLog.upsert({
+    where: { providerCallId: provider_call_id },
+    create: {
+      providerCallId: provider_call_id,
+      maskedCallRequestId: match?.id,
+      callerNumber: toE164India(caller_number),
+      destinationNumber: toE164India(destination_number),
+      status,
+      durationSeconds: duration_seconds,
+      startedAt: started_at ? new Date(started_at) : undefined,
+      endedAt: ended_at ? new Date(ended_at) : undefined,
+      rawPayload: req.body,
+    },
+    update: {
+      status,
+      durationSeconds: duration_seconds,
+      startedAt: started_at ? new Date(started_at) : undefined,
+      endedAt: ended_at ? new Date(ended_at) : undefined,
+      rawPayload: req.body,
+    },
+  });
+
+  res.status(201).json({ received: true, call_log_id: callLog.id });
 });
 
 const activateSchema = z.object({

@@ -159,7 +159,37 @@ model MaskedCallRequest {
   virtualNumber String?
   createdAt     DateTime @default(now())
 
+  callLogs CallLog[]
+
   @@index([qrCodeId])
+}
+
+/**
+ * Call detail record pushed by Knowlarity once a masked call it bridged has
+ * ended — the CDR-push side of the integration, separate from the
+ * caller-initiated GET-destination-number lookup that starts a call.
+ * `maskedCallRequestId` links back to the MaskedCallRequest our own
+ * /:code/masked-call endpoint created for that caller, when a match is found
+ * by phone number; it's nullable because a CDR can still arrive (and must
+ * still be stored) for a call log our matching couldn't resolve.
+ */
+model CallLog {
+  id                   String             @id @default(uuid())
+  maskedCallRequestId  String?
+  maskedCallRequest    MaskedCallRequest? @relation(fields: [maskedCallRequestId], references: [id], onDelete: SetNull)
+  callerNumber         String             // E.164, e.g. +919458594043
+  destinationNumber    String             // E.164
+  providerCallId       String             @unique // Knowlarity's own call/session id, for idempotency + support lookups
+  status               String             // e.g. 'completed' | 'failed' | 'no-answer' | 'busy'
+  durationSeconds      Int?
+  startedAt            DateTime?
+  endedAt              DateTime?
+  rawPayload           Json               // full Knowlarity payload, kept as-received for audit/debugging
+  createdAt            DateTime           @default(now())
+
+  @@index([maskedCallRequestId])
+  @@index([callerNumber])
+  @@index([createdAt])
 }
 
 model Product {

@@ -103,4 +103,66 @@ to provision (or reuse) a virtual number that bridges `callerPhone` ↔ the
 destination number, store that number as `virtualNumber` on the
 `MaskedCallRequest` row, and return it with `isMasked: true`.
 
+## Partner-facing endpoints (Knowlarity ⇄ ScanConnect)
+
+Two server-to-server routes, both in `server/src/routes/qrCodes.ts`, both
+gated by `requirePartnerApiKey` (shared `X-API-Key` header, not a Firebase
+user token). Full request/response reference:
+`docs/ScanConnect_Partner_API.pdf` (regenerate with
+`docs/generate_partner_api_pdf.py`).
+
+**Phone number format:** every phone number in both requests and responses
+is E.164 — `+91` followed by the 10-digit mobile number, e.g.
+`+919458594043`. Plain 10-digit input is still accepted (only the last 10
+digits are matched), but responses are always E.164. Conversion lives in
+`server/src/lib/phone.ts` (`toE164India`, `last10Digits`) — nothing else in
+the codebase should format a `+91` number by hand.
+
+### `POST /api/qr/partner/get-destination-number`
+
+Knowlarity → ScanConnect, before bridging a call. Resolves `caller_number` to
+the number to connect them to, by matching against the most recent
+`MaskedCallRequest` row for that caller (created by the app's own
+scan → verify → call flow above).
+
+```json
+// Request
+{ "caller_number": "+919458594043" }
+
+// 200 response
+{ "caller_number": "+919458594043", "destination_number": "+919392530430" }
+```
+
+### `POST /api/qr/partner/call-logs`
+
+Knowlarity → ScanConnect, after a call ends — pushes the CDR (call detail
+record). This is a push, not something ScanConnect polls for.
+
+```json
+// Request
+{
+  "provider_call_id": "kw_9f8a2c11",
+  "caller_number": "+919458594043",
+  "destination_number": "+919392530430",
+  "status": "completed",
+  "duration_seconds": 87,
+  "started_at": "2026-09-18T11:42:03Z",
+  "ended_at": "2026-09-18T11:43:30Z"
+}
+
+// 201 response
+{ "received": true, "call_log_id": "6f2b1e0a-..." }
+```
+
+`provider_call_id` is the idempotency key — pushing the same id again
+updates the existing row (`upsert`) instead of creating a duplicate.
+
+**Storage:** every push is written to the `CallLog` table in ScanConnect's
+own Postgres database (`server/prisma/schema.prisma`) — one row per call:
+`callerNumber`, `destinationNumber`, `providerCallId` (unique), `status`,
+`durationSeconds`, `startedAt`, `endedAt`, plus `rawPayload` (the full
+original JSON, kept as-received for audit/debugging). When `caller_number`
+matches a recent `MaskedCallRequest`, the row is linked to it
+(`maskedCallRequestId`) for reporting; unmatched calls are still stored in
+full with that field left null.
 
