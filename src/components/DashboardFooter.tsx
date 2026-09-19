@@ -31,19 +31,17 @@ export const DashboardFooter: React.FC = () => {
           {/* Social Icons - Dark Olive Circles with White Icons */}
           <div className="flex items-center space-x-3.5">
             {[
-              { Icon: Youtube, label: 'YouTube', href: '#' },
-              { Icon: Instagram, label: 'Instagram', href: '#' },
-              { Icon: Facebook, label: 'Facebook', href: '#' },
-              { Icon: Twitter, label: 'Twitter', href: '#' },
-              { Icon: Linkedin, label: 'LinkedIn', href: '#' },
+              { Icon: Youtube, label: 'YouTube', href: 'https://www.youtube.com/@ScanConnectOfficial' },
+              { Icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/scanconnectofficial/' },
+              { Icon: Facebook, label: 'Facebook', href: 'https://www.facebook.com/scanconnectofficial/' },
+              { Icon: Twitter, label: 'Twitter', href: 'https://x.com/scan_connect' },
+              { Icon: Linkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/company/scanconnectofficial' },
             ].map(({ Icon, label, href }, idx) => (
               <a
                 key={idx}
                 href={href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  alert(`Visit SCAN CONNECT on ${label}`);
-                }}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-[#524500] hover:bg-[#3d3300] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer shadow-xs"
                 title={label}
               >
