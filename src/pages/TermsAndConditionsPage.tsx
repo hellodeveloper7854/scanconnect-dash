@@ -457,8 +457,8 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
         <p className="font-bold text-[#1B1C1C]">Creative Frameworks / Scan Connect</p>
         <p>
           Email:{' '}
-          <a href="mailto:support@scanconnect.com" className="text-[#B58500] font-semibold hover:underline">
-            support@scanconnect.com
+          <a href="mailto:support@scanconnect.co.in" className="text-[#B58500] font-semibold hover:underline">
+            support@scanconnect.co.in
           </a>
         </p>
         <p>

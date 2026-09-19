@@ -222,24 +222,24 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                     <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
                       General Enquiries
                     </span>
-                    <a href="mailto:info@scanconnect.com" className="block hover:text-[#B58500] transition-colors text-base">
-                      info@scanconnect.com
+                    <a href="mailto:info@scanconnect.co.in" className="block hover:text-[#B58500] transition-colors text-base">
+                      info@scanconnect.co.in
                     </a>
                   </div>
                   <div>
                     <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
                       Customer Support
                     </span>
-                    <a href="mailto:support@scanconnect.com" className="block hover:text-[#B58500] transition-colors text-base">
-                      support@scanconnect.com
+                    <a href="mailto:support@scanconnect.co.in" className="block hover:text-[#B58500] transition-colors text-base">
+                      support@scanconnect.co.in
                     </a>
                   </div>
                   <div>
                     <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
                       Sales &amp; Business Partnerships
                     </span>
-                    <a href="mailto:sales@scanconnect.com" className="block hover:text-[#B58500] transition-colors text-base">
-                      sales@scanconnect.com
+                    <a href="mailto:sales@scanconnect.co.in" className="block hover:text-[#B58500] transition-colors text-base">
+                      sales@scanconnect.co.in
                     </a>
                   </div>
                 </div>

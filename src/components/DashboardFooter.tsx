@@ -166,8 +166,8 @@ export const DashboardFooter: React.FC = () => {
             </h4>
             <ul className="space-y-3 text-sm font-medium text-[#1B1C1C]/90">
               <li>
-                <a href="mailto:support@scanconnect.com" className="hover:underline block">
-                  support@scanconnect.com
+                <a href="mailto:support@scanconnect.co.in" className="hover:underline block">
+                  support@scanconnect.co.in
                 </a>
               </li>
               <li>
