@@ -222,7 +222,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Solution 1: Housing Societies */}
-              <div className="p-8 flex flex-col justify-between space-y-6">
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 hover:shadow-lg transition-all flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
                   <div className="w-11 h-11 rounded-full bg-[#FFED00] flex items-center justify-center">
                     <Building2 className="w-6 h-6 text-[#1B1C1C]" />
@@ -239,7 +239,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
               </div>
 
               {/* Solution 2: Garages & Workshops */}
-              <div className="p-8 flex flex-col justify-between space-y-6">
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 hover:shadow-lg transition-all flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
                   <div className="w-11 h-11 rounded-full bg-[#FFED00] flex items-center justify-center">
                     <Home className="w-6 h-6 text-[#1B1C1C]" />
@@ -261,7 +261,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
               </div>
 
               {/* Solution 3: Commercial Parking Hubs */}
-              <div className="p-8 flex flex-col justify-between space-y-6">
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 hover:shadow-lg transition-all flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
                   <div className="w-11 h-11 rounded-full bg-[#FFED00] flex items-center justify-center">
                     <ParkingSquare className="w-6 h-6 text-[#1B1C1C]" />
