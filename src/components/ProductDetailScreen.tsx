@@ -4,6 +4,7 @@ import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { CheckoutFlowScreen } from './CheckoutFlowScreen';
 import qrImage from '../assets/images/qrimage.png';
+import transportQrImage from '../assets/images/transportqrimage.png';
 import builtForOpenRoadImg from '../assets/images/builtforopenroad.png';
 import {
   Star,
@@ -145,6 +146,9 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
   const productTitle = product?.title || 'SCAN CONNECT Pro Tag - Digital Vehicle Protection';
   const productPrice = product?.price || '₹499';
+  // Product id 8 is the Transport Tag (see ShopScreen.tsx's products array) —
+  // it gets its own hero image instead of the shared generic qrImage.
+  const productImage = product?.id === 8 ? transportQrImage : qrImage;
 
   const handleBuyNow = () => {
     openCheckout();
@@ -198,7 +202,11 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
           {/* Left Column: Product Gallery & Visuals */}
           <div className="lg:col-span-6 space-y-6">
             
-            {/* Main Preview Container */}
+            {/* Main Preview Container — box stays the same square size for every
+                product. Every sticker preview image (bike/car/transport) has
+                its own non-square aspect ratio, so `object-contain` is used
+                instead of `object-cover` to always show the whole image
+                inside the box instead of cropping off its edges. */}
             <div className="rounded-[16px] relative overflow-hidden aspect-square flex items-center justify-center">
 
               {/* BEST SELLER Tag */}
@@ -207,9 +215,9 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
               </div>
 
               <img
-                src={qrImage}
+                src={productImage}
                 alt={productTitle}
-                className=" w-auto object-cover"
+                className="w-full h-full object-contain"
               />
             </div>
           </div>
