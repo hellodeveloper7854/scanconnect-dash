@@ -105,11 +105,13 @@ destination number, store that number as `virtualNumber` on the
 
 ## Partner-facing endpoints (Knowlarity ⇄ ScanConnect)
 
-Two server-to-server routes, both in `server/src/routes/qrCodes.ts`, both
-gated by `requirePartnerApiKey` (shared `X-API-Key` header, not a Firebase
-user token). Full request/response reference:
-`docs/ScanConnect_Partner_API.pdf` (regenerate with
-`docs/generate_partner_api_pdf.py`).
+Two server-to-server routes in `server/src/routes/qrCodes.ts`. Full
+request/response reference: `docs/ScanConnect_Partner_API.pdf` (regenerate
+with `docs/generate_partner_api_pdf.py`).
+
+`get-destination-number` is gated by `requirePartnerApiKey` (shared
+`X-API-Key` header, not a Firebase user token). `call-logs` is deliberately
+**not** authenticated — see that section below for why.
 
 **Phone number format:** every phone number in both requests and responses
 is E.164 — `+91` followed by the 10-digit mobile number, e.g.
@@ -138,31 +140,53 @@ scan → verify → call flow above).
 Knowlarity → ScanConnect, after a call ends — pushes the CDR (call detail
 record). This is a push, not something ScanConnect polls for.
 
+**No API key, and no field is required.** Knowlarity's payload shape kept
+changing between their own tests (field names, a key with a literal space in
+it — `"call start time"`), and a strict schema turned every shape mismatch
+into a 400/500 and a dropped call log. So this endpoint accepts any JSON
+body:
+
 ```json
-// Request
+// Request — any shape is accepted; this is just what Knowlarity happens to send
 {
-  "provider_call_id": "kw_9f8a2c11",
-  "caller_number": "+919458594043",
-  "destination_number": "+919392530430",
-  "status": "completed",
-  "duration_seconds": 87,
-  "started_at": "2026-09-18T11:42:03Z",
-  "ended_at": "2026-09-18T11:43:30Z"
+  "caller_number": "7290021407",
+  "display_number": "+918044901127",
+  "ivr_number": "+918047252001",
+  "call_uuid": "162dff3d-32d7-4ec5-a9a1-4aa2b58ab041",
+  "call_type": "outgoing",
+  "call_status": "Connected",
+  "call start time": "2026-03-09 16:56:01"
 }
 
 // 201 response
 { "received": true, "call_log_id": "6f2b1e0a-..." }
 ```
 
-`provider_call_id` is the idempotency key — pushing the same id again
-updates the existing row (`upsert`) instead of creating a duplicate.
+**Field extraction:** a best-effort set of common name variants is lifted
+into typed columns when present (see `firstString`/`firstNumber`/`firstDate`
+in `qrCodes.ts` for the exact list — e.g. `caller_number`/`callerNumber`/
+`caller` all map to the same column, `destination_number`/`ivr_number`/
+`display_number` all map to destination). Nothing needs to match for the
+push to succeed.
+
+**Idempotency:** if a call-id-shaped field is present (`provider_call_id`,
+`call_uuid`, `call_id`, or `callId`), pushing the same value again updates
+the existing row instead of creating a duplicate. If none of those are
+present, every push is stored as its own new row (no de-duplication
+possible without an id).
 
 **Storage:** every push is written to the `CallLog` table in ScanConnect's
-own Postgres database (`server/prisma/schema.prisma`) — one row per call:
-`callerNumber`, `destinationNumber`, `providerCallId` (unique), `status`,
-`durationSeconds`, `startedAt`, `endedAt`, plus `rawPayload` (the full
-original JSON, kept as-received for audit/debugging). When `caller_number`
-matches a recent `MaskedCallRequest`, the row is linked to it
+own Postgres database (`server/prisma/schema.prisma`) — `callerNumber`,
+`destinationNumber`, `providerCallId`, `status`, `durationSeconds`,
+`startedAt`, `endedAt` are all nullable, filled in only when recognized.
+`rawPayload` always has the **complete original JSON body, every key as
+sent** — this is the source of truth; the typed columns are a convenience
+for querying, not a filter on what gets stored. When a caller-number-shaped
+field matches a recent `MaskedCallRequest`, the row is linked to it
 (`maskedCallRequestId`) for reporting; unmatched calls are still stored in
 full with that field left null.
+
+⚠️ Because there's no API key, anyone who knows the URL can write rows to
+this table — acceptable for a low-value append-only log, but don't extend
+this endpoint to do anything beyond storing data.
 

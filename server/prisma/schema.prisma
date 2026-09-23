@@ -172,23 +172,32 @@ model MaskedCallRequest {
  * /:code/masked-call endpoint created for that caller, when a match is found
  * by phone number; it's nullable because a CDR can still arrive (and must
  * still be stored) for a call log our matching couldn't resolve.
+ *
+ * No field on this model is required by the partner endpoint itself — every
+ * typed column below is nullable because Knowlarity's payload shape isn't
+ * fixed. `providerCallId` is no longer unique (not guaranteed to be sent);
+ * when present it's still used to upsert instead of insert, so retried
+ * webhook deliveries for the same call don't duplicate. `rawPayload` always
+ * has the complete original JSON body, key by key, regardless of which typed
+ * columns could be filled in.
  */
 model CallLog {
   id                   String             @id @default(uuid())
   maskedCallRequestId  String?
   maskedCallRequest    MaskedCallRequest? @relation(fields: [maskedCallRequestId], references: [id], onDelete: SetNull)
-  callerNumber         String             // E.164, e.g. +919458594043
-  destinationNumber    String             // E.164
-  providerCallId       String             @unique // Knowlarity's own call/session id, for idempotency + support lookups
-  status               String             // e.g. 'completed' | 'failed' | 'no-answer' | 'busy'
+  callerNumber         String?            // E.164, e.g. +919458594043, when the payload included one
+  destinationNumber    String?            // E.164, when the payload included one
+  providerCallId       String?            // Knowlarity's own call/session id, when sent — used for idempotency + support lookups
+  status               String?
   durationSeconds      Int?
   startedAt            DateTime?
   endedAt              DateTime?
-  rawPayload           Json               // full Knowlarity payload, kept as-received for audit/debugging
+  rawPayload           Json               // full payload exactly as received, kept for audit/debugging and to preserve any fields with no typed column
   createdAt            DateTime           @default(now())
 
   @@index([maskedCallRequestId])
   @@index([callerNumber])
+  @@index([providerCallId])
   @@index([createdAt])
 }
 

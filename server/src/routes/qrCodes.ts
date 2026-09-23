@@ -712,64 +712,99 @@ qrCodesRouter.post('/partner/get-destination-number', requirePartnerApiKey, asyn
 
 /**
  * Call-log push: Knowlarity calls this once a bridged call ends, giving us
- * the CDR (call detail record) — duration, status, start/end times, their
- * own call id. This is a push from their side, not something we poll for.
- * Same shared-key auth as get-destination-number. Idempotent on
- * provider_call_id (upsert) so a retried webhook delivery never creates a
- * duplicate row.
+ * the CDR (call detail record). This is a push from their side, not
+ * something we poll for.
  *
- * We try to link the log back to the MaskedCallRequest that originated the
- * call (by matching caller_number, most-recent-first, same approach as
- * get-destination-number) purely for our own reporting — the row is stored
- * either way, matched or not.
+ * Deliberately open: no API key, and no field is required. Knowlarity's
+ * payload shape isn't fixed (field names have changed between their tests
+ * already), so rejecting anything that doesn't match a strict schema just
+ * turns every shape mismatch into a dropped call log. Instead:
+ *  - the complete raw body is always stored, key by key, in `rawPayload` —
+ *    nothing is ever lost even if none of the fields below are recognized.
+ *  - a best-effort set of common field name variants is lifted into typed
+ *    columns (for querying/reporting) whenever present.
+ *  - if a call id is present, it's used to upsert (so retried webhook
+ *    deliveries for the same call update the row instead of duplicating);
+ *    otherwise every push is inserted as its own new row.
+ *
+ * We also try to link the log back to the MaskedCallRequest that originated
+ * the call (by matching a caller-number-shaped field, most-recent-first,
+ * same approach as get-destination-number) purely for our own reporting —
+ * the row is stored either way, matched or not.
  */
-const callLogSchema = z.object({
-  provider_call_id: z.string().trim().min(1).max(120),
-  caller_number: z.string().trim().min(6).max(20),
-  destination_number: z.string().trim().min(6).max(20),
-  status: z.string().trim().min(1).max(40),
-  duration_seconds: z.number().int().min(0).optional(),
-  started_at: z.string().datetime().optional(),
-  ended_at: z.string().datetime().optional(),
-});
+function firstString(body: Record<string, unknown>, keys: string[]): string | undefined {
+  for (const key of keys) {
+    const value = body[key];
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+  return undefined;
+}
 
-qrCodesRouter.post('/partner/call-logs', requirePartnerApiKey, async (req, res) => {
-  const parsed = callLogSchema.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.flatten() });
+function firstNumber(body: Record<string, unknown>, keys: string[]): number | undefined {
+  for (const key of keys) {
+    const value = body[key];
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value === 'string' && value.trim() && !Number.isNaN(Number(value))) return Number(value);
+  }
+  return undefined;
+}
+
+function firstDate(body: Record<string, unknown>, keys: string[]): Date | undefined {
+  const raw = firstString(body, keys);
+  if (!raw) return undefined;
+  const parsed = new Date(raw);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+qrCodesRouter.post('/partner/call-logs', async (req, res) => {
+  const body = (req.body && typeof req.body === 'object' ? req.body : {}) as Record<string, unknown>;
+
+  const providerCallId = firstString(body, ['provider_call_id', 'call_uuid', 'call_id', 'callId']);
+  const callerNumberRaw = firstString(body, ['caller_number', 'callerNumber', 'caller']);
+  const destinationNumberRaw = firstString(body, [
+    'destination_number',
+    'destinationNumber',
+    'ivr_number',
+    'display_number',
+  ]);
+  const status = firstString(body, ['status', 'call_status', 'callStatus']);
+  const durationSeconds = firstNumber(body, ['duration_seconds', 'duration', 'call_duration']);
+  const startedAt = firstDate(body, ['started_at', 'call_start_time', 'call start time', 'startedAt']);
+  const endedAt = firstDate(body, ['ended_at', 'call_end_time', 'call end time', 'endedAt']);
+
+  let matchId: string | undefined;
+  if (callerNumberRaw) {
+    const normalizedCaller = last10Digits(callerNumberRaw);
+    const requests = await prisma.maskedCallRequest.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+    });
+    matchId = requests.find((r) => last10Digits(r.callerPhone) === normalizedCaller)?.id;
   }
 
-  const { provider_call_id, caller_number, destination_number, status, duration_seconds, started_at, ended_at } =
-    parsed.data;
+  const data: Prisma.CallLogUncheckedCreateInput = {
+    maskedCallRequestId: matchId,
+    callerNumber: callerNumberRaw ? toE164India(callerNumberRaw) : undefined,
+    destinationNumber: destinationNumberRaw ? toE164India(destinationNumberRaw) : undefined,
+    providerCallId,
+    status,
+    durationSeconds,
+    startedAt,
+    endedAt,
+    rawPayload: body as Prisma.InputJsonValue,
+  };
 
-  const normalizedCaller = last10Digits(caller_number);
-  const requests = await prisma.maskedCallRequest.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 200,
-  });
-  const match = requests.find((r) => last10Digits(r.callerPhone) === normalizedCaller);
+  // providerCallId isn't a unique column (Knowlarity doesn't always send
+  // one), so idempotency is a manual find-then-update instead of a Prisma
+  // upsert — reusing the most recent row with the same id if one exists,
+  // otherwise inserting a new one.
+  const existing = providerCallId
+    ? await prisma.callLog.findFirst({ where: { providerCallId }, orderBy: { createdAt: 'desc' } })
+    : null;
 
-  const callLog = await prisma.callLog.upsert({
-    where: { providerCallId: provider_call_id },
-    create: {
-      providerCallId: provider_call_id,
-      maskedCallRequestId: match?.id,
-      callerNumber: toE164India(caller_number),
-      destinationNumber: toE164India(destination_number),
-      status,
-      durationSeconds: duration_seconds,
-      startedAt: started_at ? new Date(started_at) : undefined,
-      endedAt: ended_at ? new Date(ended_at) : undefined,
-      rawPayload: req.body,
-    },
-    update: {
-      status,
-      durationSeconds: duration_seconds,
-      startedAt: started_at ? new Date(started_at) : undefined,
-      endedAt: ended_at ? new Date(ended_at) : undefined,
-      rawPayload: req.body,
-    },
-  });
+  const callLog = existing
+    ? await prisma.callLog.update({ where: { id: existing.id }, data })
+    : await prisma.callLog.create({ data });
 
   res.status(201).json({ received: true, call_log_id: callLog.id });
 });

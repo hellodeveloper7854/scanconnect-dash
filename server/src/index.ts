@@ -46,6 +46,14 @@ app.use('/api/contact', contactRouter);
 app.use('/api/notifications', notificationsRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  // express.json() throws a SyntaxError (with a `body` property) when the
+  // request body isn't valid JSON — e.g. a trailing comma. That's a client
+  // mistake, not a server fault, so it should surface as 400 with a message
+  // pointing at the actual problem instead of falling through to a bare
+  // "Internal server error" that gives no hint the body itself was malformed.
+  if (err instanceof SyntaxError && 'body' in err) {
+    return res.status(400).json({ error: `Invalid JSON in request body: ${err.message}` });
+  }
   console.error(err);
   res.status(500).json({ error: 'Internal server error' });
 });
