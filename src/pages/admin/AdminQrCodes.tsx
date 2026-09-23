@@ -334,10 +334,10 @@ export const AdminQrCodes: React.FC = () => {
                   stickerSize === s ? 'bg-[#FFED00] text-neutral-950' : 'bg-white/10 text-white/70 hover:bg-white/15'
                 }`}
               >
-                {s === 'bike'
-                  ? 'Bike (4×2.5in)'
-                  : s === 'car'
-                    ? 'Car (8×5in)'
+                {s === 'car'
+                  ? 'Car (4×2.5in)'
+                  : s === 'bike'
+                    ? 'Bike (3.5×2.2in)'
                     : s === 'transport'
                       ? 'Transport (5.8×8in)'
                       : 'Helmet (2.5×1.5in)'}
@@ -769,8 +769,8 @@ export const AdminQrCodes: React.FC = () => {
               <p className="text-neutral-500 text-sm">Loading codes...</p>
             ) : (
               <>
-                {/* Letter paper (8.5x11in) at 0.15in margins fits 2x4=8 bike
-                    tiles (4x2.5in each), 1x2=2 car tiles (8x5in each), 1
+                {/* Letter paper (8.5x11in) at 0.15in margins fits 2x4=8 car
+                    tiles (4x2.5in each), 2x4=8 bike tiles (3.5x2.2in each), 1
                     transport tile (5.8x8in, too tall for a second one), or
                     3x6=18 helmet tiles (2.5x1.5in each) per page. Chunking
                     into one grid per page (instead of relying on break-after
@@ -779,7 +779,7 @@ export const AdminQrCodes: React.FC = () => {
                     across a page boundary when printed. */}
                 {chunk<QrCodeRow>(
                   printCodes,
-                  stickerSize === 'bike' ? 8 : stickerSize === 'car' ? 2 : stickerSize === 'helmet' ? 18 : 1,
+                  stickerSize === 'car' || stickerSize === 'bike' ? 8 : stickerSize === 'helmet' ? 18 : 1,
                 ).map((pageCodes, pageIndex) => (
                   <div key={pageIndex} className={`qr-print-page qr-print-page--${stickerSize}`}>
                     {pageCodes.map((c) => (

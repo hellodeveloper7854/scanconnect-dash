@@ -17,16 +17,16 @@ export function formatQrDisplayId(batchName: string, batchSeq: number): string {
   return `sc-${slugifyBatchName(batchName)}-${String(batchSeq).padStart(4, '0')}`.toUpperCase();
 }
 
-// Physical label sizes at 300 DPI. Car keeps the bike's 8:5 aspect ratio, doubled.
-// Transport is a tall portrait tag (5.8in x 8in) — rendered with a different,
-// stacked layout (see drawBrandedQrCanvasStacked) rather than bike/car's
-// side-by-side one, since a landscape two-panel layout doesn't fit a portrait tag.
-// Helmet uses the same side-by-side layout as bike/car, just smaller.
+// Physical label sizes at 300 DPI — final sizes per product spec: Car
+// 4x2.5in, Bike 3.5x2.2in, Helmet 2.5x1.5in, Transport 5.8x8in. Transport is
+// a tall portrait tag, rendered with a different, stacked layout (see
+// drawBrandedQrCanvasStacked) rather than the other three's side-by-side one,
+// since a landscape two-panel layout doesn't fit a portrait tag.
 export const STICKER_DIMENSIONS_PX: Record<StickerSize, { width: number; height: number }> = {
-  bike: { width: 1200, height: 750 }, // 4in x 2.5in
-  car: { width: 2400, height: 1500 }, // 8in x 5in
-  transport: { width: 1740, height: 2400 }, // 5.8in x 8in
+  car: { width: 1200, height: 750 }, // 4in x 2.5in
+  bike: { width: 1050, height: 660 }, // 3.5in x 2.2in
   helmet: { width: 750, height: 450 }, // 2.5in x 1.5in
+  transport: { width: 1740, height: 2400 }, // 5.8in x 8in
 };
 
 /**

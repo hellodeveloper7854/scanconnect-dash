@@ -6,8 +6,9 @@
  * tile, "4in x 2.5in" is just a number in a comment, and the print dialog
  * rescales everything to fit its own default margins/paper size instead.
  * @page is a top-level at-rule (it cannot be nested inside @media or a
- * selector), so bike/car both print on the same Letter sheet here — only the
- * per-tile size (.qr-print-tile--bike / --car below) actually differs.
+ * selector), so every size prints on the same Letter sheet here — only the
+ * per-tile size (.qr-print-tile--car / --bike / --transport / --helmet below)
+ * actually differs.
  */
 @page {
   size: 8.5in 11in;
@@ -33,12 +34,12 @@
   break-after: auto;
 }
 
-.qr-print-page--bike {
+.qr-print-page--car {
   grid-template-columns: repeat(2, 4in);
 }
 
-.qr-print-page--car {
-  grid-template-columns: 8in;
+.qr-print-page--bike {
+  grid-template-columns: repeat(2, 3.5in);
 }
 
 .qr-print-page--transport {
@@ -57,14 +58,14 @@
   break-inside: avoid;
 }
 
-.qr-print-tile--bike img {
+.qr-print-tile--car img {
   width: 4in;
   height: 2.5in;
 }
 
-.qr-print-tile--car img {
-  width: 8in;
-  height: 5in;
+.qr-print-tile--bike img {
+  width: 3.5in;
+  height: 2.2in;
 }
 
 .qr-print-tile--transport img {
