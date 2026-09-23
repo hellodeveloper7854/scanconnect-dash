@@ -335,14 +335,17 @@ adminRouter.get('/resellers', async (req, res) => {
 adminRouter.get('/contact-requests', async (req, res) => {
   const page = Math.max(1, Number(req.query.page ?? 1));
   const pageSize = Math.min(100, Number(req.query.pageSize ?? 25));
+  const subject = typeof req.query.subject === 'string' ? req.query.subject : undefined;
+  const where = subject ? { subject } : {};
 
   const [contactRequests, total] = await Promise.all([
     prisma.contactRequest.findMany({
+      where,
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
-    prisma.contactRequest.count(),
+    prisma.contactRequest.count({ where }),
   ]);
 
   res.json({ contactRequests, total, page, pageSize });

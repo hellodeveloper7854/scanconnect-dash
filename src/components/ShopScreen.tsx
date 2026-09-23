@@ -3,6 +3,7 @@ import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { ProductDetailScreen } from './ProductDetailScreen';
+import { BulkOrderModal } from './BulkOrderModal';
 import shopBannerImg from '../assets/images/shopbanner.png';
 import {
   ArrowRight,
@@ -40,6 +41,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 }) => {
   const [activeNav, setActiveNav] = useState('Shop');
   const [visibleProductsCount, setVisibleProductsCount] = useState(6);
+  const [isBulkOrderModalOpen, setIsBulkOrderModalOpen] = useState(false);
   const heroImageRef = useRef<HTMLDivElement>(null);
   const [heroTilt, setHeroTilt] = useState({ x: 0, y: 0 });
 
@@ -597,19 +599,29 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     </div>
 
                     <button
-                      onClick={() =>
-                        prod.price && prod.price.startsWith('₹')
-                          ? openProduct({
-                              id: prod.id,
-                              tag: prod.badge || 'SCAN CONNECT',
-                              rating: '4.8',
-                              title: prod.title,
-                              desc: prod.desc,
-                              price: prod.price,
-                              size: prod.size,
-                            })
-                          : onNavigate('contact')
-                      }
+                      onClick={() => {
+                        if (prod.price && prod.price.startsWith('₹')) {
+                          openProduct({
+                            id: prod.id,
+                            tag: prod.badge || 'SCAN CONNECT',
+                            rating: '4.8',
+                            title: prod.title,
+                            desc: prod.desc,
+                            price: prod.price,
+                            size: prod.size,
+                          });
+                          return;
+                        }
+                        // The Bulk Orders card's "Contact Us" opens a lightweight
+                        // popup instead of navigating away — other non-purchasable
+                        // cards (e.g. Fleet & Commercial's "Contact Sales") still
+                        // go to the full Contact page.
+                        if (prod.id === 9) {
+                          setIsBulkOrderModalOpen(true);
+                          return;
+                        }
+                        onNavigate('contact');
+                      }}
                       className="btn-shimmer w-full h-[42px] bg-[#0F0F0F] hover:bg-[#FFED00] hover:shadow-[0_8px_20px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#0F0F0F] font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95 shadow-xs"
                     >
                       <span>{prod.cta}</span>
@@ -791,6 +803,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
       {/* Footer */}
       <DashboardFooter />
+
+      <BulkOrderModal isOpen={isBulkOrderModalOpen} onClose={() => setIsBulkOrderModalOpen(false)} />
     </div>
   );
 };
