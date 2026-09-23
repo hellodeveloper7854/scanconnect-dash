@@ -20,7 +20,9 @@ import {
   Home,
   MapPin,
   QrCode,
-  Store
+  Store,
+  HardHat,
+  Users
 } from 'lucide-react';
 
 interface ShopScreenProps {
@@ -182,6 +184,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         'Lifetime QR Activation',
         'No Battery Required',
       ],
+      size: 'Width: 4 in x Height: 2.5 in',
       price: '₹899',
       cta: 'View Product',
     },
@@ -202,6 +205,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         'Lifetime QR Activation',
         'No Battery Required',
       ],
+      size: 'Width: 4 in x Height: 2.5 in',
       price: '₹599',
       cta: 'View Product',
     },
@@ -222,7 +226,73 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         'Lifetime QR Activation',
         'No Battery Required',
       ],
+      size: 'Width: 3.5 in x Height: 2.2 in',
       price: '₹399',
+      cta: 'View Product',
+    },
+    {
+      id: 6,
+      icon: Bike,
+      badge: 'Best Value',
+      rating: '4.8/5 Customer Rating',
+      title: 'Bike + Helmet Tag Combo (2 + 2)',
+      desc: '2 Bike Tags and 2 Helmet Tags together — protect two riders and their helmets in one combo pack at a lower price than buying separately.',
+      idealFor: ['Two-Wheeler Owners', 'Riding Duos', 'Families with Multiple Bikes'],
+      features: [
+        'Privacy-Protected Calls',
+        'Instant QR Scan',
+        'Compact Weatherproof Design',
+        'UV Resistant Premium Material',
+        'Secure Call Routing',
+        'Easy Self Activation',
+        'Lifetime QR Activation',
+        'No Battery Required',
+      ],
+      size: 'Bike Tag — Width: 3.5 in x Height: 2.2 in · Helmet Tag — Width: 2.5 in x Height: 1.5 in',
+      price: '₹999',
+      cta: 'View Product',
+    },
+    {
+      id: 7,
+      icon: Bike,
+      rating: '4.8/5 Customer Rating',
+      title: 'Bike + Helmet Tag Combo (1 + 1)',
+      desc: '1 Bike Tag and 1 Helmet Tag together — cover both your bike and your helmet with a single combo pack.',
+      idealFor: ['Two-Wheeler Owners', 'Daily Commuters'],
+      features: [
+        'Privacy-Protected Calls',
+        'Instant QR Scan',
+        'Compact Weatherproof Design',
+        'UV Resistant Premium Material',
+        'Secure Call Routing',
+        'Easy Self Activation',
+        'Lifetime QR Activation',
+        'No Battery Required',
+      ],
+      size: 'Bike Tag — Width: 3.5 in x Height: 2.2 in · Helmet Tag — Width: 2.5 in x Height: 1.5 in',
+      price: '₹599',
+      cta: 'View Product',
+    },
+    {
+      id: 8,
+      icon: Truck,
+      rating: '4.7/5 Customer Rating',
+      title: 'Scan Connect Transport Tag',
+      desc: 'A larger-format tag designed for trucks, buses, and other transport vehicles that need to stay visible and reachable on the road.',
+      idealFor: ['Trucks', 'Buses', 'Commercial Transport', 'Logistics Vehicles'],
+      features: [
+        'Privacy-Protected Calls',
+        'Instant QR Scan',
+        'Large Format for High Visibility',
+        'Waterproof & Weatherproof',
+        'UV Resistant Premium Material',
+        'Secure Call Routing',
+        'Easy Self Activation',
+        'Lifetime QR Activation',
+        'No Battery Required',
+      ],
+      size: 'Width: 5.8 in x Height: 8 in',
+      price: '₹899',
       cta: 'View Product',
     },
     {
@@ -242,6 +312,15 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       idealFor: ['Apartments', 'Villas', 'Gated Communities', 'Residential Complexes'],
       price: '₹349',
       cta: 'View Product',
+    },
+    {
+      id: 9,
+      icon: Users,
+      title: 'Bulk Orders',
+      desc: 'Ordering for a fleet, dealership, housing society, or business? Get custom pricing and packaging for bulk Scan Connect Tag orders.',
+      idealFor: ['Fleet Operators', 'Dealerships', 'Housing Societies', 'Businesses'],
+      price: 'Contact Us for Pricing',
+      cta: 'Contact Us',
     },
   ];
 
@@ -527,6 +606,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                               title: prod.title,
                               desc: prod.desc,
                               price: prod.price,
+                              size: prod.size,
                             })
                           : onNavigate('contact')
                       }
@@ -542,6 +622,12 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
               const firstRow = products.slice(0, 3);
               const remainder = products.slice(3);
+              // Only center the very first remainder row when it's a partial
+              // row (not a clean multiple of 3) — e.g. exactly 2 leftover
+              // cards get nudged to the middle two of six columns. A clean
+              // multiple of 3 already fills every row edge-to-edge, so no
+              // offset should be applied there.
+              const centerFirstRemainderRow = remainder.length % 3 !== 0;
 
               return (
                 <div className="space-y-6 mb-8">
@@ -553,7 +639,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                       {remainder.map((prod, i) => (
                         <div
                           key={prod.id}
-                          className={`h-full lg:col-span-2 ${i === 0 ? 'lg:col-start-2' : ''}`}
+                          className={`h-full lg:col-span-2 ${i === 0 && centerFirstRemainderRow ? 'lg:col-start-2' : ''}`}
                         >
                           {renderProductCard(prod)}
                         </div>
@@ -614,6 +700,15 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                         </span>
                       ))}
                     </div>
+                  </div>
+                )}
+
+                {prod.size && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold tracking-widest text-[#9CA3AF] uppercase block">
+                      Size
+                    </span>
+                    <p className="text-[#1B1C1C] text-sm font-medium">{prod.size}</p>
                   </div>
                 )}
 

@@ -24,17 +24,21 @@ import {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
-// Maps ShopScreen's static catalog (its numeric `product.id`, 1-5 — see the
+// Maps ShopScreen's static catalog (its numeric `product.id` — see the
 // `products` array in ShopScreen.tsx) to the matching real backend Product
 // row, so checkout charges the price for whatever the customer actually
 // clicked "Buy Now" on instead of always charging the same one product.
-// Product #4 ("Fleet & Commercial Tags") isn't sold through checkout at all
-// — its CTA routes to Contact Sales — so it has no entry here.
+// Product #4 ("Fleet & Commercial Tags") and #9 ("Bulk Orders") aren't sold
+// through checkout at all — their CTAs route to Contact Sales — so they have
+// no entry here.
 const PRODUCT_ID_BY_SHOP_ID: Record<number, string> = {
   1: '5ab6e299-8795-4cfa-8293-d315bb75e98a', // Scan Connect Car Tag (Pack of 2) — ₹899
   2: '77e2f59e-da2e-4b44-acf6-b87202f900f1', // Scan Connect Car Tag (Single Pack) — ₹599
   3: 'fcda4e93-2c5f-4925-a199-82e8550e41bb', // Scan Connect Bike Tag — ₹399
   5: '8eefe311-750b-4e5b-8110-b040695b9bf7', // Home & Society QR Tags — ₹349
+  6: '40ed9d76-4958-4f2d-bb4d-549de6008be3', // Bike + Helmet Tag (2+2 Combo) — ₹999
+  7: '6aa3435d-a4ef-4933-a079-960d32e86ac9', // Bike + Helmet Tag (1+1 Combo) — ₹599
+  8: 'a950b724-b41c-43f1-9452-5f6d4d531bed', // Transport Tag — ₹899
 };
 const DEFAULT_CHECKOUT_PRODUCT_ID = PRODUCT_ID_BY_SHOP_ID[1];
 

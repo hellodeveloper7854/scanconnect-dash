@@ -23,7 +23,8 @@ import {
   Thermometer,
   Sparkles,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Ruler
 } from 'lucide-react';
 
 interface ProductDetailScreenProps {
@@ -39,6 +40,7 @@ interface ProductDetailScreenProps {
     price: string;
     tag?: string;
     rating?: string;
+    size?: string;
   };
 }
 
@@ -263,6 +265,12 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
               <span className="font-['Hanken_Grotesk'] font-bold text-[12px] leading-[12px] tracking-[1.2px] text-[#5F5E5E] uppercase block">
                 PRODUCT SPECS
               </span>
+              {product?.size && (
+                <div className="flex items-center gap-[8px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
+                  <Ruler className="w-[16px] h-[16px] text-[#676000] shrink-0" />
+                  <span>Size — {product.size}</span>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-y-[12px] gap-x-[16px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
                 <div className="flex items-center gap-[8px]">
                   <Droplets className="w-[16px] h-[16px] text-[#676000] shrink-0" />
