@@ -5,6 +5,9 @@ import { auth } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
 import { ScanResultCard, type CallTarget } from '../components/ScanResultCard';
 import logo from '../assets/images/logo.png';
+import carIcon from '../assets/images/caricon.png';
+
+const WHATSAPP_SUPPORT_NUMBER = '919973878399';
 
 const VEHICLE_TYPES = ['Car', 'Bike', 'Scooter', 'Truck', 'Bus', 'Other'];
 
@@ -47,8 +50,8 @@ interface VerifiedData {
 }
 
 const CardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="min-h-screen bg-[#FAFAF9] flex items-center justify-center p-4 font-['Hanken_Grotesk']">
-    <div className="w-full max-w-md bg-white border border-[#E4E2E2] shadow-[0px_4px_20px_-2px_rgba(0,0,0,0.08)] rounded-[16px] p-8 space-y-6">
+  <div className="min-h-screen w-full bg-[#FAFAF9] flex flex-col items-center px-4 py-10 sm:py-16 font-['Hanken_Grotesk']">
+    <div className="w-full max-w-md space-y-6">
       <div className="flex flex-col items-center gap-2 text-center">
         <img src={logo} alt="ScanConnect" className="h-9 w-auto object-contain" />
       </div>
@@ -891,8 +894,8 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
     return (
       <CardShell>
         <div className="text-center space-y-4">
-          <div className="w-14 h-14 rounded-full bg-[#FFED00] flex items-center justify-center mx-auto">
-            <QrCodeIcon className="w-7 h-7 text-[#1B1C1C]" />
+          <div className="flex items-center justify-center mx-auto">
+            <img src={carIcon} alt="" className="w-24 h-24 object-contain" />
           </div>
           <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Activate This QR Tag?</h1>
           <p className="text-sm text-[#5F5E5E]">
@@ -905,6 +908,17 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
           >
             Yes, Activate <ArrowRight className="w-4 h-4" />
           </button>
+          <p className="text-xs text-[#8B5CF6]">
+            If you need any help please{' '}
+            <a
+              href={`https://wa.me/${WHATSAPP_SUPPORT_NUMBER}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold underline hover:text-[#7C3AED] cursor-pointer"
+            >
+              click here WhatsApp Live Support
+            </a>
+          </p>
         </div>
       </CardShell>
     );
