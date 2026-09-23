@@ -1,5 +1,5 @@
 export type StickerLang = 'en' | 'hi';
-export type StickerSize = 'bike' | 'car' | 'transport';
+export type StickerSize = 'bike' | 'car' | 'transport' | 'helmet';
 
 /** Lowercases and strips a batch name down to URL/print-safe [a-z0-9-] characters, for use in a display ID. Mirrors server/src/routes/qrCodes.ts. */
 function slugifyBatchName(batchName: string): string {
@@ -21,10 +21,12 @@ export function formatQrDisplayId(batchName: string, batchSeq: number): string {
 // Transport is a tall portrait tag (5.8in x 8in) — rendered with a different,
 // stacked layout (see drawBrandedQrCanvasStacked) rather than bike/car's
 // side-by-side one, since a landscape two-panel layout doesn't fit a portrait tag.
+// Helmet uses the same side-by-side layout as bike/car, just smaller.
 export const STICKER_DIMENSIONS_PX: Record<StickerSize, { width: number; height: number }> = {
   bike: { width: 1200, height: 750 }, // 4in x 2.5in
   car: { width: 2400, height: 1500 }, // 8in x 5in
   transport: { width: 1740, height: 2400 }, // 5.8in x 8in
+  helmet: { width: 750, height: 450 }, // 2.5in x 1.5in
 };
 
 /**
