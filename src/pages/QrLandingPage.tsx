@@ -53,7 +53,9 @@ const CardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="min-h-screen w-full bg-[#FAFAF9] flex flex-col items-center px-4 py-10 sm:py-16 font-['Hanken_Grotesk']">
     <div className="w-full max-w-md space-y-6">
       <div className="flex flex-col items-center gap-2 text-center">
-        <img src={logo} alt="ScanConnect" className="h-9 w-auto object-contain" />
+        <a href="/" className="cursor-pointer">
+          <img src={logo} alt="ScanConnect" className="h-9 w-auto object-contain" />
+        </a>
       </div>
       {children}
     </div>
@@ -412,7 +414,6 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
   const [selectedVehicleId, setSelectedVehicleId] = useState('');
   const [useNewVehicle, setUseNewVehicle] = useState(false);
   const [registration, setRegistration] = useState('');
-  const [nickname, setNickname] = useState('');
   const [vehicleType, setVehicleType] = useState('');
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
@@ -435,7 +436,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
   const step1Valid = fullName.trim().length > 0 && mobileNumber.trim().length > 0;
   const step2Valid = selectedContactIds.length + newContacts.length > 0;
   const step3Valid = useNewVehicle
-    ? !!(registration.trim() && nickname.trim() && vehicleType.trim() && brand.trim() && model.trim() && fuelType.trim() && color.trim())
+    ? !!(registration.trim() && vehicleType.trim() && brand.trim() && model.trim() && fuelType.trim() && color.trim())
     : !!selectedVehicleId;
 
   const handleAddContact = () => {
@@ -480,7 +481,6 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
           ? {
               vehicle: {
                 registration: registration.trim(),
-                nickname: nickname.trim(),
                 vehicleType: vehicleType.trim(),
                 brand: brand.trim(),
                 model: model.trim(),
@@ -739,12 +739,6 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 onChange={(e) => setRegistration(e.target.value)}
                 placeholder="Registration Number"
                 className="col-span-2 h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-              />
-              <input
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                placeholder="Nickname"
-                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
               />
               <select
                 value={vehicleType}

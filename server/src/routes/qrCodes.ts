@@ -831,7 +831,7 @@ const activateSchema = z.object({
   vehicle: z
     .object({
       registration: z.string().min(1).max(30),
-      nickname: z.string().min(1).max(60),
+      nickname: z.string().max(60).optional(),
       vehicleType: z.string().min(1).max(40),
       brand: z.string().min(1).max(60),
       model: z.string().min(1).max(60),
