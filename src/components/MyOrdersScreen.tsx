@@ -4,10 +4,25 @@ import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { api, ApiError } from '../lib/api';
 import { auth } from '../lib/firebase';
-import { fetchBrandedQrPngBlob, triggerBlobDownload, stickerSizeForProductName } from '../lib/qrSticker';
+import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize } from '../lib/qrSticker';
 import { Package, ShoppingBag, Download } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
+
+const TAG_SIZE_LABEL: Record<StickerSize, string> = {
+  car: 'Car Tag',
+  bike: 'Bike Tag',
+  helmet: 'Helmet Tag',
+  transport: 'Transport Tag',
+};
+
+/** One physical tag from this order (see OrderTag in schema.prisma) — each downloads at its own correct sticker size. */
+interface OrderTagRow {
+  id: string;
+  size: StickerSize;
+  sequence: number;
+  qrToken: string;
+}
 
 interface OrderRow {
   id: string;
@@ -15,6 +30,7 @@ interface OrderRow {
   totalInPaise: number;
   createdAt: string;
   qrToken: string | null;
+  tags: OrderTagRow[];
   items: { quantity: number; product: { name: string } }[];
 }
 
@@ -99,63 +115,72 @@ export const MyOrdersScreen: React.FC<MyOrdersScreenProps> = ({ userData, onLogo
           ) : (
             <div className="space-y-4">
               {orders.map((order) => (
-                <div
-                  key={order.id}
-                  className="bg-white border border-[#EEEEEE] rounded-xl p-6 flex items-center justify-between gap-6 flex-wrap"
-                >
-                  <div className="flex items-center gap-4">
-                    {order.qrToken ? (
-                      <img
-                        src={`${API_BASE_URL}/api/order-contact/${order.qrToken}/qr.png`}
-                        alt="Order QR tag"
-                        className="w-11 h-11 rounded-lg shrink-0"
-                      />
-                    ) : (
-                      <div className="w-11 h-11 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-                        <Package className="w-5 h-5 text-[#676000]" />
+                <div key={order.id} className="bg-white border border-[#EEEEEE] rounded-xl p-6 space-y-4">
+                  <div className="flex items-center justify-between gap-6 flex-wrap">
+                    <div className="flex items-center gap-4">
+                      {order.tags.length > 0 ? (
+                        <img
+                          src={`${API_BASE_URL}/api/order-contact/${order.tags[0].qrToken}/qr.png`}
+                          alt="Order QR tag"
+                          className="w-11 h-11 rounded-lg shrink-0"
+                        />
+                      ) : (
+                        <div className="w-11 h-11 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                          <Package className="w-5 h-5 text-[#676000]" />
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-mono text-sm text-neutral-500">#{order.id.slice(0, 8).toUpperCase()}</div>
+                        <div className="text-sm text-neutral-700">
+                          {order.items.map((i) => `${i.product.name} x${i.quantity}`).join(', ')}
+                        </div>
+                        <div className="text-xs text-neutral-400 mt-0.5">
+                          {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </div>
                       </div>
-                    )}
-                    <div>
-                      <div className="font-mono text-sm text-neutral-500">#{order.id.slice(0, 8).toUpperCase()}</div>
-                      <div className="text-sm text-neutral-700">
-                        {order.items.map((i) => `${i.product.name} x${i.quantity}`).join(', ')}
-                      </div>
-                      <div className="text-xs text-neutral-400 mt-0.5">
-                        {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <span className="font-bold text-neutral-900">
+                        {(order.totalInPaise / 100).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                      </span>
+                      <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${statusColor[order.status]}`}>
+                        {order.status}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    <span className="font-bold text-neutral-900">
-                      {(order.totalInPaise / 100).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                    </span>
-                    <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${statusColor[order.status]}`}>
-                      {order.status}
-                    </span>
-                    {order.qrToken && (
-                      <button
-                        onClick={async () => {
-                          const idToken = await auth.currentUser?.getIdToken();
-                          const size = stickerSizeForProductName(order.items[0]?.product.name);
-                          const blob = await fetchBrandedQrPngBlob(
-                            `${API_BASE_URL}/api/order-contact/${order.qrToken}/qr.png`,
-                            idToken,
-                            { lang: 'en', size },
-                          );
-                          triggerBlobDownload(blob, `scanconnect-qr-${order.id.slice(0, 8)}.png`);
-                        }}
-                        title="Download QR"
-                        className="p-2 text-neutral-500 hover:text-neutral-900 rounded-lg hover:bg-neutral-100 cursor-pointer"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
+                  {/* One row per physical tag — each downloads at its own correct sticker size (see OrderTag in schema.prisma). */}
+                  {order.tags.length > 0 && (
+                    <div className="pt-3 border-t border-neutral-100 space-y-2">
+                      {order.tags.map((tag) => (
+                        <div key={tag.id} className="flex items-center justify-between gap-4">
+                          <span className="text-sm text-neutral-600">
+                            {order.tags.length > 1 ? `Tag ${tag.sequence} — ${TAG_SIZE_LABEL[tag.size]}` : TAG_SIZE_LABEL[tag.size]}
+                          </span>
+                          <button
+                            onClick={async () => {
+                              const idToken = await auth.currentUser?.getIdToken();
+                              const blob = await fetchBrandedQrPngBlob(
+                                `${API_BASE_URL}/api/order-contact/${tag.qrToken}/qr.png`,
+                                idToken,
+                                { lang: 'en', size: tag.size },
+                              );
+                              triggerBlobDownload(blob, `scanconnect-qr-${order.id.slice(0, 8)}-${tag.sequence}.png`);
+                            }}
+                            title="Download QR"
+                            className="p-2 text-neutral-500 hover:text-neutral-900 rounded-lg hover:bg-neutral-100 cursor-pointer"
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

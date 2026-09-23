@@ -7,55 +7,60 @@ import { env } from '../lib/env.js';
  * Public, unauthenticated by design: the order QR is meant to be scanned by
  * anyone holding the physical package/label (e.g. a courier) to look up who
  * to contact, so no login is required to view this order's contact details.
+ *
+ * Resolves by OrderTag.qrToken — every order (including ones placed before
+ * the per-tag model existed) has its qrToken(s) there; see the backfill
+ * script (server/scripts/backfillOrderTags.ts) and OrderTag's doc comment in
+ * schema.prisma for how pre-existing orders were migrated in.
  */
 export const orderContactRouter = Router();
 
 orderContactRouter.get('/:token', async (req, res) => {
-  const order = await prisma.order.findUnique({
+  const tag = await prisma.orderTag.findUnique({
     where: { qrToken: req.params.token },
     include: {
-      user: { select: { fullName: true, email: true, mobileNumber: true } },
+      order: { include: { user: { select: { fullName: true, email: true, mobileNumber: true } } } },
       vehicle: true,
       emergencyContact: true,
     },
   });
 
-  if (!order) {
+  if (!tag) {
     return res.status(404).json({ error: 'No order found for this QR code' });
   }
 
   res.json({
-    orderId: order.id,
-    createdAt: order.createdAt,
-    status: order.status,
+    orderId: tag.order.id,
+    createdAt: tag.order.createdAt,
+    status: tag.order.status,
     customer: {
-      fullName: order.user.fullName,
-      email: order.user.email,
-      mobileNumber: order.user.mobileNumber,
+      fullName: tag.order.user.fullName,
+      email: tag.order.user.email,
+      mobileNumber: tag.order.user.mobileNumber,
     },
-    vehicle: order.vehicle
+    vehicle: tag.vehicle
       ? {
-          registration: order.vehicle.registration,
-          nickname: order.vehicle.nickname,
-          vehicleType: order.vehicle.vehicleType,
-          brand: order.vehicle.brand,
-          model: order.vehicle.model,
-          color: order.vehicle.color,
+          registration: tag.vehicle.registration,
+          nickname: tag.vehicle.nickname,
+          vehicleType: tag.vehicle.vehicleType,
+          brand: tag.vehicle.brand,
+          model: tag.vehicle.model,
+          color: tag.vehicle.color,
         }
       : null,
-    emergencyContact: order.emergencyContact
+    emergencyContact: tag.emergencyContact
       ? {
-          name: order.emergencyContact.name,
-          role: order.emergencyContact.role,
-          phone: order.emergencyContact.phone,
+          name: tag.emergencyContact.name,
+          role: tag.emergencyContact.role,
+          phone: tag.emergencyContact.phone,
         }
       : null,
   });
 });
 
 orderContactRouter.get('/:token/qr.png', async (req, res) => {
-  const order = await prisma.order.findUnique({ where: { qrToken: req.params.token } });
-  if (!order) {
+  const tag = await prisma.orderTag.findUnique({ where: { qrToken: req.params.token } });
+  if (!tag) {
     return res.status(404).json({ error: 'No order found for this QR code' });
   }
 

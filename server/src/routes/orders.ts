@@ -6,6 +6,7 @@ import { razorpay } from '../lib/razorpay.js';
 import { env } from '../lib/env.js';
 import { requireAuth } from '../middleware/auth.js';
 import { notify } from '../lib/notify.js';
+import type { Prisma } from '@prisma/client';
 
 export const ordersRouter = Router();
 
@@ -262,14 +263,59 @@ ordersRouter.post('/', requireAuth, async (req, res) => {
   });
 });
 
+/** A Product.tagsPerUnit entry — see the field's doc comment in schema.prisma. */
+const tagSpecSchema = z.object({ size: z.string(), count: z.number().int().min(1) });
+
+/**
+ * Creates one OrderTag row per physical tag the order's items represent
+ * (Product.tagsPerUnit expanded by each item's quantity) — e.g. a quantity-1
+ * "Bike + Helmet Tag Combo (2+2)" item creates 4 rows (2 bike, 2 helmet); a
+ * quantity-2 purchase of that same product would create 8. Falls back to a
+ * single 'bike'-size tag for any item whose product has no tagsPerUnit set
+ * (e.g. an older product created before this field existed), matching the
+ * pre-this-feature behavior of always producing exactly one tag.
+ */
+async function createOrderTagsForPaidOrder(tx: Prisma.TransactionClient, orderId: string) {
+  const items = await tx.orderItem.findMany({
+    where: { orderId },
+    include: { product: { select: { tagsPerUnit: true } } },
+  });
+
+  let sequence = 0;
+  const rows: Prisma.OrderTagCreateManyInput[] = [];
+  for (const item of items) {
+    const parsed = z.array(tagSpecSchema).safeParse(item.product.tagsPerUnit);
+    const specs = parsed.success && parsed.data.length > 0 ? parsed.data : [{ size: 'bike', count: 1 }];
+    for (let unit = 0; unit < item.quantity; unit++) {
+      for (const spec of specs) {
+        for (let i = 0; i < spec.count; i++) {
+          sequence++;
+          rows.push({
+            orderId,
+            orderItemId: item.id,
+            size: spec.size,
+            sequence,
+            qrToken: randomBytes(16).toString('hex'),
+          });
+        }
+      }
+    }
+  }
+
+  if (rows.length > 0) {
+    await tx.orderTag.createMany({ data: rows });
+  }
+}
+
 /**
  * Marks an order PAID and, if it wasn't already PAID, increments its
- * coupon's usedCount — done together in one transaction so a coupon's usage
- * is only ever counted once payment actually succeeds (not at checkout/order
- * creation, so abandoned or failed carts never consume a limited-use
- * coupon), and is safe to call from both /verify and the webhook handler
- * since either one could fire first (or both, for the same order) without
- * double-incrementing.
+ * coupon's usedCount and creates its OrderTag rows (one per physical tag
+ * purchased) — done together in one transaction so a coupon's usage is only
+ * ever counted once payment actually succeeds (not at checkout/order
+ * creation, so abandoned or failed carts never consume a limited-use coupon
+ * or create tags for a never-paid order), and is safe to call from both
+ * /verify and the webhook handler since either one could fire first (or
+ * both, for the same order) without double-incrementing or duplicating tags.
  */
 async function markOrderPaidAndRedeemCoupon(
   razorpayOrderId: string,
@@ -285,8 +331,11 @@ async function markOrderPaidAndRedeemCoupon(
       data: { status: 'PAID', ...paymentFields },
     });
 
-    if (!wasAlreadyPaid && order.couponId) {
-      await tx.coupon.update({ where: { id: order.couponId }, data: { usedCount: { increment: 1 } } });
+    if (!wasAlreadyPaid) {
+      if (order.couponId) {
+        await tx.coupon.update({ where: { id: order.couponId }, data: { usedCount: { increment: 1 } } });
+      }
+      await createOrderTagsForPaidOrder(tx, order.id);
     }
 
     return { order, wasAlreadyPaid };
@@ -342,24 +391,51 @@ ordersRouter.post('/verify', requireAuth, async (req, res) => {
 ordersRouter.get('/mine', requireAuth, async (req, res) => {
   const orders = await prisma.order.findMany({
     where: { userId: req.user!.id },
-    include: { items: { include: { product: true } }, vehicle: true, emergencyContact: true },
+    include: {
+      items: { include: { product: true } },
+      vehicle: true,
+      emergencyContact: true,
+      tags: { include: { vehicle: true, emergencyContact: true }, orderBy: { sequence: 'asc' } },
+    },
     orderBy: { createdAt: 'desc' },
   });
   res.json({ orders });
 });
 
-const assignSchema = z.object({
+/**
+ * Lists this order's physical tags (one row per tag actually purchased —
+ * see OrderTag's doc comment in schema.prisma), each independently
+ * assignable to a vehicle + emergency contact via POST /:id/tags/:tagId/assign.
+ * Used by the checkout "Assign" step and My Orders to render one row per
+ * physical tag instead of one per order.
+ */
+ordersRouter.get('/:id/tags', requireAuth, async (req, res) => {
+  const order = await prisma.order.findUnique({ where: { id: req.params.id } });
+  if (!order || order.userId !== req.user!.id) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+
+  const tags = await prisma.orderTag.findMany({
+    where: { orderId: order.id },
+    include: { vehicle: true, emergencyContact: true },
+    orderBy: { sequence: 'asc' },
+  });
+  res.json({ tags });
+});
+
+const assignTagSchema = z.object({
   vehicleId: z.string().uuid(),
   emergencyContactId: z.string().uuid(),
 });
 
 /**
  * Called on the checkout "Assign" step, once payment has succeeded, to link
- * the paid order to a specific vehicle + emergency contact and generate the
- * QR token that will be printed on the sticker (and shown in My Orders).
+ * one specific physical tag from this order to a vehicle + emergency
+ * contact — called once per tag, since a multi-tag order (e.g. a Bike +
+ * Helmet combo) needs each tag assignable to its own vehicle independently.
  */
-ordersRouter.post('/:id/assign', requireAuth, async (req, res) => {
-  const parsed = assignSchema.safeParse(req.body);
+ordersRouter.post('/:id/tags/:tagId/assign', requireAuth, async (req, res) => {
+  const parsed = assignTagSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
@@ -369,7 +445,12 @@ ordersRouter.post('/:id/assign', requireAuth, async (req, res) => {
     return res.status(404).json({ error: 'Order not found' });
   }
   if (order.status !== 'PAID') {
-    return res.status(400).json({ error: 'Order must be paid before it can be assigned a QR code' });
+    return res.status(400).json({ error: 'Order must be paid before its tags can be assigned' });
+  }
+
+  const tag = await prisma.orderTag.findUnique({ where: { id: req.params.tagId } });
+  if (!tag || tag.orderId !== order.id) {
+    return res.status(404).json({ error: 'Tag not found on this order' });
   }
 
   const [vehicle, contact] = await Promise.all([
@@ -383,17 +464,13 @@ ordersRouter.post('/:id/assign', requireAuth, async (req, res) => {
     return res.status(404).json({ error: 'Emergency contact not found' });
   }
 
-  const updated = await prisma.order.update({
-    where: { id: order.id },
-    data: {
-      vehicleId: vehicle.id,
-      emergencyContactId: contact.id,
-      qrToken: order.qrToken ?? randomBytes(16).toString('hex'),
-    },
-    include: { items: { include: { product: true } }, vehicle: true, emergencyContact: true },
+  const updated = await prisma.orderTag.update({
+    where: { id: tag.id },
+    data: { vehicleId: vehicle.id, emergencyContactId: contact.id },
+    include: { vehicle: true, emergencyContact: true },
   });
 
-  res.json({ order: updated });
+  res.json({ tag: updated });
 });
 
 /**

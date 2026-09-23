@@ -68,8 +68,9 @@ model EmergencyContact {
   isPrimary Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  orders  Order[]
-  qrCodes QrCode[]
+  orders    Order[]
+  qrCodes   QrCode[]
+  orderTags OrderTag[]
 
   @@index([userId])
 }
@@ -92,6 +93,7 @@ model Vehicle {
 
   orders       Order[]
   qrCodeRecord QrCode?
+  orderTags    OrderTag[]
 
   @@index([userId])
 }
@@ -209,6 +211,18 @@ model Product {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
 
+  /// Structured breakdown of the physical tags one unit of this product
+  /// contains, e.g. `[{"size":"car","count":2}]` for a "Car Tag (Pack of 2)",
+  /// or `[{"size":"bike","count":2},{"size":"helmet","count":2}]` for a
+  /// "Bike + Helmet Tag Combo (2+2)". `size` is a StickerSize value (see
+  /// src/lib/qrSticker.ts) used both to know how many OrderTag rows to create
+  /// per unit purchased and what physical sticker size each one downloads at.
+  /// Empty/unset defaults to a single 'bike'-size tag (see
+  /// server/src/lib/tagsPerUnit.ts) so older or manually-added products
+  /// without this field still get exactly one tag, matching pre-this-feature
+  /// behavior instead of silently producing zero tags.
+  tagsPerUnit Json?
+
   orderItems OrderItem[]
 }
 
@@ -226,6 +240,14 @@ model Order {
   razorpayOrderId     String?           @unique
   razorpayPaymentId   String?
   razorpaySignature   String?
+  /// Legacy single-tag fields — kept (not dropped) for backward compatibility
+  /// with orders placed before per-tag QR codes (see OrderTag below) existed.
+  /// No longer written for new orders; new orders express every physical tag
+  /// as its own OrderTag row instead. A pre-migration order's one existing
+  /// qrToken/vehicle/contact was carried over into a single OrderTag row by
+  /// the migration, so old orders keep working unchanged through the new
+  /// per-tag endpoints without needing these columns anymore — they remain
+  /// only so nothing that still reads them directly breaks.
   qrToken             String?           @unique
   vehicleId           String?
   vehicle             Vehicle?          @relation(fields: [vehicleId], references: [id])
@@ -240,11 +262,42 @@ model Order {
   updatedAt           DateTime          @updatedAt
 
   items  OrderItem[]
+  tags   OrderTag[]
   review Review?
 
   @@index([userId])
   @@index([status])
   @@index([couponId])
+}
+
+/// One row per physical tag included in an order — e.g. a "Bike + Helmet Tag
+/// Combo (2+2)" order creates 4 rows (2 size='bike', 2 size='helmet'), each
+/// independently assignable to its own vehicle + emergency contact and
+/// independently downloadable at its own correct sticker size. Replaces the
+/// single qrToken/vehicleId/emergencyContactId that used to live directly on
+/// Order (kept there only for pre-migration orders — see the comment above).
+model OrderTag {
+  id                  String            @id @default(uuid())
+  orderId             String
+  order               Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderItemId         String
+  orderItem           OrderItem         @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  /// StickerSize value ('car' | 'bike' | 'helmet' | 'transport') — see src/lib/qrSticker.ts.
+  size                String
+  /// 1-indexed position among this order's tags, purely for stable display
+  /// ordering ("Tag 1 of 4") — not a uniqueness constraint on its own.
+  sequence            Int
+  qrToken             String            @unique
+  vehicleId           String?
+  vehicle             Vehicle?          @relation(fields: [vehicleId], references: [id])
+  emergencyContactId  String?
+  emergencyContact    EmergencyContact? @relation(fields: [emergencyContactId], references: [id])
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@index([orderId])
+  @@index([orderItemId])
+  @@index([vehicleId])
 }
 
 enum CouponType {
@@ -298,6 +351,8 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id])
   quantity  Int
   priceInPaise Int
+
+  tags OrderTag[]
 
   @@index([orderId])
 }

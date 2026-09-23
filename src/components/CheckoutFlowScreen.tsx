@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
-import { api, ApiError, downloadFile } from '../lib/api';
+import { api, ApiError } from '../lib/api';
+import { auth } from '../lib/firebase';
+import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize } from '../lib/qrSticker';
 import qrImage from '../assets/images/qrimage.png';
 import {
   ShieldCheck,
@@ -85,6 +87,23 @@ interface OrderRecord {
   qrToken: string | null;
   items: { quantity: number; product: { name: string; priceInPaise: number } }[];
 }
+
+/** One physical tag from this order (see OrderTag in schema.prisma) — each is independently assignable and downloadable at its own size. */
+interface OrderTagRecord {
+  id: string;
+  size: StickerSize;
+  sequence: number;
+  qrToken: string;
+  vehicleId: string | null;
+  emergencyContactId: string | null;
+}
+
+const TAG_SIZE_LABEL: Record<StickerSize, string> = {
+  car: 'Car Tag',
+  bike: 'Bike Tag',
+  helmet: 'Helmet Tag',
+  transport: 'Transport Tag',
+};
 
 interface AvailableCoupon {
   code: string;
@@ -243,13 +262,35 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   const [paymentError, setPaymentError] = useState('');
   const [completedOrder, setCompletedOrder] = useState<OrderRecord | null>(null);
 
-  // Assign step — pick or add the vehicle + emergency contact this order's QR maps to
+  // Assign step — pick or add the vehicle + emergency contact for each of this
+  // order's physical tags (a multi-tag order, e.g. a Bike + Helmet combo, has
+  // one OrderTag per physical tag — each needs its own vehicle/contact, not
+  // one shared across the whole order). Tags are assigned one at a time,
+  // walking through them via activeTagIndex, since most orders only have 1-2
+  // tags and a single-form-at-a-time flow is simpler than showing every tag's
+  // form at once.
+  const [orderTags, setOrderTags] = useState<OrderTagRecord[] | null>(null);
+  const [activeTagIndex, setActiveTagIndex] = useState(0);
   const [vehicles, setVehicles] = useState<VehicleOption[] | null>(null);
   const [contacts, setContacts] = useState<ContactOption[] | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState('');
   const [selectedContactId, setSelectedContactId] = useState('');
   const [assignError, setAssignError] = useState('');
   const [isAssigning, setIsAssigning] = useState(false);
+
+  const unassignedTagCount = orderTags?.filter((t) => !t.vehicleId || !t.emergencyContactId).length ?? 0;
+  const activeTag: OrderTagRecord | null = orderTags?.[activeTagIndex] ?? null;
+
+  const loadOrderTags = (orderId: string) => {
+    api
+      .get<{ tags: OrderTagRecord[] }>(`/api/orders/${orderId}/tags`)
+      .then((res) => {
+        setOrderTags(res.tags);
+        const firstUnassignedIndex = res.tags.findIndex((t) => !t.vehicleId || !t.emergencyContactId);
+        setActiveTagIndex(firstUnassignedIndex === -1 ? 0 : firstUnassignedIndex);
+      })
+      .catch(() => setOrderTags([]));
+  };
 
   const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
   const [newVehicleRegistration, setNewVehicleRegistration] = useState('');
@@ -273,24 +314,33 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   const loadAssignOptions = () => {
     api
       .get<{ vehicles: VehicleOption[] }>('/api/profile/vehicles')
-      .then((res) => {
-        setVehicles(res.vehicles);
-        if (res.vehicles.length === 1) setSelectedVehicleId(res.vehicles[0].id);
-      })
+      .then((res) => setVehicles(res.vehicles))
       .catch(() => setVehicles([]));
     api
       .get<{ contacts: ContactOption[] }>('/api/profile/emergency-contacts')
-      .then((res) => {
-        setContacts(res.contacts);
-        if (res.contacts.length === 1) setSelectedContactId(res.contacts[0].id);
-      })
+      .then((res) => setContacts(res.contacts))
       .catch(() => setContacts([]));
   };
 
   React.useEffect(() => {
-    if (step === 3 && completedOrder && !completedOrder.qrToken) loadAssignOptions();
+    if (step === 3 && completedOrder && orderTags === null) {
+      loadAssignOptions();
+      loadOrderTags(completedOrder.id);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, completedOrder?.id]);
+
+  // Whenever the active tag changes, prefill the pickers from whatever it's
+  // already assigned to (e.g. re-visiting a tag), or auto-pick the only
+  // option when there's exactly one vehicle/contact to choose from —
+  // otherwise leave both blank so the customer must choose deliberately.
+  React.useEffect(() => {
+    if (!activeTag) return;
+    setSelectedVehicleId(activeTag.vehicleId ?? (vehicles?.length === 1 ? vehicles[0].id : ''));
+    setSelectedContactId(activeTag.emergencyContactId ?? (contacts?.length === 1 ? contacts[0].id : ''));
+    setAssignError('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTag?.id, vehicles, contacts]);
 
   const handleAddVehicleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -381,22 +431,30 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
     }
   };
 
+  /** Assigns the currently active tag, then moves on to the next unassigned tag — or to Step 3 once every tag in the order has been assigned. */
   const handleConfirmAssign = async () => {
-    if (!completedOrder || !selectedVehicleId || !selectedContactId) {
+    if (!completedOrder || !activeTag || !selectedVehicleId || !selectedContactId) {
       setAssignError('Please select (or add) a vehicle and an emergency contact.');
       return;
     }
     setIsAssigning(true);
     setAssignError('');
     try {
-      const res = await api.post<{ order: OrderRecord }>(`/api/orders/${completedOrder.id}/assign`, {
-        vehicleId: selectedVehicleId,
-        emergencyContactId: selectedContactId,
-      });
-      setCompletedOrder(res.order);
-      setStep(3);
+      const res = await api.post<{ tag: OrderTagRecord }>(
+        `/api/orders/${completedOrder.id}/tags/${activeTag.id}/assign`,
+        { vehicleId: selectedVehicleId, emergencyContactId: selectedContactId },
+      );
+      const updatedTags = (orderTags ?? []).map((t) => (t.id === res.tag.id ? res.tag : t));
+      setOrderTags(updatedTags);
+
+      const nextUnassignedIndex = updatedTags.findIndex((t) => !t.vehicleId || !t.emergencyContactId);
+      if (nextUnassignedIndex === -1) {
+        setStep(3);
+      } else {
+        setActiveTagIndex(nextUnassignedIndex);
+      }
     } catch (err) {
-      setAssignError(err instanceof ApiError ? err.message : 'Failed to generate QR code');
+      setAssignError(err instanceof ApiError ? err.message : 'Failed to assign this tag');
     } finally {
       setIsAssigning(false);
     }
@@ -1028,8 +1086,9 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
           </div>
         )}
 
-        {/* STEP 3a: ASSIGN VEHICLE + EMERGENCY CONTACT (shown once, right after payment, before the QR is generated) */}
-        {step === 3 && completedOrder && !completedOrder.qrToken && (
+        {/* STEP 3a: ASSIGN VEHICLE + EMERGENCY CONTACT — shown once per tag, right after
+            payment, until every physical tag in this order has been assigned. */}
+        {step === 3 && completedOrder && unassignedTagCount > 0 && (
           <div className="max-w-[600px] mx-auto space-y-8 animate-fade-in px-2 sm:px-4 pt-2">
             <div className="text-center space-y-2">
               <div className="w-16 h-16 rounded-full bg-[#FFED00] flex items-center justify-center mx-auto">
@@ -1039,11 +1098,24 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 Payment Successful
               </h1>
               <p className="font-['Hanken_Grotesk'] text-[#5F5E5E] text-base">
-                One last step — link this order&apos;s QR tag to a vehicle and an emergency contact.
+                {orderTags && orderTags.length > 1
+                  ? `Link each of your ${orderTags.length} tags to a vehicle and an emergency contact.`
+                  : "One last step — link this order's QR tag to a vehicle and an emergency contact."}
               </p>
             </div>
 
             <div className="bg-white border border-[#CCC7AA] rounded-xl p-6 sm:p-8 space-y-6">
+              {orderTags && orderTags.length > 1 && activeTag && (
+                <div className="flex items-center justify-between px-4 py-2.5 bg-[#FFED00]/15 border border-[#FFED00]/40 rounded-lg text-sm font-bold text-[#1B1C1C]">
+                  <span>
+                    Tag {activeTag.sequence} of {orderTags.length} — {TAG_SIZE_LABEL[activeTag.size]}
+                  </span>
+                  <span className="text-xs font-semibold text-[#5F5E5E]">
+                    {orderTags.length - unassignedTagCount}/{orderTags.length} assigned
+                  </span>
+                </div>
+              )}
+
               {/* Vehicle picker */}
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-xs font-bold text-[#5F5E5E] uppercase tracking-wide">
@@ -1115,7 +1187,11 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 disabled={isAssigning || !selectedVehicleId || !selectedContactId}
                 className="w-full h-[56px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-['Hanken_Grotesk'] font-bold text-base text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
               >
-                {isAssigning ? 'Generating QR...' : 'Generate My QR Tag'}
+                {isAssigning
+                  ? 'Generating QR...'
+                  : unassignedTagCount > 1
+                    ? 'Save & Continue to Next Tag'
+                    : 'Generate My QR Tag'}
                 {!isAssigning && <ArrowRight className="w-4 h-4" />}
               </button>
             </div>
@@ -1310,8 +1386,8 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
           </div>
         )}
 
-        {/* STEP 3: REVIEW / THANK YOU PAGE (shown once the QR has been generated) */}
-        {step === 3 && completedOrder?.qrToken && (
+        {/* STEP 3: REVIEW / THANK YOU PAGE — shown once every tag in this order has a QR assigned. */}
+        {step === 3 && completedOrder && orderTags !== null && orderTags.length > 0 && unassignedTagCount === 0 && (
           <div className="max-w-[672px] mx-auto space-y-[32px] animate-fade-in px-2 sm:px-4 pt-2">
 
             {/* SUCCESS CELEBRATION SECTION */}
@@ -1403,34 +1479,50 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
 
             </div>
 
-            {/* SECTION: YOUR QR TAG */}
-            {completedOrder?.qrToken && (
-              <div className="bg-white border border-[#E4E2E2] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] rounded-[12px] p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6">
-                <img
-                  src={`${API_BASE_URL}/api/order-contact/${completedOrder.qrToken}/qr.png`}
-                  alt="Your Scan Connect QR tag"
-                  className="w-40 h-40 shrink-0 rounded-lg"
-                />
-                <div className="flex-1 space-y-3 text-center sm:text-left">
+            {/* SECTION: YOUR QR TAG(S) — one card per physical tag in this order, each
+                downloadable at its own correct sticker size. */}
+            {completedOrder && orderTags && orderTags.length > 0 && (
+              <div className="space-y-4">
+                {orderTags.length > 1 && (
                   <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-xl text-[#1B1C1C]">
-                    Your QR Tag is Ready
+                    Your {orderTags.length} QR Tags Are Ready
                   </h3>
-                  <p className="text-sm text-[#5F5E5E]">
-                    This is the QR code that will be printed on your sticker. Anyone who scans it can see your linked
-                    vehicle and emergency contact details.
-                  </p>
-                  <button
-                    onClick={() =>
-                      downloadFile(
-                        `/api/order-contact/${completedOrder.qrToken}/qr.png`,
-                        `scanconnect-qr-${completedOrder.id.slice(0, 8)}.png`,
-                      )
-                    }
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1B1C1C] hover:bg-neutral-800 text-white text-sm font-bold rounded-lg cursor-pointer"
+                )}
+                {orderTags.map((tag) => (
+                  <div
+                    key={tag.id}
+                    className="bg-white border border-[#E4E2E2] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] rounded-[12px] p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6"
                   >
-                    <Download className="w-4 h-4" /> Download QR
-                  </button>
-                </div>
+                    <img
+                      src={`${API_BASE_URL}/api/order-contact/${tag.qrToken}/qr.png`}
+                      alt={`Your Scan Connect QR tag (${TAG_SIZE_LABEL[tag.size]})`}
+                      className="w-40 h-40 shrink-0 rounded-lg"
+                    />
+                    <div className="flex-1 space-y-3 text-center sm:text-left">
+                      <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-xl text-[#1B1C1C]">
+                        {orderTags.length > 1 ? TAG_SIZE_LABEL[tag.size] : 'Your QR Tag is Ready'}
+                      </h3>
+                      <p className="text-sm text-[#5F5E5E]">
+                        This is the QR code that will be printed on your sticker. Anyone who scans it can see your
+                        linked vehicle and emergency contact details.
+                      </p>
+                      <button
+                        onClick={async () => {
+                          const idToken = await auth.currentUser?.getIdToken();
+                          const blob = await fetchBrandedQrPngBlob(
+                            `${API_BASE_URL}/api/order-contact/${tag.qrToken}/qr.png`,
+                            idToken,
+                            { lang: 'en', size: tag.size },
+                          );
+                          triggerBlobDownload(blob, `scanconnect-qr-${completedOrder.id.slice(0, 8)}-${tag.sequence}.png`);
+                        }}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1B1C1C] hover:bg-neutral-800 text-white text-sm font-bold rounded-lg cursor-pointer"
+                      >
+                        <Download className="w-4 h-4" /> Download QR
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
 
