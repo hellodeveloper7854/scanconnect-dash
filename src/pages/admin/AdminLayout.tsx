@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink, Navigate, Outlet } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -85,6 +85,17 @@ const SECTIONS: NavSection[] = [
 
 export const AdminLayout: React.FC = () => {
   const { isLoading, isLoggedIn, isAdmin, user, logout } = useAuth();
+  const mainRef = useRef<HTMLElement>(null);
+  const { pathname } = useLocation();
+
+  // React Router doesn't reset scroll on navigation (unlike a full page
+  // load), and the scrollable element here is <main> — not the window —
+  // since the sidebar has its own independent scroll. Without this, opening
+  // a new admin page while scrolled down on the previous one keeps that same
+  // scroll position instead of starting at the top.
+  useEffect(() => {
+    mainRef.current?.scrollTo(0, 0);
+  }, [pathname]);
 
   if (isLoading) {
     return (
@@ -99,7 +110,7 @@ export const AdminLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white flex print:block print:min-h-0 print:bg-white">
+    <div className="h-screen bg-neutral-950 text-white flex print:block print:h-auto print:bg-white">
       <aside className="w-64 shrink-0 border-r border-white/10 flex flex-col overflow-y-auto print:hidden">
         <div className="h-16 flex items-center px-6 border-b border-white/10 shrink-0">
           <span className="font-black uppercase tracking-wide text-[#FFED00]">ScanConnect Admin</span>
@@ -138,7 +149,7 @@ export const AdminLayout: React.FC = () => {
           </button>
         </div>
       </aside>
-      <main className="flex-1 overflow-y-auto print:overflow-visible">
+      <main ref={mainRef} className="flex-1 overflow-y-auto print:overflow-visible">
         <Outlet />
       </main>
     </div>
