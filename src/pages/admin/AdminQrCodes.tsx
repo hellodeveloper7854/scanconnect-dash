@@ -326,7 +326,7 @@ export const AdminQrCodes: React.FC = () => {
         <div className="space-y-1">
           <label className="text-xs font-bold text-white/50 uppercase">Sticker Size</label>
           <div className="flex rounded-md overflow-hidden border border-white/10">
-            {(['bike', 'car'] as const).map((s) => (
+            {(['bike', 'car', 'transport'] as const).map((s) => (
               <button
                 key={s}
                 onClick={() => setStickerSize(s)}
@@ -334,7 +334,7 @@ export const AdminQrCodes: React.FC = () => {
                   stickerSize === s ? 'bg-[#FFED00] text-neutral-950' : 'bg-white/10 text-white/70 hover:bg-white/15'
                 }`}
               >
-                {s === 'bike' ? 'Bike (4×2.5in)' : 'Car (8×5in)'}
+                {s === 'bike' ? 'Bike (4×2.5in)' : s === 'car' ? 'Car (8×5in)' : 'Transport (5.8×8in)'}
               </button>
             ))}
           </div>
@@ -764,12 +764,13 @@ export const AdminQrCodes: React.FC = () => {
             ) : (
               <>
                 {/* Letter paper (8.5x11in) at 0.15in margins fits 2x4=8 bike
-                    tiles (4x2.5in each) or 1x2=2 car tiles (8x5in each) per
+                    tiles (4x2.5in each), 1x2=2 car tiles (8x5in each), or 1
+                    transport tile (5.8x8in, too tall for a second one) per
                     page. Chunking into one grid per page (instead of relying
                     on break-after on individual flex items) is what actually
                     keeps each page's tile count exact and stops tiles from
                     being split across a page boundary when printed. */}
-                {chunk<QrCodeRow>(printCodes, stickerSize === 'bike' ? 8 : 2).map((pageCodes, pageIndex) => (
+                {chunk<QrCodeRow>(printCodes, stickerSize === 'bike' ? 8 : stickerSize === 'car' ? 2 : 1).map((pageCodes, pageIndex) => (
                   <div key={pageIndex} className={`qr-print-page qr-print-page--${stickerSize}`}>
                     {pageCodes.map((c) => (
                       <div key={c.id} className={`qr-print-tile qr-print-tile--${stickerSize}`}>

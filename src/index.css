@@ -41,6 +41,10 @@
   grid-template-columns: 8in;
 }
 
+.qr-print-page--transport {
+  grid-template-columns: 5.8in;
+}
+
 .qr-print-tile {
   display: flex;
   flex-direction: column;
@@ -57,6 +61,11 @@
 .qr-print-tile--car img {
   width: 8in;
   height: 5in;
+}
+
+.qr-print-tile--transport img {
+  width: 5.8in;
+  height: 8in;
 }
 
 @keyframes sos-shimmer {

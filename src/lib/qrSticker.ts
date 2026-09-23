@@ -1,5 +1,5 @@
 export type StickerLang = 'en' | 'hi';
-export type StickerSize = 'bike' | 'car';
+export type StickerSize = 'bike' | 'car' | 'transport';
 
 /** Lowercases and strips a batch name down to URL/print-safe [a-z0-9-] characters, for use in a display ID. Mirrors server/src/routes/qrCodes.ts. */
 function slugifyBatchName(batchName: string): string {
@@ -18,31 +18,41 @@ export function formatQrDisplayId(batchName: string, batchSeq: number): string {
 }
 
 // Physical label sizes at 300 DPI. Car keeps the bike's 8:5 aspect ratio, doubled.
+// Transport is a tall portrait tag (5.8in x 8in) — rendered with a different,
+// stacked layout (see drawBrandedQrCanvasStacked) rather than bike/car's
+// side-by-side one, since a landscape two-panel layout doesn't fit a portrait tag.
 export const STICKER_DIMENSIONS_PX: Record<StickerSize, { width: number; height: number }> = {
   bike: { width: 1200, height: 750 }, // 4in x 2.5in
   car: { width: 2400, height: 1500 }, // 8in x 5in
+  transport: { width: 1740, height: 2400 }, // 5.8in x 8in
 };
 
 /**
  * Maps a vehicle's `vehicleType` (free-text field, one of the VEHICLE_TYPES
  * options: Car, Bike, Scooter, Truck, Bus, Other) to the sticker size that
  * matches what a customer would have actually bought for that vehicle —
- * larger vehicles get the bigger car-size tag, everything two-wheeled or
- * unset falls back to the bike-size tag.
+ * trucks/buses get the transport tag, cars get the car tag, everything
+ * two-wheeled or unset falls back to the bike-size tag.
  */
 export function stickerSizeForVehicleType(vehicleType: string | null | undefined): StickerSize {
-  const carLikeTypes = new Set(['Car', 'Truck', 'Bus']);
-  return vehicleType && carLikeTypes.has(vehicleType) ? 'car' : 'bike';
+  if (vehicleType === 'Truck' || vehicleType === 'Bus') return 'transport';
+  if (vehicleType === 'Car') return 'car';
+  return 'bike';
 }
 
 /**
  * Maps a purchased product's name (e.g. "Scan Connect Car Tag (Pack of 2)",
- * "Scan Connect Bike Tag") to the sticker size that matches what was actually
- * bought, so an order's QR download reflects the product's real physical tag
- * size instead of always defaulting to one size.
+ * "Scan Connect Bike Tag", "Scan Connect Transport Tag") to the sticker size
+ * that matches what was actually bought, so an order's QR download reflects
+ * the product's real physical tag size instead of always defaulting to one
+ * size. Bike + Helmet combo orders still get the bike-size tag — the helmet
+ * tag's own (smaller) size isn't offered as a separate sticker download yet.
  */
 export function stickerSizeForProductName(productName: string | null | undefined): StickerSize {
-  return productName?.toLowerCase().includes('car') ? 'car' : 'bike';
+  const name = productName?.toLowerCase() ?? '';
+  if (name.includes('transport')) return 'transport';
+  if (name.includes('car')) return 'car';
+  return 'bike';
 }
 
 const STICKER_TEXT: Record<StickerLang, {
@@ -308,15 +318,18 @@ const STICKER_ICONS: ((ctx: CanvasRenderingContext2D, cx: number, cy: number, s:
 ];
 
 /**
- * Composites a bare QR PNG into a print-ready two-panel vehicle tag: left
- * panel carries the Scan Connect wordmark and instructions, right panel
- * (brand yellow) carries the QR code plus emergency/parking icons. Sized in
+ * Composites a bare QR PNG into a print-ready branded vehicle tag. Sized in
  * real device pixels at 300 DPI for the requested physical label size.
  *
  * This is the single source of truth for sticker branding — every QR
  * download surface (admin single/ZIP download, admin print, user dashboard
  * vehicle/order QR download) should render through this function so a design
  * change here doesn't need to be repeated in multiple places.
+ *
+ * Bike/car use a side-by-side layout (white text panel + yellow QR panel),
+ * which fits their landscape aspect ratio. Transport is a tall portrait tag,
+ * so it uses a stacked top-to-bottom layout instead — see
+ * drawBrandedQrCanvasStacked.
  */
 export async function drawBrandedQrCanvas(
   qrBlob: Blob,
@@ -328,6 +341,20 @@ export async function drawBrandedQrCanvas(
     document.fonts.load("700 100px 'Roboto Condensed'"),
     document.fonts.load("500 100px 'Roboto Condensed'"),
   ]);
+
+  const canvas =
+    opts.size === 'transport'
+      ? drawBrandedQrCanvasStacked(qrImage, opts)
+      : drawBrandedQrCanvasSideBySide(qrImage, opts);
+  qrImage.close();
+  return canvas;
+}
+
+/** Side-by-side layout used for bike/car: white left panel (wordmark + instructions), yellow right panel (QR + icons). */
+function drawBrandedQrCanvasSideBySide(
+  qrImage: ImageBitmap,
+  opts: { lang: StickerLang; size: StickerSize; displayId?: string },
+): HTMLCanvasElement {
   const { width, height } = STICKER_DIMENSIONS_PX[opts.size];
   const text = STICKER_TEXT[opts.lang];
 
@@ -486,7 +513,6 @@ export async function drawBrandedQrCanvas(
   ctx.clip();
   ctx.drawImage(qrImage, qrX, qrY, qrBoxSize, qrBoxSize);
   ctx.restore();
-  qrImage.close();
 
   const iconRowY = qrY + qrBoxSize + qrFramePad * 2 + pad * 0.9;
   const iconSize = height * 0.085;
@@ -506,6 +532,184 @@ export async function drawBrandedQrCanvas(
   let captionY = iconRowY + iconSize * 1.5;
   for (const line of captionLines) {
     ctx.fillText(line, leftWidth + rightWidth / 2, captionY);
+    captionY += captionFontSize * 1.3;
+  }
+
+  return canvas;
+}
+
+/**
+ * Stacked top-to-bottom layout used for the transport tag: white top section
+ * (wordmark, headline, subline, display ID), yellow bottom section (QR in a
+ * white frame, icon row, caption) — matches the tall portrait 5.8x8in tag
+ * shape, which a side-by-side panel layout doesn't suit.
+ */
+function drawBrandedQrCanvasStacked(
+  qrImage: ImageBitmap,
+  opts: { lang: StickerLang; size: StickerSize; displayId?: string },
+): HTMLCanvasElement {
+  const { width, height } = STICKER_DIMENSIONS_PX[opts.size];
+  const text = STICKER_TEXT[opts.lang];
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d')!;
+
+  const pad = Math.round(width * 0.07);
+
+  // Top section (white) height is a fixed share of the total — sized to
+  // comfortably fit the wordmark + a 2-3 line headline + subline, leaving the
+  // rest of the tag for the yellow QR section, matching the reference design's
+  // proportions (roughly 40% text / 60% QR panel).
+  const topHeight = Math.round(height * 0.4);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, width, topHeight);
+
+  const contentMaxWidth = width - pad * 2;
+  const wordmarkHeight = drawWordmark(ctx, pad, pad * 0.8, contentMaxWidth);
+
+  ctx.textAlign = 'center';
+  const headlineTextColor = '#000000';
+  const isHindi = opts.lang === 'hi';
+  const sublineFontSizeFitted = Math.round(width * 0.05 * (isHindi ? 0.5 : 0.6));
+  const headlineTop = pad * 0.8 + wordmarkHeight * (isHindi ? 1.7 : 1.25);
+
+  const displayIdFontSizeEstimate = Math.round(sublineFontSizeFitted * 0.8);
+  const displayIdReservedHeight = opts.displayId ? displayIdFontSizeEstimate * 1.35 : 0;
+  ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
+  const sublineLineCountEstimate = wrapText(ctx, text.subline, contentMaxWidth).length;
+  const headlineMaxHeight =
+    topHeight - headlineTop - pad * 0.6 - sublineFontSizeFitted * 1.35 * sublineLineCountEstimate -
+    displayIdReservedHeight;
+
+  const headlineFontFamily = isHindi ? 'sans-serif' : "'Poppins', sans-serif";
+  const headlineFontWeight = isHindi ? '900' : '800';
+  const headlineLineHeightMult = isHindi ? 1.05 : 1.15;
+  let headlineFontSize = Math.round(width * (isHindi ? 0.075 : 0.09));
+  let headlineLines: { text: string; startWordIndex: number; wordCount: number }[] = [];
+  let headlineLineHeight = 0;
+  while (headlineFontSize > 10) {
+    ctx.font = `${headlineFontWeight} ${headlineFontSize}px ${headlineFontFamily}`;
+    headlineLines = wrapTextWithWordIndex(ctx, text.headline, contentMaxWidth);
+    headlineLineHeight = headlineFontSize * headlineLineHeightMult;
+    if ((headlineLines.length + 0.85) * headlineLineHeight <= headlineMaxHeight) break;
+    headlineFontSize -= 2;
+  }
+  ctx.font = `${headlineFontWeight} ${headlineFontSize}px ${headlineFontFamily}`;
+  ctx.fillStyle = headlineTextColor;
+  ctx.textAlign = 'center';
+  let headlineY = headlineTop + headlineLineHeight * 0.85;
+  const underlineFrom = text.headlineUnderlineFrom;
+  for (const line of headlineLines) {
+    ctx.fillText(line.text, width / 2, headlineY);
+
+    const lineEndWordIndex = line.startWordIndex + line.wordCount;
+    if (lineEndWordIndex > underlineFrom) {
+      const underlineStartInLine = Math.max(0, underlineFrom - line.startWordIndex);
+      const words = line.text.split(' ');
+      const beforeUnderline = words.slice(0, underlineStartInLine).join(' ');
+      const underlinedPart = words.slice(underlineStartInLine).join(' ');
+      const lineWidth = ctx.measureText(line.text).width;
+      const lineStartX = width / 2 - lineWidth / 2;
+      const startX = lineStartX + (beforeUnderline ? ctx.measureText(beforeUnderline + ' ').width : 0);
+      const underlineWidth = ctx.measureText(underlinedPart).width;
+      const underlineY = headlineY + headlineFontSize * 0.12;
+      ctx.beginPath();
+      ctx.moveTo(startX, underlineY);
+      ctx.lineTo(startX + underlineWidth, underlineY);
+      ctx.lineWidth = Math.max(2, headlineFontSize * 0.05);
+      ctx.strokeStyle = headlineTextColor;
+      ctx.stroke();
+    }
+
+    headlineY += headlineLineHeight;
+  }
+
+  const sublineAvailableHeight = topHeight - pad * 0.6 - headlineY;
+  let sublineFontSize = sublineFontSizeFitted;
+  let sublineLines = wrapText(ctx, text.subline, contentMaxWidth);
+  while (sublineFontSize > 8) {
+    ctx.font = `normal ${sublineFontSize}px sans-serif`;
+    sublineLines = wrapText(ctx, text.subline, contentMaxWidth);
+    if (sublineLines.length * sublineFontSize * 1.35 <= sublineAvailableHeight) break;
+    sublineFontSize -= 1;
+  }
+  ctx.font = `normal ${sublineFontSize}px sans-serif`;
+  ctx.fillStyle = '#5F5E5E';
+  let sublineY = headlineY + sublineFontSize * (isHindi ? 1.4 : 0.7);
+  for (const line of sublineLines) {
+    ctx.fillText(line, width / 2, sublineY);
+    sublineY += sublineFontSize * 1.35;
+  }
+
+  if (opts.displayId) {
+    ctx.font = `normal ${displayIdFontSizeEstimate}px sans-serif`;
+    ctx.fillStyle = '#9CA3AF';
+    ctx.fillText(opts.displayId, width / 2, sublineY);
+  }
+
+  // Bottom section (brand yellow) — QR code + icon row + caption. The QR box
+  // is sized to fit whatever vertical space is left in this section *after*
+  // reserving room for the icon row and (possibly multi-line) caption below
+  // it, rather than being sized off the full width — a full-width square QR
+  // box would overflow past the bottom of a portrait canvas like this one,
+  // pushing the icon row and caption off-canvas entirely.
+  const bottomHeight = height - topHeight;
+  ctx.fillStyle = STICKER_YELLOW;
+  ctx.fillRect(0, topHeight, width, bottomHeight);
+
+  const captionFontSize = sublineFontSizeFitted;
+  const iconSize = width * 0.075;
+  ctx.font = `bold ${captionFontSize}px sans-serif`;
+  const captionMaxWidth = width - pad;
+  const captionLines = wrapText(ctx, text.iconCaption, captionMaxWidth);
+  const captionBlockHeight = captionLines.length * captionFontSize * 1.3;
+  // Vertical budget below the QR frame: gap to icon row + icon row height +
+  // gap to caption + the caption text block + a bottom margin matching `pad`.
+  const belowQrReservedHeight = pad * 0.9 + iconSize * 1.5 + captionBlockHeight + pad * 0.5;
+
+  const qrTopMargin = pad * 0.7;
+  const qrAvailableHeight = bottomHeight - qrTopMargin - belowQrReservedHeight;
+  const qrOuterSize = Math.min(width - pad * 2, qrAvailableHeight);
+  const qrFramePad = qrOuterSize * 0.018;
+  const qrBoxSize = qrOuterSize - qrFramePad * 2;
+  const qrX = (width - qrOuterSize) / 2 + qrFramePad;
+  const qrY = topHeight + qrTopMargin + qrFramePad;
+  const qrFrameRadius = qrOuterSize * 0.04;
+
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.roundRect(qrX - qrFramePad, qrY - qrFramePad, qrBoxSize + qrFramePad * 2, qrBoxSize + qrFramePad * 2, qrFrameRadius);
+  ctx.fill();
+
+  ctx.strokeStyle = '#1B1C1C';
+  ctx.lineWidth = Math.max(3, qrBoxSize * 0.015);
+  ctx.beginPath();
+  ctx.roundRect(qrX - qrFramePad, qrY - qrFramePad, qrBoxSize + qrFramePad * 2, qrBoxSize + qrFramePad * 2, qrFrameRadius);
+  ctx.stroke();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(qrX, qrY, qrBoxSize, qrBoxSize, qrFrameRadius * 0.6);
+  ctx.clip();
+  ctx.drawImage(qrImage, qrX, qrY, qrBoxSize, qrBoxSize);
+  ctx.restore();
+
+  const iconRowY = qrY + qrBoxSize + qrFramePad * 2 + pad * 0.9;
+  const iconGap = width / (STICKER_ICONS.length + 1);
+  STICKER_ICONS.forEach((draw, i) => {
+    const cx = iconGap * (i + 1);
+    draw(ctx, cx, iconRowY, iconSize);
+  });
+
+  ctx.fillStyle = '#1B1C1C';
+  ctx.textAlign = 'center';
+  ctx.font = `bold ${captionFontSize}px sans-serif`;
+  let captionY = iconRowY + iconSize * 1.5;
+  for (const line of captionLines) {
+    ctx.fillText(line, width / 2, captionY);
     captionY += captionFontSize * 1.3;
   }
 
