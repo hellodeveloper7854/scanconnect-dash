@@ -12,23 +12,42 @@ import {
   Check,
   CheckCircle2,
   Phone,
-  Car,
   Lock,
   Mail,
   ShieldOff,
   RefreshCw,
   Eye,
   EyeOff,
+  Sun,
+  ParkingCircle,
+  Truck,
+  Maximize2,
+  AlertTriangle,
+  MessageCircle,
+  MessageSquare,
+  Bell,
+  Star,
+  Share2,
+  Car,
 } from 'lucide-react';
 import { auth, getRecaptchaVerifier } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
-import { ScanResultCard, type CallTarget } from '../components/ScanResultCard';
+import { ScanResultCard, ScanHeader, type CallTarget } from '../components/ScanResultCard';
 import logo from '../assets/images/logo.png';
 import carIcon from '../assets/images/caricon.png';
+import carPlatePhoto from '../assets/images/carnp.jpeg';
 
 const WHATSAPP_SUPPORT_NUMBER = '919973878399';
 
 const VEHICLE_TYPES = ['Car', 'Bike', 'Scooter', 'Truck', 'Bus', 'Other'];
+
+const CONTACT_REASONS = [
+  { label: 'The lights of this car are on.', icon: Sun },
+  { label: 'The car is in no parking.', icon: ParkingCircle },
+  { label: 'The car is getting towed.', icon: Truck },
+  { label: 'The window or car is open.', icon: Maximize2 },
+  { label: 'Something wrong with this car.', icon: AlertTriangle },
+];
 
 const RECAPTCHA_CONTAINER_ID = 'qr-activation-recaptcha';
 
@@ -51,11 +70,16 @@ interface DetailsData {
   emergencyContacts: { name: string; role: string | null }[];
 }
 
-/** Shape returned by POST /:code/verify — includes phone numbers, once the last-4 check passes. */
-interface VerifiedData {
-  owner: { fullName: string; mobileNumber: string | null };
-  vehicle: VehicleData;
-  emergencyContacts: { name: string; role: string | null; phone: string }[];
+/**
+ * TEMPORARY (testing only): shape returned by GET /:code/test-contact-numbers
+ * — real phone numbers with no verification, for trying Masked Call/Message
+ * while a masking provider isn't wired up. Remove alongside that route once
+ * /verify + /masked-call are used for real.
+ */
+interface TestContactNumbers {
+  registrationLast4: string;
+  owner: { mobileNumber: string | null };
+  emergencyContacts: { phone: string }[];
 }
 
 const CardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -71,191 +95,357 @@ const CardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </div>
 );
 
-/** Response shape of POST /:code/masked-call. */
-interface MaskedCallResult {
-  virtualNumber: string;
-  isMasked: boolean;
-  destinationPhone: string;
-  callerPhone: string;
-}
-
 /**
  * Shown once someone has already picked a contact method (Masked Call or
- * Message) from the inline choice on the details card. Two internal screens:
+ * Message) from the inline choice on the details card. Internal screens:
  *  1. "verify" — enter the last 4 registration digits, plus (for a masked
  *     call only) the caller's own phone number, so a future Knowlarity
  *     SR-number/click-to-call integration has a real request to connect.
- *  2. "call" — a 90-second countdown and a "Call <number>" button that opens
- *     the phone's own dialer. Until Knowlarity is wired up server-side, the
- *     number dialed is the real destination number (see masked-call route).
- * Message (WhatsApp) skips the caller-phone field and the call screen,
- * verifying then opening wa.me directly.
+ *  2. "reason" — pick why the owner is being contacted, shown for both
+ *     methods once verification passes.
+ *  3a. "call" — a 90-second countdown and a "Call <number>" button that opens
+ *      the phone's own dialer (masked call only).
+ *  3b. "sent" — confirmation screen after a WhatsApp message is opened.
+ *
+ * TEMPORARY (testing only): fetches real numbers from
+ * GET /:code/test-contact-numbers and checks the last-4 digits client-side,
+ * so masked-call/message can be tried without a masking provider wired up
+ * yet. /verify and /masked-call are untouched — swap back to posting to
+ * those once Knowlarity (or similar) is integrated, so the phone number
+ * never reaches the client before the digit check passes server-side.
  */
-const CallVerifyModal: React.FC<{ code: string; target: CallTarget; method: 'call' | 'message'; onClose: () => void }> = ({
-  code,
-  target,
-  method,
-  onClose,
-}) => {
+const CallVerifyModal: React.FC<{
+  code: string;
+  target: CallTarget;
+  method: 'call' | 'message';
+  /** Masked registration prefix shown next to the last-4 input, e.g. "JH05ED" from "JH05ED••••". */
+  platePrefix: string;
+  onClose: () => void;
+}> = ({ code, target, method, platePrefix, onClose }) => {
+  const [screen, setScreen] = useState<'verify' | 'reason' | 'call' | 'sent'>('verify');
   const [last4, setLast4] = useState('');
   const [callerPhone, setCallerPhone] = useState('');
+  const [reason, setReason] = useState(CONTACT_REASONS[0].label);
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [maskedCall, setMaskedCall] = useState<MaskedCallResult | null>(null);
+  const [callNumber, setCallNumber] = useState<string | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(90);
+  const [testData, setTestData] = useState<TestContactNumbers | null>(null);
 
   useEffect(() => {
-    if (!maskedCall) return;
+    api
+      .get<TestContactNumbers>(`/api/qr/${code}/test-contact-numbers`)
+      .then(setTestData)
+      .catch(() => setErrorMsg('Could not load contact info. Please try again.'));
+  }, [code]);
+
+  useEffect(() => {
+    if (screen !== 'call') return;
     if (secondsLeft <= 0) {
       onClose();
       return;
     }
     const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
     return () => clearTimeout(timer);
-  }, [maskedCall, secondsLeft, onClose]);
+  }, [screen, secondsLeft, onClose]);
 
-  const handleVerifyForMessage = async (e: React.FormEvent) => {
+  const checkLast4 = () => last4.toUpperCase() === (testData?.registrationLast4 ?? '').toUpperCase();
+
+  const targetPhone = testData
+    ? target.kind === 'owner'
+      ? testData.owner.mobileNumber
+      : testData.emergencyContacts[target.index]?.phone
+    : null;
+
+  const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-    setIsSubmitting(true);
-    try {
-      const result = await api.post<VerifiedData>(`/api/qr/${code}/verify`, { last4 });
-      const phone =
-        target.kind === 'owner' ? result.owner.mobileNumber : result.emergencyContacts[target.index]?.phone;
-      if (phone) {
-        window.open(`https://wa.me/${phone.replace(/\D/g, '')}`, '_blank', 'noopener,noreferrer');
-        onClose();
-      } else {
-        onClose();
-      }
-    } catch (err) {
-      setErrorMsg(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+    if (!checkLast4()) {
+      setErrorMsg('Incorrect digits. Please try again.');
+      return;
     }
-  };
-
-  const handleSetupMaskedCall = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg('');
-    setIsSubmitting(true);
-    try {
-      const result = await api.post<MaskedCallResult>(`/api/qr/${code}/masked-call`, {
-        last4,
-        callerPhone,
-        target,
-      });
-      setMaskedCall(result);
+    if (!targetPhone) {
+      setErrorMsg('No phone number available for this contact.');
+      return;
+    }
+    // Masked Call skips the contact-reason step and goes straight to the
+    // call/countdown screen; only Message (WhatsApp) asks for a reason.
+    if (method === 'call') {
+      setCallNumber(targetPhone);
       setSecondsLeft(90);
-    } catch (err) {
-      setErrorMsg(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      setScreen('call');
+    } else {
+      setScreen('reason');
     }
   };
 
-  // Screen 3: countdown + call button, after a masked call has been set up.
-  if (maskedCall) {
+  const handleSendReason = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!targetPhone) return;
+    setIsSubmitting(true);
+    window.open(
+      `https://wa.me/${targetPhone.replace(/\D/g, '')}?text=${encodeURIComponent(reason)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
+    setIsSubmitting(false);
+    setScreen('sent');
+  };
+
+  // Screen: confirmation after a WhatsApp message has been opened.
+  if (screen === 'sent') {
     return (
-      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
-          <div className="text-center space-y-1">
-            <Phone className="w-8 h-8 text-[#1B1C1C] mx-auto" />
-            <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Call the Vehicle Owner</h1>
-            <p className="text-sm text-[#5F5E5E]">
-              You have {secondsLeft} seconds. Abuse will block your number.
-            </p>
+      <div className="min-h-screen w-full bg-[#F5F4F1] font-['Hanken_Grotesk']">
+        <ScanHeader />
+        <div className="max-w-md mx-auto px-4 py-6 space-y-4">
+          <div className="bg-white rounded-2xl p-6 space-y-3 text-center shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            <div className="w-14 h-14 rounded-full bg-[#25D366]/15 flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-8 h-8 text-[#25D366]" />
+            </div>
+            <div className="space-y-1">
+              <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Message sent</h1>
+              <p className="text-sm text-[#9CA3AF]">Thank you for helping. The owner has been notified.</p>
+            </div>
           </div>
 
-          <ul className="text-xs text-[#5F5E5E] space-y-1 list-disc list-inside">
-            <li>Do not use this for theft, harassment, or stalking.</li>
-            <li>Do not use this for spam or marketing calls.</li>
-            <li>Do not use this to buy, sell, or rent the vehicle.</li>
-          </ul>
+          <div className="bg-white rounded-2xl p-4 flex gap-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            <div className="w-10 h-10 rounded-full bg-[#F5F4F1] flex items-center justify-center shrink-0">
+              <Car className="w-5 h-5 text-[#5D5F5F]" />
+            </div>
+            <div className="space-y-2 min-w-0">
+              <div>
+                <p className="text-sm font-bold text-[#1B1C1C]">Notification sent to the owner of the vehicle</p>
+                <p className="text-xs text-[#9CA3AF]">WhatsApp, SMS and app alert were sent where available.</p>
+              </div>
+              <span className="inline-block bg-[#F5F4F1] rounded-full px-3 py-1 text-xs font-mono font-bold text-[#1B1C1C]">
+                Plate {platePrefix}
+                {last4}
+              </span>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <span className="inline-flex items-center gap-1.5 bg-[#EFFBF4] text-[#1A8754] text-xs font-bold px-3 py-1.5 rounded-full">
+                  <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                </span>
+                <span className="inline-flex items-center gap-1.5 bg-[#EFFBF4] text-[#1A8754] text-xs font-bold px-3 py-1.5 rounded-full">
+                  <MessageSquare className="w-3.5 h-3.5" /> SMS
+                </span>
+                <span className="inline-flex items-center gap-1.5 bg-[#EFFBF4] text-[#1A8754] text-xs font-bold px-3 py-1.5 rounded-full">
+                  <Bell className="w-3.5 h-3.5" /> App
+                </span>
+              </div>
+            </div>
+          </div>
 
-          <a
-            href={`tel:${maskedCall.virtualNumber}`}
-            className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
-          >
-            <Phone className="w-4 h-4" />
-            Call {maskedCall.virtualNumber}
-          </a>
+          <div className="bg-white rounded-2xl p-4 space-y-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            <div>
+              <p className="text-sm font-bold text-[#1B1C1C]">Spread the word</p>
+              <p className="text-xs text-[#9CA3AF]">Know someone who&apos;d find this useful? Share Scan Connect.</p>
+            </div>
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent('Check out Scan Connect — a QR tag that lets people reach vehicle owners without ever seeing their phone number. https://scanconnect.in')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full h-[46px] bg-[#EFFBF4] text-[#1A8754] rounded-full font-bold text-sm flex items-center justify-center gap-2 cursor-pointer hover:bg-[#25D366]/15 transition-colors"
+            >
+              <Share2 className="w-4 h-4" /> Share on WhatsApp
+            </a>
+          </div>
+
+          <div className="bg-white rounded-2xl p-4 space-y-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)] text-center">
+            <div className="flex items-center justify-center gap-1 text-[#F2CC0C]">
+              <Star className="w-4 h-4 fill-current" />
+              <p className="text-sm font-bold text-[#1B1C1C]">Rate us</p>
+            </div>
+            <p className="text-xs text-[#9CA3AF]">A quick 5-star review on the Play Store or App Store helps a lot.</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="h-[42px] bg-[#1B1C1C] rounded-lg flex items-center justify-center text-white text-xs font-bold">
+                Google Play
+              </div>
+              <div className="h-[42px] bg-[#1B1C1C] rounded-lg flex items-center justify-center text-white text-xs font-bold">
+                App Store
+              </div>
+            </div>
+          </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="w-full h-[44px] bg-[#EFEDED] text-[#5D5F5F] font-bold rounded-lg cursor-pointer"
+            className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-full font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95"
           >
-            Cancel
+            Done
           </button>
         </div>
       </div>
     );
   }
 
-  // Verify last-4 digits (+ caller's phone for a masked call).
-  return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
-        <form onSubmit={method === 'call' ? handleSetupMaskedCall : handleVerifyForMessage} className="space-y-4">
-          <div className="text-center space-y-1">
-            <Car className="w-8 h-8 text-[#1B1C1C] mx-auto" />
-            <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Verify the Plate Number</h1>
-            <p className="text-sm text-[#5F5E5E]">Enter the last 4 digits of the vehicle&apos;s plate.</p>
-          </div>
-
-          <input
-            type="text"
-            required
-            maxLength={4}
-            autoFocus
-            value={last4}
-            onChange={(e) => {
-              setLast4(e.target.value.toUpperCase());
-              setErrorMsg('');
-            }}
-            placeholder="e.g. 1234"
-            className="w-full h-[54px] text-center text-lg font-mono tracking-[6px] bg-white border border-[#CCC7AA] rounded-lg outline-none focus:ring-2 focus:ring-[#FFED00]"
-          />
-
-          {method === 'call' && (
+  // Screen: countdown + call button, after a masked call has been set up.
+  if (screen === 'call' && callNumber) {
+    return (
+      <div className="min-h-screen w-full bg-[#F5F4F1] font-['Hanken_Grotesk']">
+        <ScanHeader />
+        <div className="max-w-md mx-auto px-4 py-6 space-y-4">
+          <div className="bg-white rounded-2xl p-6 space-y-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
             <div className="space-y-1">
-              <label className="text-xs font-bold text-[#5D5F5F]">
-                Your phone (needed for a masked call)
-              </label>
-              <input
-                type="tel"
-                required
-                value={callerPhone}
-                onChange={(e) => {
-                  setCallerPhone(e.target.value);
-                  setErrorMsg('');
-                }}
-                placeholder="+91 98765 43210"
-                className="w-full h-[48px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-              />
+              <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Call the vehicle owner</h1>
+              <p className="text-sm text-[#9CA3AF]">
+                You have <span className="font-bold text-[#1B1C1C]">{secondsLeft}</span> seconds. Abuse will block
+                your number.
+              </p>
             </div>
-          )}
 
-          {errorMsg && <p className="text-sm font-semibold text-red-600 text-center">{errorMsg}</p>}
+            <div className="bg-[#F5F4F1] rounded-2xl p-4 space-y-2">
+              <p className="text-xs font-bold text-[#5D5F5F]">You can get blocked for:</p>
+              <ul className="text-xs text-[#5F5E5E] space-y-1 list-disc list-inside">
+                <li>Test / prank calls</li>
+                <li>Spam</li>
+                <li>Buying, selling or renting the vehicle</li>
+              </ul>
+            </div>
 
-          <div className="flex gap-3">
+            <a
+              href={`tel:${callNumber}`}
+              className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-full font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+            >
+              Call {callNumber}
+            </a>
+
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 h-[48px] bg-[#EFEDED] text-[#5D5F5F] font-bold rounded-lg cursor-pointer"
+              className="w-full h-[44px] text-[#5D5F5F] font-bold cursor-pointer"
             >
               Cancel
             </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Screen: pick a reason for contacting the owner, shown after verification.
+  if (screen === 'reason') {
+    return (
+      <div className="min-h-screen w-full bg-[#F5F4F1] font-['Hanken_Grotesk']">
+        <ScanHeader />
+        <div className="max-w-md mx-auto px-4 py-6">
+          <form onSubmit={handleSendReason} className="bg-white rounded-2xl p-6 space-y-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            <div className="space-y-1">
+              <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Why contact the vehicle owner?</h1>
+              <p className="text-sm text-[#9CA3AF]">This is shared with the owner along with your message.</p>
+            </div>
+
+            <div className="space-y-2">
+              {CONTACT_REASONS.map(({ label, icon: Icon }) => (
+                <label
+                  key={label}
+                  className={`flex items-center gap-3 px-3.5 py-3 rounded-xl border cursor-pointer transition-colors ${
+                    reason === label ? 'border-[#F2CC0C] bg-[#FFFCEB]' : 'border-[#E4E2E2] bg-white'
+                  }`}
+                >
+                  <Icon className="w-4.5 h-4.5 text-[#5D5F5F] shrink-0" />
+                  <span className="flex-1 text-sm font-semibold text-[#1B1C1C]">{label}</span>
+                  <input
+                    type="radio"
+                    name="reason"
+                    checked={reason === label}
+                    onChange={() => setReason(label)}
+                    className="w-4 h-4 accent-[#F2CC0C]"
+                  />
+                </label>
+              ))}
+            </div>
+
             <button
               type="submit"
-              disabled={isSubmitting || last4.length !== 4 || (method === 'call' && !callerPhone.trim())}
-              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
+              disabled={isSubmitting}
+              className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-full font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
             >
-              {isSubmitting ? 'Checking...' : method === 'call' ? 'Setup Masked Call' : 'Continue'}
+              {isSubmitting ? 'Sending...' : 'Send message'}
             </button>
+
+            <button type="button" onClick={onClose} className="w-full h-[40px] text-[#5D5F5F] font-bold cursor-pointer">
+              Cancel
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Screen: verify last-4 digits (+ caller's phone for a masked call).
+  return (
+    <div className="min-h-screen w-full bg-[#F5F4F1] font-['Hanken_Grotesk']">
+      <ScanHeader />
+      <div className="max-w-md mx-auto px-4 py-6">
+        <div className="bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <div className="h-40 relative overflow-hidden">
+            <img src={carPlatePhoto} alt="Vehicle number plate" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
           </div>
-        </form>
+
+          <form onSubmit={handleVerify} className="p-6 space-y-4">
+            <div className="space-y-1">
+              <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Verify the plate number</h1>
+              <p className="text-sm text-[#9CA3AF]">Enter the last 4 digits of the vehicle plate.</p>
+            </div>
+
+            <div className="flex items-stretch gap-2">
+              <div className="flex items-center px-3 h-[54px] bg-[#F5F4F1] rounded-lg">
+                <span className="font-mono font-bold text-base text-[#1B1C1C] tracking-wide">{platePrefix}</span>
+              </div>
+              <input
+                type="text"
+                required
+                maxLength={4}
+                autoFocus
+                value={last4}
+                onChange={(e) => {
+                  setLast4(e.target.value.toUpperCase());
+                  setErrorMsg('');
+                }}
+                placeholder="LAST 4 DIGITS"
+                className="flex-1 h-[54px] text-center text-sm font-bold tracking-[2px] uppercase bg-white border-2 border-[#1B1C1C] rounded-lg outline-none focus:ring-2 focus:ring-[#FFED00] placeholder:text-[#9CA3AF] placeholder:tracking-[2px] placeholder:font-bold"
+              />
+            </div>
+
+            {method === 'call' && (
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#5D5F5F]">
+                  Your phone <span className="font-normal text-[#9CA3AF]">· needed for a masked call</span>
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={callerPhone}
+                  onChange={(e) => {
+                    setCallerPhone(e.target.value);
+                    setErrorMsg('');
+                  }}
+                  placeholder="Your phone number"
+                  className="w-full h-[48px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+                />
+              </div>
+            )}
+
+            {errorMsg && <p className="text-sm font-semibold text-red-600 text-center">{errorMsg}</p>}
+
+            <button
+              type="submit"
+              disabled={!testData || last4.length !== 4 || (method === 'call' && !callerPhone.trim())}
+              className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-full font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
+            >
+              {!testData ? 'Loading...' : 'Continue'}
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full h-[40px] text-[#5D5F5F] font-bold cursor-pointer"
+            >
+              Cancel
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -423,7 +613,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
           vehicleType: vehicleType.trim(),
         },
       };
-      const result = await api.post<VerifiedData>(`/api/qr/${code}/activate`, payload);
+      const result = await api.post<DetailsData>(`/api/qr/${code}/activate`, payload);
       onDone(result);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -976,24 +1166,25 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
   }
 
   if (stage === 'details' && detailsData) {
-    return (
-      <>
-        <ScanResultCard
-          label={`QR Code ${code}`}
-          owner={detailsData.owner}
-          vehicle={detailsData.vehicle}
-          emergencyContacts={detailsData.emergencyContacts}
-          onChooseMethod={(target, method) => setCallChoice({ target, method })}
+    if (callChoice) {
+      return (
+        <CallVerifyModal
+          code={code}
+          target={callChoice.target}
+          method={callChoice.method}
+          platePrefix={detailsData.vehicle.registration.replace(/•+$/, '')}
+          onClose={() => setCallChoice(null)}
         />
-        {callChoice && (
-          <CallVerifyModal
-            code={code}
-            target={callChoice.target}
-            method={callChoice.method}
-            onClose={() => setCallChoice(null)}
-          />
-        )}
-      </>
+      );
+    }
+    return (
+      <ScanResultCard
+        label={`QR Code ${code}`}
+        owner={detailsData.owner}
+        vehicle={detailsData.vehicle}
+        emergencyContacts={detailsData.emergencyContacts}
+        onChooseMethod={(target, method) => setCallChoice({ target, method })}
+      />
     );
   }
 

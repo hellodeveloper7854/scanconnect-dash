@@ -11,6 +11,20 @@ import { notify } from '../lib/notify.js';
 import { last10Digits, toE164India } from '../lib/phone.js';
 import type { Prisma } from '@prisma/client';
 
+/**
+ * Masks the last 4 characters of a plate number (e.g. "JH05CY0377" ->
+ * "JH05CY••••") so the unauthenticated /:code/details response — shown to
+ * anyone who scans the tag, before any ownership check — never leaks the
+ * exact digits the /verify and /masked-call routes require as an anti-abuse
+ * gate. Registrations of 4 chars or fewer are masked in full.
+ */
+function maskRegistrationLast4(registration: string): string {
+  if (registration.length <= 4) {
+    return '•'.repeat(registration.length);
+  }
+  return registration.slice(0, -4) + '••••';
+}
+
 // Crockford-ish base32 alphabet, ambiguous characters (0/O, 1/I) removed so
 // printed/handwritten codes on physical stickers can't be misread.
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -513,7 +527,7 @@ qrCodesRouter.get('/:code/details', async (req, res) => {
   res.json({
     owner: { fullName: qrCode.vehicle.user.fullName },
     vehicle: {
-      registration: qrCode.vehicle.registration,
+      registration: maskRegistrationLast4(qrCode.vehicle.registration),
       nickname: qrCode.vehicle.nickname,
       vehicleType: qrCode.vehicle.vehicleType,
       brand: qrCode.vehicle.brand,
@@ -522,6 +536,34 @@ qrCodesRouter.get('/:code/details', async (req, res) => {
       color: qrCode.vehicle.color,
     },
     emergencyContacts: qrCode.emergencyContacts.map((c) => ({ name: c.name, role: c.role })),
+  });
+});
+
+/**
+ * TEMPORARY (testing only): returns real phone numbers plus the plate's
+ * last 4 digits, with no verification check, so the client can try the
+ * Masked Call / Message flow while a masking provider isn't wired up yet.
+ * Does not touch /verify or /masked-call — those stay as the real,
+ * server-verified path once masked calling is implemented. Remove this
+ * route (and its frontend caller) at that point.
+ */
+qrCodesRouter.get('/:code/test-contact-numbers', async (req, res) => {
+  const qrCode = await prisma.qrCode.findUnique({
+    where: { code: req.params.code },
+    include: {
+      vehicle: { include: { user: { select: { fullName: true, mobileNumber: true } } } },
+      emergencyContacts: true,
+    },
+  });
+
+  if (!qrCode || qrCode.status !== 'ACTIVE' || !qrCode.vehicle) {
+    return res.status(404).json({ error: 'This QR code is not active' });
+  }
+
+  res.json({
+    registrationLast4: qrCode.vehicle.registration.slice(-4).toUpperCase(),
+    owner: { mobileNumber: qrCode.vehicle.user.mobileNumber },
+    emergencyContacts: qrCode.emergencyContacts.map((c) => ({ phone: c.phone })),
   });
 });
 
