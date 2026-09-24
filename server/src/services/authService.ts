@@ -44,7 +44,35 @@ export async function registerUser({ decoded, fullName, email, mobileNumber }: R
 }
 
 /**
- * Called after the client links a phone credential to an already-registered
+ * Called after a client verifies a phone number via Firebase phone auth with
+ * no prior account (e.g. starting the QR activation flow by phone first).
+ * Creates a minimal User row keyed off the phone number alone — fullName and
+ * email are placeholders until the flow's later "Complete Your Profile" step
+ * calls registerUser to fill in the real values and set a password.
+ */
+export async function registerPhoneUser(decoded: DecodedIdToken) {
+  if (!decoded.phone_number) {
+    throw new Error('NO_PHONE_NUMBER');
+  }
+
+  return prisma.user.upsert({
+    where: { firebaseUid: decoded.uid },
+    create: {
+      firebaseUid: decoded.uid,
+      fullName: '',
+      email: `${decoded.uid}@phone.scanconnect.placeholder`,
+      mobileNumber: decoded.phone_number,
+      mobileVerified: true,
+    },
+    update: {
+      mobileNumber: decoded.phone_number,
+      mobileVerified: true,
+    },
+  });
+}
+
+/**
+ * Called after a client links a phone credential to an already-registered
  * email account (Firebase linkWithCredential keeps the same uid).
  */
 export async function syncLinkedMobile(decoded: DecodedIdToken) {

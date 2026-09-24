@@ -1,7 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { QrCode as QrCodeIcon, ArrowRight, ArrowLeft, Check, Plus, User, Phone, Car, Mail, Lock, ShieldOff } from 'lucide-react';
-import { auth } from '../lib/firebase';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  signInWithPhoneNumber,
+  linkWithCredential,
+  EmailAuthProvider,
+  type ConfirmationResult,
+} from 'firebase/auth';
+import {
+  QrCode as QrCodeIcon,
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  CheckCircle2,
+  Phone,
+  Car,
+  Lock,
+  ShieldOff,
+  RefreshCw,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
+import { auth, getRecaptchaVerifier } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
 import { ScanResultCard, type CallTarget } from '../components/ScanResultCard';
 import logo from '../assets/images/logo.png';
@@ -11,19 +29,9 @@ const WHATSAPP_SUPPORT_NUMBER = '919973878399';
 
 const VEHICLE_TYPES = ['Car', 'Bike', 'Scooter', 'Truck', 'Bus', 'Other'];
 
-type Stage = 'loading' | 'invalid' | 'disabled' | 'inactive-prompt' | 'login-gate' | 'wizard' | 'details';
+const RECAPTCHA_CONTAINER_ID = 'qr-activation-recaptcha';
 
-interface VehicleOption {
-  id: string;
-  registration: string;
-  nickname: string | null;
-}
-
-interface ContactOption {
-  id: string;
-  name: string;
-  phone: string;
-}
+type Stage = 'loading' | 'invalid' | 'disabled' | 'inactive-prompt' | 'wizard' | 'success' | 'details';
 
 interface VehicleData {
   registration: string;
@@ -61,123 +69,6 @@ const CardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     </div>
   </div>
 );
-
-const LoginGate: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
-  const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg('');
-    setIsSubmitting(true);
-    try {
-      if (mode === 'login') {
-        const credential = await signInWithEmailAndPassword(auth, email, password);
-        const idToken = await credential.user.getIdToken();
-        await api.post('/api/auth/session', { idToken });
-      } else {
-        const credential = await createUserWithEmailAndPassword(auth, email, password);
-        const idToken = await credential.user.getIdToken();
-        await api.post('/api/auth/register', { idToken, fullName, email });
-      }
-      onSuccess();
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setErrorMsg(err.message);
-      } else if (err instanceof Error) {
-        setErrorMsg(err.message.replace('Firebase: ', ''));
-      } else {
-        setErrorMsg('Something went wrong. Please try again.');
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <div className="space-y-5">
-      <div className="text-center space-y-1">
-        <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">
-          {mode === 'login' ? 'Log In to Activate' : 'Create an Account'}
-        </h1>
-        <p className="text-sm text-[#5F5E5E]">
-          You need to be signed in before activating this QR tag.
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-3">
-        {mode === 'register' && (
-          <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
-            <input
-              type="text"
-              required
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Full Name"
-              className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
-            />
-          </div>
-        )}
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email address"
-            className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
-          />
-        </div>
-        <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
-          <input
-            type="password"
-            required
-            minLength={6}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
-          />
-        </div>
-
-        {errorMsg && <p className="text-sm font-semibold text-red-600">{errorMsg}</p>}
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
-        >
-          {isSubmitting ? 'Please wait...' : mode === 'login' ? 'Log In' : 'Register'}
-        </button>
-      </form>
-
-      <p className="text-center text-xs text-[#5F5E5E]">
-        {mode === 'login' ? (
-          <>
-            New here?{' '}
-            <button onClick={() => setMode('register')} className="text-[#736B00] font-bold hover:underline cursor-pointer">
-              Create an account
-            </button>
-          </>
-        ) : (
-          <>
-            Already have an account?{' '}
-            <button onClick={() => setMode('login')} className="text-[#736B00] font-bold hover:underline cursor-pointer">
-              Log in
-            </button>
-          </>
-        )}
-      </p>
-    </div>
-  );
-};
 
 /** Response shape of POST /:code/masked-call. */
 interface MaskedCallResult {
@@ -369,131 +260,176 @@ const CallVerifyModal: React.FC<{ code: string; target: CallTarget; method: 'cal
   );
 };
 
+/** 4-step stepper header shared by every step of the activation wizard, styled after the reference flow's dot-and-line progress bar. */
+const WizardStepper: React.FC<{ step: 1 | 2 | 3 | 4 }> = ({ step }) => (
+  <div className="flex items-center justify-center gap-2">
+    {[1, 2, 3, 4].map((n) => (
+      <React.Fragment key={n}>
+        <div
+          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+            step === n ? 'bg-[#FFED00] text-[#1B1C1C]' : step > n ? 'bg-[#FFED00]/30 text-[#736B00]' : 'bg-[#E9E8E7] text-[#6B7280]'
+          }`}
+        >
+          {step > n ? <Check className="w-4 h-4" /> : n}
+        </div>
+        {n < 4 && <div className="w-6 h-[2px] bg-[#CCC7AA]" />}
+      </React.Fragment>
+    ))}
+  </div>
+);
+
 const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => void }> = ({ code, onDone }) => {
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Step 1: personal
-  const [fullName, setFullName] = useState('');
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [mobileReadOnly, setMobileReadOnly] = useState(false);
-
-  useEffect(() => {
-    api
-      .get<{ user: { fullName: string; mobileNumber: string | null; mobileVerified: boolean } }>('/api/auth/me')
-      .then((res) => {
-        setFullName(res.user.fullName ?? '');
-        if (res.user.mobileVerified && res.user.mobileNumber) {
-          setMobileNumber(res.user.mobileNumber);
-          setMobileReadOnly(true);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  // Step 2: emergency contacts
-  const [existingContacts, setExistingContacts] = useState<ContactOption[] | null>(null);
-  const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
-  const [isAddContactOpen, setIsAddContactOpen] = useState(false);
-  const [newContactName, setNewContactName] = useState('');
-  const [newContactRole, setNewContactRole] = useState('');
-  const [newContactPhone, setNewContactPhone] = useState('');
-  const [newContactEmail, setNewContactEmail] = useState('');
-  const [newContacts, setNewContacts] = useState<{ name: string; role: string; phone: string; email: string }[]>([]);
-
-  useEffect(() => {
-    api
-      .get<{ contacts: ContactOption[] }>('/api/profile/emergency-contacts')
-      .then((res) => setExistingContacts(res.contacts))
-      .catch(() => setExistingContacts([]));
-  }, []);
-
-  // Step 3: vehicle
-  const [existingVehicles, setExistingVehicles] = useState<VehicleOption[] | null>(null);
-  const [selectedVehicleId, setSelectedVehicleId] = useState('');
-  const [useNewVehicle, setUseNewVehicle] = useState(false);
-  const [registration, setRegistration] = useState('');
+  // Step 1: vehicle
   const [vehicleType, setVehicleType] = useState('');
-  const [brand, setBrand] = useState('');
-  const [model, setModel] = useState('');
-  const [fuelType, setFuelType] = useState('');
-  const [color, setColor] = useState('');
+  const [registration, setRegistration] = useState('');
+  const [noRegistrationYet, setNoRegistrationYet] = useState(false);
+
+  // Step 2: phone + OTP
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
+  const [otpTimer, setOtpTimer] = useState(30);
+  const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    api
-      .get<{ vehicles: VehicleOption[] }>('/api/profile/vehicles')
-      .then((res) => {
-        setExistingVehicles(res.vehicles);
-        if (res.vehicles.length === 0) setUseNewVehicle(true);
-      })
-      .catch(() => {
-        setExistingVehicles([]);
-        setUseNewVehicle(true);
-      });
-  }, []);
+    if (!isOtpSent || otpTimer <= 0) return;
+    const interval = setInterval(() => setOtpTimer((t) => t - 1), 1000);
+    return () => clearInterval(interval);
+  }, [isOtpSent, otpTimer]);
 
-  const step1Valid = fullName.trim().length > 0 && mobileNumber.trim().length > 0;
-  const step2Valid = selectedContactIds.length + newContacts.length > 0;
-  const step3Valid = useNewVehicle
-    ? !!(registration.trim() && vehicleType.trim() && brand.trim() && model.trim() && fuelType.trim() && color.trim())
-    : !!selectedVehicleId;
+  // Step 3: emergency contacts (Family required, Friend optional)
+  const [familyName, setFamilyName] = useState('');
+  const [familyPhone, setFamilyPhone] = useState('');
+  const [friendName, setFriendName] = useState('');
+  const [friendPhone, setFriendPhone] = useState('');
+  const [contactsSkipped, setContactsSkipped] = useState(false);
 
-  const handleAddContact = () => {
-    if (!newContactName.trim() || !newContactPhone.trim()) return;
-    setNewContacts((prev) => [
-      ...prev,
-      {
-        name: newContactName.trim(),
-        role: newContactRole.trim(),
-        phone: newContactPhone.trim(),
-        email: newContactEmail.trim(),
-      },
-    ]);
-    setNewContactName('');
-    setNewContactRole('');
-    setNewContactPhone('');
-    setNewContactEmail('');
-    setIsAddContactOpen(false);
+  // Step 4: complete profile
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const step1Valid = vehicleType.trim().length > 0 && (noRegistrationYet || registration.trim().length > 0);
+  const step3Valid = contactsSkipped || (familyName.trim().length > 0 && familyPhone.trim().length > 0);
+  const step4Valid =
+    firstName.trim().length > 0 &&
+    lastName.trim().length > 0 &&
+    password.length >= 6 &&
+    password === confirmPassword;
+
+  const sendOtp = async () => {
+    if (!mobileNumber.trim()) return;
+    setSubmitError('');
+    setIsSendingOtp(true);
+    try {
+      const verifier = getRecaptchaVerifier(RECAPTCHA_CONTAINER_ID);
+      const result = await signInWithPhoneNumber(auth, mobileNumber.trim(), verifier);
+      setConfirmation(result);
+      setIsOtpSent(true);
+      setOtpDigits(['', '', '', '', '', '']);
+      setOtpTimer(30);
+      setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message.replace('Firebase: ', '') : 'Failed to send OTP.');
+    } finally {
+      setIsSendingOtp(false);
+    }
   };
 
-  const toggleContact = (id: string) => {
-    setSelectedContactIds((prev) => (prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]));
+  const handleOtpDigitChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const next = [...otpDigits];
+    next[index] = value.slice(-1);
+    setOtpDigits(next);
+    setSubmitError('');
+    if (value && index < 5) otpInputRefs.current[index + 1]?.focus();
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    const code = otpDigits.join('');
+    if (code.length < 6) {
+      setSubmitError('Please enter all 6 digits of the OTP code.');
+      return;
+    }
+    if (!confirmation) {
+      setSubmitError('OTP session expired. Please resend the code.');
+      return;
+    }
+    setIsVerifyingOtp(true);
+    setSubmitError('');
+    try {
+      const credential = await confirmation.confirm(code);
+      const idToken = await credential.user.getIdToken();
+      await api.post('/api/auth/phone-session', { idToken });
+      setIsPhoneVerified(true);
+      setStep(3);
+    } catch (err) {
+      setSubmitError(err instanceof ApiError ? err.message : 'Verification failed. Please try again.');
+    } finally {
+      setIsVerifyingOtp(false);
+    }
   };
 
   const handleFinish = async () => {
     setSubmitError('');
     setIsSubmitting(true);
     try {
+      if (!auth.currentUser) {
+        throw new Error('Your session expired. Please verify your phone number again.');
+      }
+
+      // Link an email/password credential to the phone-authed Firebase user,
+      // then fill in the real name/email that /phone-session left as
+      // placeholders, so the account is fully usable going forward.
+      const accountEmail = `${mobileNumber.replace(/\D/g, '')}@scanconnect.in`;
+      const credential = EmailAuthProvider.credential(accountEmail, password);
+      await linkWithCredential(auth.currentUser, credential);
+      const idToken = await auth.currentUser.getIdToken(true);
+      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+      await api.post('/api/auth/register', { idToken, fullName, email: accountEmail });
+
       const payload = {
-        personal: { fullName: fullName.trim() },
-        emergencyContacts: [
-          ...selectedContactIds.map((id) => ({ kind: 'existing' as const, id })),
-          ...newContacts.map((c) => ({
-            kind: 'new' as const,
-            name: c.name,
-            phone: c.phone,
-            role: c.role || undefined,
-            email: c.email || undefined,
-          })),
-        ],
-        ...(useNewVehicle
-          ? {
-              vehicle: {
-                registration: registration.trim(),
-                vehicleType: vehicleType.trim(),
-                brand: brand.trim(),
-                model: model.trim(),
-                fuelType: fuelType.trim(),
-                color: color.trim(),
-              },
-            }
-          : { vehicleId: selectedVehicleId }),
+        personal: { fullName },
+        emergencyContacts: contactsSkipped
+          ? []
+          : [
+              { kind: 'new' as const, name: familyName.trim(), phone: familyPhone.trim(), role: 'Family' },
+              ...(friendName.trim() && friendPhone.trim()
+                ? [{ kind: 'new' as const, name: friendName.trim(), phone: friendPhone.trim(), role: 'Friend' }]
+                : []),
+            ],
+        vehicle: {
+          registration: noRegistrationYet ? 'PENDING' : registration.trim().toUpperCase(),
+          vehicleType: vehicleType.trim(),
+        },
       };
       const result = await api.post<VerifiedData>(`/api/qr/${code}/activate`, payload);
       onDone(result);
     } catch (err) {
-      setSubmitError(err instanceof ApiError ? err.message : 'Failed to activate. Please try again.');
+      if (err instanceof ApiError) {
+        setSubmitError(err.message);
+      } else if (err instanceof Error) {
+        setSubmitError(err.message.replace('Firebase: ', ''));
+      } else {
+        setSubmitError('Failed to activate. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -501,63 +437,68 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
 
   return (
     <div className="space-y-5">
-      {/* Stepper */}
-      <div className="flex items-center justify-center gap-2">
-        {[1, 2, 3].map((n) => (
-          <React.Fragment key={n}>
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                step === n ? 'bg-[#FFED00] text-[#1B1C1C]' : step > n ? 'bg-[#FFED00]/30 text-[#736B00]' : 'bg-[#E9E8E7] text-[#6B7280]'
-              }`}
-            >
-              {step > n ? <Check className="w-4 h-4" /> : n}
-            </div>
-            {n < 3 && <div className="w-8 h-[2px] bg-[#CCC7AA]" />}
-          </React.Fragment>
-        ))}
-      </div>
+      <WizardStepper step={step} />
 
       {step === 1 && (
         <div className="space-y-4">
-          <div className="text-center space-y-1">
-            <h1 className="font-['Rubik'] font-bold text-lg text-[#1B1C1C]">Personal Details</h1>
-            <p className="text-xs text-[#5F5E5E]">Required to activate this tag.</p>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <img src={carIcon} alt="" className="w-16 h-16 object-contain" />
+            <h1 className="font-['Rubik'] font-bold text-lg text-[#1B1C1C]">Activate Your QR Sticker</h1>
+            <p className="text-xs text-[#5F5E5E]">
+              Code <span className="font-bold text-[#1B1C1C]">{code}</span>
+            </p>
           </div>
+
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#5D5F5F]">Full Name</label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
-              <input
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-              />
-            </div>
+            <label className="text-xs font-bold text-[#5D5F5F]">Vehicle Type</label>
+            <select
+              value={vehicleType}
+              onChange={(e) => setVehicleType(e.target.value)}
+              className="w-full h-[46px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] cursor-pointer"
+            >
+              <option value="">Select vehicle type</option>
+              {VEHICLE_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
           </div>
+
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#5D5F5F]">Phone Number</label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+            <label className="text-xs font-bold text-[#5D5F5F]">Vehicle Registration Number</label>
+            <input
+              type="text"
+              disabled={noRegistrationYet}
+              value={registration}
+              onChange={(e) => setRegistration(e.target.value.toUpperCase())}
+              placeholder="e.g. KA01AB1234"
+              className="w-full h-[46px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] disabled:bg-[#F5F3F3] disabled:text-[#5F5E5E]"
+            />
+            <label className="flex items-start gap-2 pt-1 cursor-pointer">
               <input
-                type="text"
-                required
-                disabled={mobileReadOnly}
-                value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
-                placeholder="+91 98765 43210"
-                className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] disabled:bg-[#F5F3F3] disabled:text-[#5F5E5E]"
+                type="checkbox"
+                checked={noRegistrationYet}
+                onChange={(e) => {
+                  setNoRegistrationYet(e.target.checked);
+                  if (e.target.checked) setRegistration('');
+                }}
+                className="mt-0.5 w-4 h-4 accent-[#FFED00]"
               />
-            </div>
-            {mobileReadOnly && <p className="text-[10px] text-[#9CA3AF]">Verified number on your account.</p>}
+              <span className="text-[11px] text-[#5F5E5E]">
+                I don&apos;t have my registration number yet. You can add it later from your dashboard.
+              </span>
+            </label>
           </div>
+
+          {submitError && <p className="text-sm font-semibold text-red-600">{submitError}</p>}
+
           <button
             onClick={() => setStep(2)}
             disabled={!step1Valid}
             className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
           >
-            Next <ArrowRight className="w-4 h-4" />
+            Next — Enter Your Details <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       )}
@@ -565,237 +506,280 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
       {step === 2 && (
         <div className="space-y-4">
           <div className="text-center space-y-1">
-            <h1 className="font-['Rubik'] font-bold text-lg text-[#1B1C1C]">Emergency Contact</h1>
-            <p className="text-xs text-[#5F5E5E]">Select or add at least one emergency contact.</p>
+            <h1 className="font-['Rubik'] font-bold text-lg text-[#1B1C1C]">Your Details</h1>
+            <p className="text-xs text-[#5F5E5E]">
+              Vehicle: <span className="font-bold text-[#1B1C1C]">{noRegistrationYet ? 'Pending' : registration}</span>
+            </p>
           </div>
 
-          {!existingContacts ? (
-            <p className="text-sm text-[#5F5E5E]">Loading contacts...</p>
-          ) : (
-            <div className="space-y-2">
-              {existingContacts.map((c) => (
-                <label
-                  key={c.id}
-                  className="flex items-center gap-3 p-3 border border-[#CCC7AA] rounded-lg cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedContactIds.includes(c.id)}
-                    onChange={() => toggleContact(c.id)}
-                    className="w-4 h-4 accent-[#FFED00]"
-                  />
-                  <span className="text-sm text-[#1B1C1C]">
-                    {c.name} — {c.phone}
-                  </span>
-                </label>
-              ))}
-              {newContacts.map((c, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-3 border border-[#FFED00] bg-[#FFED00]/5 rounded-lg">
-                  <Check className="w-4 h-4 text-[#736B00]" />
-                  <span className="text-sm text-[#1B1C1C]">
-                    {c.name}
-                    {c.role && <span className="text-[#9CA3AF]"> · {c.role}</span>} — {c.phone}{' '}
-                    <span className="text-[10px] text-[#9CA3AF]">(new)</span>
-                  </span>
-                </div>
-              ))}
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#5D5F5F]">Mobile Number</label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+              <input
+                type="tel"
+                required
+                disabled={isOtpSent}
+                value={mobileNumber}
+                onChange={(e) => setMobileNumber(e.target.value)}
+                placeholder="+91 98765 43210"
+                className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] disabled:bg-[#F5F3F3] disabled:text-[#5F5E5E]"
+              />
             </div>
-          )}
+          </div>
 
-          {!isAddContactOpen ? (
+          {!isOtpSent ? (
             <button
-              type="button"
-              onClick={() => setIsAddContactOpen(true)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1B1C1C] hover:underline cursor-pointer"
+              onClick={sendOtp}
+              disabled={isSendingOtp || !mobileNumber.trim()}
+              className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              <Plus className="w-3.5 h-3.5" /> Add a new emergency contact
+              {isSendingOtp ? 'Sending OTP...' : 'Send OTP via WhatsApp/SMS'}
             </button>
           ) : (
-            <div className="space-y-3 border border-[#CCC7AA] rounded-lg p-3">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-[#5D5F5F]">Full Name</label>
-                <input
-                  type="text"
-                  required
-                  value={newContactName}
-                  onChange={(e) => setNewContactName(e.target.value)}
-                  placeholder="e.g. Alex Morgan"
-                  className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-                />
+            <div className="space-y-3">
+              <p className="text-xs text-[#5F5E5E] text-center">
+                OTP sent to your phone. Check your messages.
+              </p>
+              <div className="flex justify-between gap-2">
+                {otpDigits.map((digit, index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    maxLength={1}
+                    value={digit}
+                    ref={(el) => (otpInputRefs.current[index] = el)}
+                    onChange={(e) => handleOtpDigitChange(index, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                    className="w-full h-12 text-center text-lg font-bold bg-white border border-[#CCC7AA] rounded-lg outline-none focus:ring-2 focus:ring-[#FFED00]"
+                  />
+                ))}
               </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-[#5D5F5F]">Role / Relationship</label>
-                <input
-                  type="text"
-                  value={newContactRole}
-                  onChange={(e) => setNewContactRole(e.target.value)}
-                  placeholder="e.g. Security Supervisor"
-                  className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-[#5D5F5F]">
-                  Phone Number <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newContactPhone}
-                  onChange={(e) => setNewContactPhone(e.target.value)}
-                  placeholder="e.g. +44 7700 900888"
-                  className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-[#5D5F5F]">Email Address</label>
-                <input
-                  type="email"
-                  value={newContactEmail}
-                  onChange={(e) => setNewContactEmail(e.target.value)}
-                  placeholder="e.g. alex.morgan@example.com"
-                  className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-                />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAddContactOpen(false)}
-                  className="flex-1 py-2 bg-[#EFEDED] text-[#5D5F5F] font-bold text-xs rounded-lg cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleAddContact}
-                  className="flex-1 py-2 bg-[#FFED00] text-[#1B1C1C] font-bold text-xs rounded-lg cursor-pointer"
-                >
-                  Add
-                </button>
+
+              <button
+                onClick={handleVerifyOtp}
+                disabled={isVerifyingOtp}
+                className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {isVerifyingOtp ? 'Verifying...' : 'Verify & Activate QR'}
+              </button>
+
+              <div className="flex items-center justify-between text-xs text-[#5F5E5E]">
+                <span>Didn&apos;t receive code?</span>
+                {otpTimer > 0 ? (
+                  <span className="font-bold text-[#1B1C1C]">Resend in {otpTimer}s</span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={sendOtp}
+                    className="flex items-center gap-1 text-[#1B1C1C] font-bold hover:underline cursor-pointer"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
+                  </button>
+                )}
               </div>
             </div>
           )}
 
-          <div className="flex gap-3">
+          <div id={RECAPTCHA_CONTAINER_ID} />
+
+          {submitError && <p className="text-sm font-semibold text-red-600 text-center">{submitError}</p>}
+
+          {!isOtpSent && (
             <button
               onClick={() => setStep(1)}
-              className="flex-1 h-[48px] border border-[#1B1C1C] rounded-lg font-bold text-[#1B1C1C] cursor-pointer flex items-center justify-center gap-2"
+              className="w-full h-[44px] border border-[#1B1C1C] rounded-lg font-bold text-[#1B1C1C] cursor-pointer flex items-center justify-center gap-2"
             >
-              <ArrowLeft className="w-4 h-4" /> Back
+              <ArrowLeft className="w-4 h-4" /> Back to vehicle details
             </button>
-            <button
-              onClick={() => setStep(3)}
-              disabled={!step2Valid}
-              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
-            >
-              Next <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
+          )}
         </div>
       )}
 
       {step === 3 && (
         <div className="space-y-4">
           <div className="text-center space-y-1">
-            <h1 className="font-['Rubik'] font-bold text-lg text-[#1B1C1C]">Vehicle Details</h1>
-            <p className="text-xs text-[#5F5E5E]">All fields are required to activate this tag.</p>
+            <h1 className="font-['Rubik'] font-bold text-lg text-[#1B1C1C]">Emergency Contacts</h1>
+            <p className="text-xs text-[#5F5E5E]">
+              If something urgent happens with your vehicle, scanners can reach your nominated contacts — without
+              seeing their numbers.
+            </p>
           </div>
 
-          {existingVehicles && existingVehicles.length > 0 && (
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setUseNewVehicle(false)}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold cursor-pointer ${!useNewVehicle ? 'bg-[#FFED00] text-[#1B1C1C]' : 'bg-[#EFEDED] text-[#5D5F5F]'}`}
-              >
-                Use Existing
-              </button>
-              <button
-                type="button"
-                onClick={() => setUseNewVehicle(true)}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold cursor-pointer ${useNewVehicle ? 'bg-[#FFED00] text-[#1B1C1C]' : 'bg-[#EFEDED] text-[#5D5F5F]'}`}
-              >
-                Add New
-              </button>
-            </div>
-          )}
+          <div className="space-y-3 border border-[#CCC7AA] rounded-lg p-3">
+            <p className="text-xs font-bold text-[#5D5F5F]">
+              Family contact <span className="text-red-500">*</span>
+            </p>
+            <p className="text-[10px] text-[#9CA3AF] -mt-2">
+              Just a name and number — you can fine-tune later in your dashboard.
+            </p>
+            <input
+              type="text"
+              value={familyName}
+              onChange={(e) => setFamilyName(e.target.value)}
+              placeholder="Contact name — e.g. Priya (spouse)"
+              className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+            />
+            <input
+              type="text"
+              value={familyPhone}
+              onChange={(e) => setFamilyPhone(e.target.value)}
+              placeholder="Mobile number — 98765 43210"
+              className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+            />
+          </div>
 
-          {!useNewVehicle && existingVehicles && existingVehicles.length > 0 ? (
-            <select
-              value={selectedVehicleId}
-              onChange={(e) => setSelectedVehicleId(e.target.value)}
-              className="w-full h-[46px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] cursor-pointer"
-            >
-              <option value="">Select a vehicle</option>
-              {existingVehicles.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {v.nickname ? `${v.nickname} — ${v.registration}` : v.registration}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                value={registration}
-                onChange={(e) => setRegistration(e.target.value)}
-                placeholder="Registration Number"
-                className="col-span-2 h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-              />
-              <select
-                value={vehicleType}
-                onChange={(e) => setVehicleType(e.target.value)}
-                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] cursor-pointer"
-              >
-                <option value="">Vehicle Type</option>
-                {VEHICLE_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-              <input
-                value={brand}
-                onChange={(e) => setBrand(e.target.value)}
-                placeholder="Brand"
-                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-              />
-              <input
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                placeholder="Model"
-                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-              />
-              <input
-                value={fuelType}
-                onChange={(e) => setFuelType(e.target.value)}
-                placeholder="Fuel Type"
-                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-              />
-              <input
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-                placeholder="Color"
-                className="h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-              />
-            </div>
-          )}
+          <div className="space-y-3 border border-[#CCC7AA] rounded-lg p-3">
+            <p className="text-xs font-bold text-[#5D5F5F]">
+              Friend contact <span className="text-[#9CA3AF] font-normal">(optional)</span>
+            </p>
+            <input
+              type="text"
+              value={friendName}
+              onChange={(e) => setFriendName(e.target.value)}
+              placeholder="Contact name — e.g. Priya (spouse)"
+              className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+            />
+            <input
+              type="text"
+              value={friendPhone}
+              onChange={(e) => setFriendPhone(e.target.value)}
+              placeholder="Mobile number — 98765 43210"
+              className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+            />
+          </div>
 
           {submitError && <p className="text-sm font-semibold text-red-600">{submitError}</p>}
 
-          <div className="flex gap-3">
-            <button
-              onClick={() => setStep(2)}
-              className="flex-1 h-[48px] border border-[#1B1C1C] rounded-lg font-bold text-[#1B1C1C] cursor-pointer flex items-center justify-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" /> Back
-            </button>
-            <button
-              onClick={handleFinish}
-              disabled={!step3Valid || isSubmitting}
-              className="flex-1 h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? 'Activating...' : 'Activate Tag'}
-            </button>
+          <button
+            onClick={() => {
+              setContactsSkipped(false);
+              setStep(4);
+            }}
+            disabled={!step3Valid}
+            className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+          >
+            Save & Continue <ArrowRight className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setContactsSkipped(true);
+              setStep(4);
+            }}
+            className="w-full text-center text-xs font-bold text-[#5F5E5E] hover:underline cursor-pointer"
+          >
+            Skip for now
+          </button>
+        </div>
+      )}
+
+      {step === 4 && (
+        <div className="space-y-4">
+          <div className="text-center space-y-1">
+            <h1 className="font-['Rubik'] font-bold text-lg text-[#1B1C1C]">Complete Your Profile</h1>
+            <p className="text-xs text-[#5F5E5E]">Add your name and set a password to secure your account.</p>
           </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#5D5F5F]">Username (Phone Number)</label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+              <input
+                type="text"
+                disabled
+                value={mobileNumber}
+                className="w-full h-[46px] pl-10 pr-3 bg-[#F5F3F3] border border-[#CCC7AA] rounded-lg text-sm text-[#5F5E5E] outline-none"
+              />
+            </div>
+            <p className="text-[10px] text-[#9CA3AF]">This is your login username. It cannot be changed.</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#5D5F5F]">First Name</label>
+              <input
+                type="text"
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="First name"
+                className="w-full h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#5D5F5F]">Last Name</label>
+              <input
+                type="text"
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Last name"
+                className="w-full h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#5D5F5F]">Password</label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="At least 6 characters"
+                className="w-full h-[46px] pl-10 pr-10 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#1B1C1C] cursor-pointer"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#5D5F5F]">Confirm Password</label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                required
+                minLength={6}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Type password again"
+                className="w-full h-[46px] pl-10 pr-10 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#1B1C1C] cursor-pointer"
+              >
+                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            {confirmPassword.length > 0 && password !== confirmPassword && (
+              <p className="text-[10px] text-red-600">Passwords do not match.</p>
+            )}
+          </div>
+
+          {submitError && <p className="text-sm font-semibold text-red-600">{submitError}</p>}
+
+          <button
+            onClick={handleFinish}
+            disabled={!step4Valid || isSubmitting || !isPhoneVerified}
+            className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+          >
+            {isSubmitting ? 'Activating...' : 'Save & Continue'}
+          </button>
         </div>
       )}
     </div>
@@ -804,20 +788,10 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
 
 export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
   const [stage, setStage] = useState<Stage>('loading');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
   const [statusChecked, setStatusChecked] = useState(false);
   const [pendingStage, setPendingStage] = useState<'inactive-prompt' | 'details' | null>(null);
   const [detailsData, setDetailsData] = useState<DetailsData | null>(null);
   const [callChoice, setCallChoice] = useState<{ target: CallTarget; method: 'call' | 'message' } | null>(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user);
-      setAuthChecked(true);
-    });
-    return unsubscribe;
-  }, []);
 
   useEffect(() => {
     api
@@ -845,10 +819,10 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
   }, [code]);
 
   useEffect(() => {
-    if (statusChecked && authChecked && pendingStage && stage === 'loading') {
+    if (statusChecked && pendingStage && stage === 'loading') {
       setStage(pendingStage);
     }
-  }, [statusChecked, authChecked, pendingStage, stage]);
+  }, [statusChecked, pendingStage, stage]);
 
   if (stage === 'loading') {
     return (
@@ -897,7 +871,7 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
             emergency contact.
           </p>
           <button
-            onClick={() => setStage(isLoggedIn ? 'wizard' : 'login-gate')}
+            onClick={() => setStage('wizard')}
             className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
           >
             Yes, Activate <ArrowRight className="w-4 h-4" />
@@ -918,14 +892,6 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
     );
   }
 
-  if (stage === 'login-gate') {
-    return (
-      <CardShell>
-        <LoginGate onSuccess={() => setStage('wizard')} />
-      </CardShell>
-    );
-  }
-
   if (stage === 'wizard') {
     return (
       <CardShell>
@@ -933,9 +899,47 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
           code={code}
           onDone={(result) => {
             setDetailsData(result);
-            setStage('details');
+            setStage('success');
           }}
         />
+      </CardShell>
+    );
+  }
+
+  if (stage === 'success') {
+    return (
+      <CardShell>
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-[#FFED00] flex items-center justify-center mx-auto">
+            <CheckCircle2 className="w-9 h-9 text-[#1B1C1C]" />
+          </div>
+          <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">QR Activated!</h1>
+          <p className="text-sm text-[#5F5E5E]">
+            Your sticker <span className="font-bold text-[#1B1C1C]">{code}</span> is now live. Anyone who scans it
+            can contact you securely.
+          </p>
+          <button
+            onClick={() => setStage('details')}
+            className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+          >
+            Preview Your QR Page <ArrowRight className="w-4 h-4" />
+          </button>
+          <a
+            href="/"
+            className="w-full h-[48px] border border-[#1B1C1C] rounded-lg font-bold text-[#1B1C1C] cursor-pointer flex items-center justify-center gap-2"
+          >
+            Go to Dashboard
+          </a>
+
+          <div className="text-left space-y-2 pt-2">
+            <p className="text-xs font-bold text-[#5D5F5F]">What&apos;s next?</p>
+            <ul className="text-xs text-[#5F5E5E] space-y-1.5 list-disc list-inside">
+              <li>Stick it on your vehicle — place the sticker where it&apos;s easily visible.</li>
+              <li>Your number stays private — scanners contact you via WhatsApp/call, they never see your phone number.</li>
+              <li>Customize in your dashboard — toggle call masking, update vehicle details, manage contacts.</li>
+            </ul>
+          </div>
+        </div>
       </CardShell>
     );
   }

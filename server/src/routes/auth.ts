@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { firebaseAuth } from '../lib/firebase.js';
-import { registerUser, syncLinkedMobile, findUserByFirebaseUid } from '../services/authService.js';
+import { registerUser, registerPhoneUser, syncLinkedMobile, findUserByFirebaseUid } from '../services/authService.js';
 import { requireAuth } from '../middleware/auth.js';
 import { prisma } from '../lib/prisma.js';
 
@@ -39,6 +39,36 @@ authRouter.post('/register', async (req, res) => {
       return res.status(409).json({ error: 'Email or mobile number already registered' });
     }
     console.error('register failed:', err);
+    res.status(401).json({ error: 'Invalid Firebase token' });
+  }
+});
+
+const phoneSessionSchema = z.object({
+  idToken: z.string().min(1),
+});
+
+/**
+ * Client flow: Firebase signInWithPhoneNumber + OTP confirm -> get idToken ->
+ * POST here, with no prior account required. Creates a minimal placeholder
+ * User row (see registerPhoneUser) so phone-first flows like QR activation
+ * can proceed before a name/email/password exist — /register later fills
+ * those in for real once the flow reaches its "Complete Your Profile" step.
+ */
+authRouter.post('/phone-session', async (req, res) => {
+  const parsed = phoneSessionSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  try {
+    const decoded = await firebaseAuth.verifyIdToken(parsed.data.idToken);
+    const user = await registerPhoneUser(decoded);
+    res.status(201).json({ user });
+  } catch (err) {
+    if (err instanceof Error && err.message === 'NO_PHONE_NUMBER') {
+      return res.status(400).json({ error: 'Token does not contain a verified phone number' });
+    }
+    console.error('phone-session failed:', err);
     res.status(401).json({ error: 'Invalid Firebase token' });
   }
 });

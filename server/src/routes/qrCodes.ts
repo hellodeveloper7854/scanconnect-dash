@@ -813,30 +813,28 @@ const activateSchema = z.object({
   personal: z.object({
     fullName: z.string().min(1).max(120),
   }),
-  emergencyContacts: z
-    .array(
-      z.discriminatedUnion('kind', [
-        z.object({ kind: z.literal('existing'), id: z.string().uuid() }),
-        z.object({
-          kind: z.literal('new'),
-          name: z.string().min(1).max(120),
-          phone: z.string().min(6).max(20),
-          role: z.string().max(120).optional(),
-          email: z.string().email().optional(),
-        }),
-      ]),
-    )
-    .min(1),
+  emergencyContacts: z.array(
+    z.discriminatedUnion('kind', [
+      z.object({ kind: z.literal('existing'), id: z.string().uuid() }),
+      z.object({
+        kind: z.literal('new'),
+        name: z.string().min(1).max(120),
+        phone: z.string().min(6).max(20),
+        role: z.string().max(120).optional(),
+        email: z.string().email().optional(),
+      }),
+    ]),
+  ),
   vehicleId: z.string().uuid().optional(),
   vehicle: z
     .object({
       registration: z.string().min(1).max(30),
       nickname: z.string().max(60).optional(),
       vehicleType: z.string().min(1).max(40),
-      brand: z.string().min(1).max(60),
-      model: z.string().min(1).max(60),
-      fuelType: z.string().min(1).max(30),
-      color: z.string().min(1).max(30),
+      brand: z.string().max(60).optional(),
+      model: z.string().max(60).optional(),
+      fuelType: z.string().max(30).optional(),
+      color: z.string().max(30).optional(),
     })
     .optional(),
 });
