@@ -14,6 +14,7 @@ import {
   Phone,
   Car,
   Lock,
+  Mail,
   ShieldOff,
   RefreshCw,
   Eye,
@@ -315,6 +316,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
   // Step 4: complete profile
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -325,6 +327,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
   const step4Valid =
     firstName.trim().length > 0 &&
     lastName.trim().length > 0 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
     password.length >= 6 &&
     password === confirmPassword;
 
@@ -398,7 +401,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
       // Link an email/password credential to the phone-authed Firebase user,
       // then fill in the real name/email that /phone-session left as
       // placeholders, so the account is fully usable going forward.
-      const accountEmail = `${mobileNumber.replace(/\D/g, '')}@scanconnect.in`;
+      const accountEmail = email.trim().toLowerCase();
       const credential = EmailAuthProvider.credential(accountEmail, password);
       await linkWithCredential(auth.currentUser, credential);
       const idToken = await auth.currentUser.getIdToken(true);
@@ -730,6 +733,22 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 className="w-full h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
               />
             </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#5D5F5F]">Email Address</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+            </div>
+            <p className="text-[10px] text-[#9CA3AF]">This email will be linked to your phone number {mobileNumber}.</p>
           </div>
 
           <div className="space-y-1">

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Mail, Phone, ShieldCheck, Car, UserRound, Lock, MessageCircle } from 'lucide-react';
+import React from 'react';
+import { Phone, ShieldCheck, Car, UserRound, MessageCircle } from 'lucide-react';
 import logo from '../assets/images/logo.png';
 
 export type CallTarget = { kind: 'owner' } | { kind: 'contact'; index: number };
 
 interface ScanResultCardProps {
   label: string;
-  owner: { fullName: string; email?: string; mobileNumber?: string | null };
+  owner: { fullName: string; mobileNumber?: string | null };
   vehicle: {
     registration: string;
     nickname: string | null;
@@ -80,11 +80,6 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({
   emergencyContacts,
   onChooseMethod,
 }) => {
-  const [openTarget, setOpenTarget] = useState<CallTarget | null>(null);
-
-  const targetsMatch = (a: CallTarget, b: CallTarget) =>
-    a.kind === 'owner' && b.kind === 'owner' ? true : a.kind === 'contact' && b.kind === 'contact' && a.index === b.index;
-
   return (
     <div className="min-h-screen bg-[#FAFAF9] flex items-center justify-center p-4 font-['Hanken_Grotesk']">
       <div className="w-full max-w-sm bg-white border border-[#E4E2E2] shadow-[0px_4px_20px_-2px_rgba(0,0,0,0.08)] rounded-[16px] p-8 space-y-6">
@@ -101,15 +96,6 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({
             <p className="text-xs font-bold uppercase text-[#9CA3AF] tracking-wide">Owner</p>
             <p className="font-['Rubik'] font-bold text-lg text-[#1B1C1C]">{owner.fullName}</p>
           </div>
-
-          {owner.email && (
-            <div className="flex items-center gap-2 text-[#5F5E5E]">
-              <Mail className="w-4 h-4 text-[#1B1C1C]" />
-              <a href={`mailto:${owner.email}`} className="hover:underline text-sm">
-                {owner.email}
-              </a>
-            </div>
-          )}
 
           {onChooseMethod ? (
             <ContactMethodChoice onChoose={(method) => onChooseMethod({ kind: 'owner' }, method)} />
@@ -129,12 +115,20 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({
               <div className="flex items-center gap-2 text-xs font-bold uppercase text-[#9CA3AF] tracking-wide">
                 <Car className="w-3.5 h-3.5" /> Vehicle
               </div>
-              {vehicle.nickname && (
-                <p className="font-['Rubik'] font-bold text-[#1B1C1C]">{vehicle.nickname}</p>
-              )}
-              {(vehicle.brand || vehicle.model || vehicle.color) && (
+              <p className="font-['Rubik'] font-bold text-[#1B1C1C]">
+                {vehicle.nickname || vehicle.registration}
+              </p>
+              {[vehicle.nickname ? vehicle.registration : null, vehicle.vehicleType, vehicle.brand, vehicle.model, vehicle.fuelType, vehicle.color]
+                .filter(Boolean).length > 0 && (
                 <p className="text-[#9CA3AF] text-xs">
-                  {[vehicle.vehicleType, vehicle.brand, vehicle.model, vehicle.fuelType, vehicle.color]
+                  {[
+                    vehicle.nickname ? vehicle.registration : null,
+                    vehicle.vehicleType,
+                    vehicle.brand,
+                    vehicle.model,
+                    vehicle.fuelType,
+                    vehicle.color,
+                  ]
                     .filter(Boolean)
                     .join(' · ')}
                 </p>
@@ -148,33 +142,13 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({
                 <UserRound className="w-3.5 h-3.5" /> Emergency Contact{emergencyContacts.length > 1 ? 's' : ''}
               </div>
               {emergencyContacts.map((contact, idx) => (
-                <div key={idx} className="space-y-1">
-                  <p className="font-['Rubik'] font-bold text-[#1B1C1C] text-sm">{contact.name}</p>
-                  {contact.role && <p className="text-[#9CA3AF] text-xs">{contact.role}</p>}
+                <div key={idx} className="space-y-2">
+                  <div>
+                    <p className="font-['Rubik'] font-bold text-[#1B1C1C] text-sm">{contact.name}</p>
+                    {contact.role && <p className="text-[#9CA3AF] text-xs">{contact.role}</p>}
+                  </div>
                   {onChooseMethod ? (
-                    <div className="space-y-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setOpenTarget((t) =>
-                            t && targetsMatch(t, { kind: 'contact', index: idx }) ? null : { kind: 'contact', index: idx },
-                          )
-                        }
-                        className="flex items-center gap-2 text-[#736B00] hover:underline text-sm font-semibold cursor-pointer"
-                      >
-                        <Lock className="w-3.5 h-3.5 text-[#1B1C1C]" />
-                        Contact
-                      </button>
-                      {openTarget && targetsMatch(openTarget, { kind: 'contact', index: idx }) && (
-                        <ContactMethodChoice
-                          onChoose={(method) => {
-                            onChooseMethod({ kind: 'contact', index: idx }, method);
-                            setOpenTarget(null);
-                          }}
-                          onCancel={() => setOpenTarget(null)}
-                        />
-                      )}
-                    </div>
+                    <ContactMethodChoice onChoose={(method) => onChooseMethod({ kind: 'contact', index: idx }, method)} />
                   ) : (
                     contact.phone && (
                       <a
