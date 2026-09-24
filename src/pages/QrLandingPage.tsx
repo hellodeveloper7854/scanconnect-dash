@@ -613,40 +613,52 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             <p className="text-[10px] text-[#9CA3AF] -mt-2">
               Just a name and number — you can fine-tune later in your dashboard.
             </p>
-            <input
-              type="text"
-              value={familyName}
-              onChange={(e) => setFamilyName(e.target.value)}
-              placeholder="Contact name — e.g. Priya (spouse)"
-              className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-            />
-            <input
-              type="text"
-              value={familyPhone}
-              onChange={(e) => setFamilyPhone(e.target.value)}
-              placeholder="Mobile number — 98765 43210"
-              className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-            />
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#5D5F5F]">Contact Name</label>
+              <input
+                type="text"
+                value={familyName}
+                onChange={(e) => setFamilyName(e.target.value)}
+                placeholder="e.g. Priya (spouse)"
+                className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#5D5F5F]">Mobile Number</label>
+              <input
+                type="text"
+                value={familyPhone}
+                onChange={(e) => setFamilyPhone(e.target.value)}
+                placeholder="e.g. 98765 43210"
+                className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+            </div>
           </div>
 
           <div className="space-y-3 border border-[#CCC7AA] rounded-lg p-3">
             <p className="text-xs font-bold text-[#5D5F5F]">
               Friend contact <span className="text-[#9CA3AF] font-normal">(optional)</span>
             </p>
-            <input
-              type="text"
-              value={friendName}
-              onChange={(e) => setFriendName(e.target.value)}
-              placeholder="Contact name — e.g. Priya (spouse)"
-              className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-            />
-            <input
-              type="text"
-              value={friendPhone}
-              onChange={(e) => setFriendPhone(e.target.value)}
-              placeholder="Mobile number — 98765 43210"
-              className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-            />
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#5D5F5F]">Contact Name</label>
+              <input
+                type="text"
+                value={friendName}
+                onChange={(e) => setFriendName(e.target.value)}
+                placeholder="e.g. Priya (spouse)"
+                className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#5D5F5F]">Mobile Number</label>
+              <input
+                type="text"
+                value={friendPhone}
+                onChange={(e) => setFriendPhone(e.target.value)}
+                placeholder="e.g. 98765 43210"
+                className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+            </div>
           </div>
 
           {submitError && <p className="text-sm font-semibold text-red-600">{submitError}</p>}
