@@ -697,7 +697,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
       {step === 1 && (
         <div className="space-y-4">
           <div className="flex flex-col items-center gap-2 text-center">
-            <img src={carIcon} alt="" className="w-16 h-16 object-contain" />
+            <img src={carIcon} alt="" className="w-28 h-28 object-contain" />
             <h1 className="font-['Rubik'] font-bold text-lg text-[#1B1C1C]">Activate Your QR Sticker</h1>
             <p className="text-xs text-[#5F5E5E]">
               Code <span className="font-bold text-[#1B1C1C]">{code}</span>
