@@ -203,6 +203,37 @@ model CallLog {
   @@index([createdAt])
 }
 
+/**
+ * One row per callback Gupshup's WhatsApp webhook pushes to us — inbound
+ * messages from a vehicle owner replying, delivery-status updates for
+ * messages we sent (enqueued/sent/delivered/read/failed), and account-level
+ * events (e.g. template review status). Gupshup's top-level `type` field
+ * distinguishes these ("message" | "message-event" | "account-event");
+ * stored as-is in `eventType` since Gupshup's exact set of values isn't
+ * fixed and validating against a strict enum would just turn any new event
+ * type into a dropped webhook delivery.
+ *
+ * Same shape as CallLog's approach to an unpredictable partner payload:
+ * `rawPayload` always has the complete original JSON body, and a
+ * best-effort set of common fields is lifted into typed columns for
+ * querying. `gupshupMessageId` is used to de-duplicate retried deliveries
+ * for the same underlying message/event when present.
+ */
+model WhatsAppEvent {
+  id               String   @id @default(uuid())
+  eventType        String   // Gupshup's top-level "type": "message" | "message-event" | "account-event" | ...
+  gupshupMessageId String?  // payload.id / payload.gsId, when present — used for idempotency
+  phoneNumber      String?  // sender's or destination's number (E.164), when the payload included one
+  status           String?  // for message-event: "enqueued" | "sent" | "delivered" | "read" | "failed" | "deleted"
+  rawPayload       Json     // full payload exactly as received, kept for audit/debugging and to preserve any fields with no typed column
+  createdAt        DateTime @default(now())
+
+  @@index([eventType])
+  @@index([gupshupMessageId])
+  @@index([phoneNumber])
+  @@index([createdAt])
+}
+
 model Product {
   id          String   @id @default(uuid())
   name        String

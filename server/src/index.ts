@@ -14,6 +14,7 @@ import { adminQrCodesRouter, qrCodesRouter } from './routes/qrCodes.js';
 import { resellersRouter } from './routes/resellers.js';
 import { contactRouter } from './routes/contact.js';
 import { notificationsRouter } from './routes/notifications.js';
+import { whatsappRouter } from './routes/whatsapp.js';
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use('/api/qr', qrCodesRouter);
 app.use('/api/resellers', resellersRouter);
 app.use('/api/contact', contactRouter);
 app.use('/api/notifications', notificationsRouter);
+app.use('/api/whatsapp', whatsappRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   // express.json() throws a SyntaxError (with a `body` property) when the
