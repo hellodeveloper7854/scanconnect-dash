@@ -531,7 +531,12 @@ function drawBrandedQrCanvasSideBySide(
   const captionFontSize = sublineFontSizeFitted;
   ctx.font = `bold ${captionFontSize}px sans-serif`;
   const captionLines = wrapText(ctx, text.iconCaption, captionMaxWidth);
-  let captionY = iconRowY + iconSize * 1.5;
+  // The helmet tag's yellow panel is much shorter than bike/car's (same
+  // relative layout, smaller canvas), so the same gap below the icon row
+  // left the caption sitting too low, close to the panel's bottom edge —
+  // a smaller multiplier pulls it back up under the icons.
+  const captionGapMultiplier = opts.size === 'helmet' ? 1.0 : 1.5;
+  let captionY = iconRowY + iconSize * captionGapMultiplier;
   for (const line of captionLines) {
     ctx.fillText(line, leftWidth + rightWidth / 2, captionY);
     captionY += captionFontSize * 1.3;
