@@ -185,7 +185,11 @@ const CallVerifyModal: React.FC<{
       return;
     }
     if (!targetPhone) {
-      setErrorMsg('No phone number available for this contact.');
+      setErrorMsg(
+        target.kind === 'owner'
+          ? 'The owner has not added their contact number.'
+          : 'This contact has not added their contact number.',
+      );
       return;
     }
     // Masked Call skips the contact-reason step and goes straight to the
