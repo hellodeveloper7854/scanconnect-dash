@@ -5,6 +5,15 @@ import { auth } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
 import { ScreenType, UserFormData } from '../types';
 import logoImg from '../assets/images/logo.png';
+import {
+  isValidName,
+  isValidEmail,
+  isValidPassword,
+  VALIDATION_MESSAGES,
+  NAME_PLACEHOLDER,
+  PASSWORD_HINT,
+  getAuthErrorMessage,
+} from '../lib/validation';
 
 interface RegistrationScreenProps {
   onNavigate: (screen: ScreenType) => void;
@@ -21,10 +30,24 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNaviga
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [touched, setTouched] = useState({ fullName: false, email: false, password: false });
+
+  const fieldErrors = {
+    fullName: isValidName(formData.fullName) ? '' : VALIDATION_MESSAGES.name,
+    email: isValidEmail(formData.email) ? '' : VALIDATION_MESSAGES.email,
+    password: isValidPassword(formData.password) ? '' : VALIDATION_MESSAGES.password,
+  };
+  const isFormValid = !fieldErrors.fullName && !fieldErrors.email && !fieldErrors.password;
+  const markTouched = (field: keyof typeof touched) => setTouched((t) => ({ ...t, [field]: true }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+    setTouched({ fullName: true, email: true, password: true });
+    if (!isFormValid) {
+      setErrorMsg('Please fix the highlighted fields before continuing.');
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -41,10 +64,8 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNaviga
     } catch (err) {
       if (err instanceof ApiError) {
         setErrorMsg(err.message);
-      } else if (err instanceof Error) {
-        setErrorMsg(err.message.replace('Firebase: ', ''));
       } else {
-        setErrorMsg('Registration failed. Please try again.');
+        setErrorMsg(getAuthErrorMessage(err, 'Registration failed. Please try again.'));
       }
     } finally {
       setIsSubmitting(false);
@@ -108,10 +129,18 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNaviga
                   required
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  placeholder="Rahul Sharma"
-                  className="w-full h-[52px] pl-12 pr-4 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-transparent transition-all"
+                  onBlur={() => markTouched('fullName')}
+                  placeholder={NAME_PLACEHOLDER}
+                  className={`w-full h-[52px] pl-12 pr-4 bg-white border text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    touched.fullName && fieldErrors.fullName
+                      ? 'border-rose-500 focus:ring-rose-400'
+                      : 'border-neutral-300 focus:ring-[#FFED00]'
+                  }`}
                 />
               </div>
+              {touched.fullName && fieldErrors.fullName && (
+                <p className="text-xs font-semibold text-rose-600">{fieldErrors.fullName}</p>
+              )}
             </div>
 
             {/* Email Address */}
@@ -128,10 +157,18 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNaviga
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onBlur={() => markTouched('email')}
                   placeholder="driver@scanme.com"
-                  className="w-full h-[52px] pl-12 pr-4 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-transparent transition-all"
+                  className={`w-full h-[52px] pl-12 pr-4 bg-white border text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    touched.email && fieldErrors.email
+                      ? 'border-rose-500 focus:ring-rose-400'
+                      : 'border-neutral-300 focus:ring-[#FFED00]'
+                  }`}
                 />
               </div>
+              {touched.email && fieldErrors.email && (
+                <p className="text-xs font-semibold text-rose-600">{fieldErrors.email}</p>
+              )}
             </div>
 
             {/* Password */}
@@ -149,8 +186,13 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNaviga
                   minLength={6}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  onBlur={() => markTouched('password')}
                   placeholder="At least 6 characters"
-                  className="w-full h-[52px] pl-12 pr-12 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-transparent transition-all"
+                  className={`w-full h-[52px] pl-12 pr-12 bg-white border text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    touched.password && fieldErrors.password
+                      ? 'border-rose-500 focus:ring-rose-400'
+                      : 'border-neutral-300 focus:ring-[#FFED00]'
+                  }`}
                 />
                 <button
                   type="button"
@@ -161,6 +203,11 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNaviga
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
+              {touched.password && fieldErrors.password ? (
+                <p className="text-xs font-semibold text-rose-600">{fieldErrors.password}</p>
+              ) : (
+                <p className="text-xs font-normal text-neutral-400">{PASSWORD_HINT}</p>
+              )}
             </div>
 
             <p className="text-xs font-normal text-neutral-400 -mt-2">

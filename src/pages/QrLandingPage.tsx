@@ -33,6 +33,15 @@ import {
 import { auth, getRecaptchaVerifier } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
 import { ScanResultCard, ScanHeader, type CallTarget } from '../components/ScanResultCard';
+import {
+  isValidName,
+  isValidPhone,
+  isValidEmail,
+  isValidPassword,
+  VALIDATION_MESSAGES,
+  PASSWORD_HINT,
+  getAuthErrorMessage,
+} from '../lib/validation';
 import logo from '../assets/images/logo.png';
 import carIcon from '../assets/images/caricon.png';
 import carPlatePhoto from '../assets/images/carnp.jpeg';
@@ -131,6 +140,10 @@ const CallVerifyModal: React.FC<{
   const [callNumber, setCallNumber] = useState<string | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(90);
   const [testData, setTestData] = useState<TestContactNumbers | null>(null);
+  const [callerPhoneTouched, setCallerPhoneTouched] = useState(false);
+
+  const callerPhoneError =
+    method === 'call' && !isValidPhone(callerPhone) ? VALIDATION_MESSAGES.phone : '';
 
   useEffect(() => {
     api
@@ -160,8 +173,13 @@ const CallVerifyModal: React.FC<{
   const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+    setCallerPhoneTouched(true);
     if (!checkLast4()) {
       setErrorMsg('Incorrect digits. Please try again.');
+      return;
+    }
+    if (callerPhoneError) {
+      setErrorMsg('Please fix the highlighted field before continuing.');
       return;
     }
     if (!targetPhone) {
@@ -421,9 +439,17 @@ const CallVerifyModal: React.FC<{
                     setCallerPhone(e.target.value);
                     setErrorMsg('');
                   }}
-                  placeholder="Your phone number"
-                  className="w-full h-[48px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+                  onBlur={() => setCallerPhoneTouched(true)}
+                  placeholder="9876543210"
+                  className={`w-full h-[48px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
+                    callerPhoneTouched && callerPhoneError
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                  }`}
                 />
+                {callerPhoneTouched && callerPhoneError && (
+                  <p className="text-xs font-semibold text-red-600">{callerPhoneError}</p>
+                )}
               </div>
             )}
 
@@ -512,29 +538,67 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const step1Valid = vehicleType.trim().length > 0 && (noRegistrationYet || registration.trim().length > 0);
-  const step3Valid = contactsSkipped || (familyName.trim().length > 0 && familyPhone.trim().length > 0);
+  // Touched state so the wizard highlights exactly which field blocked
+  // advancing, instead of only disabling the Next button with no reason.
+  const [step1Touched, setStep1Touched] = useState({ vehicleType: false, registration: false });
+  const [step2Touched, setStep2Touched] = useState(false);
+  const [step3Touched, setStep3Touched] = useState({ familyName: false, familyPhone: false });
+  const [step4Touched, setStep4Touched] = useState({
+    firstName: false,
+    lastName: false,
+    email: false,
+    password: false,
+    confirmPassword: false,
+  });
+
+  const step1Errors = {
+    vehicleType: vehicleType.trim() ? '' : 'Select a vehicle type',
+    registration:
+      noRegistrationYet || registration.trim().length > 0 ? '' : 'Enter your vehicle registration number',
+  };
+  const step1Valid = !step1Errors.vehicleType && !step1Errors.registration;
+
+  const mobileNumberError = isValidPhone(mobileNumber) ? '' : VALIDATION_MESSAGES.phone;
+
+  const step3Errors = {
+    familyName: contactsSkipped || isValidName(familyName) ? '' : VALIDATION_MESSAGES.name,
+    familyPhone: contactsSkipped || isValidPhone(familyPhone) ? '' : VALIDATION_MESSAGES.phone,
+  };
+  const step3Valid = !step3Errors.familyName && !step3Errors.familyPhone;
+
+  const step4Errors = {
+    firstName: isValidName(firstName) ? '' : 'Enter a valid first name (letters only)',
+    lastName: isValidName(lastName) ? '' : 'Enter a valid last name (letters only)',
+    email: isValidEmail(email) ? '' : VALIDATION_MESSAGES.email,
+    password: isValidPassword(password) ? '' : VALIDATION_MESSAGES.password,
+    confirmPassword: password === confirmPassword ? '' : VALIDATION_MESSAGES.passwordMismatch,
+  };
   const step4Valid =
-    firstName.trim().length > 0 &&
-    lastName.trim().length > 0 &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
-    password.length >= 6 &&
-    password === confirmPassword;
+    !step4Errors.firstName &&
+    !step4Errors.lastName &&
+    !step4Errors.email &&
+    !step4Errors.password &&
+    !step4Errors.confirmPassword;
 
   const sendOtp = async () => {
-    if (!mobileNumber.trim()) return;
+    setStep2Touched(true);
+    if (mobileNumberError) {
+      setSubmitError('Please fix the highlighted field before continuing.');
+      return;
+    }
     setSubmitError('');
     setIsSendingOtp(true);
     try {
       const verifier = getRecaptchaVerifier(RECAPTCHA_CONTAINER_ID);
-      const result = await signInWithPhoneNumber(auth, mobileNumber.trim(), verifier);
+      const digitsOnly = mobileNumber.replace(/[^\d]/g, '').replace(/^91(?=\d{10}$)/, '');
+      const result = await signInWithPhoneNumber(auth, `+91${digitsOnly}`, verifier);
       setConfirmation(result);
       setIsOtpSent(true);
       setOtpDigits(['', '', '', '', '', '']);
       setOtpTimer(30);
       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message.replace('Firebase: ', '') : 'Failed to send OTP.');
+      setSubmitError(getAuthErrorMessage(err, 'Failed to send OTP.'));
     } finally {
       setIsSendingOtp(false);
     }
@@ -574,7 +638,11 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
       setIsPhoneVerified(true);
       setStep(3);
     } catch (err) {
-      setSubmitError(err instanceof ApiError ? err.message : 'Verification failed. Please try again.');
+      if (err instanceof ApiError) {
+        setSubmitError(err.message);
+      } else {
+        setSubmitError(getAuthErrorMessage(err, 'Verification failed. Please try again.'));
+      }
     } finally {
       setIsVerifyingOtp(false);
     }
@@ -618,10 +686,8 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
     } catch (err) {
       if (err instanceof ApiError) {
         setSubmitError(err.message);
-      } else if (err instanceof Error) {
-        setSubmitError(err.message.replace('Firebase: ', ''));
       } else {
-        setSubmitError('Failed to activate. Please try again.');
+        setSubmitError(getAuthErrorMessage(err, 'Failed to activate. Please try again.'));
       }
     } finally {
       setIsSubmitting(false);
@@ -647,7 +713,12 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             <select
               value={vehicleType}
               onChange={(e) => setVehicleType(e.target.value)}
-              className="w-full h-[46px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] cursor-pointer"
+              onBlur={() => setStep1Touched((t) => ({ ...t, vehicleType: true }))}
+              className={`w-full h-[46px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 cursor-pointer ${
+                step1Touched.vehicleType && step1Errors.vehicleType
+                  ? 'border-red-500 focus:ring-red-400'
+                  : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+              }`}
             >
               <option value="">Select vehicle type</option>
               {VEHICLE_TYPES.map((t) => (
@@ -656,6 +727,9 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 </option>
               ))}
             </select>
+            {step1Touched.vehicleType && step1Errors.vehicleType && (
+              <p className="text-xs font-semibold text-red-600">{step1Errors.vehicleType}</p>
+            )}
           </div>
 
           <div className="space-y-1">
@@ -665,9 +739,17 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
               disabled={noRegistrationYet}
               value={registration}
               onChange={(e) => setRegistration(e.target.value.toUpperCase())}
+              onBlur={() => setStep1Touched((t) => ({ ...t, registration: true }))}
               placeholder="e.g. KA01AB1234"
-              className="w-full h-[46px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] disabled:bg-[#F5F3F3] disabled:text-[#5F5E5E]"
+              className={`w-full h-[46px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 disabled:bg-[#F5F3F3] disabled:text-[#5F5E5E] ${
+                step1Touched.registration && step1Errors.registration
+                  ? 'border-red-500 focus:ring-red-400'
+                  : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+              }`}
             />
+            {step1Touched.registration && step1Errors.registration && (
+              <p className="text-xs font-semibold text-red-600">{step1Errors.registration}</p>
+            )}
             <label className="flex items-start gap-2 pt-1 cursor-pointer">
               <input
                 type="checkbox"
@@ -687,8 +769,10 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
           {submitError && <p className="text-sm font-semibold text-red-600">{submitError}</p>}
 
           <button
-            onClick={() => setStep(2)}
-            disabled={!step1Valid}
+            onClick={() => {
+              setStep1Touched({ vehicleType: true, registration: true });
+              if (step1Valid) setStep(2);
+            }}
             className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
           >
             Next — Enter Your Details <ArrowRight className="w-4 h-4" />
@@ -715,16 +799,24 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 disabled={isOtpSent}
                 value={mobileNumber}
                 onChange={(e) => setMobileNumber(e.target.value)}
+                onBlur={() => setStep2Touched(true)}
                 placeholder="+91 98765 43210"
-                className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00] disabled:bg-[#F5F3F3] disabled:text-[#5F5E5E]"
+                className={`w-full h-[46px] pl-10 pr-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 disabled:bg-[#F5F3F3] disabled:text-[#5F5E5E] ${
+                  step2Touched && mobileNumberError && !isOtpSent
+                    ? 'border-red-500 focus:ring-red-400'
+                    : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                }`}
               />
             </div>
+            {step2Touched && mobileNumberError && !isOtpSent && (
+              <p className="text-xs font-semibold text-red-600">{mobileNumberError}</p>
+            )}
           </div>
 
           {!isOtpSent ? (
             <button
               onClick={sendOtp}
-              disabled={isSendingOtp || !mobileNumber.trim()}
+              disabled={isSendingOtp}
               className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {isSendingOtp ? 'Sending OTP...' : 'Send OTP via WhatsApp/SMS'}
@@ -812,9 +904,17 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 type="text"
                 value={familyName}
                 onChange={(e) => setFamilyName(e.target.value)}
-                placeholder="e.g. Priya (spouse)"
-                className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+                onBlur={() => setStep3Touched((t) => ({ ...t, familyName: true }))}
+                placeholder="e.g. Priya Sharma (spouse)"
+                className={`w-full h-[42px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
+                  step3Touched.familyName && step3Errors.familyName
+                    ? 'border-red-500 focus:ring-red-400'
+                    : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                }`}
               />
+              {step3Touched.familyName && step3Errors.familyName && (
+                <p className="text-xs font-semibold text-red-600">{step3Errors.familyName}</p>
+              )}
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-[#5D5F5F]">Mobile Number</label>
@@ -822,9 +922,17 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 type="text"
                 value={familyPhone}
                 onChange={(e) => setFamilyPhone(e.target.value)}
+                onBlur={() => setStep3Touched((t) => ({ ...t, familyPhone: true }))}
                 placeholder="e.g. 98765 43210"
-                className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+                className={`w-full h-[42px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
+                  step3Touched.familyPhone && step3Errors.familyPhone
+                    ? 'border-red-500 focus:ring-red-400'
+                    : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                }`}
               />
+              {step3Touched.familyPhone && step3Errors.familyPhone && (
+                <p className="text-xs font-semibold text-red-600">{step3Errors.familyPhone}</p>
+              )}
             </div>
           </div>
 
@@ -838,7 +946,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 type="text"
                 value={friendName}
                 onChange={(e) => setFriendName(e.target.value)}
-                placeholder="e.g. Priya (spouse)"
+                placeholder="e.g. Arjun Mehta (friend)"
                 className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
               />
             </div>
@@ -858,10 +966,11 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
 
           <button
             onClick={() => {
+              setStep3Touched({ familyName: true, familyPhone: true });
+              if (!step3Valid) return;
               setContactsSkipped(false);
               setStep(4);
             }}
-            disabled={!step3Valid}
             className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
           >
             Save & Continue <ArrowRight className="w-4 h-4" />
@@ -908,9 +1017,17 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 required
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                placeholder="First name"
-                className="w-full h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+                onBlur={() => setStep4Touched((t) => ({ ...t, firstName: true }))}
+                placeholder="Rahul"
+                className={`w-full h-[44px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
+                  step4Touched.firstName && step4Errors.firstName
+                    ? 'border-red-500 focus:ring-red-400'
+                    : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                }`}
               />
+              {step4Touched.firstName && step4Errors.firstName && (
+                <p className="text-[10px] font-semibold text-red-600">{step4Errors.firstName}</p>
+              )}
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-[#5D5F5F]">Last Name</label>
@@ -919,9 +1036,17 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 required
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                placeholder="Last name"
-                className="w-full h-[44px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+                onBlur={() => setStep4Touched((t) => ({ ...t, lastName: true }))}
+                placeholder="Sharma"
+                className={`w-full h-[44px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
+                  step4Touched.lastName && step4Errors.lastName
+                    ? 'border-red-500 focus:ring-red-400'
+                    : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                }`}
               />
+              {step4Touched.lastName && step4Errors.lastName && (
+                <p className="text-[10px] font-semibold text-red-600">{step4Errors.lastName}</p>
+              )}
             </div>
           </div>
 
@@ -934,11 +1059,20 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => setStep4Touched((t) => ({ ...t, email: true }))}
                 placeholder="you@example.com"
-                className="w-full h-[46px] pl-10 pr-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+                className={`w-full h-[46px] pl-10 pr-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
+                  step4Touched.email && step4Errors.email
+                    ? 'border-red-500 focus:ring-red-400'
+                    : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                }`}
               />
             </div>
-            <p className="text-[10px] text-[#9CA3AF]">This email will be linked to your phone number {mobileNumber}.</p>
+            {step4Touched.email && step4Errors.email ? (
+              <p className="text-[10px] font-semibold text-red-600">{step4Errors.email}</p>
+            ) : (
+              <p className="text-[10px] text-[#9CA3AF]">This email will be linked to your phone number {mobileNumber}.</p>
+            )}
           </div>
 
           <div className="space-y-1">
@@ -951,8 +1085,13 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onBlur={() => setStep4Touched((t) => ({ ...t, password: true }))}
                 placeholder="At least 6 characters"
-                className="w-full h-[46px] pl-10 pr-10 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+                className={`w-full h-[46px] pl-10 pr-10 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
+                  step4Touched.password && step4Errors.password
+                    ? 'border-red-500 focus:ring-red-400'
+                    : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                }`}
               />
               <button
                 type="button"
@@ -963,6 +1102,11 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+            {step4Touched.password && step4Errors.password ? (
+              <p className="text-[10px] font-semibold text-red-600">{step4Errors.password}</p>
+            ) : (
+              <p className="text-[10px] text-[#9CA3AF]">{PASSWORD_HINT}</p>
+            )}
           </div>
 
           <div className="space-y-1">
@@ -975,8 +1119,13 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 minLength={6}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                onBlur={() => setStep4Touched((t) => ({ ...t, confirmPassword: true }))}
                 placeholder="Type password again"
-                className="w-full h-[46px] pl-10 pr-10 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+                className={`w-full h-[46px] pl-10 pr-10 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
+                  step4Touched.confirmPassword && step4Errors.confirmPassword
+                    ? 'border-red-500 focus:ring-red-400'
+                    : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                }`}
               />
               <button
                 type="button"
@@ -987,16 +1136,33 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            {confirmPassword.length > 0 && password !== confirmPassword && (
-              <p className="text-[10px] text-red-600">Passwords do not match.</p>
+            {step4Touched.confirmPassword && step4Errors.confirmPassword && (
+              <p className="text-[10px] font-semibold text-red-600">{step4Errors.confirmPassword}</p>
             )}
           </div>
 
           {submitError && <p className="text-sm font-semibold text-red-600">{submitError}</p>}
 
           <button
-            onClick={handleFinish}
-            disabled={!step4Valid || isSubmitting || !isPhoneVerified}
+            onClick={() => {
+              setStep4Touched({
+                firstName: true,
+                lastName: true,
+                email: true,
+                password: true,
+                confirmPassword: true,
+              });
+              if (!step4Valid) {
+                setSubmitError('Please fix the highlighted fields before continuing.');
+                return;
+              }
+              if (!isPhoneVerified) {
+                setSubmitError('Please verify your phone number before continuing.');
+                return;
+              }
+              handleFinish();
+            }}
+            disabled={isSubmitting}
             className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {isSubmitting ? 'Activating...' : 'Save & Continue'}

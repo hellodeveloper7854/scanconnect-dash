@@ -5,6 +5,7 @@ import { auth } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
 import { ScreenType, UserFormData } from '../types';
 import logoImg from '../assets/images/logo.png';
+import { isValidEmail, getAuthErrorMessage } from '../lib/validation';
 
 interface LoginScreenProps {
   onNavigate: (screen: ScreenType) => void;
@@ -18,10 +19,25 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
   const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [touched, setTouched] = useState({ vehicleEmail: false, accessKey: false });
+
+  const fieldErrors = {
+    vehicleEmail: vehicleEmail.trim()
+      ? (isValidEmail(vehicleEmail) ? '' : 'Enter a valid email address')
+      : 'Email is required',
+    accessKey: accessKey ? '' : 'Access key is required',
+  };
+  const isFormValid = !fieldErrors.vehicleEmail && !fieldErrors.accessKey;
+  const markTouched = (field: keyof typeof touched) => setTouched((t) => ({ ...t, [field]: true }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+    setTouched({ vehicleEmail: true, accessKey: true });
+    if (!isFormValid) {
+      setErrorMsg('Please fix the highlighted fields before continuing.');
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -40,10 +56,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
     } catch (err) {
       if (err instanceof ApiError) {
         setErrorMsg(err.message);
-      } else if (err instanceof Error) {
-        setErrorMsg(err.message.replace('Firebase: ', ''));
       } else {
-        setErrorMsg('Login failed. Please try again.');
+        setErrorMsg(getAuthErrorMessage(err, 'Login failed. Please try again.'));
       }
     } finally {
       setIsSubmitting(false);
@@ -59,7 +73,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
       await sendPasswordResetEmail(auth, vehicleEmail);
       alert('Password reset instructions sent to your registered email.');
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message.replace('Firebase: ', '') : 'Could not send reset email.');
+      setErrorMsg(getAuthErrorMessage(err, 'Could not send reset email.'));
     }
   };
 
@@ -120,10 +134,18 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
                   required
                   value={vehicleEmail}
                   onChange={(e) => setVehicleEmail(e.target.value)}
+                  onBlur={() => markTouched('vehicleEmail')}
                   placeholder="driver@scanme.com"
-                  className="w-full h-[52px] pl-12 pr-4 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-transparent transition-all"
+                  className={`w-full h-[52px] pl-12 pr-4 bg-white border text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    touched.vehicleEmail && fieldErrors.vehicleEmail
+                      ? 'border-rose-500 focus:ring-rose-400'
+                      : 'border-neutral-300 focus:ring-[#FFED00]'
+                  }`}
                 />
               </div>
+              {touched.vehicleEmail && fieldErrors.vehicleEmail && (
+                <p className="text-xs font-semibold text-rose-600">{fieldErrors.vehicleEmail}</p>
+              )}
             </div>
 
             {/* Access Key */}
@@ -140,8 +162,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
                   required
                   value={accessKey}
                   onChange={(e) => setAccessKey(e.target.value)}
+                  onBlur={() => markTouched('accessKey')}
                   placeholder="••••••••"
-                  className="w-full h-[52px] pl-12 pr-12 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-transparent transition-all"
+                  className={`w-full h-[52px] pl-12 pr-12 bg-white border text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    touched.accessKey && fieldErrors.accessKey
+                      ? 'border-rose-500 focus:ring-rose-400'
+                      : 'border-neutral-300 focus:ring-[#FFED00]'
+                  }`}
                 />
                 <button
                   type="button"
@@ -152,6 +179,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
                   {showAccessKey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
+              {touched.accessKey && fieldErrors.accessKey && (
+                <p className="text-xs font-semibold text-rose-600">{fieldErrors.accessKey}</p>
+              )}
             </div>
 
             {/* Remember Me & Forgot Password */}

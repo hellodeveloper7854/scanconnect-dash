@@ -134,6 +134,7 @@ export const AdminQrCodes: React.FC = () => {
   const [dateTo, setDateTo] = useState('');
   const [quantity, setQuantity] = useState(100);
   const [batchName, setBatchName] = useState('');
+  const [batchNameTouched, setBatchNameTouched] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloadingZip, setIsDownloadingZip] = useState(false);
   const [error, setError] = useState('');
@@ -180,6 +181,7 @@ export const AdminQrCodes: React.FC = () => {
   }, [statusFilter, batchFilter, nameFilter, dateFrom, dateTo, page, pageSize]);
 
   const handleGenerate = async () => {
+    setBatchNameTouched(true);
     if (!batchName.trim()) {
       setError('Please enter a name for this batch.');
       return;
@@ -193,6 +195,7 @@ export const AdminQrCodes: React.FC = () => {
       });
       setBatchFilter(res.batchId);
       setBatchName('');
+      setBatchNameTouched(false);
       load();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate batch');
@@ -355,9 +358,17 @@ export const AdminQrCodes: React.FC = () => {
             type="text"
             value={batchName}
             onChange={(e) => setBatchName(e.target.value)}
+            onBlur={() => setBatchNameTouched(true)}
             placeholder="e.g. Mall Parking Lot A"
-            className="w-56 h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
+            className={`w-56 h-10 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
+              batchNameTouched && !batchName.trim()
+                ? 'border-rose-500 focus:ring-rose-500'
+                : 'border-white/10 focus:ring-[#FFED00]'
+            }`}
           />
+          {batchNameTouched && !batchName.trim() && (
+            <p className="text-xs font-semibold text-rose-400">Batch name is required</p>
+          )}
         </div>
         <div className="space-y-1">
           <label className="text-xs font-bold text-white/50 uppercase">Quantity</label>

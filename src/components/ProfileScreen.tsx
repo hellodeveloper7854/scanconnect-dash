@@ -8,6 +8,14 @@ import { auth } from '../lib/firebase';
 import { fetchBrandedQrPngBlob, triggerBlobDownload, stickerSizeForVehicleType } from '../lib/qrSticker';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import {
+  isValidName,
+  isValidPhone,
+  isValidEmail,
+  VALIDATION_MESSAGES,
+  NAME_PLACEHOLDER,
+  getAuthErrorMessage,
+} from '../lib/validation';
+import {
   Camera,
   Lock,
   Laptop,
@@ -129,8 +137,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setIsEditingIdentity(false);
   };
 
+  const identityNameError = isValidName(draftFullName) ? '' : VALIDATION_MESSAGES.name;
+
   const saveIdentity = async () => {
-    if (!draftFullName.trim()) return;
+    if (identityNameError) {
+      setProfileError(identityNameError);
+      return;
+    }
+    setProfileError('');
     setIsSavingIdentity(true);
     try {
       const res = await api.patch<{ user: BackendUser }>('/api/auth/me', { fullName: draftFullName.trim() });
@@ -232,6 +246,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [vehicleFuelType, setVehicleFuelType] = useState('');
   const [vehicleColor, setVehicleColor] = useState('');
   const [isSavingVehicle, setIsSavingVehicle] = useState(false);
+  const [vehicleFormError, setVehicleFormError] = useState('');
+  const [vehicleRegTouched, setVehicleRegTouched] = useState(false);
+
+  const vehicleRegistrationError = vehicleRegistration.trim() ? '' : 'Vehicle registration number is required';
 
   const openAddVehicle = () => {
     setEditingVehicleId(null);
@@ -242,6 +260,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setVehicleModel('');
     setVehicleFuelType('');
     setVehicleColor('');
+    setVehicleFormError('');
+    setVehicleRegTouched(false);
     setIsVehicleModalOpen(true);
   };
 
@@ -254,15 +274,19 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setVehicleModel(vehicle.model ?? '');
     setVehicleFuelType(vehicle.fuelType ?? '');
     setVehicleColor(vehicle.color ?? '');
+    setVehicleFormError('');
+    setVehicleRegTouched(false);
     setIsVehicleModalOpen(true);
   };
 
   const handleVehicleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!vehicleRegistration.trim()) {
-      alert('Please enter a vehicle registration number.');
+    setVehicleRegTouched(true);
+    if (vehicleRegistrationError) {
+      setVehicleFormError('Please fix the highlighted field before continuing.');
       return;
     }
+    setVehicleFormError('');
 
     setIsSavingVehicle(true);
     try {
@@ -283,7 +307,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       loadVehicles();
       setIsVehicleModalOpen(false);
     } catch (err) {
-      alert(err instanceof ApiError ? err.message : 'Failed to save vehicle');
+      setVehicleFormError(err instanceof ApiError ? err.message : 'Failed to save vehicle');
     } finally {
       setIsSavingVehicle(false);
     }
@@ -297,6 +321,17 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [newContactPhone, setNewContactPhone] = useState('');
   const [newContactEmail, setNewContactEmail] = useState('');
   const [isSavingContact, setIsSavingContact] = useState(false);
+  const [contactFormError, setContactFormError] = useState('');
+  const [contactTouched, setContactTouched] = useState({ name: false, phone: false, email: false });
+
+  const contactFieldErrors = {
+    name: isValidName(newContactName) ? '' : VALIDATION_MESSAGES.name,
+    phone: newContactPhone.trim() ? '' : 'Phone number is required',
+    email: !newContactEmail.trim() || isValidEmail(newContactEmail) ? '' : VALIDATION_MESSAGES.email,
+  };
+  const isContactFormValid = !contactFieldErrors.name && !contactFieldErrors.phone && !contactFieldErrors.email;
+  const markContactTouched = (field: keyof typeof contactTouched) =>
+    setContactTouched((t) => ({ ...t, [field]: true }));
 
   const openAddContact = () => {
     setEditingContactId(null);
@@ -304,6 +339,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setNewContactRole('');
     setNewContactPhone('');
     setNewContactEmail('');
+    setContactFormError('');
+    setContactTouched({ name: false, phone: false, email: false });
     setIsContactModalOpen(true);
   };
 
@@ -313,6 +350,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setNewContactRole(contact.role ?? '');
     setNewContactPhone(contact.phone);
     setNewContactEmail(contact.email ?? '');
+    setContactFormError('');
+    setContactTouched({ name: false, phone: false, email: false });
     setIsContactModalOpen(true);
   };
 
@@ -354,7 +393,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       await sendPasswordResetEmail(auth, profile.email);
       alert(`Password reset instructions sent to ${profile.email}.`);
     } catch (err) {
-      alert(err instanceof Error ? err.message.replace('Firebase: ', '') : 'Failed to send reset email.');
+      alert(getAuthErrorMessage(err, 'Failed to send reset email.'));
     } finally {
       setIsSendingReset(false);
     }
@@ -362,10 +401,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newContactName || !newContactPhone) {
-      alert('Please enter at least a name and phone number.');
+    setContactTouched({ name: true, phone: true, email: true });
+    if (!isContactFormValid) {
+      setContactFormError('Please fix the highlighted fields before continuing.');
       return;
     }
+    setContactFormError('');
 
     setIsSavingContact(true);
     try {
@@ -383,7 +424,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       loadContacts();
       setIsContactModalOpen(false);
     } catch (err) {
-      alert(err instanceof ApiError ? err.message : 'Failed to save contact');
+      setContactFormError(err instanceof ApiError ? err.message : 'Failed to save contact');
     } finally {
       setIsSavingContact(false);
     }
@@ -466,13 +507,22 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                           FULL NAME
                         </label>
                         {isEditingIdentity ? (
-                          <input
-                            type="text"
-                            value={draftFullName}
-                            onChange={(e) => setDraftFullName(e.target.value)}
-                            placeholder="Rahul Sharma"
-                            className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 focus:ring-[#FFED00] outline-none transition-all"
-                          />
+                          <>
+                            <input
+                              type="text"
+                              value={draftFullName}
+                              onChange={(e) => setDraftFullName(e.target.value)}
+                              placeholder={NAME_PLACEHOLDER}
+                              className={`w-full h-[50px] px-4 bg-white border rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 outline-none transition-all ${
+                                draftFullName && identityNameError
+                                  ? 'border-red-500 focus:ring-red-400'
+                                  : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                              }`}
+                            />
+                            {draftFullName && identityNameError && (
+                              <p className="text-xs font-semibold text-red-600 mt-1">{identityNameError}</p>
+                            )}
+                          </>
                         ) : (
                           <div className="w-full h-[50px] px-4 flex items-center bg-[#F8F8F8] border border-[#EEEEEE] rounded-lg text-[#1B1C1C] font-normal text-base">
                             {profile?.fullName || '—'}
@@ -1077,9 +1127,17 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   required
                   value={newContactName}
                   onChange={(e) => setNewContactName(e.target.value)}
-                  placeholder="e.g. Alex Morgan"
-                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
+                  onBlur={() => markContactTouched('name')}
+                  placeholder="e.g. Priya Sharma"
+                  className={`w-full h-[46px] px-3.5 bg-white border rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 ${
+                    contactTouched.name && contactFieldErrors.name
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                  }`}
                 />
+                {contactTouched.name && contactFieldErrors.name && (
+                  <p className="text-xs font-semibold text-red-600">{contactFieldErrors.name}</p>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -1100,9 +1158,17 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   required
                   value={newContactPhone}
                   onChange={(e) => setNewContactPhone(e.target.value)}
-                  placeholder="e.g. +44 7700 900888"
-                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
+                  onBlur={() => markContactTouched('phone')}
+                  placeholder="e.g. 98765 43210"
+                  className={`w-full h-[46px] px-3.5 bg-white border rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 ${
+                    contactTouched.phone && contactFieldErrors.phone
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                  }`}
                 />
+                {contactTouched.phone && contactFieldErrors.phone && (
+                  <p className="text-xs font-semibold text-red-600">{contactFieldErrors.phone}</p>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -1111,10 +1177,22 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   type="email"
                   value={newContactEmail}
                   onChange={(e) => setNewContactEmail(e.target.value)}
-                  placeholder="e.g. alex@scanme.fleet"
-                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
+                  onBlur={() => markContactTouched('email')}
+                  placeholder="e.g. priya@scanme.fleet"
+                  className={`w-full h-[46px] px-3.5 bg-white border rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 ${
+                    contactTouched.email && contactFieldErrors.email
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                  }`}
                 />
+                {contactTouched.email && contactFieldErrors.email && (
+                  <p className="text-xs font-semibold text-red-600">{contactFieldErrors.email}</p>
+                )}
               </div>
+
+              {contactFormError && (
+                <p className="text-xs font-semibold text-red-600">{contactFormError}</p>
+              )}
 
               <div className="flex gap-3 pt-3">
                 <button
@@ -1161,9 +1239,17 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   required
                   value={vehicleRegistration}
                   onChange={(e) => setVehicleRegistration(e.target.value)}
+                  onBlur={() => setVehicleRegTouched(true)}
                   placeholder="e.g. MH12AB1234"
-                  className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
+                  className={`w-full h-[46px] px-3.5 bg-white border rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 ${
+                    vehicleRegTouched && vehicleRegistrationError
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                  }`}
                 />
+                {vehicleRegTouched && vehicleRegistrationError && (
+                  <p className="text-xs font-semibold text-red-600">{vehicleRegistrationError}</p>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -1238,6 +1324,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   className="w-full h-[46px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 focus:ring-[#FFED00]"
                 />
               </div>
+
+              {vehicleFormError && (
+                <p className="text-xs font-semibold text-red-600">{vehicleFormError}</p>
+              )}
 
               <div className="flex gap-3 pt-3">
                 <button

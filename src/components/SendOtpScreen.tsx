@@ -5,6 +5,7 @@ import { auth, getRecaptchaVerifier } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
 import { ScreenType, UserFormData } from '../types';
 import logoImg from '../assets/images/logo.png';
+import { isValidPhone, getAuthErrorMessage } from '../lib/validation';
 
 interface SendOtpScreenProps {
   onVerifySuccess: (data: Partial<UserFormData>) => void;
@@ -21,8 +22,18 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
   const [timer, setTimer] = useState(30);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [phoneTouched, setPhoneTouched] = useState(false);
   const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Accepts a bare 10-digit Indian mobile number or one already prefixed with
+  // +91 — either way it's normalized to E.164 before being sent to Firebase,
+  // which requires the +91 prefix to accept the number.
+  const digitsOnly = mobileNumber.replace(/[^\d]/g, '').replace(/^91(?=\d{10}$)/, '');
+  const phoneError = isValidPhone(digitsOnly)
+    ? ''
+    : 'Enter a valid 10-digit mobile number starting with 6-9';
+  const e164Number = `+91${digitsOnly}`;
 
   useEffect(() => {
     if (!isOtpSent || timer <= 0) return;
@@ -36,19 +47,24 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
     setErrorMsg('');
     try {
       const verifier = getRecaptchaVerifier(RECAPTCHA_CONTAINER_ID);
-      const result = await signInWithPhoneNumber(auth, mobileNumber, verifier);
+      const result = await signInWithPhoneNumber(auth, e164Number, verifier);
       setConfirmation(result);
       setIsOtpSent(true);
       setOtpDigits(['', '', '', '', '', '']);
       setTimer(30);
       setTimeout(() => inputRefs.current[0]?.focus(), 100);
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message.replace('Firebase: ', '') : 'Failed to send OTP.');
+      setErrorMsg(getAuthErrorMessage(err, 'Failed to send OTP.'));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPhoneTouched(true);
+    if (phoneError) {
+      setErrorMsg('Please fix the highlighted field before continuing.');
+      return;
+    }
     setIsSubmitting(true);
     await sendOtp();
     setIsSubmitting(false);
@@ -96,10 +112,8 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
     } catch (err) {
       if (err instanceof ApiError) {
         setErrorMsg(err.message);
-      } else if (err instanceof Error) {
-        setErrorMsg(err.message.replace('Firebase: ', ''));
       } else {
-        setErrorMsg('Verification failed. Please try again.');
+        setErrorMsg(getAuthErrorMessage(err, 'Verification failed. Please try again.'));
       }
     } finally {
       setIsVerifying(false);
@@ -164,15 +178,22 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
                   disabled={isOtpSent}
                   value={mobileNumber}
                   onChange={(e) => setMobileNumber(e.target.value)}
+                  onBlur={() => setPhoneTouched(true)}
                   placeholder="+91 98765 43210"
-                  className="w-full h-[52px] pl-12 pr-4 bg-white border border-neutral-300 text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-transparent transition-all disabled:opacity-70 disabled:bg-neutral-50"
+                  className={`w-full h-[52px] pl-12 pr-4 bg-white border text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:border-transparent transition-all disabled:opacity-70 disabled:bg-neutral-50 ${
+                    phoneTouched && phoneError && !isOtpSent
+                      ? 'border-rose-500 focus:ring-rose-400'
+                      : 'border-neutral-300 focus:ring-[#FFED00]'
+                  }`}
                 />
               </div>
-              {!isOtpSent && (
+              {!isOtpSent && phoneTouched && phoneError ? (
+                <p className="text-xs font-semibold text-rose-600 mt-1">{phoneError}</p>
+              ) : !isOtpSent ? (
                 <p className="text-xs font-normal text-neutral-400 mt-1">
                   We&apos;ll send a 6-digit code via SMS
                 </p>
-              )}
+              ) : null}
             </div>
 
             {!isOtpSent ? (

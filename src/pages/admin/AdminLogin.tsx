@@ -5,6 +5,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 import { api, ApiError } from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
+import { isValidEmail, getAuthErrorMessage } from '../../lib/validation';
 
 export const AdminLogin: React.FC = () => {
   const { isLoading, isLoggedIn, isAdmin, refreshUser } = useAuth();
@@ -13,14 +14,27 @@ export const AdminLogin: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [touched, setTouched] = useState({ email: false, password: false });
 
   if (!isLoading && isLoggedIn && isAdmin) {
     return <Navigate to="/admin" replace />;
   }
 
+  const fieldErrors = {
+    email: email.trim() ? (isValidEmail(email) ? '' : 'Enter a valid email address') : 'Email is required',
+    password: password ? '' : 'Password is required',
+  };
+  const isFormValid = !fieldErrors.email && !fieldErrors.password;
+  const markTouched = (field: keyof typeof touched) => setTouched((t) => ({ ...t, [field]: true }));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+    setTouched({ email: true, password: true });
+    if (!isFormValid) {
+      setErrorMsg('Please fix the highlighted fields before continuing.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const credential = await signInWithEmailAndPassword(auth, email, password);
@@ -30,10 +44,8 @@ export const AdminLogin: React.FC = () => {
     } catch (err) {
       if (err instanceof ApiError) {
         setErrorMsg(err.message);
-      } else if (err instanceof Error) {
-        setErrorMsg(err.message.replace('Firebase: ', ''));
       } else {
-        setErrorMsg('Login failed.');
+        setErrorMsg(getAuthErrorMessage(err, 'Login failed.'));
       }
     } finally {
       setIsSubmitting(false);
@@ -55,9 +67,15 @@ export const AdminLogin: React.FC = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onBlur={() => markTouched('email')}
               placeholder="admin@scanconnect.com"
-              className="w-full h-11 pl-10 pr-3 bg-white/90 text-neutral-900 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
+              className={`w-full h-11 pl-10 pr-3 bg-white/90 text-neutral-900 rounded-md text-sm focus:outline-none focus:ring-2 ${
+                touched.email && fieldErrors.email ? 'ring-2 ring-rose-500' : 'focus:ring-[#FFED00]'
+              }`}
             />
+            {touched.email && fieldErrors.email && (
+              <p className="text-xs font-semibold text-rose-400 mt-1">{fieldErrors.email}</p>
+            )}
           </div>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
@@ -66,8 +84,11 @@ export const AdminLogin: React.FC = () => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onBlur={() => markTouched('password')}
               placeholder="••••••••"
-              className="w-full h-11 pl-10 pr-10 bg-white/90 text-neutral-900 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
+              className={`w-full h-11 pl-10 pr-10 bg-white/90 text-neutral-900 rounded-md text-sm focus:outline-none focus:ring-2 ${
+                touched.password && fieldErrors.password ? 'ring-2 ring-rose-500' : 'focus:ring-[#FFED00]'
+              }`}
             />
             <button
               type="button"
@@ -77,6 +98,9 @@ export const AdminLogin: React.FC = () => {
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
+            {touched.password && fieldErrors.password && (
+              <p className="text-xs font-semibold text-rose-400 mt-1">{fieldErrors.password}</p>
+            )}
           </div>
           {errorMsg && <p className="text-xs font-semibold text-rose-400">{errorMsg}</p>}
           <button

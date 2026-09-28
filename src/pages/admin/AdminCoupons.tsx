@@ -66,6 +66,9 @@ export const AdminCoupons: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; code: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [touched, setTouched] = useState({ code: false, value: false, usageLimit: false, minOrder: false });
+  const markTouched = (field: keyof typeof touched) => setTouched((t) => ({ ...t, [field]: true }));
+
   const load = () => {
     api
       .get<{ coupons: CouponRow[] }>('/api/admin/coupons')
@@ -80,6 +83,7 @@ export const AdminCoupons: React.FC = () => {
   const openCreate = () => {
     setForm(emptyForm());
     setFormError('');
+    setTouched({ code: false, value: false, usageLimit: false, minOrder: false });
     setEditingId(null);
     setModalMode('create');
   };
@@ -87,6 +91,7 @@ export const AdminCoupons: React.FC = () => {
   const openEdit = (c: CouponRow) => {
     setForm(rowToForm(c));
     setFormError('');
+    setTouched({ code: false, value: false, usageLimit: false, minOrder: false });
     setEditingId(c.id);
     setModalMode('edit');
   };
@@ -118,6 +123,7 @@ export const AdminCoupons: React.FC = () => {
   const isFormValid = Object.values(fieldErrors).every((e) => !e);
 
   const handleSave = async () => {
+    setTouched({ code: true, value: true, usageLimit: true, minOrder: true });
     if (!isFormValid) {
       setFormError('Please fix the highlighted fields.');
       return;
@@ -287,9 +293,17 @@ export const AdminCoupons: React.FC = () => {
                   type="text"
                   value={form.code}
                   onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '') }))}
+                  onBlur={() => markTouched('code')}
                   placeholder="WELCOME10"
-                  className="w-full h-10 px-3 bg-white/10 border border-white/10 text-white font-mono text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
+                  className={`w-full h-10 px-3 bg-white/10 border text-white font-mono text-sm rounded-md focus:outline-none focus:ring-2 ${
+                    touched.code && fieldErrors.code
+                      ? 'border-rose-500 focus:ring-rose-500'
+                      : 'border-white/10 focus:ring-[#FFED00]'
+                  }`}
                 />
+                {touched.code && fieldErrors.code && (
+                  <p className="text-xs font-semibold text-rose-400 mt-1">{fieldErrors.code}</p>
+                )}
               </div>
 
               <div>
@@ -319,9 +333,17 @@ export const AdminCoupons: React.FC = () => {
                     max={100}
                     value={form.percentageValue}
                     onChange={(e) => setForm((f) => ({ ...f, percentageValue: e.target.value }))}
+                    onBlur={() => markTouched('value')}
                     placeholder="10"
-                    className="w-full h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
+                    className={`w-full h-10 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
+                      touched.value && fieldErrors.value
+                        ? 'border-rose-500 focus:ring-rose-500'
+                        : 'border-white/10 focus:ring-[#FFED00]'
+                    }`}
                   />
+                  {touched.value && fieldErrors.value && (
+                    <p className="text-xs font-semibold text-rose-400 mt-1">{fieldErrors.value}</p>
+                  )}
                 </div>
               ) : (
                 <div>
@@ -331,9 +353,17 @@ export const AdminCoupons: React.FC = () => {
                     min={1}
                     value={form.fixedValueInRupees}
                     onChange={(e) => setForm((f) => ({ ...f, fixedValueInRupees: e.target.value }))}
+                    onBlur={() => markTouched('value')}
                     placeholder="100"
-                    className="w-full h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
+                    className={`w-full h-10 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
+                      touched.value && fieldErrors.value
+                        ? 'border-rose-500 focus:ring-rose-500'
+                        : 'border-white/10 focus:ring-[#FFED00]'
+                    }`}
                   />
+                  {touched.value && fieldErrors.value && (
+                    <p className="text-xs font-semibold text-rose-400 mt-1">{fieldErrors.value}</p>
+                  )}
                 </div>
               )}
 
@@ -344,9 +374,17 @@ export const AdminCoupons: React.FC = () => {
                   min={0}
                   value={form.minOrderInRupees}
                   onChange={(e) => setForm((f) => ({ ...f, minOrderInRupees: e.target.value }))}
+                  onBlur={() => markTouched('minOrder')}
                   placeholder="No minimum"
-                  className="w-full h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
+                  className={`w-full h-10 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
+                    touched.minOrder && fieldErrors.minOrder
+                      ? 'border-rose-500 focus:ring-rose-500'
+                      : 'border-white/10 focus:ring-[#FFED00]'
+                  }`}
                 />
+                {touched.minOrder && fieldErrors.minOrder && (
+                  <p className="text-xs font-semibold text-rose-400 mt-1">{fieldErrors.minOrder}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -357,9 +395,17 @@ export const AdminCoupons: React.FC = () => {
                     min={1}
                     value={form.usageLimit}
                     onChange={(e) => setForm((f) => ({ ...f, usageLimit: e.target.value }))}
+                    onBlur={() => markTouched('usageLimit')}
                     placeholder="Unlimited"
-                    className="w-full h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
+                    className={`w-full h-10 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
+                      touched.usageLimit && fieldErrors.usageLimit
+                        ? 'border-rose-500 focus:ring-rose-500'
+                        : 'border-white/10 focus:ring-[#FFED00]'
+                    }`}
                   />
+                  {touched.usageLimit && fieldErrors.usageLimit && (
+                    <p className="text-xs font-semibold text-rose-400 mt-1">{fieldErrors.usageLimit}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-white/50 uppercase mb-1.5">Expires On</label>

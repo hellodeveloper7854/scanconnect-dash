@@ -8,6 +8,7 @@ import {
 } from 'firebase/auth';
 import { auth, getRecaptchaVerifier } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
+import { isValidPhone, getAuthErrorMessage } from '../lib/validation';
 
 interface OtpModalProps {
   isOpen: boolean;
@@ -25,8 +26,17 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
   const [isVerifying, setIsVerifying] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [phoneTouched, setPhoneTouched] = useState(false);
   const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Accepts a bare 10-digit Indian mobile number or one already prefixed with
+  // +91 — either way it's normalized to E.164 before being sent to Firebase.
+  const digitsOnly = phone.replace(/[^\d]/g, '').replace(/^91(?=\d{10}$)/, '');
+  const phoneError = isValidPhone(digitsOnly)
+    ? ''
+    : 'Enter a valid 10-digit mobile number starting with 6-9';
+  const e164Phone = `+91${digitsOnly}`;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -47,21 +57,22 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
   if (!isOpen) return null;
 
   const sendOtp = async () => {
-    if (!phone.trim()) {
-      setErrorMsg('Please enter your mobile number.');
+    setPhoneTouched(true);
+    if (phoneError) {
+      setErrorMsg(phoneError);
       return;
     }
     setIsSending(true);
     setErrorMsg('');
     try {
       const verifier = getRecaptchaVerifier(RECAPTCHA_CONTAINER_ID);
-      const result = await signInWithPhoneNumber(auth, phone.trim(), verifier);
+      const result = await signInWithPhoneNumber(auth, e164Phone, verifier);
       setConfirmation(result);
       setOtpDigits(['', '', '', '', '', '']);
       setTimer(30);
       setTimeout(() => inputRefs.current[0]?.focus(), 100);
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message.replace('Firebase: ', '') : 'Failed to send OTP.');
+      setErrorMsg(getAuthErrorMessage(err, 'Failed to send OTP.'));
     } finally {
       setIsSending(false);
     }
@@ -113,10 +124,8 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
     } catch (err) {
       if (err instanceof ApiError) {
         setErrorMsg(err.message);
-      } else if (err instanceof Error) {
-        setErrorMsg(err.message.replace('Firebase: ', ''));
       } else {
-        setErrorMsg('Verification failed. Please try again.');
+        setErrorMsg(getAuthErrorMessage(err, 'Verification failed. Please try again.'));
       }
     } finally {
       setIsVerifying(false);
@@ -156,12 +165,20 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                onBlur={() => setPhoneTouched(true)}
                 placeholder="+91 98765 43210"
-                className="w-full h-14 px-4 text-center text-base font-bold bg-neutral-200 text-neutral-950 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFED00] transition-all"
+                className={`w-full h-14 px-4 text-center text-base font-bold bg-neutral-200 text-neutral-950 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                  phoneTouched && phoneError
+                    ? 'border-rose-500 focus:ring-rose-400'
+                    : 'border-white/20 focus:ring-[#FFED00]'
+                }`}
               />
 
               <div id={RECAPTCHA_CONTAINER_ID} />
 
+              {phoneTouched && phoneError && !errorMsg && (
+                <p className="text-xs font-semibold text-rose-400 text-center">{phoneError}</p>
+              )}
               {errorMsg && <p className="text-xs font-semibold text-rose-400 text-center">{errorMsg}</p>}
 
               <button
