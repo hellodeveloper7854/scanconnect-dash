@@ -11,7 +11,7 @@ export const MIN_PASSWORD_LENGTH = 6;
 
 export const VALIDATION_MESSAGES = {
   name: 'Enter a valid full name (letters only, at least 2 characters)',
-  phone: 'Enter a valid 10-digit mobile number starting with 6-9',
+  phone: 'Enter a valid 10-digit mobile number',
   email: 'Enter a valid email address',
   pincode: 'Enter a valid 6-digit pincode',
   password: `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
@@ -24,6 +24,13 @@ export const isValidPhone = (value: string) => PHONE_PATTERN.test(value.trim());
 export const isValidEmail = (value: string) => EMAIL_PATTERN.test(value.trim());
 export const isValidPincode = (value: string) => PINCODE_PATTERN.test(value.trim());
 export const isValidPassword = (value: string) => value.length >= MIN_PASSWORD_LENGTH;
+
+/** Strips everything but digits and a leading 91, leaving the bare 10-digit number — for use with the fixed "+91" prefix UI. */
+export const toBare10DigitPhone = (value: string) =>
+  value.replace(/[^\d]/g, '').replace(/^91(?=\d{10}$)/, '').slice(0, 10);
+
+/** Normalizes a bare 10-digit number to E.164 for Firebase (e.g. signInWithPhoneNumber). */
+export const toE164Phone = (bare10Digit: string) => `+91${bare10Digit}`;
 
 // Example Indian name shown as placeholder text in every name field.
 export const NAME_PLACEHOLDER = 'Rahul Sharma';

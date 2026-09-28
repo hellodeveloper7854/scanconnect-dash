@@ -8,7 +8,8 @@ import {
 } from 'firebase/auth';
 import { auth, getRecaptchaVerifier } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
-import { isValidPhone, getAuthErrorMessage } from '../lib/validation';
+import { isValidPhone, getAuthErrorMessage, toE164Phone } from '../lib/validation';
+import { PhoneInput } from './PhoneInput';
 
 interface OtpModalProps {
   isOpen: boolean;
@@ -30,13 +31,9 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
   const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Accepts a bare 10-digit Indian mobile number or one already prefixed with
-  // +91 — either way it's normalized to E.164 before being sent to Firebase.
-  const digitsOnly = phone.replace(/[^\d]/g, '').replace(/^91(?=\d{10}$)/, '');
-  const phoneError = isValidPhone(digitsOnly)
+  const phoneError = isValidPhone(phone)
     ? ''
-    : 'Enter a valid 10-digit mobile number starting with 6-9';
-  const e164Phone = `+91${digitsOnly}`;
+    : 'Enter a valid 10-digit mobile number';
 
   useEffect(() => {
     if (!isOpen) return;
@@ -66,7 +63,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
     setErrorMsg('');
     try {
       const verifier = getRecaptchaVerifier(RECAPTCHA_CONTAINER_ID);
-      const result = await signInWithPhoneNumber(auth, e164Phone, verifier);
+      const result = await signInWithPhoneNumber(auth, toE164Phone(phone), verifier);
       setConfirmation(result);
       setOtpDigits(['', '', '', '', '', '']);
       setTimer(30);
@@ -161,17 +158,13 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
             </div>
 
             <div className="space-y-4">
-              <input
-                type="tel"
+              <PhoneInput
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={setPhone}
                 onBlur={() => setPhoneTouched(true)}
-                placeholder="+91 98765 43210"
-                className={`w-full h-14 px-4 text-center text-base font-bold bg-neutral-200 text-neutral-950 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  phoneTouched && phoneError
-                    ? 'border-rose-500 focus:ring-rose-400'
-                    : 'border-white/20 focus:ring-[#FFED00]'
-                }`}
+                hasError={phoneTouched && !!phoneError}
+                className="h-14 rounded-lg bg-neutral-200 border-white/20"
+                inputClassName="text-center text-base font-bold bg-neutral-200"
               />
 
               <div id={RECAPTCHA_CONTAINER_ID} />
@@ -214,7 +207,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onVerifySuc
               <h3 className="text-2xl font-black text-white tracking-tight uppercase">ENTER OTP CODE</h3>
               <p className="text-neutral-400 text-xs">
                 We sent a 6-digit verification code to{' '}
-                <span className="text-[#FFED00] font-mono font-bold">{phone}</span>
+                <span className="text-[#FFED00] font-mono font-bold">+91 {phone}</span>
               </p>
             </div>
 

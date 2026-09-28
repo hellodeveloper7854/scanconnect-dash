@@ -3,6 +3,7 @@ import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { OtpModal } from './OtpModal';
+import { PhoneInput } from './PhoneInput';
 import { api, ApiError } from '../lib/api';
 import { auth } from '../lib/firebase';
 import { fetchBrandedQrPngBlob, triggerBlobDownload, stickerSizeForVehicleType } from '../lib/qrSticker';
@@ -14,6 +15,7 @@ import {
   VALIDATION_MESSAGES,
   NAME_PLACEHOLDER,
   getAuthErrorMessage,
+  toBare10DigitPhone,
 } from '../lib/validation';
 import {
   Camera,
@@ -326,7 +328,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
   const contactFieldErrors = {
     name: isValidName(newContactName) ? '' : VALIDATION_MESSAGES.name,
-    phone: newContactPhone.trim() ? '' : 'Phone number is required',
+    phone: isValidPhone(newContactPhone) ? '' : VALIDATION_MESSAGES.phone,
     email: !newContactEmail.trim() || isValidEmail(newContactEmail) ? '' : VALIDATION_MESSAGES.email,
   };
   const isContactFormValid = !contactFieldErrors.name && !contactFieldErrors.phone && !contactFieldErrors.email;
@@ -348,7 +350,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setEditingContactId(contact.id);
     setNewContactName(contact.name);
     setNewContactRole(contact.role ?? '');
-    setNewContactPhone(contact.phone);
+    setNewContactPhone(toBare10DigitPhone(contact.phone));
     setNewContactEmail(contact.email ?? '');
     setContactFormError('');
     setContactTouched({ name: false, phone: false, email: false });
@@ -1153,18 +1155,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-[#5D5F5F]">Phone Number</label>
-                <input
-                  type="text"
+                <PhoneInput
                   required
                   value={newContactPhone}
-                  onChange={(e) => setNewContactPhone(e.target.value)}
+                  onChange={setNewContactPhone}
                   onBlur={() => markContactTouched('phone')}
-                  placeholder="e.g. 98765 43210"
-                  className={`w-full h-[46px] px-3.5 bg-white border rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 ${
-                    contactTouched.phone && contactFieldErrors.phone
-                      ? 'border-red-500 focus:ring-red-400'
-                      : 'border-[#CCC7AA] focus:ring-[#FFED00]'
-                  }`}
+                  hasError={contactTouched.phone && !!contactFieldErrors.phone}
+                  className="h-[46px]"
                 />
                 {contactTouched.phone && contactFieldErrors.phone && (
                   <p className="text-xs font-semibold text-red-600">{contactFieldErrors.phone}</p>

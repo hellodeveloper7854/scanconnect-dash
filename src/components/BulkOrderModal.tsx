@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { X, Check, Users } from 'lucide-react';
 import { api, ApiError } from '../lib/api';
+import { PhoneInput } from './PhoneInput';
 
 interface BulkOrderModalProps {
   isOpen: boolean;
@@ -162,15 +163,13 @@ export const BulkOrderModal: React.FC<BulkOrderModalProps> = ({ isOpen, onClose 
                 <label className="block text-xs font-bold text-[#1B1C1C] uppercase tracking-wide mb-1.5">
                   Phone <span className="text-rose-500">*</span>
                 </label>
-                <input
-                  type="tel"
+                <PhoneInput
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  onChange={setPhone}
                   onBlur={() => markTouched('phone')}
-                  placeholder="9876543210"
-                  className={`w-full h-12 px-4 bg-neutral-100 text-[#1B1C1C] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:bg-white transition-all text-sm ${
-                    touched.phone && fieldErrors.phone ? 'border-rose-500' : 'border-neutral-200'
-                  }`}
+                  hasError={touched.phone && !!fieldErrors.phone}
+                  className="h-12 bg-neutral-100 border-neutral-200"
+                  inputClassName="bg-neutral-100"
                 />
                 {touched.phone && fieldErrors.phone && (
                   <p className="text-xs font-semibold text-rose-500 mt-1">{fieldErrors.phone}</p>

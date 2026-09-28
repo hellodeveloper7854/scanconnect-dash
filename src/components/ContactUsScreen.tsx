@@ -3,6 +3,7 @@ import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { api, ApiError } from '../lib/api';
+import { PhoneInput } from './PhoneInput';
 import {
   Mail,
   Phone,
@@ -456,19 +457,14 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
                   Phone Number <span className="text-[#9CA3AF] font-medium normal-case">(Optional)</span>
                 </label>
-                <div className="relative">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#9CA3AF] pointer-events-none" />
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                    onBlur={() => markInquiryTouched('phone')}
-                    placeholder="Enter your 10-digit contact number"
-                    className={`w-full h-[51px] bg-[#F5F3F3] pl-11 pr-4 font-['Manrope',sans-serif] text-base text-[#1B1C1C] focus:bg-white focus:ring-2 focus:ring-[#FFED00] outline-none transition-all rounded-none border ${
-                      inquiryTouched.phone && inquiryFieldErrors.phone ? 'border-rose-500' : 'border-transparent'
-                    }`}
-                  />
-                </div>
+                <PhoneInput
+                  value={phone}
+                  onChange={setPhone}
+                  onBlur={() => markInquiryTouched('phone')}
+                  hasError={inquiryTouched.phone && !!inquiryFieldErrors.phone}
+                  className="h-[51px] rounded-none bg-[#F5F3F3] border-transparent focus-within:bg-white"
+                  inputClassName="bg-[#F5F3F3] font-['Manrope',sans-serif] text-base focus:bg-white"
+                />
                 {inquiryTouched.phone && inquiryFieldErrors.phone && (
                   <p className="text-xs font-semibold text-rose-500">{inquiryFieldErrors.phone}</p>
                 )}

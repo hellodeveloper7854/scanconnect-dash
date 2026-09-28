@@ -5,6 +5,8 @@ import { DashboardFooter } from './DashboardFooter';
 import { api, ApiError } from '../lib/api';
 import { auth } from '../lib/firebase';
 import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize } from '../lib/qrSticker';
+import { PhoneInput } from './PhoneInput';
+import { toBare10DigitPhone, isValidPhone } from '../lib/validation';
 import qrImage from '../assets/images/qrimage.png';
 import {
   ShieldCheck,
@@ -49,7 +51,6 @@ const VEHICLE_TYPES = ['Car', 'Bike', 'Scooter', 'Truck', 'Bus', 'Other'];
 // Mirrors the backend's registration format expectations loosely: letters,
 // digits, spaces and hyphens only, at least 4 characters.
 const REGISTRATION_PATTERN = /^[A-Za-z0-9 -]{4,}$/;
-const PHONE_PATTERN = /^\+?[0-9 ()-]{6,20}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Shipping fields — must mirror server/src/routes/orders.ts exactly so the
@@ -172,7 +173,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
 
   // Form states for Shipping (Step 1)
   const [fullName, setFullName] = useState(userData.fullName || '');
-  const [phone, setPhone] = useState(userData.mobileNumber || '');
+  const [phone, setPhone] = useState(toBare10DigitPhone(userData.mobileNumber || ''));
   const [city, setCity] = useState(userData.city || '');
   const [pincode, setPincode] = useState(userData.pincode || '');
   const [address, setAddress] = useState(userData.address || '');
@@ -400,8 +401,8 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
       setContactFormError('Please enter a phone number.');
       return;
     }
-    if (!PHONE_PATTERN.test(phone)) {
-      setContactFormError('Please enter a valid phone number (6-20 digits, spaces, +, or - allowed).');
+    if (!isValidPhone(phone)) {
+      setContactFormError('Enter a valid 10-digit mobile number starting with 6-9.');
       return;
     }
     if (email && !EMAIL_PATTERN.test(email)) {
@@ -722,16 +723,13 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                       <label className="font-['Hanken_Grotesk'] font-normal text-[16px] leading-[24px] text-[#1B1C1C]">
                         Phone Number <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="tel"
+                      <PhoneInput
                         required
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                        onChange={setPhone}
                         onBlur={() => markShippingTouched('phone')}
-                        placeholder="9876543210"
-                        className={`w-full h-[42px] bg-[#FFFFFF] border rounded-[5px] px-[13px] font-['Hanken_Grotesk'] font-normal text-[16px] leading-[21px] text-[#1B1C1C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFED00] ${
-                          shippingTouched.phone && shippingFieldErrors.phone ? 'border-red-500' : 'border-[#6B7280]'
-                        }`}
+                        hasError={shippingTouched.phone && !!shippingFieldErrors.phone}
+                        className="h-[42px] rounded-[5px]"
                       />
                       {shippingTouched.phone && shippingFieldErrors.phone && (
                         <p className="text-xs font-semibold text-red-600">{shippingFieldErrors.phone}</p>
@@ -1338,14 +1336,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     </div>
                     <div className="space-y-1">
                       <label className="text-xs font-bold text-[#5D5F5F]">Phone Number</label>
-                      <input
-                        type="text"
-                        required
-                        value={newContactPhone}
-                        onChange={(e) => setNewContactPhone(e.target.value)}
-                        placeholder="e.g. +91 98765 43210"
-                        className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-                      />
+                      <PhoneInput required value={newContactPhone} onChange={setNewContactPhone} className="h-[44px]" />
                     </div>
                     <div className="space-y-1">
                       <label className="text-xs font-bold text-[#5D5F5F]">Email Address (optional)</label>

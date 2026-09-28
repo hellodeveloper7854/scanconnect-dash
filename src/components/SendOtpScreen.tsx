@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Phone, ArrowRight, Check, RefreshCw, ShieldCheck, X } from 'lucide-react';
+import { ArrowRight, Check, RefreshCw, ShieldCheck, X } from 'lucide-react';
 import { signInWithPhoneNumber, type ConfirmationResult } from 'firebase/auth';
 import { auth, getRecaptchaVerifier } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
 import { ScreenType, UserFormData } from '../types';
 import logoImg from '../assets/images/logo.png';
-import { isValidPhone, getAuthErrorMessage } from '../lib/validation';
+import { isValidPhone, getAuthErrorMessage, toE164Phone } from '../lib/validation';
+import { PhoneInput } from './PhoneInput';
 
 interface SendOtpScreenProps {
   onVerifySuccess: (data: Partial<UserFormData>) => void;
@@ -26,14 +27,9 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
   const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Accepts a bare 10-digit Indian mobile number or one already prefixed with
-  // +91 — either way it's normalized to E.164 before being sent to Firebase,
-  // which requires the +91 prefix to accept the number.
-  const digitsOnly = mobileNumber.replace(/[^\d]/g, '').replace(/^91(?=\d{10}$)/, '');
-  const phoneError = isValidPhone(digitsOnly)
+  const phoneError = isValidPhone(mobileNumber)
     ? ''
-    : 'Enter a valid 10-digit mobile number starting with 6-9';
-  const e164Number = `+91${digitsOnly}`;
+    : 'Enter a valid 10-digit mobile number';
 
   useEffect(() => {
     if (!isOtpSent || timer <= 0) return;
@@ -47,7 +43,7 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
     setErrorMsg('');
     try {
       const verifier = getRecaptchaVerifier(RECAPTCHA_CONTAINER_ID);
-      const result = await signInWithPhoneNumber(auth, e164Number, verifier);
+      const result = await signInWithPhoneNumber(auth, toE164Phone(mobileNumber), verifier);
       setConfirmation(result);
       setIsOtpSent(true);
       setOtpDigits(['', '', '', '', '', '']);
@@ -168,25 +164,15 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
               <label className="block text-xs font-semibold tracking-wide text-[#0F0F0F] uppercase">
                 Mobile Number
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-neutral-400">
-                  <Phone className="w-5 h-5" />
-                </div>
-                <input
-                  type="tel"
-                  required
-                  disabled={isOtpSent}
-                  value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value)}
-                  onBlur={() => setPhoneTouched(true)}
-                  placeholder="+91 98765 43210"
-                  className={`w-full h-[52px] pl-12 pr-4 bg-white border text-[#0F0F0F] font-normal placeholder-neutral-400 rounded-xl text-base focus:outline-none focus:ring-2 focus:border-transparent transition-all disabled:opacity-70 disabled:bg-neutral-50 ${
-                    phoneTouched && phoneError && !isOtpSent
-                      ? 'border-rose-500 focus:ring-rose-400'
-                      : 'border-neutral-300 focus:ring-[#FFED00]'
-                  }`}
-                />
-              </div>
+              <PhoneInput
+                required
+                disabled={isOtpSent}
+                value={mobileNumber}
+                onChange={setMobileNumber}
+                onBlur={() => setPhoneTouched(true)}
+                hasError={phoneTouched && !!phoneError && !isOtpSent}
+                className="h-[52px] rounded-xl"
+              />
               {!isOtpSent && phoneTouched && phoneError ? (
                 <p className="text-xs font-semibold text-rose-600 mt-1">{phoneError}</p>
               ) : !isOtpSent ? (

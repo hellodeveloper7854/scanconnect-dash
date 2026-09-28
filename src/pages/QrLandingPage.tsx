@@ -41,7 +41,9 @@ import {
   VALIDATION_MESSAGES,
   PASSWORD_HINT,
   getAuthErrorMessage,
+  toE164Phone,
 } from '../lib/validation';
+import { PhoneInput } from '../components/PhoneInput';
 import logo from '../assets/images/logo.png';
 import carIcon from '../assets/images/caricon.png';
 import carPlatePhoto from '../assets/images/carnp.jpeg';
@@ -431,21 +433,16 @@ const CallVerifyModal: React.FC<{
                 <label className="text-xs font-bold text-[#5D5F5F]">
                   Your phone <span className="font-normal text-[#9CA3AF]">· needed for a masked call</span>
                 </label>
-                <input
-                  type="tel"
+                <PhoneInput
                   required
                   value={callerPhone}
-                  onChange={(e) => {
-                    setCallerPhone(e.target.value);
+                  onChange={(v) => {
+                    setCallerPhone(v);
                     setErrorMsg('');
                   }}
                   onBlur={() => setCallerPhoneTouched(true)}
-                  placeholder="9876543210"
-                  className={`w-full h-[48px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
-                    callerPhoneTouched && callerPhoneError
-                      ? 'border-red-500 focus:ring-red-400'
-                      : 'border-[#CCC7AA] focus:ring-[#FFED00]'
-                  }`}
+                  hasError={callerPhoneTouched && !!callerPhoneError}
+                  className="h-[48px]"
                 />
                 {callerPhoneTouched && callerPhoneError && (
                   <p className="text-xs font-semibold text-red-600">{callerPhoneError}</p>
@@ -590,8 +587,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
     setIsSendingOtp(true);
     try {
       const verifier = getRecaptchaVerifier(RECAPTCHA_CONTAINER_ID);
-      const digitsOnly = mobileNumber.replace(/[^\d]/g, '').replace(/^91(?=\d{10}$)/, '');
-      const result = await signInWithPhoneNumber(auth, `+91${digitsOnly}`, verifier);
+      const result = await signInWithPhoneNumber(auth, toE164Phone(mobileNumber), verifier);
       setConfirmation(result);
       setIsOtpSent(true);
       setOtpDigits(['', '', '', '', '', '']);
@@ -791,23 +787,14 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
 
           <div className="space-y-1">
             <label className="text-xs font-bold text-[#5D5F5F]">Mobile Number</label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
-              <input
-                type="tel"
-                required
-                disabled={isOtpSent}
-                value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
-                onBlur={() => setStep2Touched(true)}
-                placeholder="+91 98765 43210"
-                className={`w-full h-[46px] pl-10 pr-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 disabled:bg-[#F5F3F3] disabled:text-[#5F5E5E] ${
-                  step2Touched && mobileNumberError && !isOtpSent
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-[#CCC7AA] focus:ring-[#FFED00]'
-                }`}
-              />
-            </div>
+            <PhoneInput
+              required
+              disabled={isOtpSent}
+              value={mobileNumber}
+              onChange={setMobileNumber}
+              onBlur={() => setStep2Touched(true)}
+              hasError={step2Touched && !!mobileNumberError && !isOtpSent}
+            />
             {step2Touched && mobileNumberError && !isOtpSent && (
               <p className="text-xs font-semibold text-red-600">{mobileNumberError}</p>
             )}
@@ -918,17 +905,12 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-[#5D5F5F]">Mobile Number</label>
-              <input
-                type="text"
+              <PhoneInput
                 value={familyPhone}
-                onChange={(e) => setFamilyPhone(e.target.value)}
+                onChange={setFamilyPhone}
                 onBlur={() => setStep3Touched((t) => ({ ...t, familyPhone: true }))}
-                placeholder="e.g. 98765 43210"
-                className={`w-full h-[42px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
-                  step3Touched.familyPhone && step3Errors.familyPhone
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-[#CCC7AA] focus:ring-[#FFED00]'
-                }`}
+                hasError={step3Touched.familyPhone && !!step3Errors.familyPhone}
+                className="h-[42px]"
               />
               {step3Touched.familyPhone && step3Errors.familyPhone && (
                 <p className="text-xs font-semibold text-red-600">{step3Errors.familyPhone}</p>
@@ -952,13 +934,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-[#5D5F5F]">Mobile Number</label>
-              <input
-                type="text"
-                value={friendPhone}
-                onChange={(e) => setFriendPhone(e.target.value)}
-                placeholder="e.g. 98765 43210"
-                className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
-              />
+              <PhoneInput value={friendPhone} onChange={setFriendPhone} className="h-[42px]" />
             </div>
           </div>
 
@@ -1002,7 +978,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
               <input
                 type="text"
                 disabled
-                value={mobileNumber}
+                value={`+91 ${mobileNumber}`}
                 className="w-full h-[46px] pl-10 pr-3 bg-[#F5F3F3] border border-[#CCC7AA] rounded-lg text-sm text-[#5F5E5E] outline-none"
               />
             </div>
@@ -1071,7 +1047,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             {step4Touched.email && step4Errors.email ? (
               <p className="text-[10px] font-semibold text-red-600">{step4Errors.email}</p>
             ) : (
-              <p className="text-[10px] text-[#9CA3AF]">This email will be linked to your phone number {mobileNumber}.</p>
+              <p className="text-[10px] text-[#9CA3AF]">This email will be linked to your phone number +91 {mobileNumber}.</p>
             )}
           </div>
 
