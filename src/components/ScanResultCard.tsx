@@ -149,36 +149,40 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({ label, owner, ve
           )}
         </div>
 
-        {primaryContact && (
-          <div className="rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-            <div className="w-full bg-gradient-to-r from-[#D6272C] to-[#B01E23] px-4 py-3.5 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center shrink-0">
-                <ShieldAlert className="w-5.5 h-5.5 text-white" />
-              </div>
-              <div className="text-left min-w-0 flex-1">
-                <p className="font-['Rubik'] font-extrabold text-white text-[15px]">Emergency</p>
-                <p className="text-[11px] text-white/85 truncate">Accident or family emergency? Reach the emergency contact.</p>
-              </div>
+        <div className="rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <div className="w-full bg-gradient-to-r from-[#D6272C] to-[#B01E23] px-4 py-3.5 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center shrink-0">
+              <ShieldAlert className="w-5.5 h-5.5 text-white" />
             </div>
-
-            <div className="bg-white px-4 py-4 space-y-3">
-              {primaryContact.role && (
-                <p className="text-xs font-bold text-[#5D5F5F]">{primaryContact.role}</p>
-              )}
-
-              {onChooseMethod ? (
-                <MethodCards onChoose={(method) => onChooseMethod({ kind: 'contact', index: contactIndex }, method)} />
-              ) : (
-                primaryContact.phone && (
-                  <a href={`tel:${primaryContact.phone}`} className="flex items-center gap-2 text-[#5F5E5E] hover:underline text-sm">
-                    <Phone className="w-4 h-4 text-[#1B1C1C]" />
-                    {primaryContact.phone}
-                  </a>
-                )
-              )}
+            <div className="text-left min-w-0 flex-1">
+              <p className="font-['Rubik'] font-extrabold text-white text-[15px]">Emergency</p>
+              <p className="text-[11px] text-white/85 truncate">Accident or family emergency? Reach the emergency contact.</p>
             </div>
           </div>
-        )}
+
+          <div className="bg-white px-4 py-4 space-y-3">
+            {primaryContact ? (
+              <>
+                {primaryContact.role && (
+                  <p className="text-xs font-bold text-[#5D5F5F]">{primaryContact.role}</p>
+                )}
+
+                {onChooseMethod ? (
+                  <MethodCards onChoose={(method) => onChooseMethod({ kind: 'contact', index: contactIndex }, method)} />
+                ) : (
+                  primaryContact.phone && (
+                    <a href={`tel:${primaryContact.phone}`} className="flex items-center gap-2 text-[#5F5E5E] hover:underline text-sm">
+                      <Phone className="w-4 h-4 text-[#1B1C1C]" />
+                      {primaryContact.phone}
+                    </a>
+                  )
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-[#9CA3AF]">No emergency contact added.</p>
+            )}
+          </div>
+        </div>
 
         <div className="bg-[#1B1C1C] rounded-2xl px-4 py-3.5 space-y-1">
           <p className="text-[11px] font-bold text-[#FFED00]">
