@@ -87,7 +87,14 @@ const STICKER_YELLOW = '#FFED00';
  * rough brand-yellow marker-stroke drawn behind it for emphasis. Returns the
  * total rendered height so callers can lay out the headline beneath it.
  */
-function drawWordmark(ctx: CanvasRenderingContext2D, x: number, y: number, maxWidth: number, sizeScale = 1): number {
+function drawWordmark(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  maxWidth: number,
+  sizeScale = 1,
+  centerWithin?: number,
+): number {
   const wordmarkFontFamily = "'Roboto Condensed', sans-serif";
   const fontSize = fitFontSize(ctx, 'SCAN CONNECT', maxWidth, maxWidth * 0.25 * sizeScale, '700', wordmarkFontFamily);
   ctx.textAlign = 'left';
@@ -100,6 +107,12 @@ function drawWordmark(ctx: CanvasRenderingContext2D, x: number, y: number, maxWi
   ctx.font = `700 ${fontSize}px ${wordmarkFontFamily}`;
   const scanWidth = ctx.measureText(scanText).width;
   const connectWidth = ctx.measureText(connectText).width;
+
+  // When centerWithin is given, re-anchor x so the wordmark's actual
+  // rendered width sits centered in that span instead of starting flush left.
+  if (centerWithin !== undefined) {
+    x += (centerWithin - (scanWidth + connectWidth)) / 2;
+  }
 
   // Rough yellow zigzag marker-stroke behind "CONNECT", drawn as a thick
   // hand-drawn-style zigzag ribbon rather than a clean box, for emphasis.
@@ -578,7 +591,7 @@ function drawBrandedQrCanvasStacked(
   // Smaller than the side-by-side layout's logo — the transport tag's tall
   // portrait canvas otherwise renders the wordmark oversized relative to the
   // headline below it.
-  const wordmarkHeight = drawWordmark(ctx, pad, pad * 0.8, contentMaxWidth, 0.55);
+  const wordmarkHeight = drawWordmark(ctx, pad, pad * 0.8, contentMaxWidth, 0.55, contentMaxWidth);
 
   ctx.textAlign = 'center';
   const headlineTextColor = '#000000';
