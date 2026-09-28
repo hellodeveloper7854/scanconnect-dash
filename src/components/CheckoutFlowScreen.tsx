@@ -6,7 +6,7 @@ import { api, ApiError } from '../lib/api';
 import { auth } from '../lib/firebase';
 import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize } from '../lib/qrSticker';
 import { PhoneInput } from './PhoneInput';
-import { toBare10DigitPhone, isValidPhone } from '../lib/validation';
+import { toBare10DigitPhone, isValidPhone, isValidName } from '../lib/validation';
 import qrImage from '../assets/images/qrimage.png';
 import {
   ShieldCheck,
@@ -395,6 +395,10 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
 
     if (!name) {
       setContactFormError('Please enter a full name.');
+      return;
+    }
+    if (!isValidName(name)) {
+      setContactFormError('Enter a valid full name (letters only, at least 2 characters).');
       return;
     }
     if (!phone) {
@@ -1319,8 +1323,8 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                         type="text"
                         required
                         value={newContactName}
-                        onChange={(e) => setNewContactName(e.target.value)}
-                        placeholder="e.g. Alex Morgan"
+                        onChange={(e) => setNewContactName(e.target.value.replace(/[^A-Za-z .'-]/g, ''))}
+                        placeholder="e.g. Priya Sharma"
                         className="w-full h-[44px] px-3.5 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
                       />
                     </div>

@@ -1128,7 +1128,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   type="text"
                   required
                   value={newContactName}
-                  onChange={(e) => setNewContactName(e.target.value)}
+                  onChange={(e) => setNewContactName(e.target.value.replace(/[^A-Za-z .'-]/g, ''))}
                   onBlur={() => markContactTouched('name')}
                   placeholder="e.g. Priya Sharma"
                   className={`w-full h-[46px] px-3.5 bg-white border rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 ${

@@ -515,6 +515,12 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
   const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  // Set from /phone-session's response once OTP verifies — a non-empty
+  // fullName means this phone number already belongs to a completed
+  // account (registerPhoneUser only leaves fullName blank for a brand-new
+  // phone-only signup), so "Complete Your Profile" (Step 4) can be skipped
+  // entirely instead of asking an existing user to set a new email/password.
+  const [existingFullName, setExistingFullName] = useState<string | null>(null);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -543,7 +549,12 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
   // advancing, instead of only disabling the Next button with no reason.
   const [step1Touched, setStep1Touched] = useState({ vehicleType: false, registration: false });
   const [step2Touched, setStep2Touched] = useState(false);
-  const [step3Touched, setStep3Touched] = useState({ familyName: false, familyPhone: false });
+  const [step3Touched, setStep3Touched] = useState({
+    familyName: false,
+    familyPhone: false,
+    friendName: false,
+    friendPhone: false,
+  });
   const [step4Touched, setStep4Touched] = useState({
     firstName: false,
     lastName: false,
@@ -561,11 +572,15 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
 
   const mobileNumberError = isValidPhone(mobileNumber) ? '' : VALIDATION_MESSAGES.phone;
 
+  const hasFriendContact = friendName.trim().length > 0 || friendPhone.trim().length > 0;
   const step3Errors = {
     familyName: contactsSkipped || isValidName(familyName) ? '' : VALIDATION_MESSAGES.name,
     familyPhone: contactsSkipped || isValidPhone(familyPhone) ? '' : VALIDATION_MESSAGES.phone,
+    friendName: !hasFriendContact || isValidName(friendName) ? '' : VALIDATION_MESSAGES.name,
+    friendPhone: !hasFriendContact || isValidPhone(friendPhone) ? '' : VALIDATION_MESSAGES.phone,
   };
-  const step3Valid = !step3Errors.familyName && !step3Errors.familyPhone;
+  const step3Valid =
+    !step3Errors.familyName && !step3Errors.familyPhone && !step3Errors.friendName && !step3Errors.friendPhone;
 
   const step4Errors = {
     firstName: isValidName(firstName) ? '' : 'Enter a valid first name (letters only)',
@@ -645,7 +660,8 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
     try {
       const credential = await confirmation.confirm(code);
       const idToken = await credential.user.getIdToken();
-      await api.post('/api/auth/phone-session', { idToken });
+      const { user } = await api.post<{ user: { fullName: string } }>('/api/auth/phone-session', { idToken });
+      setExistingFullName(user.fullName.trim() || null);
       setIsPhoneVerified(true);
       setStep(3);
     } catch (err) {
@@ -657,6 +673,32 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
     } finally {
       setIsVerifyingOtp(false);
     }
+  };
+
+  // Shared by both finish paths — vehicle + emergency contacts never depend
+  // on whether this is a brand-new or already-registered account.
+  const activateQrCode = async (fullName: string) => {
+    const payload = {
+      personal: { fullName },
+      emergencyContacts: contactsSkipped
+        ? []
+        : [
+            { kind: 'new' as const, name: familyName.trim(), phone: familyPhone.trim(), role: 'Family' },
+            ...(friendName.trim() && friendPhone.trim()
+              ? [{ kind: 'new' as const, name: friendName.trim(), phone: friendPhone.trim(), role: 'Friend' }]
+              : []),
+          ],
+      vehicle: {
+        registration: noRegistrationYet ? 'PENDING' : registration.trim().toUpperCase(),
+        vehicleType: vehicleType.trim(),
+        brand: vehicleBrand.trim() || undefined,
+        model: vehicleModel.trim() || undefined,
+        fuelType: vehicleFuelType.trim() || undefined,
+        color: vehicleColor.trim() || undefined,
+      },
+    };
+    const result = await api.post<DetailsData>(`/api/qr/${code}/activate`, payload);
+    onDone(result);
   };
 
   const handleFinish = async () => {
@@ -677,27 +719,28 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
       const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
       await api.post('/api/auth/register', { idToken, fullName, email: accountEmail });
 
-      const payload = {
-        personal: { fullName },
-        emergencyContacts: contactsSkipped
-          ? []
-          : [
-              { kind: 'new' as const, name: familyName.trim(), phone: familyPhone.trim(), role: 'Family' },
-              ...(friendName.trim() && friendPhone.trim()
-                ? [{ kind: 'new' as const, name: friendName.trim(), phone: friendPhone.trim(), role: 'Friend' }]
-                : []),
-            ],
-        vehicle: {
-          registration: noRegistrationYet ? 'PENDING' : registration.trim().toUpperCase(),
-          vehicleType: vehicleType.trim(),
-          brand: vehicleBrand.trim() || undefined,
-          model: vehicleModel.trim() || undefined,
-          fuelType: vehicleFuelType.trim() || undefined,
-          color: vehicleColor.trim() || undefined,
-        },
-      };
-      const result = await api.post<DetailsData>(`/api/qr/${code}/activate`, payload);
-      onDone(result);
+      await activateQrCode(fullName);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setSubmitError(err.message);
+      } else {
+        setSubmitError(getAuthErrorMessage(err, 'Failed to activate. Please try again.'));
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // This phone number already belongs to a completed account (see
+  // existingFullName above) — skip "Complete Your Profile" (Step 4)
+  // entirely, since asking them to set a brand-new email/password would
+  // either conflict with their existing credential or be redundant.
+  const handleFinishForExistingAccount = async () => {
+    if (!existingFullName) return;
+    setSubmitError('');
+    setIsSubmitting(true);
+    try {
+      await activateQrCode(existingFullName);
     } catch (err) {
       if (err instanceof ApiError) {
         setSubmitError(err.message);
@@ -973,9 +1016,9 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
               <input
                 type="text"
                 value={familyName}
-                onChange={(e) => setFamilyName(e.target.value)}
+                onChange={(e) => setFamilyName(e.target.value.replace(/[^A-Za-z .'-]/g, ''))}
                 onBlur={() => setStep3Touched((t) => ({ ...t, familyName: true }))}
-                placeholder="e.g. Priya Sharma (spouse)"
+                placeholder="e.g. Priya Sharma"
                 className={`w-full h-[42px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
                   step3Touched.familyName && step3Errors.familyName
                     ? 'border-red-500 focus:ring-red-400'
@@ -1010,14 +1053,31 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
               <input
                 type="text"
                 value={friendName}
-                onChange={(e) => setFriendName(e.target.value)}
-                placeholder="e.g. Arjun Mehta (friend)"
-                className="w-full h-[42px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+                onChange={(e) => setFriendName(e.target.value.replace(/[^A-Za-z .'-]/g, ''))}
+                onBlur={() => setStep3Touched((t) => ({ ...t, friendName: true }))}
+                placeholder="e.g. Arjun Mehta"
+                className={`w-full h-[42px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
+                  step3Touched.friendName && step3Errors.friendName
+                    ? 'border-red-500 focus:ring-red-400'
+                    : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                }`}
               />
+              {step3Touched.friendName && step3Errors.friendName && (
+                <p className="text-xs font-semibold text-red-600">{step3Errors.friendName}</p>
+              )}
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-[#5D5F5F]">Mobile Number</label>
-              <PhoneInput value={friendPhone} onChange={setFriendPhone} className="h-[42px]" />
+              <PhoneInput
+                value={friendPhone}
+                onChange={setFriendPhone}
+                onBlur={() => setStep3Touched((t) => ({ ...t, friendPhone: true }))}
+                hasError={step3Touched.friendPhone && !!step3Errors.friendPhone}
+                className="h-[42px]"
+              />
+              {step3Touched.friendPhone && step3Errors.friendPhone && (
+                <p className="text-xs font-semibold text-red-600">{step3Errors.friendPhone}</p>
+              )}
             </div>
           </div>
 
@@ -1025,22 +1085,36 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
 
           <button
             onClick={() => {
-              setStep3Touched({ familyName: true, familyPhone: true });
+              setStep3Touched({ familyName: true, familyPhone: true, friendName: true, friendPhone: true });
               if (!step3Valid) return;
               setContactsSkipped(false);
-              setStep(4);
+              if (existingFullName) {
+                handleFinishForExistingAccount();
+              } else {
+                setStep(4);
+              }
             }}
+            disabled={isSubmitting}
             className="w-full h-[48px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-lg font-bold text-[#1B1C1C] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
           >
-            Save & Continue <ArrowRight className="w-4 h-4" />
+            {isSubmitting ? 'Activating...' : (
+              <>
+                Save & Continue <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </button>
           <button
             type="button"
             onClick={() => {
               setContactsSkipped(true);
-              setStep(4);
+              if (existingFullName) {
+                handleFinishForExistingAccount();
+              } else {
+                setStep(4);
+              }
             }}
-            className="w-full text-center text-xs font-bold text-[#5F5E5E] hover:underline cursor-pointer"
+            disabled={isSubmitting}
+            className="w-full text-center text-xs font-bold text-[#5F5E5E] hover:underline cursor-pointer disabled:opacity-60"
           >
             Skip for now
           </button>
@@ -1070,7 +1144,9 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
 
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <label className="text-xs font-bold text-[#5D5F5F]">First Name</label>
+              <label className="text-xs font-bold text-[#5D5F5F]">
+                First Name <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 required
@@ -1089,7 +1165,9 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
               )}
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-bold text-[#5D5F5F]">Last Name</label>
+              <label className="text-xs font-bold text-[#5D5F5F]">
+                Last Name <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 required
@@ -1110,7 +1188,9 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#5D5F5F]">Email Address</label>
+            <label className="text-xs font-bold text-[#5D5F5F]">
+              Email Address <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
               <input
@@ -1135,7 +1215,9 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#5D5F5F]">Password</label>
+            <label className="text-xs font-bold text-[#5D5F5F]">
+              Password <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
               <input
@@ -1169,7 +1251,9 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#5D5F5F]">Confirm Password</label>
+            <label className="text-xs font-bold text-[#5D5F5F]">
+              Confirm Password <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
               <input
