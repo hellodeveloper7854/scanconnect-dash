@@ -501,6 +501,10 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
   const [vehicleType, setVehicleType] = useState('');
   const [registration, setRegistration] = useState('');
   const [noRegistrationYet, setNoRegistrationYet] = useState(false);
+  const [vehicleBrand, setVehicleBrand] = useState('');
+  const [vehicleModel, setVehicleModel] = useState('');
+  const [vehicleFuelType, setVehicleFuelType] = useState('');
+  const [vehicleColor, setVehicleColor] = useState('');
 
   // Step 2: phone + OTP
   const [mobileNumber, setMobileNumber] = useState('');
@@ -675,6 +679,10 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
         vehicle: {
           registration: noRegistrationYet ? 'PENDING' : registration.trim().toUpperCase(),
           vehicleType: vehicleType.trim(),
+          brand: vehicleBrand.trim() || undefined,
+          model: vehicleModel.trim() || undefined,
+          fuelType: vehicleFuelType.trim() || undefined,
+          color: vehicleColor.trim() || undefined,
         },
       };
       const result = await api.post<DetailsData>(`/api/qr/${code}/activate`, payload);
@@ -697,7 +705,6 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
       {step === 1 && (
         <div className="space-y-4">
           <div className="flex flex-col items-center gap-2 text-center">
-            <img src={carIcon} alt="" className="w-28 h-28 object-contain" />
             <h1 className="font-['Rubik'] font-bold text-lg text-[#1B1C1C]">Activate Your QR Sticker</h1>
             <p className="text-xs text-[#5F5E5E]">
               Code <span className="font-bold text-[#1B1C1C]">{code}</span>
@@ -760,6 +767,60 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                 I don&apos;t have my registration number yet. You can add it later from your dashboard.
               </span>
             </label>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#5D5F5F]">
+                Brand <span className="text-[#9CA3AF] font-normal">(Optional)</span>
+              </label>
+              <input
+                type="text"
+                value={vehicleBrand}
+                onChange={(e) => setVehicleBrand(e.target.value)}
+                placeholder="e.g. Maruti Suzuki"
+                className="w-full h-[46px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#5D5F5F]">
+                Model <span className="text-[#9CA3AF] font-normal">(Optional)</span>
+              </label>
+              <input
+                type="text"
+                value={vehicleModel}
+                onChange={(e) => setVehicleModel(e.target.value)}
+                placeholder="e.g. Swift"
+                className="w-full h-[46px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#5D5F5F]">
+                Fuel Type <span className="text-[#9CA3AF] font-normal">(Optional)</span>
+              </label>
+              <input
+                type="text"
+                value={vehicleFuelType}
+                onChange={(e) => setVehicleFuelType(e.target.value)}
+                placeholder="e.g. Petrol"
+                className="w-full h-[46px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#5D5F5F]">
+                Color <span className="text-[#9CA3AF] font-normal">(Optional)</span>
+              </label>
+              <input
+                type="text"
+                value={vehicleColor}
+                onChange={(e) => setVehicleColor(e.target.value)}
+                placeholder="e.g. White"
+                className="w-full h-[46px] px-3 bg-white border border-[#CCC7AA] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#FFED00]"
+              />
+            </div>
           </div>
 
           {submitError && <p className="text-sm font-semibold text-red-600">{submitError}</p>}
