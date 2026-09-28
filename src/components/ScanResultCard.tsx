@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, MessageCircle, ShieldAlert, Menu, X, UserRound, ChevronDown } from 'lucide-react';
+import { Phone, MessageCircle, ShieldAlert, Menu, X } from 'lucide-react';
 import logo from '../assets/images/logo.png';
 
 export type CallTarget = { kind: 'owner' } | { kind: 'contact'; index: number };
@@ -60,14 +60,19 @@ export const ScanHeader: React.FC = () => {
   );
 };
 
-/** An Indian-style number plate: yellow face, black border, IND badge strip, monospace plate text. */
+/** An Indian-style HSRP number plate: white face, black border, blue IND strip with tricolor flag, monospace plate text. */
 const PlateGraphic: React.FC<{ registration: string }> = ({ registration }) => (
-  <div className="inline-flex rounded-lg border-[3px] border-[#1B1C1C] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.15)]">
-    <div className="bg-[#1B1C1C] flex flex-col items-center justify-center px-1.5 py-1">
-      <span className="text-[7px] font-black text-[#FF9933] leading-none">IND</span>
-      <span className="text-base leading-none">🇮🇳</span>
+  <div className="inline-flex rounded-[3px] border-2 border-[#1B1C1C] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.15)] bg-white">
+    <div className="bg-[#0B1F51] flex flex-col items-center justify-center gap-0.5 px-1.5 py-1">
+      <svg viewBox="0 0 24 16" className="w-4 h-3 shrink-0" xmlns="http://www.w3.org/2000/svg">
+        <rect width="24" height="5.33" y="0" fill="#FF9933" />
+        <rect width="24" height="5.33" y="5.33" fill="#FFFFFF" />
+        <rect width="24" height="5.34" y="10.66" fill="#138808" />
+        <circle cx="12" cy="8" r="2" fill="none" stroke="#000080" strokeWidth="0.3" />
+      </svg>
+      <span className="text-[6px] font-black text-white leading-none tracking-wide">IND</span>
     </div>
-    <div className="bg-[#FFED00] px-3 py-1.5 flex items-center">
+    <div className="bg-white px-3 py-1.5 flex items-center">
       <span className="font-mono font-black text-lg text-[#1B1C1C] tracking-widest">{registration}</span>
     </div>
   </div>
@@ -101,7 +106,6 @@ const MethodCards: React.FC<{ onChoose: (method: 'call' | 'message') => void }> 
 );
 
 export const ScanResultCard: React.FC<ScanResultCardProps> = ({ label, owner, vehicle, emergencyContacts, onChooseMethod }) => {
-  const [emergencyOpen, setEmergencyOpen] = useState(false);
   const primaryContact = emergencyContacts[0];
   const contactIndex = 0;
 
@@ -115,7 +119,7 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({ label, owner, ve
 
       <div className="max-w-md mx-auto px-4 py-5 space-y-4">
         <div className="text-center space-y-0.5">
-          <h1 className="font-['Rubik'] font-black text-[22px] text-[#1B1C1C] tracking-tight">Contact Vehicle Owner</h1>
+          <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C] tracking-tight">Contact Vehicle Owner</h1>
           <p className="text-[11px] font-semibold text-[#B0AA9E] uppercase tracking-wide">{label}</p>
         </div>
 
@@ -131,13 +135,6 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({ label, owner, ve
         )}
 
         <div className="bg-white rounded-2xl p-4 space-y-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-          <div className="flex items-baseline justify-between">
-            <div>
-              <p className="text-[10px] font-bold uppercase text-[#B0AA9E] tracking-widest">Owner</p>
-              <p className="font-['Rubik'] font-extrabold text-lg text-[#1B1C1C] leading-tight">{owner.fullName}</p>
-            </div>
-          </div>
-
           <p className="text-xs font-bold text-[#5D5F5F]">How would you like to reach the owner?</p>
 
           {onChooseMethod ? (
@@ -154,43 +151,32 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({ label, owner, ve
 
         {primaryContact && (
           <div className="rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-            <button
-              type="button"
-              onClick={() => setEmergencyOpen((prev) => !prev)}
-              className="w-full bg-gradient-to-r from-[#D6272C] to-[#B01E23] px-4 py-3.5 flex items-center gap-3 cursor-pointer active:scale-[0.99] transition-transform"
-            >
+            <div className="w-full bg-gradient-to-r from-[#D6272C] to-[#B01E23] px-4 py-3.5 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center shrink-0">
                 <ShieldAlert className="w-5.5 h-5.5 text-white" />
               </div>
               <div className="text-left min-w-0 flex-1">
                 <p className="font-['Rubik'] font-extrabold text-white text-[15px]">Emergency</p>
-                <p className="text-[11px] text-white/85 truncate">Accident or family emergency? Tap here.</p>
+                <p className="text-[11px] text-white/85 truncate">Accident or family emergency? Reach the emergency contact.</p>
               </div>
-              <ChevronDown className={`w-4 h-4 text-white/80 shrink-0 transition-transform ${emergencyOpen ? 'rotate-180' : ''}`} />
-            </button>
+            </div>
 
-            {emergencyOpen && (
-              <div className="bg-white px-4 py-4 space-y-3 animate-fade-in">
-                <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-[#B0AA9E] tracking-widest">
-                  <UserRound className="w-3.5 h-3.5" /> Emergency Contact
-                </div>
-                <div>
-                  <p className="font-['Rubik'] font-extrabold text-[#1B1C1C] text-base">{primaryContact.name}</p>
-                  {primaryContact.role && <p className="text-[#9CA3AF] text-xs">{primaryContact.role}</p>}
-                </div>
+            <div className="bg-white px-4 py-4 space-y-3">
+              {primaryContact.role && (
+                <p className="text-xs font-bold text-[#5D5F5F]">{primaryContact.role}</p>
+              )}
 
-                {onChooseMethod ? (
-                  <MethodCards onChoose={(method) => onChooseMethod({ kind: 'contact', index: contactIndex }, method)} />
-                ) : (
-                  primaryContact.phone && (
-                    <a href={`tel:${primaryContact.phone}`} className="flex items-center gap-2 text-[#5F5E5E] hover:underline text-sm">
-                      <Phone className="w-4 h-4 text-[#1B1C1C]" />
-                      {primaryContact.phone}
-                    </a>
-                  )
-                )}
-              </div>
-            )}
+              {onChooseMethod ? (
+                <MethodCards onChoose={(method) => onChooseMethod({ kind: 'contact', index: contactIndex }, method)} />
+              ) : (
+                primaryContact.phone && (
+                  <a href={`tel:${primaryContact.phone}`} className="flex items-center gap-2 text-[#5F5E5E] hover:underline text-sm">
+                    <Phone className="w-4 h-4 text-[#1B1C1C]" />
+                    {primaryContact.phone}
+                  </a>
+                )
+              )}
+            </div>
           </div>
         )}
 

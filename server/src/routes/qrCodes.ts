@@ -13,16 +13,16 @@ import type { Prisma } from '@prisma/client';
 
 /**
  * Masks the last 4 characters of a plate number (e.g. "JH05CY0377" ->
- * "JH05CY••••") so the unauthenticated /:code/details response — shown to
+ * "JH05CY####") so the unauthenticated /:code/details response — shown to
  * anyone who scans the tag, before any ownership check — never leaks the
  * exact digits the /verify and /masked-call routes require as an anti-abuse
  * gate. Registrations of 4 chars or fewer are masked in full.
  */
 function maskRegistrationLast4(registration: string): string {
   if (registration.length <= 4) {
-    return '•'.repeat(registration.length);
+    return '#'.repeat(registration.length);
   }
-  return registration.slice(0, -4) + '••••';
+  return registration.slice(0, -4) + '####';
 }
 
 // Crockford-ish base32 alphabet, ambiguous characters (0/O, 1/I) removed so

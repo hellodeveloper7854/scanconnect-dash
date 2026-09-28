@@ -177,7 +177,7 @@ const CallVerifyModal: React.FC<{
     setErrorMsg('');
     setCallerPhoneTouched(true);
     if (!checkLast4()) {
-      setErrorMsg('Incorrect digits. Please try again.');
+      setErrorMsg('Enter the correct last 4 digits of the registration number.');
       return;
     }
     if (callerPhoneError) {
@@ -399,7 +399,7 @@ const CallVerifyModal: React.FC<{
       <div className="max-w-md mx-auto px-4 py-6">
         <div className="bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
           <div className="h-40 relative overflow-hidden">
-            <img src={carPlatePhoto} alt="Vehicle number plate" className="w-full h-full object-cover" />
+            <img src={carPlatePhoto} alt="Vehicle number plate" className="w-full h-full object-cover object-bottom" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
           </div>
 
@@ -1481,7 +1481,7 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
           code={code}
           target={callChoice.target}
           method={callChoice.method}
-          platePrefix={detailsData.vehicle.registration.replace(/•+$/, '')}
+          platePrefix={detailsData.vehicle.registration.replace(/#+$/, '')}
           onClose={() => setCallChoice(null)}
         />
       );
