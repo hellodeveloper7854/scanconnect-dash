@@ -223,7 +223,16 @@ adminQrCodesRouter.get('/', async (req, res) => {
       include: {
         vehicle: { include: { user: { select: { fullName: true, email: true, mobileNumber: true } } } },
       },
-      orderBy: { createdAt: 'desc' },
+      // Sort by the batch's creation time first, then by each code's
+      // position within that batch — not by the individual row's own
+      // createdAt. Bulk-generated codes can have createdAt timestamps that
+      // are all extremely close but not perfectly identical (insert order
+      // inside the same request), so ordering by createdAt directly mixes
+      // up the display-ID sequence (e.g. ...-0003, ...-0002, ...-0006...).
+      // batchCreatedAt is identical for every code in a batch, and batchSeq
+      // is that code's 1-indexed slot, so this always reproduces the exact
+      // 0001, 0002, 0003... order shown in each code's display ID.
+      orderBy: [{ batchCreatedAt: 'desc' }, { batchSeq: 'asc' }],
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
@@ -257,7 +266,10 @@ adminQrCodesRouter.get('/', async (req, res) => {
 adminQrCodesRouter.get('/:batchId/download.csv', async (req, res) => {
   const codes = await prisma.qrCode.findMany({
     where: { batchId: req.params.batchId, deletedAt: null },
-    orderBy: { createdAt: 'asc' },
+    // Already scoped to one batch, so batchSeq alone reproduces the exact
+    // 0001, 0002, 0003... display-ID order (see the admin list route above
+    // for why createdAt isn't a reliable sort key for bulk-created rows).
+    orderBy: { batchSeq: 'asc' },
   });
   if (codes.length === 0) {
     return res.status(404).json({ error: 'Batch not found' });
@@ -288,7 +300,7 @@ adminQrCodesRouter.get('/download.zip', async (req, res) => {
 
   const codes = await prisma.qrCode.findMany({
     where,
-    orderBy: { createdAt: 'asc' },
+    orderBy: [{ batchCreatedAt: 'asc' }, { batchSeq: 'asc' }],
     take: MAX_ADMIN_PAGE_SIZE,
   });
 
@@ -363,7 +375,7 @@ adminQrCodesRouter.get('/deleted', async (req, res) => {
       include: {
         vehicle: { include: { user: { select: { fullName: true, email: true, mobileNumber: true } } } },
       },
-      orderBy: { deletedAt: 'desc' },
+      orderBy: [{ deletedAt: 'desc' }, { batchSeq: 'desc' }],
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
