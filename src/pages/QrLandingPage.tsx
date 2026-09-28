@@ -604,6 +604,17 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
     }
   };
 
+  // Lets the user go back and fix a mistyped mobile number after the OTP has
+  // already been sent, instead of being stuck waiting out the resend timer
+  // or reloading the whole wizard.
+  const handleEditPhoneNumber = () => {
+    setIsOtpSent(false);
+    setConfirmation(null);
+    setOtpDigits(['', '', '', '', '', '']);
+    setSubmitError('');
+    setStep2Touched(false);
+  };
+
   const handleOtpDigitChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
     const next = [...otpDigits];
@@ -847,7 +858,18 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#5D5F5F]">Mobile Number</label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-[#5D5F5F]">Mobile Number</label>
+              {isOtpSent && (
+                <button
+                  type="button"
+                  onClick={handleEditPhoneNumber}
+                  className="text-xs font-bold text-[#1B1C1C] hover:underline cursor-pointer"
+                >
+                  Edit
+                </button>
+              )}
+            </div>
             <PhoneInput
               required
               disabled={isOtpSent}
