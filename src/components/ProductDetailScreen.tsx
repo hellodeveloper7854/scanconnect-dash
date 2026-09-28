@@ -150,6 +150,17 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   // it gets its own hero image instead of the shared generic qrImage.
   const productImage = product?.id === 8 ? transportQrImage : qrImage;
 
+  // The site-wide discount is 37% off — the struck-through "original" price
+  // and the OFF badge must be derived from the real selling price so they
+  // stay mathematically consistent for every product, instead of a fixed
+  // ₹799/37% pair that only happened to match the default ₹499 product.
+  const DISCOUNT_RATE = 0.37;
+  const numericPrice = Number(productPrice.replace(/[^0-9.]/g, ''));
+  const hasNumericPrice = productPrice.startsWith('₹') && !Number.isNaN(numericPrice) && numericPrice > 0;
+  const originalPrice = hasNumericPrice
+    ? `₹${Math.round(numericPrice / (1 - DISCOUNT_RATE)).toLocaleString('en-IN')}`
+    : null;
+
   const handleBuyNow = () => {
     openCheckout();
   };
@@ -252,12 +263,16 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
               <span className="font-['Plus_Jakarta_Sans'] font-extrabold text-[44px] sm:text-[56px] leading-[50px] sm:leading-[64px] text-[#1B1C1C] tracking-[-1.28px]">
                 {productPrice}
               </span>
-              <span className="font-['Hanken_Grotesk'] font-normal text-[18px] text-[#5F5E5E] line-through">
-                ₹799
-              </span>
-              <span className="bg-[#BA1A1A] text-white font-['Hanken_Grotesk'] font-bold text-[12px] leading-[12px] tracking-[1.2px] px-[8px] py-[4px] rounded-[4px] uppercase">
-                37% OFF
-              </span>
+              {originalPrice && (
+                <>
+                  <span className="font-['Hanken_Grotesk'] font-normal text-[18px] text-[#5F5E5E] line-through">
+                    {originalPrice}
+                  </span>
+                  <span className="bg-[#BA1A1A] text-white font-['Hanken_Grotesk'] font-bold text-[12px] leading-[12px] tracking-[1.2px] px-[8px] py-[4px] rounded-[4px] uppercase">
+                    {Math.round(DISCOUNT_RATE * 100)}% OFF
+                  </span>
+                </>
+              )}
             </div>
 
             {/* Delivery Alert Banner Box */}
