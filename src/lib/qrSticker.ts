@@ -87,9 +87,9 @@ const STICKER_YELLOW = '#FFED00';
  * rough brand-yellow marker-stroke drawn behind it for emphasis. Returns the
  * total rendered height so callers can lay out the headline beneath it.
  */
-function drawWordmark(ctx: CanvasRenderingContext2D, x: number, y: number, maxWidth: number): number {
+function drawWordmark(ctx: CanvasRenderingContext2D, x: number, y: number, maxWidth: number, sizeScale = 1): number {
   const wordmarkFontFamily = "'Roboto Condensed', sans-serif";
-  const fontSize = fitFontSize(ctx, 'SCAN CONNECT', maxWidth, maxWidth * 0.25, '700', wordmarkFontFamily);
+  const fontSize = fitFontSize(ctx, 'SCAN CONNECT', maxWidth, maxWidth * 0.25 * sizeScale, '700', wordmarkFontFamily);
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
 
@@ -575,13 +575,19 @@ function drawBrandedQrCanvasStacked(
   ctx.fillRect(0, 0, width, topHeight);
 
   const contentMaxWidth = width - pad * 2;
-  const wordmarkHeight = drawWordmark(ctx, pad, pad * 0.8, contentMaxWidth);
+  // Smaller than the side-by-side layout's logo — the transport tag's tall
+  // portrait canvas otherwise renders the wordmark oversized relative to the
+  // headline below it.
+  const wordmarkHeight = drawWordmark(ctx, pad, pad * 0.8, contentMaxWidth, 0.55);
 
   ctx.textAlign = 'center';
   const headlineTextColor = '#000000';
   const isHindi = opts.lang === 'hi';
   const sublineFontSizeFitted = Math.round(width * 0.05 * (isHindi ? 0.5 : 0.6));
-  const headlineTop = pad * 0.8 + wordmarkHeight * (isHindi ? 1.7 : 1.25);
+  // Same gap below the logo regardless of language — wordmarkHeight is
+  // already the logo's actual rendered pixel height, so there's no reason
+  // for English and Hindi to leave a different amount of space beneath it.
+  const headlineTop = pad * 0.8 + wordmarkHeight * 1.25;
 
   const displayIdFontSizeEstimate = Math.round(sublineFontSizeFitted * 0.8);
   const displayIdReservedHeight = opts.displayId ? displayIdFontSizeEstimate * 1.35 : 0;
@@ -594,7 +600,7 @@ function drawBrandedQrCanvasStacked(
   const headlineFontFamily = isHindi ? 'sans-serif' : "'Poppins', sans-serif";
   const headlineFontWeight = isHindi ? '900' : '800';
   const headlineLineHeightMult = isHindi ? 1.05 : 1.15;
-  let headlineFontSize = Math.round(width * (isHindi ? 0.075 : 0.09));
+  let headlineFontSize = Math.round(width * (isHindi ? 0.085 : 0.1));
   let headlineLines: { text: string; startWordIndex: number; wordCount: number }[] = [];
   let headlineLineHeight = 0;
   while (headlineFontSize > 10) {
@@ -705,9 +711,14 @@ function drawBrandedQrCanvasStacked(
   ctx.restore();
 
   const iconRowY = qrY + qrBoxSize + qrFramePad * 2 + pad * 0.9;
-  const iconGap = width / (STICKER_ICONS.length + 1);
+  // Spread evenly across the full canvas width (as bike/car/helmet do) left
+  // large gaps between icons on the transport tag's much wider canvas — a
+  // fixed, compact gap keeps them clustered together instead.
+  const iconGap = iconSize * 1.5;
+  const iconRowWidth = iconGap * (STICKER_ICONS.length - 1);
+  const iconRowStartX = (width - iconRowWidth) / 2;
   STICKER_ICONS.forEach((draw, i) => {
-    const cx = iconGap * (i + 1);
+    const cx = iconRowStartX + iconGap * i;
     draw(ctx, cx, iconRowY, iconSize);
   });
 
