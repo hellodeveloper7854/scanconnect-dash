@@ -20,6 +20,7 @@ import { QrLandingPage } from './pages/QrLandingPage';
 import { BlogListPage } from './pages/BlogListPage';
 import { BlogPostPage } from './pages/BlogPostPage';
 import { InvestorsPage } from './pages/InvestorsPage';
+import { HelpDemoPage } from './pages/HelpDemoPage';
 import { FaqPage } from './pages/FaqPage';
 import { TermsAndConditionsPage } from './pages/TermsAndConditionsPage';
 import { ShippingPolicyPage } from './pages/ShippingPolicyPage';
@@ -67,6 +68,10 @@ export default function App() {
 
   if (path === '/investors') {
     return <InvestorsPage />;
+  }
+
+  if (path === '/help') {
+    return <HelpDemoPage />;
   }
 
   if (path === '/faq') {

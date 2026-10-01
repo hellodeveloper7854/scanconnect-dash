@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, PhoneCall, MessageCircle, ArrowLeft, ShieldAlert, Menu, X } from 'lucide-react';
+import { Phone, PhoneCall, MessageCircle, ArrowLeft, ShieldAlert, Menu, X, ShoppingBag, CircleHelp, Mail, LogIn } from 'lucide-react';
 import logo from '../assets/images/logo.png';
 
 export type CallTarget = { kind: 'owner' } | { kind: 'contact'; index: number };
@@ -26,6 +26,13 @@ interface ScanResultCardProps {
   onChooseMethod?: (target: CallTarget, method: 'call' | 'message') => void;
 }
 
+const MENU_ITEMS = [
+  { label: 'Shop', href: '/shop', Icon: ShoppingBag },
+  { label: 'Help/Demo', href: '/help', Icon: CircleHelp },
+  { label: 'Contact Us', href: '/contact', Icon: Mail },
+  { label: 'Login', href: '/login', Icon: LogIn },
+];
+
 export const ScanHeader: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -37,25 +44,47 @@ export const ScanHeader: React.FC = () => {
         </a>
         <button
           type="button"
-          onClick={() => setMenuOpen((prev) => !prev)}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          onClick={() => setMenuOpen(true)}
+          aria-label="Open menu"
           className="p-2 -mr-2 text-[#1B1C1C] hover:bg-black/10 rounded-lg cursor-pointer"
         >
-          {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          <Menu className="w-5 h-5" />
         </button>
       </div>
-      {menuOpen && (
-        <div className="bg-[#1B1C1C] border-t border-black/20">
-          <div className="max-w-md mx-auto px-4 py-2">
-            <a href="/" className="block py-2.5 px-2 rounded-lg font-bold text-white hover:bg-white/10 cursor-pointer">
-              Scan Connect Home
-            </a>
-            <a href="/contact" className="block py-2.5 px-2 rounded-lg font-bold text-white hover:bg-white/10 cursor-pointer">
-              Report Wrong Info
-            </a>
-          </div>
+
+      <div
+        onClick={() => setMenuOpen(false)}
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-200 ${menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+      />
+      <nav
+        aria-hidden={!menuOpen}
+        className={`fixed top-0 right-0 bottom-0 z-50 w-72 max-w-[80vw] bg-white shadow-2xl flex flex-col transition-transform duration-200 ease-out ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+      >
+        <div className="h-14 px-4 flex items-center justify-between bg-[#FFED00]">
+          <img src={logo} alt="ScanConnect" className="h-6 w-auto object-contain" />
+          <button
+            type="button"
+            onClick={() => setMenuOpen(false)}
+            aria-label="Close menu"
+            className="p-2 -mr-2 text-[#1B1C1C] hover:bg-black/10 rounded-lg cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
-      )}
+        <div className="p-3 space-y-1">
+          {MENU_ITEMS.map(({ label, href, Icon }) => (
+            <a
+              key={label}
+              href={href}
+              tabIndex={menuOpen ? 0 : -1}
+              className="flex items-center gap-3 py-3 px-3 rounded-xl font-bold text-[#1B1C1C] hover:bg-[#F5F4F1] cursor-pointer"
+            >
+              <Icon className="w-5 h-5 text-[#5F5E5E]" />
+              {label}
+            </a>
+          ))}
+        </div>
+      </nav>
     </header>
   );
 };
