@@ -80,6 +80,9 @@ const STICKER_TEXT: Record<StickerLang, {
 
 const STICKER_YELLOW = '#FFED00';
 
+/** Transport tag: the QR's outer frame width as a share of the tag's width. */
+const QR_WIDTH_RATIO = 0.65;
+
 /**
  * Draws the "SCAN CONNECT" wordmark as text (no logo image) with a
  * "CONNECTING SOLUTION" subtitle beneath it, so the sticker doesn't depend on
@@ -578,11 +581,26 @@ function drawBrandedQrCanvasStacked(
 
   const pad = Math.round(width * 0.07);
 
-  // Top section (white) height is a fixed share of the total — sized to
-  // comfortably fit the wordmark + a 2-3 line headline + subline, leaving the
-  // rest of the tag for the yellow QR section, matching the reference design's
-  // proportions (roughly 40% text / 60% QR panel).
-  const topHeight = Math.round(height * 0.4);
+  const isHindi = opts.lang === 'hi';
+  const sublineFontSizeFitted = Math.round(width * 0.05 * (isHindi ? 0.5 : 0.6));
+
+  // The QR is a fixed share of the tag's width, so the yellow section is sized
+  // bottom-up: QR + the icon row and caption beneath it (kept small and tightly
+  // packed) + margins. The white top section gets whatever height remains for
+  // the wordmark, headline and subline.
+  const captionFontSize = sublineFontSizeFitted;
+  const iconSize = width * 0.06;
+  ctx.font = `bold ${captionFontSize}px sans-serif`;
+  const captionLines = wrapText(ctx, text.iconCaption, width - pad);
+  const captionBlockHeight = (captionLines.length - 1) * captionFontSize * 1.3 + captionFontSize * 0.3;
+  // Distance from the QR frame's bottom edge to the icon row's center, and from
+  // the icon row's center to the caption's first baseline — both kept tight.
+  const iconCenterOffset = pad * 0.35 + iconSize / 2;
+  const captionBaselineOffset = iconSize / 2 + captionFontSize * 1.25;
+  const belowQrReservedHeight = pad * 0.1 + iconCenterOffset + captionBaselineOffset + captionBlockHeight + pad * 0.35;
+  const qrTopMargin = pad * 0.5;
+  const qrOuterSize = width * QR_WIDTH_RATIO;
+  const topHeight = Math.round(height - qrTopMargin - qrOuterSize - belowQrReservedHeight);
 
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, width, topHeight);
@@ -590,30 +608,29 @@ function drawBrandedQrCanvasStacked(
   const contentMaxWidth = width - pad * 2;
   // Smaller than the side-by-side layout's logo — the transport tag's tall
   // portrait canvas otherwise renders the wordmark oversized relative to the
-  // headline below it.
-  const wordmarkHeight = drawWordmark(ctx, pad, pad * 0.8, contentMaxWidth, 0.55, contentMaxWidth);
+  // headline below it. Kept compact so the freed vertical room goes to a
+  // bigger headline.
+  const wordmarkHeight = drawWordmark(ctx, pad, pad * 0.55, contentMaxWidth, 0.42, contentMaxWidth);
 
   ctx.textAlign = 'center';
   const headlineTextColor = '#000000';
-  const isHindi = opts.lang === 'hi';
-  const sublineFontSizeFitted = Math.round(width * 0.05 * (isHindi ? 0.5 : 0.6));
   // Same gap below the logo regardless of language — wordmarkHeight is
   // already the logo's actual rendered pixel height, so there's no reason
   // for English and Hindi to leave a different amount of space beneath it.
-  const headlineTop = pad * 0.8 + wordmarkHeight * 1.25;
+  const headlineTop = pad * 0.55 + wordmarkHeight * 1.1;
 
   const displayIdFontSizeEstimate = Math.round(sublineFontSizeFitted * 0.8);
   const displayIdReservedHeight = opts.displayId ? displayIdFontSizeEstimate * 1.35 : 0;
   ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
   const sublineLineCountEstimate = wrapText(ctx, text.subline, contentMaxWidth).length;
   const headlineMaxHeight =
-    topHeight - headlineTop - pad * 0.6 - sublineFontSizeFitted * 1.35 * sublineLineCountEstimate -
+    topHeight - headlineTop - pad * 0.3 - sublineFontSizeFitted * 1.35 * sublineLineCountEstimate -
     displayIdReservedHeight;
 
   const headlineFontFamily = isHindi ? 'sans-serif' : "'Poppins', sans-serif";
   const headlineFontWeight = isHindi ? '900' : '800';
   const headlineLineHeightMult = isHindi ? 1.05 : 1.15;
-  let headlineFontSize = Math.round(width * (isHindi ? 0.085 : 0.1));
+  let headlineFontSize = Math.round(width * (isHindi ? 0.105 : 0.125));
   let headlineLines: { text: string; startWordIndex: number; wordCount: number }[] = [];
   let headlineLineHeight = 0;
   while (headlineFontSize > 10) {
@@ -653,7 +670,7 @@ function drawBrandedQrCanvasStacked(
     headlineY += headlineLineHeight;
   }
 
-  const sublineAvailableHeight = topHeight - pad * 0.6 - headlineY;
+  const sublineAvailableHeight = topHeight - pad * 0.3 - headlineY;
   let sublineFontSize = sublineFontSizeFitted;
   let sublineLines = wrapText(ctx, text.subline, contentMaxWidth);
   while (sublineFontSize > 8) {
@@ -686,19 +703,6 @@ function drawBrandedQrCanvasStacked(
   ctx.fillStyle = STICKER_YELLOW;
   ctx.fillRect(0, topHeight, width, bottomHeight);
 
-  const captionFontSize = sublineFontSizeFitted;
-  const iconSize = width * 0.075;
-  ctx.font = `bold ${captionFontSize}px sans-serif`;
-  const captionMaxWidth = width - pad;
-  const captionLines = wrapText(ctx, text.iconCaption, captionMaxWidth);
-  const captionBlockHeight = captionLines.length * captionFontSize * 1.3;
-  // Vertical budget below the QR frame: gap to icon row + icon row height +
-  // gap to caption + the caption text block + a bottom margin matching `pad`.
-  const belowQrReservedHeight = pad * 0.9 + iconSize * 1.5 + captionBlockHeight + pad * 0.5;
-
-  const qrTopMargin = pad * 0.7;
-  const qrAvailableHeight = bottomHeight - qrTopMargin - belowQrReservedHeight;
-  const qrOuterSize = Math.min(width - pad * 2, qrAvailableHeight);
   const qrFramePad = qrOuterSize * 0.018;
   const qrBoxSize = qrOuterSize - qrFramePad * 2;
   const qrX = (width - qrOuterSize) / 2 + qrFramePad;
@@ -723,7 +727,7 @@ function drawBrandedQrCanvasStacked(
   ctx.drawImage(qrImage, qrX, qrY, qrBoxSize, qrBoxSize);
   ctx.restore();
 
-  const iconRowY = qrY + qrBoxSize + qrFramePad * 2 + pad * 0.9;
+  const iconRowY = qrY + qrBoxSize + qrFramePad * 2 + iconCenterOffset;
   // Spread evenly across the full canvas width (as bike/car/helmet do) left
   // large gaps between icons on the transport tag's much wider canvas — a
   // fixed, compact gap keeps them clustered together instead.
@@ -738,7 +742,7 @@ function drawBrandedQrCanvasStacked(
   ctx.fillStyle = '#1B1C1C';
   ctx.textAlign = 'center';
   ctx.font = `bold ${captionFontSize}px sans-serif`;
-  let captionY = iconRowY + iconSize * 1.5;
+  let captionY = iconRowY + captionBaselineOffset;
   for (const line of captionLines) {
     ctx.fillText(line, width / 2, captionY);
     captionY += captionFontSize * 1.3;
