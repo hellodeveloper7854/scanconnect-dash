@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, MessageCircle, ShieldAlert, Menu, X } from 'lucide-react';
+import { Phone, PhoneCall, MessageCircle, ShieldAlert, Menu, X } from 'lucide-react';
 import logo from '../assets/images/logo.png';
 
 export type CallTarget = { kind: 'owner' } | { kind: 'contact'; index: number };
@@ -60,20 +60,30 @@ export const ScanHeader: React.FC = () => {
   );
 };
 
-/** An Indian-style HSRP number plate: white face, black border, blue IND strip with tricolor flag, monospace plate text. */
+/** An Indian-style HSRP number plate: navy IND strip across the top, tricolor flag strip on the left, light monospace plate text. */
 const PlateGraphic: React.FC<{ registration: string }> = ({ registration }) => (
-  <div className="inline-flex rounded-[3px] border-2 border-[#1B1C1C] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.15)] bg-white">
-    <div className="bg-[#0B1F51] flex flex-col items-center justify-center gap-0.5 px-1.5 py-1">
-      <svg viewBox="0 0 24 16" className="w-4 h-3 shrink-0" xmlns="http://www.w3.org/2000/svg">
-        <rect width="24" height="5.33" y="0" fill="#FF9933" />
-        <rect width="24" height="5.33" y="5.33" fill="#FFFFFF" />
-        <rect width="24" height="5.34" y="10.66" fill="#138808" />
-        <circle cx="12" cy="8" r="2" fill="none" stroke="#000080" strokeWidth="0.3" />
-      </svg>
-      <span className="text-[6px] font-black text-white leading-none tracking-wide">IND</span>
+  <div className="flex flex-col w-full rounded-md border border-[#9CA3AF] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.12)] bg-white">
+    <div className="bg-[#1E2A78] h-[18px] flex items-center justify-center">
+      <span className="text-[10px] font-semibold text-white leading-none tracking-[0.12em]">IND</span>
     </div>
-    <div className="bg-white px-3 py-1.5 flex items-center">
-      <span className="font-mono font-black text-lg text-[#1B1C1C] tracking-widest">{registration}</span>
+    <div className="flex items-stretch">
+      <div className="relative w-6 shrink-0 flex flex-col">
+        <div className="flex-1 bg-[#FF9933]" />
+        <div className="flex-1 bg-white" />
+        <div className="flex-1 bg-[#138808]" />
+        <svg viewBox="0 0 24 24" className="absolute left-1/2 top-1/2 w-[18px] h-[18px] -translate-x-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg">
+          <g fill="none" stroke="#1E2A78">
+            <circle cx="12" cy="12" r="10.5" strokeWidth="1.5" />
+            <circle cx="12" cy="12" r="1.6" fill="#1E2A78" strokeWidth="0" />
+            {Array.from({ length: 24 }).map((_, i) => (
+              <line key={i} x1="12" y1="12" x2="12" y2="2" strokeWidth="0.8" transform={`rotate(${i * 15} 12 12)`} />
+            ))}
+          </g>
+        </svg>
+      </div>
+      <div className="relative bg-white flex-1 pl-3 pr-4 py-3 flex items-center justify-center">
+        <span className="font-mono font-normal text-[32px] leading-none text-[#2B2B2B] tracking-[0.08em] whitespace-pre">{registration}</span>
+      </div>
     </div>
   </div>
 );
@@ -118,14 +128,15 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({ label, owner, ve
       <ScanHeader />
 
       <div className="max-w-md mx-auto px-4 py-5 space-y-4">
-        <div className="text-center space-y-0.5">
-          <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C] tracking-tight">Contact Vehicle Owner</h1>
-          <p className="text-[11px] font-semibold text-[#B0AA9E] uppercase tracking-wide">{label}</p>
-        </div>
+        <p className="text-center text-[11px] font-semibold text-[#B0AA9E] uppercase tracking-wide">{label}</p>
 
         {vehicle && (
-          <div className="bg-white rounded-2xl p-4 flex flex-col items-center gap-2 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-            <PlateGraphic registration={vehicle.nickname ? vehicle.registration : vehicle.registration} />
+          <div className="bg-white rounded-2xl border border-[#D1D5DB] p-4 space-y-3">
+            <h1 className="flex items-center gap-2 text-base font-normal text-[#374151]">
+              Contact vehicle owner
+              <PhoneCall className="w-5 h-5 text-[#374151]" strokeWidth={1.5} />
+            </h1>
+            <PlateGraphic registration={vehicle.registration} />
             {(vehicle.nickname || vehicleSubtitle) && (
               <p className="text-xs font-semibold text-[#5F5E5E]">
                 {[vehicle.nickname, vehicleSubtitle].filter(Boolean).join(' · ')}
