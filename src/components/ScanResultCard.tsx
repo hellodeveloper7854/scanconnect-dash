@@ -88,32 +88,54 @@ const PlateGraphic: React.FC<{ registration: string }> = ({ registration }) => (
   </div>
 );
 
-const MethodCards: React.FC<{ onChoose: (method: 'call' | 'message') => void }> = ({ onChoose }) => (
-  <div className="grid grid-cols-2 gap-3">
-    <button
-      type="button"
-      onClick={() => onChoose('call')}
-      className="p-4 bg-[#FFFCEB] border border-[#F2CC0C]/50 rounded-2xl flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#F2CC0C] hover:shadow-md active:scale-[0.98] transition-all"
-    >
-      <div className="w-11 h-11 rounded-full bg-[#FFED00] flex items-center justify-center">
-        <Phone className="w-5 h-5 text-[#1B1C1C]" />
+const BOX = 'h-[132px] p-4 rounded-2xl flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all';
+
+const MethodCards: React.FC<{
+  onChoose?: (method: 'call' | 'message') => void;
+  onEmergency?: () => void;
+  emergencyHref?: string;
+  emergencySubtitle?: string;
+}> = ({ onChoose, onEmergency, emergencyHref, emergencySubtitle }) => {
+  const emergencyBody = (
+    <>
+      <div className="w-11 h-11 rounded-full bg-[#D6272C] flex items-center justify-center">
+        <ShieldAlert className="w-5 h-5 text-white" />
       </div>
-      <span className="font-bold text-sm text-[#1B1C1C]">Masked Call</span>
-      <span className="text-[11px] text-[#9A8B00]">90 sec · private</span>
-    </button>
-    <button
-      type="button"
-      onClick={() => onChoose('message')}
-      className="p-4 bg-[#EFFBF4] border border-[#25D366]/30 rounded-2xl flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#25D366] hover:shadow-md active:scale-[0.98] transition-all"
-    >
-      <div className="w-11 h-11 rounded-full bg-[#25D366] flex items-center justify-center">
-        <MessageCircle className="w-5 h-5 text-white" />
-      </div>
-      <span className="font-bold text-sm text-[#1B1C1C]">Message</span>
-      <span className="text-[11px] text-[#1A8754]">WhatsApp style</span>
-    </button>
-  </div>
-);
+      <span className="font-bold text-sm text-[#1B1C1C] text-center leading-tight">Emergency Family Contact</span>
+      <span className="text-[11px] text-[#B01E23]">{emergencySubtitle}</span>
+    </>
+  );
+  const emergencyClass = `${BOX} col-span-2 justify-self-center w-[calc(50%-6px)] bg-[#FFF1F1] border border-[#D6272C]/30 hover:border-[#D6272C]`;
+
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      {onChoose && (
+        <>
+          <button type="button" onClick={() => onChoose('call')} className={`${BOX} bg-[#FFFCEB] border border-[#F2CC0C]/50 hover:border-[#F2CC0C]`}>
+            <div className="w-11 h-11 rounded-full bg-[#FFED00] flex items-center justify-center">
+              <Phone className="w-5 h-5 text-[#1B1C1C]" />
+            </div>
+            <span className="font-bold text-sm text-[#1B1C1C]">Masked Call</span>
+            <span className="text-[11px] text-[#9A8B00]">90 sec · private</span>
+          </button>
+          <button type="button" onClick={() => onChoose('message')} className={`${BOX} bg-[#EFFBF4] border border-[#25D366]/30 hover:border-[#25D366]`}>
+            <div className="w-11 h-11 rounded-full bg-[#25D366] flex items-center justify-center">
+              <MessageCircle className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-bold text-sm text-[#1B1C1C]">WhatsApp</span>
+            <span className="text-[11px] text-[#1A8754]">Private & secure</span>
+          </button>
+        </>
+      )}
+      {onEmergency && (
+        <button type="button" onClick={onEmergency} className={emergencyClass}>{emergencyBody}</button>
+      )}
+      {emergencyHref && (
+        <a href={emergencyHref} className={emergencyClass}>{emergencyBody}</a>
+      )}
+    </div>
+  );
+};
 
 export const ScanResultCard: React.FC<ScanResultCardProps> = ({ label, owner, vehicle, emergencyContacts, onChooseMethod }) => {
   const primaryContact = emergencyContacts[0];
@@ -149,50 +171,24 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({ label, owner, ve
           <p className="text-xs font-bold text-[#5D5F5F]">How would you like to reach the owner?</p>
 
           {onChooseMethod ? (
-            <MethodCards onChoose={(method) => onChooseMethod({ kind: 'owner' }, method)} />
+            <MethodCards
+              onChoose={(method) => onChooseMethod({ kind: 'owner' }, method)}
+              onEmergency={primaryContact ? () => onChooseMethod({ kind: 'contact', index: contactIndex }, 'call') : undefined}
+              emergencySubtitle={primaryContact?.role ?? 'Call family'}
+            />
           ) : (
-            owner.mobileNumber && (
-              <a href={`tel:${owner.mobileNumber}`} className="flex items-center gap-2 text-[#5F5E5E] hover:underline text-sm">
-                <Phone className="w-4 h-4 text-[#1B1C1C]" />
-                {owner.mobileNumber}
-              </a>
-            )
+            <>
+              {owner.mobileNumber && (
+                <a href={`tel:${owner.mobileNumber}`} className="flex items-center gap-2 text-[#5F5E5E] hover:underline text-sm">
+                  <Phone className="w-4 h-4 text-[#1B1C1C]" />
+                  {owner.mobileNumber}
+                </a>
+              )}
+              {primaryContact?.phone && (
+                <MethodCards emergencyHref={`tel:${primaryContact.phone}`} emergencySubtitle={primaryContact.role ?? 'Call family'} />
+              )}
+            </>
           )}
-        </div>
-
-        <div className="rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-          <div className="w-full bg-gradient-to-r from-[#D6272C] to-[#B01E23] px-4 py-3.5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center shrink-0">
-              <ShieldAlert className="w-5.5 h-5.5 text-white" />
-            </div>
-            <div className="text-left min-w-0 flex-1">
-              <p className="font-['Rubik'] font-extrabold text-white text-[15px]">Emergency</p>
-              <p className="text-[11px] text-white/85 truncate">Accident or family emergency? Reach the emergency contact.</p>
-            </div>
-          </div>
-
-          <div className="bg-white px-4 py-4 space-y-3">
-            {primaryContact ? (
-              <>
-                {primaryContact.role && (
-                  <p className="text-xs font-bold text-[#5D5F5F]">{primaryContact.role}</p>
-                )}
-
-                {onChooseMethod ? (
-                  <MethodCards onChoose={(method) => onChooseMethod({ kind: 'contact', index: contactIndex }, method)} />
-                ) : (
-                  primaryContact.phone && (
-                    <a href={`tel:${primaryContact.phone}`} className="flex items-center gap-2 text-[#5F5E5E] hover:underline text-sm">
-                      <Phone className="w-4 h-4 text-[#1B1C1C]" />
-                      {primaryContact.phone}
-                    </a>
-                  )
-                )}
-              </>
-            ) : (
-              <p className="text-sm text-[#9CA3AF]">No emergency contact added.</p>
-            )}
-          </div>
         </div>
 
         <div className="bg-[#1B1C1C] rounded-2xl px-4 py-3.5 space-y-1">
