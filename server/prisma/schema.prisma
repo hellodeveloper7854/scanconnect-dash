@@ -123,6 +123,10 @@ model QrCode {
   previousStatus QrCodeStatus?
   batchId        String
   batchName      String
+  /// Admin-only note of who this batch was issued/assigned to. Stored on every
+  /// row of the batch (like batchName), editable per batch, and never printed
+  /// on the QR sticker.
+  issuedTo       String?
   batchCreatedAt DateTime      @default(now())
   vehicleId      String?       @unique
   vehicle        Vehicle?      @relation(fields: [vehicleId], references: [id], onDelete: SetNull)

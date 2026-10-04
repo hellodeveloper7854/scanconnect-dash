@@ -77,6 +77,7 @@ adminQrCodesRouter.use(requireAuth, requireAdmin);
 const bulkCreateSchema = z.object({
   quantity: z.number().int().min(1).max(5000),
   name: z.string().min(1).max(120),
+  issuedTo: z.string().trim().max(120).optional(),
 });
 
 adminQrCodesRouter.post('/bulk', async (req, res) => {
@@ -86,6 +87,7 @@ adminQrCodesRouter.post('/bulk', async (req, res) => {
   }
 
   const { quantity, name } = parsed.data;
+  const issuedTo = parsed.data.issuedTo || null;
   const batchId = randomUUID();
   const batchCreatedAt = new Date();
 
@@ -101,7 +103,7 @@ adminQrCodesRouter.post('/bulk', async (req, res) => {
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
       await prisma.qrCode.createMany({
-        data: rows.map((r) => ({ id: r.id, code: r.code, batchSeq: r.batchSeq, batchId, batchName: name, batchCreatedAt })),
+        data: rows.map((r) => ({ id: r.id, code: r.code, batchSeq: r.batchSeq, batchId, batchName: name, issuedTo, batchCreatedAt })),
       });
       return res.status(201).json({ batchId, batchName: name, quantity, codes: rows });
     } catch (err) {
@@ -203,6 +205,7 @@ async function buildQrCodeWhere(query: Record<string, unknown>): Promise<Prisma.
       ? {
           OR: [
             { batchName: { contains: name, mode: 'insensitive' } },
+            { issuedTo: { contains: name, mode: 'insensitive' } },
             { code: { contains: name, mode: 'insensitive' } },
             ...(idSearchWhere ? [idSearchWhere] : []),
           ],
@@ -238,7 +241,7 @@ adminQrCodesRouter.get('/', async (req, res) => {
     }),
     prisma.qrCode.count({ where }),
     prisma.qrCode.groupBy({
-      by: ['batchId', 'batchName', 'batchCreatedAt'],
+      by: ['batchId', 'batchName', 'issuedTo', 'batchCreatedAt'],
       where: { deletedAt: null },
       _count: { _all: true },
       orderBy: { batchCreatedAt: 'desc' },
@@ -255,6 +258,7 @@ adminQrCodesRouter.get('/', async (req, res) => {
   const batches = batchGroups.map((b) => ({
     batchId: b.batchId,
     batchName: b.batchName,
+    issuedTo: b.issuedTo,
     batchCreatedAt: b.batchCreatedAt,
     total: b._count._all,
     activated: activatedByBatch.get(b.batchId) ?? 0,

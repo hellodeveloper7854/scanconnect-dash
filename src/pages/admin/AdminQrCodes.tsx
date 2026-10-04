@@ -78,6 +78,7 @@ export interface QrCodeRow {
   status: 'INACTIVE' | 'ACTIVE' | 'DISABLED';
   batchId: string;
   batchName: string;
+  issuedTo?: string | null;
   createdAt: string;
   activatedAt: string | null;
   deletedAt?: string | null;
@@ -91,6 +92,7 @@ export interface QrCodeRow {
 interface BatchSummary {
   batchId: string;
   batchName: string;
+  issuedTo?: string | null;
   batchCreatedAt: string;
   total: number;
   activated: number;
@@ -134,6 +136,7 @@ export const AdminQrCodes: React.FC = () => {
   const [dateTo, setDateTo] = useState('');
   const [quantity, setQuantity] = useState(100);
   const [batchName, setBatchName] = useState('');
+  const [issuedTo, setIssuedTo] = useState('');
   const [batchNameTouched, setBatchNameTouched] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloadingZip, setIsDownloadingZip] = useState(false);
@@ -192,9 +195,11 @@ export const AdminQrCodes: React.FC = () => {
       const res = await api.post<{ batchId: string; quantity: number }>('/api/admin/qr-codes/bulk', {
         quantity,
         name: batchName.trim(),
+        issuedTo: issuedTo.trim() || undefined,
       });
       setBatchFilter(res.batchId);
       setBatchName('');
+      setIssuedTo('');
       setBatchNameTouched(false);
       load();
     } catch (err) {
@@ -371,6 +376,17 @@ export const AdminQrCodes: React.FC = () => {
           )}
         </div>
         <div className="space-y-1">
+          <label className="text-xs font-bold text-white/50 uppercase">Issued To / Assigned To</label>
+          <input
+            type="text"
+            value={issuedTo}
+            onChange={(e) => setIssuedTo(e.target.value)}
+            maxLength={120}
+            placeholder="e.g. Rahul Sharma (optional)"
+            className="w-56 h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
+          />
+        </div>
+        <div className="space-y-1">
           <label className="text-xs font-bold text-white/50 uppercase">Quantity</label>
           <input
             type="number"
@@ -400,7 +416,7 @@ export const AdminQrCodes: React.FC = () => {
             <input
               value={nameFilter}
               onChange={(e) => setNameFilter(e.target.value)}
-              placeholder="Batch name, ID, or code"
+              placeholder="Batch, issued to, ID, or code"
               className="pl-9 pr-3 h-10 bg-white/10 border border-white/10 text-white text-sm rounded-md w-56 focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
             />
           </div>
@@ -423,7 +439,7 @@ export const AdminQrCodes: React.FC = () => {
           <option value="" className="bg-neutral-900 text-white">All batches</option>
           {batches.map((b) => (
             <option key={b.batchId} value={b.batchId} className="bg-neutral-900 text-white">
-              {b.batchName} — {new Date(b.batchCreatedAt).toLocaleDateString()} — {b.activated}/{b.total} activated
+              {b.batchName}{b.issuedTo ? ` (${b.issuedTo})` : ''} — {new Date(b.batchCreatedAt).toLocaleDateString()} — {b.activated}/{b.total} activated
             </option>
           ))}
         </select>
@@ -512,6 +528,7 @@ export const AdminQrCodes: React.FC = () => {
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Vehicle Owner</th>
                 <th className="px-4 py-3">Batch</th>
+                <th className="px-4 py-3">Issued To</th>
                 <th className="px-4 py-3">Created</th>
                 <th className="px-4 py-3">Activated</th>
                 <th className="px-4 py-3"></th>
@@ -548,6 +565,9 @@ export const AdminQrCodes: React.FC = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 text-white/70 text-xs">{c.batchName}</td>
+                  <td className="px-4 py-3 text-white/70 text-xs">
+                    {c.issuedTo || <span className="text-white/20">—</span>}
+                  </td>
                   <td className="px-4 py-3 text-white/50 text-xs">{new Date(c.createdAt).toLocaleDateString()}</td>
                   <td className="px-4 py-3 text-white/50 text-xs">
                     {c.activatedAt ? (
