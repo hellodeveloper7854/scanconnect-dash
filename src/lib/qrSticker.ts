@@ -583,6 +583,9 @@ function drawBrandedQrCanvasStacked(
 
   const isHindi = opts.lang === 'hi';
   const sublineFontSizeFitted = Math.round(width * 0.05 * (isHindi ? 0.5 : 0.6));
+  // The subline is set a touch smaller than the caption under the QR (which keeps
+  // sublineFontSizeFitted), freeing room for a slightly larger headline.
+  const sublineBaseSize = Math.round(sublineFontSizeFitted * 0.88);
 
   // The QR is a fixed share of the tag's width, so the yellow section is sized
   // bottom-up: QR + the icon row and caption beneath it (kept small and tightly
@@ -619,18 +622,18 @@ function drawBrandedQrCanvasStacked(
   // for English and Hindi to leave a different amount of space beneath it.
   const headlineTop = pad * 0.55 + wordmarkHeight * 1.1;
 
-  const displayIdFontSizeEstimate = Math.round(sublineFontSizeFitted * 0.8);
+  const displayIdFontSizeEstimate = Math.round(sublineBaseSize * 0.8);
   const displayIdReservedHeight = opts.displayId ? displayIdFontSizeEstimate * 1.35 : 0;
-  ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
+  ctx.font = `normal ${sublineBaseSize}px sans-serif`;
   const sublineLineCountEstimate = wrapText(ctx, text.subline, contentMaxWidth).length;
   const headlineMaxHeight =
-    topHeight - headlineTop - pad * 0.3 - sublineFontSizeFitted * 1.35 * sublineLineCountEstimate -
+    topHeight - headlineTop - pad * 0.3 - sublineBaseSize * 1.35 * sublineLineCountEstimate -
     displayIdReservedHeight;
 
   const headlineFontFamily = isHindi ? 'sans-serif' : "'Poppins', sans-serif";
   const headlineFontWeight = isHindi ? '900' : '800';
   const headlineLineHeightMult = isHindi ? 1.05 : 1.15;
-  let headlineFontSize = Math.round(width * (isHindi ? 0.105 : 0.125));
+  let headlineFontSize = Math.round(width * (isHindi ? 0.115 : 0.138));
   let headlineLines: { text: string; startWordIndex: number; wordCount: number }[] = [];
   let headlineLineHeight = 0;
   while (headlineFontSize > 10) {
@@ -671,7 +674,7 @@ function drawBrandedQrCanvasStacked(
   }
 
   const sublineAvailableHeight = topHeight - pad * 0.3 - headlineY;
-  let sublineFontSize = sublineFontSizeFitted;
+  let sublineFontSize = sublineBaseSize;
   let sublineLines = wrapText(ctx, text.subline, contentMaxWidth);
   while (sublineFontSize > 8) {
     ctx.font = `normal ${sublineFontSize}px sans-serif`;
