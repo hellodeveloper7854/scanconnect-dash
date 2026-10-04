@@ -70,6 +70,8 @@ export const AuthedQrImage: React.FC<{
   return <img src={src} alt={alt} className={className} onLoad={onReady} />;
 };
 
+const ZIP_CONCURRENCY = 8;
+
 export interface QrCodeRow {
   id: string;
   code: string;
@@ -140,6 +142,7 @@ export const AdminQrCodes: React.FC = () => {
   const [batchNameTouched, setBatchNameTouched] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloadingZip, setIsDownloadingZip] = useState(false);
+  const [zipProgress, setZipProgress] = useState(0);
   const [error, setError] = useState('');
   const [printBatchId, setPrintBatchId] = useState<string | null>(null);
   const [printCodes, setPrintCodes] = useState<QrCodeRow[] | null>(null);
@@ -233,20 +236,31 @@ export const AdminQrCodes: React.FC = () => {
       const { codes: allCodes } = await api.get<{ codes: QrCodeRow[] }>(`/api/admin/qr-codes?${params}`);
 
       const zip = new JSZip();
-      for (const c of allCodes) {
-        const blob = await fetchBrandedQrPngBlob(
-          `${API_BASE_URL}/api/admin/qr-codes/${c.id}/qr.png`,
-          idToken,
-          { lang: stickerLang, size: stickerSize, displayId: formatQrDisplayId(c.batchName, c.batchSeq) },
-        );
-        zip.file(`qr-${c.code}-${stickerSize}-${stickerLang}.png`, blob);
-      }
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      // Render several stickers at once (fetch + canvas draw + PNG encode are
+      // mostly async/off-thread) instead of one after another.
+      let next = 0;
+      let done = 0;
+      const worker = async () => {
+        while (next < allCodes.length) {
+          const c = allCodes[next++];
+          const blob = await fetchBrandedQrPngBlob(
+            `${API_BASE_URL}/api/admin/qr-codes/${c.id}/qr.png`,
+            idToken,
+            { lang: stickerLang, size: stickerSize, displayId: formatQrDisplayId(c.batchName, c.batchSeq) },
+          );
+          zip.file(`qr-${c.code}-${stickerSize}-${stickerLang}.png`, blob);
+          setZipProgress(++done);
+        }
+      };
+      await Promise.all(Array.from({ length: Math.min(ZIP_CONCURRENCY, allCodes.length) }, worker));
+      // PNGs are already compressed — STORE skips a slow, pointless DEFLATE pass.
+      const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'STORE', streamFiles: true });
       triggerBlobDownload(zipBlob, `qr-codes-${stickerSize}-${stickerLang}-${Date.now()}.zip`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to download ZIP');
     } finally {
       setIsDownloadingZip(false);
+      setZipProgress(0);
     }
   };
 
@@ -478,7 +492,7 @@ export const AdminQrCodes: React.FC = () => {
           className="inline-flex items-center gap-1.5 h-10 px-4 bg-[#FFED00]/15 hover:bg-[#FFED00]/25 text-[#FFED00] text-xs font-bold rounded-md cursor-pointer disabled:opacity-50"
           title="Download every QR code matching the current filters as a ZIP of PNGs"
         >
-          <FileArchive className="w-3.5 h-3.5" /> {isDownloadingZip ? 'Zipping...' : `Download ZIP (${total})`}
+          <FileArchive className="w-3.5 h-3.5" /> {isDownloadingZip ? `Zipping... ${zipProgress}/${total}` : `Download ZIP (${total})`}
         </button>
         {batchFilter && (
           <>
