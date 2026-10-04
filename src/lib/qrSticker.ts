@@ -598,8 +598,9 @@ function drawBrandedQrCanvasStacked(
   const captionBlockHeight = (captionLines.length - 1) * captionFontSize * 1.3 + captionFontSize * 0.3;
   // Distance from the QR frame's bottom edge to the icon row's center, and from
   // the icon row's center to the caption's first baseline — both kept tight.
-  const iconCenterOffset = pad * 0.35 + iconSize / 2;
-  const captionBaselineOffset = iconSize / 2 + captionFontSize * 1.25;
+  const iconCenterOffset = pad * 0.25 + iconSize / 2;
+  // Extra breathing room between the icons and the caption's first line.
+  const captionBaselineOffset = iconSize / 2 + captionFontSize * 1.9;
   const belowQrReservedHeight = pad * 0.1 + iconCenterOffset + captionBaselineOffset + captionBlockHeight + pad * 0.35;
   const qrTopMargin = pad * 0.5;
   const qrOuterSize = width * QR_WIDTH_RATIO;
