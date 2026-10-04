@@ -120,14 +120,14 @@ const PlateGraphic: React.FC<{ registration: string }> = ({ registration }) => (
 const BOX = 'h-[132px] p-4 rounded-2xl flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all';
 const CALL_BOX = `${BOX} bg-[#FFFCEB] border border-[#F2CC0C]/50 hover:border-[#F2CC0C]`;
 const WHATSAPP_BOX = `${BOX} bg-[#EFFBF4] border border-[#25D366]/30 hover:border-[#25D366]`;
-const EMERGENCY_BOX = `${BOX} col-span-2 justify-self-center w-[calc(50%-6px)] bg-[#FFF1F1] border border-[#D6272C]/30 hover:border-[#D6272C]`;
+const EMERGENCY_BOX = `${BOX} col-span-2 justify-self-center w-3/4 bg-[#FFF1F1] border border-[#D6272C]/30 hover:border-[#D6272C]`;
 
 const callBody = (
   <>
     <div className="w-11 h-11 rounded-full bg-[#FFED00] flex items-center justify-center">
       <Phone className="w-5 h-5 text-[#1B1C1C]" />
     </div>
-    <span className="font-bold text-sm text-[#1B1C1C]">Masked Call</span>
+    <span className="font-bold text-sm text-[#1B1C1C]">Call Vehicle Owner</span>
     <span className="text-[11px] text-[#9A8B00]">90 sec · private</span>
   </>
 );
@@ -164,7 +164,7 @@ const MethodCards: React.FC<{
         <div className="w-11 h-11 rounded-full bg-[#D6272C] flex items-center justify-center">
           <ShieldAlert className="w-5 h-5 text-white" />
         </div>
-        <span className="font-bold text-sm text-[#1B1C1C] text-center leading-tight">Emergency Family Contact</span>
+        <span className="font-bold text-sm text-[#1B1C1C] text-center leading-tight whitespace-nowrap">Emergency Family Contact</span>
         <span className="text-[11px] text-[#B01E23]">{emergencySubtitle}</span>
       </button>
     )}
