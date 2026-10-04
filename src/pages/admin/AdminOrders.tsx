@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { QrCode } from 'lucide-react';
+import { QrCode, Download } from 'lucide-react';
 import { api } from '../../lib/api';
+import { auth } from '../../lib/firebase';
+import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize } from '../../lib/qrSticker';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -10,6 +12,8 @@ interface OrderRow {
   totalInPaise: number;
   createdAt: string;
   qrToken: string | null;
+  stickerLanguage: 'en' | 'hi';
+  tags: { id: string; size: StickerSize; sequence: number; qrToken: string }[];
   user: { fullName: string; email: string; mobileNumber: string | null };
   items: { quantity: number; product: { name: string } }[];
   vehicle: { registration: string; nickname: string | null } | null;
@@ -80,6 +84,7 @@ export const AdminOrders: React.FC = () => {
                 <th className="px-4 py-3">Order</th>
                 <th className="px-4 py-3">Customer</th>
                 <th className="px-4 py-3">Items</th>
+                <th className="px-4 py-3">Language</th>
                 <th className="px-4 py-3">Vehicle</th>
                 <th className="px-4 py-3">Emergency Contact</th>
                 <th className="px-4 py-3">Total</th>
@@ -98,6 +103,9 @@ export const AdminOrders: React.FC = () => {
                   </td>
                   <td className="px-4 py-3 text-white/70">
                     {order.items.map((i) => `${i.product.name} x${i.quantity}`).join(', ')}
+                  </td>
+                  <td className="px-4 py-3 text-white/70">
+                    {order.stickerLanguage === 'hi' ? 'हिन्दी (Hindi)' : 'English'}
                   </td>
                   <td className="px-4 py-3 text-white/70">
                     {order.vehicle ? (
@@ -139,7 +147,29 @@ export const AdminOrders: React.FC = () => {
                     {new Date(order.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3">
-                    {order.qrToken ? (
+                    {order.tags.length > 0 && (
+                      <div className="space-y-1">
+                        {order.tags.map((tag) => (
+                          <button
+                            key={tag.id}
+                            onClick={async () => {
+                              const idToken = await auth.currentUser?.getIdToken();
+                              const blob = await fetchBrandedQrPngBlob(
+                                `${API_BASE_URL}/api/order-contact/${tag.qrToken}/qr.png`,
+                                idToken,
+                                { lang: order.stickerLanguage, size: tag.size },
+                              );
+                              triggerBlobDownload(blob, `scanconnect-qr-${order.id.slice(0, 8)}-${tag.sequence}.png`);
+                            }}
+                            className="flex items-center gap-1.5 text-xs font-bold text-[#FFED00] hover:underline cursor-pointer"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            Tag {tag.sequence} ({tag.size})
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {order.tags.length > 0 ? null : order.qrToken ? (
                       <button
                         onClick={() => setPreviewToken(order.qrToken)}
                         className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FFED00] hover:underline cursor-pointer"

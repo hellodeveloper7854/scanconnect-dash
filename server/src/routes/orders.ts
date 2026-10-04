@@ -27,6 +27,7 @@ const createOrderSchema = z.object({
   items: z.array(z.object({ productId: z.string().uuid(), quantity: z.number().int().min(1) })).min(1),
   shipping: shippingSchema,
   couponCode: z.string().trim().min(1).max(40).optional(),
+  stickerLanguage: z.enum(['en', 'hi']).default('en'),
 });
 
 /**
@@ -239,6 +240,7 @@ ordersRouter.post('/', requireAuth, async (req, res) => {
       shippingCity: shipping.city,
       shippingPincode: shipping.pincode,
       shippingAddress: shipping.address,
+      stickerLanguage: parsed.data.stickerLanguage,
     },
     include: { items: true },
   });

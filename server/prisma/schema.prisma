@@ -289,6 +289,9 @@ model Order {
   shippingCity        String?
   shippingPincode     String?
   shippingAddress     String?
+  /// Language ('en' | 'hi') the customer chose on the product page for the
+  /// printed QR sticker text — used when downloading each tag's sticker.
+  stickerLanguage     String            @default("en")
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 

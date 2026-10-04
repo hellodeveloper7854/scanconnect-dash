@@ -1,0 +1,1 @@
+ALTER TABLE "Order" ADD COLUMN "stickerLanguage" TEXT NOT NULL DEFAULT 'en';

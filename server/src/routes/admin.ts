@@ -120,6 +120,7 @@ adminRouter.get('/orders', async (req, res) => {
         items: { include: { product: true } },
         vehicle: true,
         emergencyContact: true,
+        tags: { select: { id: true, size: true, sequence: true, qrToken: true }, orderBy: { sequence: 'asc' } },
       },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * pageSize,
@@ -381,12 +382,13 @@ adminRouter.get('/reports/orders.csv', async (_req, res) => {
     id: o.id,
     userEmail: o.user.email,
     status: o.status,
+    stickerLanguage: o.stickerLanguage,
     totalInPaise: o.totalInPaise,
     razorpayOrderId: o.razorpayOrderId,
     razorpayPaymentId: o.razorpayPaymentId,
     createdAt: o.createdAt.toISOString(),
   }));
-  const csv = toCsv(rows, ['id', 'userEmail', 'status', 'totalInPaise', 'razorpayOrderId', 'razorpayPaymentId', 'createdAt']);
+  const csv = toCsv(rows, ['id', 'userEmail', 'status', 'stickerLanguage', 'totalInPaise', 'razorpayOrderId', 'razorpayPaymentId', 'createdAt']);
   sendCsv(res, 'orders.csv', csv);
 });
 

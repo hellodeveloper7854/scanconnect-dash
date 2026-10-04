@@ -30,6 +30,7 @@ interface OrderRow {
   totalInPaise: number;
   createdAt: string;
   qrToken: string | null;
+  stickerLanguage?: 'en' | 'hi';
   tags: OrderTagRow[];
   items: { quantity: number; product: { name: string } }[];
 }
@@ -168,7 +169,7 @@ export const MyOrdersScreen: React.FC<MyOrdersScreenProps> = ({ userData, onLogo
                               const blob = await fetchBrandedQrPngBlob(
                                 `${API_BASE_URL}/api/order-contact/${tag.qrToken}/qr.png`,
                                 idToken,
-                                { lang: 'en', size: tag.size },
+                                { lang: order.stickerLanguage ?? 'en', size: tag.size },
                               );
                               triggerBlobDownload(blob, `scanconnect-qr-${order.id.slice(0, 8)}-${tag.sequence}.png`);
                             }}

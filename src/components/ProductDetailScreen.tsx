@@ -56,6 +56,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   const [activeNav, setActiveNav] = useState('Shop');
   const [activeTab, setActiveTab] = useState<'how' | 'security' | 'reviews'>('reviews');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [stickerLang, setStickerLang] = useState<'en' | 'hi'>('en');
   const reviewsTrackRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -173,6 +174,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
         onNavigate={onNavigate}
         isLoggedIn={isLoggedIn}
         onBackToProduct={closeCheckout}
+        stickerLang={stickerLang}
         product={{
           id: product?.id || 1,
           title: productTitle,
@@ -311,6 +313,30 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
                   <Award className="w-[18px] h-[18px] text-[#676000] shrink-0" />
                   <span>1-Year Warranty</span>
                 </div>
+              </div>
+            </div>
+
+            {/* QR sticker language — decides which language the downloaded QR sticker is printed in */}
+            <div className="space-y-[12px]">
+              <span className="font-['Hanken_Grotesk'] font-bold text-[12px] leading-[12px] tracking-[1.2px] text-[#5F5E5E] uppercase block">
+                QR STICKER LANGUAGE
+              </span>
+              <div className="flex gap-[8px]">
+                {([['en', 'English'], ['hi', 'हिन्दी (Hindi)']] as const).map(([code, label]) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => setStickerLang(code)}
+                    aria-pressed={stickerLang === code}
+                    className={`flex-1 h-[44px] rounded-[8px] border font-['Hanken_Grotesk'] font-semibold text-[15px] cursor-pointer transition-all ${
+                      stickerLang === code
+                        ? 'bg-[#FFED00] border-[#1B1C1C] text-[#1B1C1C]'
+                        : 'bg-white border-[#CCC7AA] text-[#5F5E5E] hover:border-[#1B1C1C]'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             </div>
 

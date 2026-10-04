@@ -4,7 +4,7 @@ import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { api, ApiError } from '../lib/api';
 import { auth } from '../lib/firebase';
-import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize } from '../lib/qrSticker';
+import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize, type StickerLang } from '../lib/qrSticker';
 import { PhoneInput } from './PhoneInput';
 import { toBare10DigitPhone, isValidPhone, isValidName } from '../lib/validation';
 import qrImage from '../assets/images/qrimage.png';
@@ -122,6 +122,7 @@ interface CheckoutFlowScreenProps {
   onNavigate: (nav: string) => void;
   isLoggedIn?: boolean;
   onBackToProduct?: () => void;
+  stickerLang?: StickerLang;
   product?: {
     id: number;
     title: string;
@@ -136,6 +137,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   onNavigate,
   isLoggedIn,
   onBackToProduct,
+  stickerLang = 'en',
   product
 }) => {
   const [activeNav, setActiveNav] = useState('Shop');
@@ -529,6 +531,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
           address: address.trim(),
         },
         couponCode: appliedCoupon?.code,
+        stickerLanguage: stickerLang,
       });
 
       const razorpay = new window.Razorpay({
@@ -1507,7 +1510,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                           const blob = await fetchBrandedQrPngBlob(
                             `${API_BASE_URL}/api/order-contact/${tag.qrToken}/qr.png`,
                             idToken,
-                            { lang: 'en', size: tag.size },
+                            { lang: stickerLang as StickerLang, size: tag.size },
                           );
                           triggerBlobDownload(blob, `scanconnect-qr-${completedOrder.id.slice(0, 8)}-${tag.sequence}.png`);
                         }}
