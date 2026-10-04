@@ -620,7 +620,9 @@ function drawBrandedQrCanvasStacked(
   // Same gap below the logo regardless of language — wordmarkHeight is
   // already the logo's actual rendered pixel height, so there's no reason
   // for English and Hindi to leave a different amount of space beneath it.
-  const headlineTop = pad * 0.55 + wordmarkHeight * 1.1;
+  // Devanagari glyphs (shirorekha + matras) reach well above the line's box, so
+  // Hindi needs extra clearance or it collides with the logo's tagline.
+  const headlineTop = pad * 0.55 + wordmarkHeight * (isHindi ? 1.35 : 1.1);
 
   const displayIdFontSizeEstimate = Math.round(sublineBaseSize * 0.8);
   const displayIdReservedHeight = opts.displayId ? displayIdFontSizeEstimate * 1.35 : 0;
@@ -632,7 +634,7 @@ function drawBrandedQrCanvasStacked(
 
   const headlineFontFamily = isHindi ? 'sans-serif' : "'Poppins', sans-serif";
   const headlineFontWeight = isHindi ? '900' : '800';
-  const headlineLineHeightMult = isHindi ? 1.05 : 1.15;
+  const headlineLineHeightMult = isHindi ? 1.25 : 1.15;
   let headlineFontSize = Math.round(width * (isHindi ? 0.115 : 0.138));
   let headlineLines: { text: string; startWordIndex: number; wordCount: number }[] = [];
   let headlineLineHeight = 0;
@@ -650,6 +652,13 @@ function drawBrandedQrCanvasStacked(
   const underlineFrom = text.headlineUnderlineFrom;
   for (const line of headlineLines) {
     ctx.fillText(line.text, width / 2, headlineY);
+    if (isHindi) {
+      // A thin same-colour outline makes the Hindi headline slightly bolder.
+      ctx.lineWidth = headlineFontSize * 0.018;
+      ctx.strokeStyle = headlineTextColor;
+      ctx.lineJoin = 'round';
+      ctx.strokeText(line.text, width / 2, headlineY);
+    }
 
     const lineEndWordIndex = line.startWordIndex + line.wordCount;
     if (lineEndWordIndex > underlineFrom) {
