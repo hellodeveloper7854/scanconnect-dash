@@ -212,27 +212,6 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       cta: 'View Product',
     },
     {
-      id: 3,
-      icon: Bike,
-      rating: '4.7/5 Customer Rating',
-      title: 'Scan Connect Bike Tag',
-      desc: 'Designed specifically for motorcycles and scooters with a compact, durable design that withstands all weather conditions.',
-      idealFor: ['Motorcycles', 'Scooters', 'Electric Two-Wheelers'],
-      features: [
-        'Privacy-Protected Calls',
-        'Instant QR Scan',
-        'Compact Weatherproof Design',
-        'UV Resistant Premium Material',
-        'Secure Call Routing',
-        'Easy Self Activation',
-        'Lifetime QR Activation',
-        'No Battery Required',
-      ],
-      size: 'Width: 3.5 in x Height: 2.2 in',
-      price: '₹399',
-      cta: 'View Product',
-    },
-    {
       id: 6,
       icon: Bike,
       badge: 'Best Value',
@@ -276,28 +255,6 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       cta: 'View Product',
     },
     {
-      id: 8,
-      icon: Truck,
-      rating: '4.7/5 Customer Rating',
-      title: 'Scan Connect Transport Tag',
-      desc: 'A larger-format tag designed for trucks, buses, and other transport vehicles that need to stay visible and reachable on the road.',
-      idealFor: ['Trucks', 'Buses', 'Commercial Transport', 'Logistics Vehicles'],
-      features: [
-        'Privacy-Protected Calls',
-        'Instant QR Scan',
-        'Large Format for High Visibility',
-        'Waterproof & Weatherproof',
-        'UV Resistant Premium Material',
-        'Secure Call Routing',
-        'Easy Self Activation',
-        'Lifetime QR Activation',
-        'No Battery Required',
-      ],
-      size: 'Width: 5.8 in x Height: 8 in',
-      price: '₹899',
-      cta: 'View Product',
-    },
-    {
       id: 4,
       icon: Truck,
       title: 'Fleet & Commercial Tags',
@@ -312,8 +269,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
       title: 'Home & Society QR Tags',
       desc: 'Enable visitors, security personnel, and neighbors to contact residents securely without exposing private phone numbers.',
       idealFor: ['Apartments', 'Villas', 'Gated Communities', 'Residential Complexes'],
-      price: '₹349',
-      cta: 'View Product',
+      price: 'Contact Us for Pricing',
+      cta: 'Contact Us',
     },
     {
       id: 9,
@@ -632,32 +589,9 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                 );
               };
 
-              const firstRow = products.slice(0, 3);
-              const remainder = products.slice(3);
-              // Only center the very first remainder row when it's a partial
-              // row (not a clean multiple of 3) — e.g. exactly 2 leftover
-              // cards get nudged to the middle two of six columns. A clean
-              // multiple of 3 already fills every row edge-to-edge, so no
-              // offset should be applied there.
-              const centerFirstRemainderRow = remainder.length % 3 !== 0;
-
               return (
-                <div className="space-y-6 mb-8">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:items-stretch">
-                    {firstRow.map(renderProductCard)}
-                  </div>
-                  {remainder.length > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 lg:items-stretch">
-                      {remainder.map((prod, i) => (
-                        <div
-                          key={prod.id}
-                          className={`h-full lg:col-span-2 ${i === 0 && centerFirstRemainderRow ? 'lg:col-start-2' : ''}`}
-                        >
-                          {renderProductCard(prod)}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:items-stretch mb-8">
+                  {products.map(renderProductCard)}
                 </div>
               );
             })()}
