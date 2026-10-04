@@ -203,16 +203,34 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({ label, owner, ve
               </div>
               <div className="min-w-0">
                 <h1 className="font-['Rubik'] font-bold text-lg text-[#1B1C1C] leading-tight">
-                  {primaryContact.role || 'Emergency Family Contact'}
+                  {onChooseMethod ? 'Emergency Family Contact' : primaryContact.role || 'Emergency Family Contact'}
                 </h1>
-                <p className="text-xs font-semibold text-[#5F5E5E] truncate">{primaryContact.name}</p>
+                {!onChooseMethod && <p className="text-xs font-semibold text-[#5F5E5E] truncate">{primaryContact.name}</p>}
               </div>
             </div>
 
-            <p className="text-xs font-bold text-[#5D5F5F]">How would you like to reach them?</p>
-
             {onChooseMethod ? (
-              <MethodCards onChoose={(method) => onChooseMethod({ kind: 'contact', index: contactIndex }, method)} />
+              <>
+                <p className="text-xs font-bold text-[#5D5F5F]">Select the person you want to call</p>
+                <div className="space-y-2">
+                  {emergencyContacts.map((c, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => onChooseMethod({ kind: 'contact', index: i }, 'call')}
+                      className="w-full flex items-center gap-3 p-3 rounded-xl bg-[#FFF1F1] border border-[#D6272C]/30 hover:border-[#D6272C] text-left cursor-pointer active:scale-[0.98] transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-[#D6272C] flex items-center justify-center shrink-0">
+                        <Phone className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm text-[#1B1C1C] truncate">{c.name}</p>
+                        {c.role && <p className="text-[11px] text-[#B01E23]">{c.role}</p>}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </>
             ) : (
               primaryContact.phone && (
                 <MethodCards callHref={`tel:${primaryContact.phone}`} whatsappHref={`https://wa.me/${emergencyDigits}`} />
@@ -252,7 +270,16 @@ export const ScanResultCard: React.FC<ScanResultCardProps> = ({ label, owner, ve
           {onChooseMethod ? (
             <MethodCards
               onChoose={(method) => onChooseMethod({ kind: 'owner' }, method)}
-              onEmergency={primaryContact ? () => setView('emergency') : undefined}
+              // One contact: straight into verify-plate → call, same steps as
+              // calling the owner. Several: ask which person to call first.
+              onEmergency={
+                primaryContact
+                  ? () =>
+                      emergencyContacts.length === 1
+                        ? onChooseMethod({ kind: 'contact', index: 0 }, 'call')
+                        : setView('emergency')
+                  : undefined
+              }
               emergencySubtitle={primaryContact?.role ?? 'Call family'}
             />
           ) : (
