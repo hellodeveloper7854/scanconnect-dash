@@ -237,22 +237,33 @@ export const AdminQrCodes: React.FC = () => {
 
       const zip = new JSZip();
       // Render several stickers at once (fetch + canvas draw + PNG encode are
-      // mostly async/off-thread) instead of one after another.
+      // mostly async/off-thread) instead of one after another. Workers finish
+      // out of order, so blobs are stored by index and added to the ZIP
+      // afterwards in display-ID order (batch, then 0001, 0002, ...).
+      const sortedCodes = [...allCodes].sort(
+        (a, b) => a.batchName.localeCompare(b.batchName) || a.batchSeq - b.batchSeq,
+      );
+      const blobs: Blob[] = new Array(sortedCodes.length);
       let next = 0;
       let done = 0;
       const worker = async () => {
-        while (next < allCodes.length) {
-          const c = allCodes[next++];
-          const blob = await fetchBrandedQrPngBlob(
+        while (next < sortedCodes.length) {
+          const i = next++;
+          const c = sortedCodes[i];
+          blobs[i] = await fetchBrandedQrPngBlob(
             `${API_BASE_URL}/api/admin/qr-codes/${c.id}/qr.png`,
             idToken,
             { lang: stickerLang, size: stickerSize, displayId: formatQrDisplayId(c.batchName, c.batchSeq) },
           );
-          zip.file(`qr-${c.code}-${stickerSize}-${stickerLang}.png`, blob);
           setZipProgress(++done);
         }
       };
-      await Promise.all(Array.from({ length: Math.min(ZIP_CONCURRENCY, allCodes.length) }, worker));
+      await Promise.all(Array.from({ length: Math.min(ZIP_CONCURRENCY, sortedCodes.length) }, worker));
+      // Filename leads with the display ID so file managers sort alphabetically
+      // into the same order.
+      sortedCodes.forEach((c, i) => {
+        zip.file(`${formatQrDisplayId(c.batchName, c.batchSeq)}-${c.code}-${stickerSize}-${stickerLang}.png`, blobs[i]);
+      });
       // PNGs are already compressed — STORE skips a slow, pointless DEFLATE pass.
       const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'STORE', streamFiles: true });
       triggerBlobDownload(zipBlob, `qr-codes-${stickerSize}-${stickerLang}-${Date.now()}.zip`);
