@@ -310,7 +310,7 @@ const CallVerifyModal: React.FC<{
         <div className="max-w-md mx-auto px-4 py-6 space-y-4">
           <div className="bg-white rounded-2xl p-6 space-y-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
             <div className="space-y-1">
-              <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">Call the vehicle owner</h1>
+              <h1 className="font-['Rubik'] font-bold text-xl text-[#1B1C1C]">{target.kind === 'owner' ? 'Call the vehicle owner' : 'Call the emergency contact'}</h1>
               <p className="text-sm text-[#9CA3AF]">
                 You have <span className="font-bold text-[#1B1C1C]">{secondsLeft}</span> seconds. Abuse will block
                 your number.
@@ -322,7 +322,7 @@ const CallVerifyModal: React.FC<{
               <ul className="text-xs text-[#5F5E5E] space-y-1 list-disc list-inside">
                 <li>Test / prank calls</li>
                 <li>Spam</li>
-                <li>Buying, selling or renting the vehicle</li>
+                {target.kind === 'owner' && <li>Buying, selling or renting the vehicle</li>}
               </ul>
             </div>
 
