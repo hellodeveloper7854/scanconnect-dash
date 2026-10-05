@@ -5,6 +5,8 @@ import { DashboardFooter } from './DashboardFooter';
 import { CheckoutFlowScreen } from './CheckoutFlowScreen';
 import qrImage from '../assets/images/qrimage.png';
 import transportQrImage from '../assets/images/transportqrimage.png';
+import hindiQrImage from '../assets/images/hindiqrimage.png';
+import hindiTransportQrImage from '../assets/images/hinditransportqrimage.png';
 import builtForOpenRoadImg from '../assets/images/builtforopenroad.png';
 import {
   Star,
@@ -149,7 +151,11 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   const productPrice = product?.price || '₹499';
   // Product id 8 is the Transport Tag (see ShopScreen.tsx's products array) —
   // it gets its own hero image instead of the shared generic qrImage.
-  const productImage = product?.id === 8 ? transportQrImage : qrImage;
+  const isHindi = stickerLang === 'hi';
+  const productImage =
+    product?.id === 8
+      ? isHindi ? hindiTransportQrImage : transportQrImage
+      : isHindi ? hindiQrImage : qrImage;
 
   // The site-wide discount is 37% off — the struck-through "original" price
   // and the OFF badge must be derived from the real selling price so they

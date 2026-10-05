@@ -7,7 +7,10 @@ import { auth } from '../lib/firebase';
 import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize, type StickerLang } from '../lib/qrSticker';
 import { PhoneInput } from './PhoneInput';
 import { toBare10DigitPhone, isValidPhone, isValidName } from '../lib/validation';
-import qrImage from '../assets/images/qrimage.png';
+import baseQrImage from '../assets/images/qrimage.png';
+import transportQrImage from '../assets/images/transportqrimage.png';
+import hindiQrImage from '../assets/images/hindiqrimage.png';
+import hindiTransportQrImage from '../assets/images/hinditransportqrimage.png';
 import {
   ShieldCheck,
   Lock,
@@ -574,6 +577,11 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
     }
   };
 
+  const isHindi = stickerLang === 'hi';
+  const qrImage =
+    product?.id === 8
+      ? isHindi ? hindiTransportQrImage : transportQrImage
+      : isHindi ? hindiQrImage : baseQrImage;
   const productTitle = product?.title || 'SCAN CONNECT Tag';
   const formatPaise = (paise: number) => (paise / 100).toLocaleString('en-IN', { style: 'currency', currency: 'INR' });
   // Falls back to the product prop's price string only while pricing is still
