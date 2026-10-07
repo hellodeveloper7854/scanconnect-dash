@@ -533,7 +533,7 @@ qrCodesRouter.get('/:code/details', async (req, res) => {
     where: { code: req.params.code },
     include: {
       vehicle: { include: { user: { select: { fullName: true } } } },
-      emergencyContacts: true,
+      emergencyContacts: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] },
     },
   });
 
@@ -569,7 +569,7 @@ qrCodesRouter.get('/:code/test-contact-numbers', async (req, res) => {
     where: { code: req.params.code },
     include: {
       vehicle: { include: { user: { select: { fullName: true, mobileNumber: true } } } },
-      emergencyContacts: true,
+      emergencyContacts: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] },
     },
   });
 
@@ -598,7 +598,7 @@ qrCodesRouter.post('/:code/verify', async (req, res) => {
     where: { code: req.params.code },
     include: {
       vehicle: { include: { user: { select: { fullName: true, mobileNumber: true } } } },
-      emergencyContacts: true,
+      emergencyContacts: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] },
     },
   });
 
@@ -654,7 +654,7 @@ qrCodesRouter.post('/:code/masked-call', async (req, res) => {
     where: { code: req.params.code },
     include: {
       vehicle: { include: { user: { select: { id: true, fullName: true, mobileNumber: true } } } },
-      emergencyContacts: true,
+      emergencyContacts: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] },
     },
   });
 
@@ -766,7 +766,7 @@ qrCodesRouter.post('/partner/get-destination-number', requirePartnerApiKey, asyn
     where: { id: match.qrCodeId },
     include: {
       vehicle: { include: { user: { select: { mobileNumber: true } } } },
-      emergencyContacts: true,
+      emergencyContacts: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] },
     },
   });
   const destinationPhone =
@@ -1006,7 +1006,7 @@ qrCodesRouter.post('/:code/activate', requireAuth, async (req, res) => {
         },
         include: {
           vehicle: { include: { user: { select: { fullName: true, mobileNumber: true } } } },
-          emergencyContacts: true,
+          emergencyContacts: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] },
         },
       });
 
