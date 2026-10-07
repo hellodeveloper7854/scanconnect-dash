@@ -140,6 +140,7 @@ const CallVerifyModal: React.FC<{
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [callNumber, setCallNumber] = useState<string | null>(null);
+  const [isMasked, setIsMasked] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(90);
   const [testData, setTestData] = useState<TestContactNumbers | null>(null);
   const [callerPhoneTouched, setCallerPhoneTouched] = useState(false);
@@ -147,12 +148,16 @@ const CallVerifyModal: React.FC<{
   const callerPhoneError =
     method === 'call' && !isValidPhone(callerPhone) ? VALIDATION_MESSAGES.phone : '';
 
+  // Only the WhatsApp message flow still needs the real number client-side.
+  // Masked calls are verified and connected entirely server-side, so the
+  // owner's number never reaches the browser.
   useEffect(() => {
+    if (method !== 'message') return;
     api
       .get<TestContactNumbers>(`/api/qr/${code}/test-contact-numbers`)
       .then(setTestData)
       .catch(() => setErrorMsg('Could not load contact info. Please try again.'));
-  }, [code]);
+  }, [code, method]);
 
   useEffect(() => {
     if (screen !== 'call') return;
@@ -172,10 +177,37 @@ const CallVerifyModal: React.FC<{
       : testData.emergencyContacts[target.index]?.phone
     : null;
 
+  const handleMaskedCall = async () => {
+    setIsSubmitting(true);
+    try {
+      const result = await api.post<{ virtualNumber: string; isMasked: boolean }>(`/api/qr/${code}/masked-call`, {
+        last4,
+        callerPhone,
+        target,
+      });
+      setCallNumber(result.virtualNumber);
+      setIsMasked(result.isMasked);
+      setSecondsLeft(90);
+      setScreen('call');
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Could not place the call. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setCallerPhoneTouched(true);
+    if (method === 'call') {
+      if (callerPhoneError) {
+        setErrorMsg('Please fix the highlighted field before continuing.');
+        return;
+      }
+      void handleMaskedCall();
+      return;
+    }
     if (!checkLast4()) {
       setErrorMsg('Enter the correct last 4 digits of the registration number.');
       return;
@@ -192,15 +224,7 @@ const CallVerifyModal: React.FC<{
       );
       return;
     }
-    // Masked Call skips the contact-reason step and goes straight to the
-    // call/countdown screen; only Message (WhatsApp) asks for a reason.
-    if (method === 'call') {
-      setCallNumber(targetPhone);
-      setSecondsLeft(90);
-      setScreen('call');
-    } else {
-      setScreen('reason');
-    }
+    setScreen('reason');
   };
 
   const handleSendReason = (e: React.FormEvent) => {
@@ -326,12 +350,22 @@ const CallVerifyModal: React.FC<{
               </ul>
             </div>
 
-            <a
-              href={`tel:${callNumber}`}
-              className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-full font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
-            >
-              Call {callNumber}
-            </a>
+            {isMasked ? (
+              <div className="bg-[#EFFBF4] rounded-2xl p-4 space-y-1 text-center">
+                <p className="text-sm font-bold text-[#1A8754]">Your phone will ring shortly</p>
+                <p className="text-xs text-[#5F5E5E]">
+                  Answer the call from <span className="font-mono font-bold">{callNumber}</span> and you&apos;ll be
+                  connected. Neither number is shared.
+                </p>
+              </div>
+            ) : (
+              <a
+                href={`tel:${callNumber}`}
+                className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-full font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+              >
+                Call {callNumber}
+              </a>
+            )}
 
             <button
               type="button"
@@ -458,10 +492,15 @@ const CallVerifyModal: React.FC<{
 
             <button
               type="submit"
-              disabled={!testData || last4.length !== 4 || (method === 'call' && !callerPhone.trim())}
+              disabled={
+                isSubmitting ||
+                (method === 'message' && !testData) ||
+                last4.length !== 4 ||
+                (method === 'call' && !callerPhone.trim())
+              }
               className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-full font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
             >
-              {!testData ? 'Loading...' : 'Continue'}
+              {isSubmitting || (method === 'message' && !testData) ? 'Loading...' : 'Continue'}
             </button>
 
             <button
