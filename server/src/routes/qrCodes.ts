@@ -9,6 +9,7 @@ import { requireAuth, requireAdmin, requirePartnerApiKey } from '../middleware/a
 import { toCsv } from '../lib/csv.js';
 import { notify } from '../lib/notify.js';
 import { last10Digits, toE164India } from '../lib/phone.js';
+import { isKnowlarityConfigured, placeMaskedCall, KnowlarityError } from '../lib/knowlarity.js';
 import type { Prisma } from '@prisma/client';
 
 /**
@@ -674,16 +675,30 @@ qrCodesRouter.post('/:code/masked-call', async (req, res) => {
     return res.status(404).json({ error: 'No phone number available for this contact.' });
   }
 
+  const masked = isKnowlarityConfigured();
+
   await prisma.maskedCallRequest.create({
     data: {
       qrCodeId: qrCode.id,
       targetKind: target.kind,
       targetIndex: target.kind === 'contact' ? target.index : null,
       callerPhone: parsed.data.callerPhone,
-      // virtualNumber intentionally left null until Knowlarity (or another
-      // masking provider) is connected — see model doc comment.
+      virtualNumber: masked ? toE164India(env.knowlarity.kNumber!) : null,
     },
   });
+
+  if (masked) {
+    // Knowlarity rings the scanner first, then bridges to the destination;
+    // both see our k_number instead of each other's real number.
+    try {
+      await placeMaskedCall(parsed.data.callerPhone, destinationPhone);
+    } catch (err) {
+      console.error('Knowlarity makecall failed:', err);
+      return res.status(502).json({
+        error: err instanceof KnowlarityError ? err.message : 'Could not place the call. Please try again.',
+      });
+    }
+  }
 
   await notify({
     userId: qrCode.vehicle.user.id,
@@ -693,15 +708,19 @@ qrCodesRouter.post('/:code/masked-call', async (req, res) => {
     linkPath: '/profile',
   });
 
+  if (masked) {
+    // The real destination number is never sent back to the scanner when masked.
+    return res.json({
+      virtualNumber: toE164India(env.knowlarity.kNumber!),
+      isMasked: true,
+      callerPhone: parsed.data.callerPhone,
+    });
+  }
+
+  // Knowlarity not configured: fall back to the real number, unmasked.
   res.json({
-    // TODO: replace with the Knowlarity SR/virtual number once that
-    // integration is wired up; falls back to the real number for now.
     virtualNumber: destinationPhone,
     isMasked: false,
-    // Included explicitly (not just folded into virtualNumber) so whoever
-    // wires up Knowlarity has both legs of the bridge — callerPhone (from
-    // the request) and destinationPhone — without having to look anything
-    // else up to create the actual masked-call/click-to-call request.
     destinationPhone,
     callerPhone: parsed.data.callerPhone,
   });
