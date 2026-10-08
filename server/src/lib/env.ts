@@ -45,12 +45,12 @@ export const env = {
   // get-destination-number lookup) — not a Firebase user token, since the
   // caller here is another company's backend, not a signed-in app user.
   partnerApiKey: process.env.PARTNER_API_KEY,
-  // Knowlarity click-to-call (makecall). All optional: when unset, the
-  // /:code/masked-call route falls back to returning the real number unmasked.
+  // Knowlarity account credentials, used to fetch the masked number shown to
+  // scanners from the account's bought-numbers list. /:code/masked-call
+  // returns 503 until both keys are set.
   knowlarity: {
     apiKey: process.env.KNOWLARITY_API_KEY, // sent as x-api-key (application access key)
     srApiKey: process.env.KNOWLARITY_SR_API_KEY, // sent as Authorization (SR API key)
-    kNumber: process.env.KNOWLARITY_K_NUMBER, // our SuperReceptionist number, shown to both parties
     channel: process.env.KNOWLARITY_CHANNEL ?? 'Basic', // Basic | Advance | Premium | Enterprise
     baseUrl: process.env.KNOWLARITY_BASE_URL ?? 'https://kpi.knowlarity.com',
   },

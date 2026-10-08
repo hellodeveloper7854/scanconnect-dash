@@ -2,48 +2,30 @@ import { env } from './env.js';
 import { toE164India } from './phone.js';
 
 /**
- * Knowlarity "Make Outbound Call" (click-to-call) client.
- * https://developer.knowlarity.com/ -> Calls -> Make Outbound Call
- *
- * Knowlarity rings `agent_number` first; only if that leg is answered does it
- * dial `customer_number` and bridge the two. Both parties see `k_number` (our
- * SuperReceptionist number) as the caller ID rather than each other's real
- * number — that's the masking.
+ * Knowlarity "Get the list of bought numbers" client — the source of the
+ * masked number shown to scanners, so it always reflects what's actually
+ * active on the account instead of a hand-copied env value.
+ * GET {baseUrl}/{channel}/v1/account/numbers/
  */
+
+const CACHE_TTL_MS = 10 * 60 * 1000;
+
+let cache: { numbers: string[]; fetchedAt: number } | null = null;
+let nextIndex = 0;
+
+export class KnowlarityError extends Error {}
 
 export function isKnowlarityConfigured(): boolean {
-  const k = env.knowlarity;
-  return Boolean(k.apiKey && k.srApiKey && k.kNumber);
+  return Boolean(env.knowlarity.apiKey && env.knowlarity.srApiKey);
 }
 
-export class KnowlarityError extends Error {
-  constructor(message: string, readonly status?: number) {
-    super(message);
-  }
-}
-
-/**
- * Places a masked call: rings `callerPhone` (the scanner) first, then bridges
- * to `destinationPhone` (vehicle owner / emergency contact) once answered.
- * Throws KnowlarityError on any non-success response.
- */
-export async function placeMaskedCall(callerPhone: string, destinationPhone: string): Promise<void> {
-  const { apiKey, srApiKey, kNumber, channel, baseUrl } = env.knowlarity;
+async function fetchBoughtNumbers(): Promise<string[]> {
+  const { apiKey, srApiKey, channel, baseUrl } = env.knowlarity;
 
   let response: Response;
   try {
-    response = await fetch(`${baseUrl}/${channel}/v1/account/call/makecall`, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': apiKey!,
-        Authorization: srApiKey!,
-      },
-      body: JSON.stringify({
-        k_number: toE164India(kNumber!),
-        agent_number: toE164India(callerPhone),
-        customer_number: toE164India(destinationPhone),
-      }),
+    response = await fetch(`${baseUrl}/${channel}/v1/account/numbers/`, {
+      headers: { 'content-type': 'application/json', 'x-api-key': apiKey!, Authorization: srApiKey! },
       signal: AbortSignal.timeout(15_000),
     });
   } catch (err) {
@@ -51,11 +33,37 @@ export async function placeMaskedCall(callerPhone: string, destinationPhone: str
   }
 
   const body = (await response.json().catch(() => null)) as {
-    success?: { status?: string; message?: string };
+    objects?: { phone_number?: string; is_expired?: boolean; number_type?: string; cli_type?: string }[];
     error?: { message?: string };
   } | null;
-
-  if (!response.ok || body?.error || !body?.success) {
-    throw new KnowlarityError(body?.error?.message ?? `Knowlarity returned HTTP ${response.status}`, response.status);
+  if (!response.ok || !body?.objects) {
+    throw new KnowlarityError(body?.error?.message ?? `Knowlarity returned HTTP ${response.status}`);
   }
+
+  // number_type "1" is a dialable SR (inbound) number. The account's CLI
+  // number (number_type "0", cli_type "OUTGOING") is outbound caller-ID only —
+  // dialing it gives "not a correct number", so it must never be handed out.
+  return body.objects
+    .filter((n) => n.phone_number && !n.is_expired && n.number_type === '1' && (n.cli_type ?? 'NONE') === 'NONE')
+    .map((n) => toE164India(n.phone_number!));
+}
+
+/**
+ * Returns one of the account's active Knowlarity numbers (E.164), rotating
+ * round-robin when there are several. The list is cached for 10 minutes; a
+ * stale cache is used if a refresh fails.
+ */
+export async function getMaskedNumber(): Promise<string> {
+  if (!cache || Date.now() - cache.fetchedAt > CACHE_TTL_MS) {
+    try {
+      cache = { numbers: await fetchBoughtNumbers(), fetchedAt: Date.now() };
+    } catch (err) {
+      if (!cache) throw err;
+      console.error('Knowlarity number refresh failed, using cached list:', err);
+    }
+  }
+  if (cache.numbers.length === 0) {
+    throw new KnowlarityError('No active Knowlarity numbers on this account');
+  }
+  return cache.numbers[nextIndex++ % cache.numbers.length];
 }

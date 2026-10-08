@@ -9,8 +9,8 @@ import { requireAuth, requireAdmin, requirePartnerApiKey } from '../middleware/a
 import { toCsv } from '../lib/csv.js';
 import { notify } from '../lib/notify.js';
 import { last10Digits, toE164India } from '../lib/phone.js';
+import { isKnowlarityConfigured, getMaskedNumber } from '../lib/knowlarity.js';
 import { isGupshupConfigured, sendTemplateMessage, GupshupError } from '../lib/gupshup.js';
-import { isKnowlarityConfigured, placeMaskedCall, KnowlarityError } from '../lib/knowlarity.js';
 import type { Prisma } from '@prisma/client';
 
 /**
@@ -611,11 +611,9 @@ const maskedCallSchema = z.object({
 /**
  * Re-verifies the last-4 digits (never trust a client-held verification
  * result across a second request) and logs a masked-call setup request —
- * this is the same target-number lookup as /verify, but also records the
- * caller's own phone number so a future Knowlarity SR-number / click-to-call
- * integration has a real request to act on. Until that's wired up,
- * `virtualNumber` is null and the frontend falls back to dialing the real
- * destination number directly.
+ * records the caller's own phone number against the target, and returns a
+ * Knowlarity number fetched from the account's bought-numbers API. The scanner dials it themselves; Knowlarity resolves
+ * the real destination through /partner/get-destination-number.
  */
 qrCodesRouter.post('/:code/masked-call', async (req, res) => {
   const parsed = maskedCallSchema.safeParse(req.body);
@@ -648,30 +646,29 @@ qrCodesRouter.post('/:code/masked-call', async (req, res) => {
     return res.status(404).json({ error: 'No phone number available for this contact.' });
   }
 
-  const masked = isKnowlarityConfigured();
+  // Never fall back to the real number on failure — that would defeat the masking.
+  if (!isKnowlarityConfigured()) {
+    return res.status(503).json({ error: 'Calling is not available right now.' });
+  }
+  let virtualNumber: string;
+  try {
+    virtualNumber = await getMaskedNumber();
+  } catch (err) {
+    console.error('Could not get a Knowlarity number:', err);
+    return res.status(502).json({ error: 'Calling is not available right now. Please try again.' });
+  }
 
+  // Persisted so Knowlarity's get-destination-number lookup can resolve the
+  // scanner's number (callerPhone) to the real destination when they dial in.
   await prisma.maskedCallRequest.create({
     data: {
       qrCodeId: qrCode.id,
       targetKind: target.kind,
       targetIndex: target.kind === 'contact' ? target.index : null,
       callerPhone: parsed.data.callerPhone,
-      virtualNumber: masked ? toE164India(env.knowlarity.kNumber!) : null,
+      virtualNumber,
     },
   });
-
-  if (masked) {
-    // Knowlarity rings the scanner first, then bridges to the destination;
-    // both see our k_number instead of each other's real number.
-    try {
-      await placeMaskedCall(parsed.data.callerPhone, destinationPhone);
-    } catch (err) {
-      console.error('Knowlarity makecall failed:', err);
-      return res.status(502).json({
-        error: err instanceof KnowlarityError ? err.message : 'Could not place the call. Please try again.',
-      });
-    }
-  }
 
   await notify({
     userId: qrCode.vehicle.user.id,
@@ -681,22 +678,10 @@ qrCodesRouter.post('/:code/masked-call', async (req, res) => {
     linkPath: '/profile',
   });
 
-  if (masked) {
-    // The real destination number is never sent back to the scanner when masked.
-    return res.json({
-      virtualNumber: toE164India(env.knowlarity.kNumber!),
-      isMasked: true,
-      callerPhone: parsed.data.callerPhone,
-    });
-  }
-
-  // Knowlarity not configured: fall back to the real number, unmasked.
-  res.json({
-    virtualNumber: destinationPhone,
-    isMasked: false,
-    destinationPhone,
-    callerPhone: parsed.data.callerPhone,
-  });
+  // The scanner dials this number themselves, from the phone number they
+  // entered; Knowlarity then looks up the real destination via
+  // /partner/get-destination-number. The real number is never returned.
+  res.json({ virtualNumber, isMasked: true, callerPhone: parsed.data.callerPhone });
 });
 
 const messageSchema = z.object({

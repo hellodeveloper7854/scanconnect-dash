@@ -125,7 +125,6 @@ const CallVerifyModal: React.FC<{
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [callNumber, setCallNumber] = useState<string | null>(null);
-  const [isMasked, setIsMasked] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(90);
   const [callerPhoneTouched, setCallerPhoneTouched] = useState(false);
 
@@ -145,13 +144,12 @@ const CallVerifyModal: React.FC<{
   const handleMaskedCall = async () => {
     setIsSubmitting(true);
     try {
-      const result = await api.post<{ virtualNumber: string; isMasked: boolean }>(`/api/qr/${code}/masked-call`, {
+      const result = await api.post<{ virtualNumber: string }>(`/api/qr/${code}/masked-call`, {
         last4,
         callerPhone,
         target,
       });
       setCallNumber(result.virtualNumber);
-      setIsMasked(result.isMasked);
       setSecondsLeft(90);
       setScreen('call');
     } catch (err) {
@@ -303,22 +301,17 @@ const CallVerifyModal: React.FC<{
               </ul>
             </div>
 
-            {isMasked ? (
-              <div className="bg-[#EFFBF4] rounded-2xl p-4 space-y-1 text-center">
-                <p className="text-sm font-bold text-[#1A8754]">Your phone will ring shortly</p>
-                <p className="text-xs text-[#5F5E5E]">
-                  Answer the call from <span className="font-mono font-bold">{callNumber}</span> and you&apos;ll be
-                  connected. Neither number is shared.
-                </p>
-              </div>
-            ) : (
-              <a
-                href={`tel:${callNumber}`}
-                className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-full font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
-              >
-                Call {callNumber}
-              </a>
-            )}
+            <p className="text-xs text-[#5F5E5E] text-center">
+              Call from <span className="font-bold">{callerPhone}</span> — the same number you entered. The owner will
+              never see your number, and you won&apos;t see theirs.
+            </p>
+
+            <a
+              href={`tel:${callNumber}`}
+              className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-full font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+            >
+              Call {callNumber}
+            </a>
 
             <button
               type="button"
