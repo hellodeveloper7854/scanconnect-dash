@@ -9,6 +9,7 @@ import { requireAuth, requireAdmin, requirePartnerApiKey } from '../middleware/a
 import { toCsv } from '../lib/csv.js';
 import { notify } from '../lib/notify.js';
 import { last10Digits, toE164India } from '../lib/phone.js';
+import { isGupshupConfigured, sendTemplateMessage, GupshupError } from '../lib/gupshup.js';
 import { isKnowlarityConfigured, placeMaskedCall, KnowlarityError } from '../lib/knowlarity.js';
 import type { Prisma } from '@prisma/client';
 
@@ -556,34 +557,6 @@ qrCodesRouter.get('/:code/details', async (req, res) => {
   });
 });
 
-/**
- * TEMPORARY (testing only): returns real phone numbers plus the plate's
- * last 4 digits, with no verification check, so the client can try the
- * Masked Call / Message flow while a masking provider isn't wired up yet.
- * Does not touch /verify or /masked-call — those stay as the real,
- * server-verified path once masked calling is implemented. Remove this
- * route (and its frontend caller) at that point.
- */
-qrCodesRouter.get('/:code/test-contact-numbers', async (req, res) => {
-  const qrCode = await prisma.qrCode.findUnique({
-    where: { code: req.params.code },
-    include: {
-      vehicle: { include: { user: { select: { fullName: true, mobileNumber: true } } } },
-      emergencyContacts: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] },
-    },
-  });
-
-  if (!qrCode || qrCode.status !== 'ACTIVE' || !qrCode.vehicle) {
-    return res.status(404).json({ error: 'This QR code is not active' });
-  }
-
-  res.json({
-    registrationLast4: qrCode.vehicle.registration.slice(-4).toUpperCase(),
-    owner: { mobileNumber: qrCode.vehicle.user.mobileNumber },
-    emergencyContacts: qrCode.emergencyContacts.map((c) => ({ phone: c.phone })),
-  });
-});
-
 const verifySchema = z.object({
   last4: z.string().length(4),
 });
@@ -724,6 +697,70 @@ qrCodesRouter.post('/:code/masked-call', async (req, res) => {
     destinationPhone,
     callerPhone: parsed.data.callerPhone,
   });
+});
+
+const messageSchema = z.object({
+  last4: z.string().length(4),
+  reason: z.string().trim().min(1).max(200),
+  target: maskedCallSchema.shape.target,
+});
+
+/**
+ * Sends the owner (or an emergency contact) a WhatsApp template message via
+ * Gupshup saying why the scanner is reaching out. Like /masked-call, the
+ * last-4 digits are verified server-side and the destination number never
+ * leaves the server. Template variables: var1 = reason, var2 = plate.
+ */
+qrCodesRouter.post('/:code/message', async (req, res) => {
+  const parsed = messageSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+  if (!isGupshupConfigured()) {
+    return res.status(503).json({ error: 'Messaging is not available right now.' });
+  }
+
+  const qrCode = await prisma.qrCode.findUnique({
+    where: { code: req.params.code },
+    include: {
+      vehicle: { include: { user: { select: { id: true, mobileNumber: true } } } },
+      emergencyContacts: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] },
+    },
+  });
+  if (!qrCode || qrCode.status !== 'ACTIVE' || !qrCode.vehicle) {
+    return res.status(404).json({ error: 'This QR code is not active' });
+  }
+
+  const registration = qrCode.vehicle.registration;
+  if (registration.slice(-4).toUpperCase() !== parsed.data.last4.toUpperCase()) {
+    return res.status(400).json({ error: 'Incorrect digits. Please try again.' });
+  }
+
+  const { target } = parsed.data;
+  const destinationPhone =
+    target.kind === 'owner' ? qrCode.vehicle.user.mobileNumber : qrCode.emergencyContacts[target.index]?.phone;
+  if (!destinationPhone) {
+    return res.status(404).json({ error: 'No phone number available for this contact.' });
+  }
+
+  try {
+    await sendTemplateMessage(destinationPhone, [parsed.data.reason, registration]);
+  } catch (err) {
+    console.error('Gupshup send failed:', err);
+    return res.status(502).json({
+      error: err instanceof GupshupError ? err.message : 'Could not send the message. Please try again.',
+    });
+  }
+
+  await notify({
+    userId: qrCode.vehicle.user.id,
+    type: 'MASKED_CALL',
+    title: 'Someone messaged you',
+    body: `A scan of your QR tag sent a message: ${parsed.data.reason}`,
+    linkPath: '/profile',
+  });
+
+  res.json({ sent: true });
 });
 
 /**

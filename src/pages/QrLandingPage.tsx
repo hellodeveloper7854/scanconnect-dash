@@ -81,18 +81,6 @@ interface DetailsData {
   emergencyContacts: { name: string; role: string | null }[];
 }
 
-/**
- * TEMPORARY (testing only): shape returned by GET /:code/test-contact-numbers
- * — real phone numbers with no verification, for trying Masked Call/Message
- * while a masking provider isn't wired up. Remove alongside that route once
- * /verify + /masked-call are used for real.
- */
-interface TestContactNumbers {
-  registrationLast4: string;
-  owner: { mobileNumber: string | null };
-  emergencyContacts: { phone: string }[];
-}
-
 const CardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="min-h-screen w-full bg-[#FAFAF9] flex flex-col items-center px-4 py-10 sm:py-16 font-['Hanken_Grotesk']">
     <div className="w-full max-w-md space-y-6">
@@ -118,12 +106,9 @@ const CardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
  *      the phone's own dialer (masked call only).
  *  3b. "sent" — confirmation screen after a WhatsApp message is opened.
  *
- * TEMPORARY (testing only): fetches real numbers from
- * GET /:code/test-contact-numbers and checks the last-4 digits client-side,
- * so masked-call/message can be tried without a masking provider wired up
- * yet. /verify and /masked-call are untouched — swap back to posting to
- * those once Knowlarity (or similar) is integrated, so the phone number
- * never reaches the client before the digit check passes server-side.
+ * Both flows are verified and executed server-side (/masked-call via
+ * Knowlarity, /message via Gupshup), so the owner's number never reaches the
+ * browser.
  */
 const CallVerifyModal: React.FC<{
   code: string;
@@ -142,22 +127,10 @@ const CallVerifyModal: React.FC<{
   const [callNumber, setCallNumber] = useState<string | null>(null);
   const [isMasked, setIsMasked] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(90);
-  const [testData, setTestData] = useState<TestContactNumbers | null>(null);
   const [callerPhoneTouched, setCallerPhoneTouched] = useState(false);
 
   const callerPhoneError =
     method === 'call' && !isValidPhone(callerPhone) ? VALIDATION_MESSAGES.phone : '';
-
-  // Only the WhatsApp message flow still needs the real number client-side.
-  // Masked calls are verified and connected entirely server-side, so the
-  // owner's number never reaches the browser.
-  useEffect(() => {
-    if (method !== 'message') return;
-    api
-      .get<TestContactNumbers>(`/api/qr/${code}/test-contact-numbers`)
-      .then(setTestData)
-      .catch(() => setErrorMsg('Could not load contact info. Please try again.'));
-  }, [code, method]);
 
   useEffect(() => {
     if (screen !== 'call') return;
@@ -168,14 +141,6 @@ const CallVerifyModal: React.FC<{
     const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
     return () => clearTimeout(timer);
   }, [screen, secondsLeft, onClose]);
-
-  const checkLast4 = () => last4.toUpperCase() === (testData?.registrationLast4 ?? '').toUpperCase();
-
-  const targetPhone = testData
-    ? target.kind === 'owner'
-      ? testData.owner.mobileNumber
-      : testData.emergencyContacts[target.index]?.phone
-    : null;
 
   const handleMaskedCall = async () => {
     setIsSubmitting(true);
@@ -208,36 +173,24 @@ const CallVerifyModal: React.FC<{
       void handleMaskedCall();
       return;
     }
-    if (!checkLast4()) {
-      setErrorMsg('Enter the correct last 4 digits of the registration number.');
-      return;
-    }
-    if (callerPhoneError) {
-      setErrorMsg('Please fix the highlighted field before continuing.');
-      return;
-    }
-    if (!targetPhone) {
-      setErrorMsg(
-        target.kind === 'owner'
-          ? 'The owner has not added their contact number.'
-          : 'This contact has not added their contact number.',
-      );
-      return;
-    }
+    // Message (WhatsApp) asks for a reason next; the last-4 check happens
+    // server-side when the message is sent.
+    setCallerPhoneTouched(true);
     setScreen('reason');
   };
 
-  const handleSendReason = (e: React.FormEvent) => {
+  const handleSendReason = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!targetPhone) return;
+    setErrorMsg('');
     setIsSubmitting(true);
-    window.open(
-      `https://wa.me/${targetPhone.replace(/\D/g, '')}?text=${encodeURIComponent(reason)}`,
-      '_blank',
-      'noopener,noreferrer',
-    );
-    setIsSubmitting(false);
-    setScreen('sent');
+    try {
+      await api.post(`/api/qr/${code}/message`, { last4, reason, target });
+      setScreen('sent');
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Could not send the message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Screen: confirmation after a WhatsApp message has been opened.
@@ -413,6 +366,8 @@ const CallVerifyModal: React.FC<{
               ))}
             </div>
 
+            {errorMsg && <p className="text-sm font-semibold text-red-600 text-center">{errorMsg}</p>}
+
             <button
               type="submit"
               disabled={isSubmitting}
@@ -494,13 +449,12 @@ const CallVerifyModal: React.FC<{
               type="submit"
               disabled={
                 isSubmitting ||
-                (method === 'message' && !testData) ||
                 last4.length !== 4 ||
                 (method === 'call' && !callerPhone.trim())
               }
               className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-full font-bold text-[#1B1C1C] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
             >
-              {isSubmitting || (method === 'message' && !testData) ? 'Loading...' : 'Continue'}
+              {isSubmitting ? 'Loading...' : 'Continue'}
             </button>
 
             <button

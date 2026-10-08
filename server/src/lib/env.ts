@@ -54,4 +54,12 @@ export const env = {
     channel: process.env.KNOWLARITY_CHANNEL ?? 'Basic', // Basic | Advance | Premium | Enterprise
     baseUrl: process.env.KNOWLARITY_BASE_URL ?? 'https://kpi.knowlarity.com',
   },
+  // Gupshup WhatsApp template messaging. Optional; the QR message route
+  // returns 503 until all three are set.
+  gupshup: {
+    userId: process.env.GUPSHUP_USER_ID, // client id, e.g. 2000XXXXXX
+    token: process.env.GUPSHUP_TOKEN, // secret token (Bearer)
+    templateId: process.env.GUPSHUP_TEMPLATE_ID, // whatsAppTemplateId of the approved template
+    baseUrl: process.env.GUPSHUP_BASE_URL ?? 'https://mediaapi.smsgupshup.com',
+  },
 };
