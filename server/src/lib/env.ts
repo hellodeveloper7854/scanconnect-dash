@@ -52,6 +52,13 @@ export const env = {
     apiKey: process.env.KNOWLARITY_API_KEY, // sent as x-api-key (application access key)
     srApiKey: process.env.KNOWLARITY_SR_API_KEY, // sent as Authorization (SR API key)
     channel: process.env.KNOWLARITY_CHANNEL ?? 'Basic', // Basic | Advance | Premium | Enterprise
+    // Optional comma-separated allow-list of live SR numbers. When set, these are
+    // handed out (round-robin) instead of the account's bought-numbers list —
+    // for numbers whose call flow isn't configured yet.
+    maskedNumbers: (process.env.KNOWLARITY_MASKED_NUMBERS ?? '')
+      .split(',')
+      .map((n) => n.trim())
+      .filter(Boolean),
     baseUrl: process.env.KNOWLARITY_BASE_URL ?? 'https://kpi.knowlarity.com',
   },
   // Gupshup WhatsApp template messaging. Optional; the QR message route

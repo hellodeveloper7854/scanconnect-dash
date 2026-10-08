@@ -16,7 +16,7 @@ let nextIndex = 0;
 export class KnowlarityError extends Error {}
 
 export function isKnowlarityConfigured(): boolean {
-  return Boolean(env.knowlarity.apiKey && env.knowlarity.srApiKey);
+  return env.knowlarity.maskedNumbers.length > 0 || Boolean(env.knowlarity.apiKey && env.knowlarity.srApiKey);
 }
 
 async function fetchBoughtNumbers(): Promise<string[]> {
@@ -54,6 +54,10 @@ async function fetchBoughtNumbers(): Promise<string[]> {
  * stale cache is used if a refresh fails.
  */
 export async function getMaskedNumber(): Promise<string> {
+  const override = env.knowlarity.maskedNumbers;
+  if (override.length > 0) {
+    return toE164India(override[nextIndex++ % override.length]);
+  }
   if (!cache || Date.now() - cache.fetchedAt > CACHE_TTL_MS) {
     try {
       cache = { numbers: await fetchBoughtNumbers(), fetchedAt: Date.now() };
