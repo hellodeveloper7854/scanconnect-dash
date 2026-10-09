@@ -493,9 +493,9 @@ function drawBrandedQrCanvasSideBySide(
     sublineY += sublineFontSize * 1.35;
   }
 
-  // Display ID — identical styling to the subline (font, size, weight, colour), directly beneath it.
+  // Display ID — same font, size and colour as the subline, but bold, directly beneath it.
   if (opts.displayId) {
-    ctx.font = `normal ${sublineFontSize}px sans-serif`;
+    ctx.font = `bold ${sublineFontSize}px sans-serif`;
     ctx.fillStyle = '#5F5E5E';
     ctx.fillText(opts.displayId, pad, sublineY);
   }
@@ -700,7 +700,7 @@ function drawBrandedQrCanvasStacked(
   }
 
   if (opts.displayId) {
-    ctx.font = `normal ${sublineFontSize}px sans-serif`;
+    ctx.font = `bold ${sublineFontSize}px sans-serif`;
     ctx.fillStyle = '#5F5E5E';
     ctx.fillText(opts.displayId, width / 2, sublineY);
   }
