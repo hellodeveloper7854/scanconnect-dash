@@ -412,7 +412,7 @@ function drawBrandedQrCanvasSideBySide(
   // the headline (the flexible element) yields this room, never the
   // subline, so the subline's own size is unaffected by whether a display
   // ID is present.
-  const displayIdFontSizeEstimate = Math.round(sublineFontSizeFitted * 0.8);
+  const displayIdFontSizeEstimate = sublineFontSizeFitted;
   const displayIdReservedHeight = opts.displayId ? displayIdFontSizeEstimate * 1.35 : 0;
   ctx.font = `normal ${sublineFontSizeFitted}px sans-serif`;
   const sublineLineCount = wrapText(ctx, text.subline, headlineMaxWidth).length;
@@ -476,7 +476,6 @@ function drawBrandedQrCanvasSideBySide(
   // above (so the headline yields the room, not the subline — the subline's
   // own size must stay exactly as it was before the display ID existed),
   // so this budget only needs to fit the subline itself.
-  const displayIdFontSize = displayIdFontSizeEstimate;
   const sublineAvailableHeight = height - pad - headlineY;
   let sublineFontSize = sublineFontSizeFitted;
   let sublineLines = wrapText(ctx, text.subline, headlineMaxWidth);
@@ -494,10 +493,10 @@ function drawBrandedQrCanvasSideBySide(
     sublineY += sublineFontSize * 1.35;
   }
 
-  // Display ID — lighter and smaller than the subline, directly beneath it.
+  // Display ID — identical styling to the subline (font, size, weight, colour), directly beneath it.
   if (opts.displayId) {
-    ctx.font = `normal ${displayIdFontSize}px sans-serif`;
-    ctx.fillStyle = '#9CA3AF';
+    ctx.font = `normal ${sublineFontSize}px sans-serif`;
+    ctx.fillStyle = '#5F5E5E';
     ctx.fillText(opts.displayId, pad, sublineY);
   }
 
@@ -625,7 +624,7 @@ function drawBrandedQrCanvasStacked(
   // Hindi needs extra clearance or it collides with the logo's tagline.
   const headlineTop = pad * 0.55 + wordmarkHeight * (isHindi ? 1.35 : 1.1);
 
-  const displayIdFontSizeEstimate = Math.round(sublineBaseSize * 0.8);
+  const displayIdFontSizeEstimate = sublineBaseSize;
   const displayIdReservedHeight = opts.displayId ? displayIdFontSizeEstimate * 1.35 : 0;
   ctx.font = `normal ${sublineBaseSize}px sans-serif`;
   const sublineLineCountEstimate = wrapText(ctx, text.subline, contentMaxWidth).length;
@@ -701,8 +700,8 @@ function drawBrandedQrCanvasStacked(
   }
 
   if (opts.displayId) {
-    ctx.font = `normal ${displayIdFontSizeEstimate}px sans-serif`;
-    ctx.fillStyle = '#9CA3AF';
+    ctx.font = `normal ${sublineFontSize}px sans-serif`;
+    ctx.fillStyle = '#5F5E5E';
     ctx.fillText(opts.displayId, width / 2, sublineY);
   }
 
