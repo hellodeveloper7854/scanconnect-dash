@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type RequestHandler } from 'express';
 import { randomBytes, randomUUID } from 'node:crypto';
 import QRCode from 'qrcode';
 import { ZipArchive } from 'archiver';
@@ -764,8 +764,13 @@ const getDestinationNumberSchema = z.object({
   caller_number: z.string().trim().min(6).max(20),
 });
 
-qrCodesRouter.post('/partner/get-destination-number', requirePartnerApiKey, async (req, res) => {
-  const parsed = getDestinationNumberSchema.safeParse(req.body);
+// Knowlarity's flow calls this as a GET with a JSON body (their "get agent"
+// node), while our docs/tests used POST — so both methods are accepted, and
+// caller_number is read from the body or, failing that, the query string.
+const getDestinationNumberHandler: RequestHandler = async (req, res) => {
+  const parsed = getDestinationNumberSchema.safeParse({
+    caller_number: req.body?.caller_number ?? req.query.caller_number,
+  });
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
@@ -807,7 +812,10 @@ qrCodesRouter.post('/partner/get-destination-number', requirePartnerApiKey, asyn
     caller_number: toE164India(parsed.data.caller_number),
     destination_number: toE164India(destinationPhone),
   });
-});
+};
+
+qrCodesRouter.get('/partner/get-destination-number', requirePartnerApiKey, getDestinationNumberHandler);
+qrCodesRouter.post('/partner/get-destination-number', requirePartnerApiKey, getDestinationNumberHandler);
 
 /**
  * Call-log push: Knowlarity calls this once a bridged call ends, giving us
@@ -848,6 +856,17 @@ function firstNumber(body: Record<string, unknown>, keys: string[]): number | un
   return undefined;
 }
 
+/** Parses an "H:MM:SS" (or "MM:SS") clock duration like "0:00:22" into whole seconds. */
+function parseClockDuration(raw: string | undefined): number | undefined {
+  if (!raw || !/^\d+(:\d{1,2}){1,2}$/.test(raw)) return undefined;
+  return raw.split(':').reduce((total, part) => total * 60 + Number(part), 0);
+}
+
+function parseDate(raw: string): Date | undefined {
+  const parsed = new Date(raw);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
 function firstDate(body: Record<string, unknown>, keys: string[]): Date | undefined {
   const raw = firstString(body, keys);
   if (!raw) return undefined;
@@ -863,12 +882,21 @@ qrCodesRouter.post('/partner/call-logs', async (req, res) => {
   const destinationNumberRaw = firstString(body, [
     'destination_number',
     'destinationNumber',
+    'agent_number', // the real number Knowlarity bridged the caller to
     'ivr_number',
     'display_number',
   ]);
   const status = firstString(body, ['status', 'call_status', 'callStatus']);
-  const durationSeconds = firstNumber(body, ['duration_seconds', 'duration', 'call_duration']);
-  const startedAt = firstDate(body, ['started_at', 'call_start_time', 'call start time', 'startedAt']);
+  const durationSeconds =
+    firstNumber(body, ['duration_seconds', 'duration', 'call_duration']) ??
+    parseClockDuration(firstString(body, ['caller_duration', 'call_duration']));
+  // Knowlarity sends the start as separate call_date ("2026-09-30") and
+  // call_time ("17:25:43") fields, in IST.
+  const callDate = firstString(body, ['call_date']);
+  const callTime = firstString(body, ['call_time']);
+  const startedAt =
+    firstDate(body, ['started_at', 'call_start_time', 'call start time', 'startedAt']) ??
+    (callDate && callTime ? parseDate(`${callDate}T${callTime}+05:30`) : undefined);
   const endedAt = firstDate(body, ['ended_at', 'call_end_time', 'call end time', 'endedAt']);
 
   let matchId: string | undefined;
