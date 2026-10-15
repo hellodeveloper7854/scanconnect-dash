@@ -129,12 +129,15 @@ authRouter.get('/me', requireAuth, async (req, res) => {
 });
 
 const updateMeSchema = z.object({
-  fullName: z.string().min(1).max(120),
+  fullName: z.string().min(1).max(120).optional(),
+  email: z.string().email().optional(),
 });
 
 /**
- * Email is intentionally not editable here — it's the account's Firebase
- * identity. Mobile number changes go through the OTP link-mobile flow.
+ * Email changes are mirrored to the Firebase user first (it's the account's
+ * identity for email/password login), then to Postgres. Phone-only accounts
+ * start with a placeholder email, so this is how they add a real one.
+ * Mobile number changes go through the OTP link-mobile flow.
  */
 authRouter.patch('/me', requireAuth, async (req, res) => {
   const parsed = updateMeSchema.safeParse(req.body);
@@ -142,10 +145,30 @@ authRouter.patch('/me', requireAuth, async (req, res) => {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
 
-  const user = await prisma.user.update({
-    where: { id: req.user!.id },
-    data: { fullName: parsed.data.fullName },
-  });
+  const data: { fullName?: string; email?: string; emailVerified?: boolean } = {};
+  if (parsed.data.fullName !== undefined) data.fullName = parsed.data.fullName;
+
+  const newEmail = parsed.data.email?.trim().toLowerCase();
+  if (newEmail && newEmail !== req.user!.email) {
+    const taken = await prisma.user.findUnique({ where: { email: newEmail } });
+    if (taken && taken.id !== req.user!.id) {
+      return res.status(409).json({ error: 'This email is already in use by another account' });
+    }
+    try {
+      await firebaseAuth.updateUser(req.user!.firebaseUid, { email: newEmail, emailVerified: false });
+    } catch (err) {
+      const code = (err as { code?: string }).code;
+      if (code === 'auth/email-already-exists') {
+        return res.status(409).json({ error: 'This email is already in use by another account' });
+      }
+      console.error('update email failed:', err);
+      return res.status(500).json({ error: 'Failed to update email' });
+    }
+    data.email = newEmail;
+    data.emailVerified = false;
+  }
+
+  const user = await prisma.user.update({ where: { id: req.user!.id }, data });
 
   res.json({ user });
 });

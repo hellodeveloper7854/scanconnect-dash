@@ -111,6 +111,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [profileError, setProfileError] = useState('');
   const [isEditingIdentity, setIsEditingIdentity] = useState(false);
   const [draftFullName, setDraftFullName] = useState('');
+  const [draftEmail, setDraftEmail] = useState('');
   const [isSavingIdentity, setIsSavingIdentity] = useState(false);
   // Profile photo — stored on the backend, shared with the mobile app.
   const avatarUrl = useMyAvatar(isLoggedIn);
@@ -136,8 +137,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     loadProfile();
   };
 
+  // Phone-only accounts carry a server-generated placeholder email — treat it as empty.
+  const displayEmail = profile?.email?.endsWith('@phone.scanconnect.placeholder') ? '' : profile?.email ?? '';
+
   const startEditingIdentity = () => {
     setDraftFullName(profile?.fullName ?? '');
+    setDraftEmail(displayEmail);
     setIsEditingIdentity(true);
   };
 
@@ -146,16 +151,21 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   };
 
   const identityNameError = isValidName(draftFullName) ? '' : VALIDATION_MESSAGES.name;
+  const identityEmailError = !draftEmail.trim() || isValidEmail(draftEmail) ? '' : VALIDATION_MESSAGES.email;
 
   const saveIdentity = async () => {
-    if (identityNameError) {
-      setProfileError(identityNameError);
+    const error = identityNameError || identityEmailError;
+    if (error) {
+      setProfileError(error);
       return;
     }
     setProfileError('');
     setIsSavingIdentity(true);
     try {
-      const res = await api.patch<{ user: BackendUser }>('/api/auth/me', { fullName: draftFullName.trim() });
+      const body: { fullName: string; email?: string } = { fullName: draftFullName.trim() };
+      const email = draftEmail.trim();
+      if (email && email.toLowerCase() !== displayEmail.toLowerCase()) body.email = email;
+      const res = await api.patch<{ user: BackendUser }>('/api/auth/me', body);
       setProfile(res.user);
       setIsEditingIdentity(false);
     } catch (err) {
@@ -607,14 +617,33 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       </div>
                     </div>
 
-                    {/* Row 2: Email Address (read-only, tied to Firebase identity) */}
+                    {/* Row 2: Email Address */}
                     <div className="space-y-2">
                       <label className="block text-xs font-bold tracking-[1.2px] text-[#5D5F5F] uppercase">
                         EMAIL ADDRESS
                       </label>
-                      <div className="w-full h-[50px] px-4 flex items-center bg-[#F8F8F8] border border-[#EEEEEE] rounded-lg text-[#5D5F5F] font-normal text-base">
-                        {profile?.email || '—'}
-                      </div>
+                      {isEditingIdentity ? (
+                        <>
+                          <input
+                            type="email"
+                            value={draftEmail}
+                            onChange={(e) => setDraftEmail(e.target.value)}
+                            placeholder="you@example.com"
+                            className={`w-full h-[50px] px-4 bg-white border rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 outline-none transition-all ${
+                              draftEmail && identityEmailError
+                                ? 'border-red-500 focus:ring-red-400'
+                                : 'border-[#CCC7AA] focus:ring-[#FFED00]'
+                            }`}
+                          />
+                          {draftEmail && identityEmailError && (
+                            <p className="text-xs font-semibold text-red-600 mt-1">{identityEmailError}</p>
+                          )}
+                        </>
+                      ) : (
+                        <div className="w-full h-[50px] px-4 flex items-center bg-[#F8F8F8] border border-[#EEEEEE] rounded-lg text-[#5D5F5F] font-normal text-base">
+                          {displayEmail || '—'}
+                        </div>
+                      )}
                     </div>
 
                     {isEditingIdentity && (
