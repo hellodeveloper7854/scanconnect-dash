@@ -417,6 +417,27 @@ adminQrCodesRouter.delete('/:id/permanent', async (req, res) => {
   res.status(204).send();
 });
 
+const bulkPermanentDeleteSchema = z.object({
+  ids: z.array(z.string().min(1)).min(1).max(MAX_ADMIN_PAGE_SIZE),
+});
+
+/**
+ * Permanently deletes several trashed QR codes at once. Same guard as the
+ * single-code route: only rows that are already soft-deleted are removed, so
+ * any id that isn't in the trash is simply skipped.
+ */
+adminQrCodesRouter.post('/permanent-bulk', async (req, res) => {
+  const parsed = bulkPermanentDeleteSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const result = await prisma.qrCode.deleteMany({
+    where: { id: { in: parsed.data.ids }, deletedAt: { not: null } },
+  });
+  res.json({ deleted: result.count });
+});
+
 const disableSchema = z.object({
   disabled: z.boolean(),
 });

@@ -18,6 +18,42 @@ export const AdminQrCodesTrash: React.FC = () => {
   const [restoringId, setRestoringId] = useState<string | null>(null);
   const [permanentDeleteTarget, setPermanentDeleteTarget] = useState<{ id: string; code: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+
+  const allOnPageSelected = !!codes && codes.length > 0 && codes.every((c) => selectedIds.has(c.id));
+
+  const toggleSelected = (id: string) =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const toggleSelectAll = () =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      codes?.forEach((c) => (allOnPageSelected ? next.delete(c.id) : next.add(c.id)));
+      return next;
+    });
+
+  const confirmBulkDelete = async () => {
+    setIsDeleting(true);
+    setError('');
+    try {
+      await api.post('/api/admin/qr-codes/permanent-bulk', { ids: [...selectedIds] });
+      setIsBulkDeleteOpen(false);
+      setSelectedIds(new Set());
+      // Deleting a whole last page would leave us on an empty page.
+      if (codes && selectedIds.size >= codes.length && page > 1) setPage(page - 1);
+      else load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to permanently delete QR codes');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const load = () => {
     const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
@@ -54,6 +90,11 @@ export const AdminQrCodesTrash: React.FC = () => {
     setError('');
     try {
       await api.delete(`/api/admin/qr-codes/${permanentDeleteTarget.id}/permanent`);
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(permanentDeleteTarget.id);
+        return next;
+      });
       setPermanentDeleteTarget(null);
       load();
     } catch (err) {
@@ -87,6 +128,28 @@ export const AdminQrCodesTrash: React.FC = () => {
         </div>
       )}
 
+      {selectedIds.size > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+          <span className="text-white text-sm font-bold">{selectedIds.size} selected</span>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSelectedIds(new Set())}
+              className="h-9 px-3 text-white/70 hover:text-white text-xs font-bold cursor-pointer"
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsBulkDeleteOpen(true)}
+              className="inline-flex items-center gap-1.5 h-9 px-4 bg-rose-500 hover:bg-rose-400 text-white text-xs font-bold rounded-md cursor-pointer"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Delete Selected
+            </button>
+          </div>
+        </div>
+      )}
+
       {!codes ? (
         <div className="text-white/60">Loading...</div>
       ) : codes.length === 0 ? (
@@ -101,6 +164,15 @@ export const AdminQrCodesTrash: React.FC = () => {
                 <th className="px-4 py-3">Code</th>
                 <th className="px-4 py-3">Batch</th>
                 <th className="px-4 py-3">Deleted</th>
+                <th className="px-4 py-3 w-10">
+                  <input
+                    type="checkbox"
+                    checked={allOnPageSelected}
+                    onChange={toggleSelectAll}
+                    title="Select all on this page"
+                    className="w-4 h-4 accent-[#FFED00] cursor-pointer"
+                  />
+                </th>
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
@@ -117,6 +189,14 @@ export const AdminQrCodesTrash: React.FC = () => {
                   <td className="px-4 py-3 text-white/70 text-xs">{c.batchName}</td>
                   <td className="px-4 py-3 text-white/50 text-xs">
                     {c.deletedAt ? new Date(c.deletedAt).toLocaleString() : '—'}
+                  </td>
+                  <td className="px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(c.id)}
+                      onChange={() => toggleSelected(c.id)}
+                      className="w-4 h-4 accent-[#FFED00] cursor-pointer"
+                    />
                   </td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">
                     <button
@@ -183,6 +263,43 @@ export const AdminQrCodesTrash: React.FC = () => {
             >
               Next
             </button>
+          </div>
+        </div>
+      )}
+
+      {isBulkDeleteOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-neutral-900 border border-white/10 rounded-xl max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-rose-500/15 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-rose-400" />
+              </div>
+              <h2 className="font-black text-lg text-white">Permanently delete {selectedIds.size} QR codes?</h2>
+            </div>
+
+            <p className="text-sm text-white/70">
+              This will permanently delete the {selectedIds.size} selected QR codes. This cannot be undone — they
+              will no longer be recoverable from this trash view.
+            </p>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsBulkDeleteOpen(false)}
+                disabled={isDeleting}
+                className="h-10 px-4 text-white/70 hover:text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmBulkDelete}
+                disabled={isDeleting}
+                className="h-10 px-4 bg-rose-500 hover:bg-rose-400 text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Permanently'}
+              </button>
+            </div>
           </div>
         </div>
       )}
