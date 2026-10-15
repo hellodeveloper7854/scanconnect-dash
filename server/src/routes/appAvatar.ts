@@ -1,4 +1,4 @@
-import express, { Router } from 'express';
+import express, { Router, type NextFunction, type Request, type RequestHandler, type Response } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth } from '../middleware/auth.js';
 
@@ -18,6 +18,14 @@ import { requireAuth } from '../middleware/auth.js';
  */
 export const appAvatarRouter = Router();
 
+/** Express 4 doesn't catch rejected promises: without this, a database error
+ *  in an async handler becomes an unhandled rejection that kills the process. */
+const safe =
+  (handler: (req: Request, res: Response) => Promise<unknown>): RequestHandler =>
+  (req: Request, res: Response, next: NextFunction) => {
+    handler(req, res).catch(next);
+  };
+
 const MAX_BYTES = 2 * 1024 * 1024;
 
 function detectMime(buf: Buffer): 'image/jpeg' | 'image/png' | 'image/webp' | null {
@@ -35,7 +43,7 @@ appAvatarRouter.put(
   '/',
   requireAuth,
   express.raw({ type: ['image/jpeg', 'image/png', 'image/webp', 'application/octet-stream'], limit: MAX_BYTES }),
-  async (req, res) => {
+  safe(async (req, res) => {
     const body = req.body;
     if (!Buffer.isBuffer(body) || body.length === 0) {
       return res.status(400).json({ error: 'Send the image as the request body (JPEG, PNG or WebP).' });
@@ -51,15 +59,15 @@ appAvatarRouter.put(
       update: { mimeType, data: body },
     });
     res.json({ ok: true, url: `/api/avatar/${req.user!.id}`, version: Date.now() });
-  },
+  }),
 );
 
-appAvatarRouter.delete('/', requireAuth, async (req, res) => {
+appAvatarRouter.delete('/', requireAuth, safe(async (req, res) => {
   await prisma.userAvatar.deleteMany({ where: { userId: req.user!.id } });
   res.json({ ok: true });
-});
+}));
 
-appAvatarRouter.get('/:userId', async (req, res) => {
+appAvatarRouter.get('/:userId', safe(async (req, res) => {
   const avatar = await prisma.userAvatar.findUnique({ where: { userId: req.params.userId } });
   if (!avatar) {
     return res.status(404).json({ error: 'No profile photo' });
@@ -73,4 +81,4 @@ appAvatarRouter.get('/:userId', async (req, res) => {
   }
   res.setHeader('Content-Type', avatar.mimeType);
   res.send(Buffer.from(avatar.data));
-});
+}));
