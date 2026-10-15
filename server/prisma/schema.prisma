@@ -40,6 +40,7 @@ model User {
   reviews           Review[]
   sosAlerts         SosAlert[]
   notifications     Notification[]
+  chatThreads       ChatThread[]
 
   @@index([email])
   @@index([mobileNumber])
@@ -620,4 +621,48 @@ model UserAvatar {
   mimeType  String
   data      Bytes
   updatedAt DateTime @updatedAt
+}
+
+enum ChatThreadStatus {
+  OPEN
+  CLOSED
+}
+
+enum ChatSender {
+  USER
+  ADMIN
+}
+
+/// Support live-chat conversation between one user (website or app) and the
+/// admin team. A user has at most one OPEN thread; when an admin closes it
+/// the user's next message starts a fresh one. The unread counters are the
+/// number of messages the *other* side has not seen yet.
+model ChatThread {
+  id            String           @id @default(uuid())
+  userId        String
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status        ChatThreadStatus @default(OPEN)
+  lastMessageAt DateTime         @default(now())
+  userUnread    Int              @default(0)
+  adminUnread   Int              @default(0)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  messages ChatMessage[]
+
+  @@index([userId])
+  @@index([status, lastMessageAt])
+}
+
+model ChatMessage {
+  id        String     @id @default(uuid())
+  threadId  String
+  thread    ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender    ChatSender
+  /// The admin who wrote it (null for USER messages) — shown to staff only.
+  adminId   String?
+  body      String
+  createdAt DateTime   @default(now())
+
+  @@index([threadId, createdAt])
 }

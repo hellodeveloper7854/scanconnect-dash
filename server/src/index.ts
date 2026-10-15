@@ -18,6 +18,7 @@ import { whatsappRouter } from './routes/whatsapp.js';
 import { appAccountRouter } from './routes/appAccount.js';
 import { appVehicleLookupRouter } from './routes/appVehicleLookup.js';
 import { appAvatarRouter } from './routes/appAvatar.js';
+import { adminChatRouter, chatRouter } from './routes/appChat.js';
 
 const app = express();
 
@@ -52,6 +53,8 @@ app.use('/api/whatsapp', whatsappRouter);
 app.use('/api/app/account', appAccountRouter);
 app.use('/api/app/vehicle-lookup', appVehicleLookupRouter);
 app.use('/api/avatar', appAvatarRouter);
+app.use('/api/chat', chatRouter);
+app.use('/api/admin/chat', adminChatRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   // express.json() throws a SyntaxError (with a `body` property) when the

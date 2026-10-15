@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -27,8 +27,10 @@ import {
   Handshake,
   Mail,
   Trash2,
+  MessageCircle,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../lib/api';
 
 interface NavItem {
   to: string;
@@ -62,6 +64,7 @@ const SECTIONS: NavSection[] = [
       { to: '/admin/sos-alerts', label: 'SOS Alerts', icon: Siren },
       { to: '/admin/resellers', label: 'Resellers', icon: Handshake },
       { to: '/admin/contact-requests', label: 'Contact Requests', icon: Mail },
+      { to: '/admin/live-chat', label: 'Live Chat', icon: MessageCircle },
       { to: '/admin/coupons', label: 'Coupons', icon: Ticket },
     ],
   },
@@ -87,6 +90,28 @@ export const AdminLayout: React.FC = () => {
   const { isLoading, isLoggedIn, isAdmin, user, logout } = useAuth();
   const mainRef = useRef<HTMLElement>(null);
   const { pathname } = useLocation();
+  const [chatUnread, setChatUnread] = useState(0);
+
+  // Poll the count of open chats awaiting a reply (paused while tab hidden).
+  useEffect(() => {
+    if (!isLoggedIn || !isAdmin) return;
+    let cancelled = false;
+    const fetchCount = () => {
+      if (document.hidden) return;
+      api
+        .get<{ count: number }>('/api/admin/chat/unread-count')
+        .then((res) => !cancelled && setChatUnread(res.count))
+        .catch(() => {});
+    };
+    fetchCount();
+    const timer = window.setInterval(fetchCount, 15000);
+    document.addEventListener('visibilitychange', fetchCount);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', fetchCount);
+    };
+  }, [isLoggedIn, isAdmin]);
 
   // React Router doesn't reset scroll on navigation (unlike a full page
   // load), and the scrollable element here is <main> — not the window —
@@ -133,7 +158,12 @@ export const AdminLayout: React.FC = () => {
                   }
                 >
                   <Icon className="w-4 h-4 shrink-0" />
-                  <span className="truncate">{label}</span>
+                  <span className="truncate flex-1">{label}</span>
+                  {to === '/admin/live-chat' && chatUnread > 0 && (
+                    <span className="min-w-5 h-5 px-1.5 rounded-full bg-[#FFED00] text-[#1B1C1C] text-xs font-black flex items-center justify-center">
+                      {chatUnread > 99 ? '99+' : chatUnread}
+                    </span>
+                  )}
                 </NavLink>
               ))}
             </div>
