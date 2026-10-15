@@ -610,3 +610,14 @@ model DemoSystemConfig {
   appVersion                String  @default("1.0.0")
   updatedAt                 DateTime @updatedAt
 }
+
+/// Profile photo, kept apart from `User` so the image bytes never ride along
+/// on the many queries that load a user (auth middleware loads one per
+/// request). One row per user, keyed by the user id; no foreign key, so it is
+/// removed explicitly when an account is deleted (routes/appAccount.ts).
+model UserAvatar {
+  userId    String   @id
+  mimeType  String
+  data      Bytes
+  updatedAt DateTime @updatedAt
+}

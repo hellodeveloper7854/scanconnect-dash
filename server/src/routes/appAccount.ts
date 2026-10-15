@@ -37,6 +37,7 @@ appAccountRouter.delete('/', async (req, res) => {
   const orderCount = await prisma.order.count({ where: { userId: user.id } });
 
   await prisma.$transaction(async (tx) => {
+    await tx.userAvatar.deleteMany({ where: { userId: user.id } });
     await tx.qrCode.updateMany({
       where: { vehicle: { userId: user.id } },
       data: { vehicleId: null, status: 'INACTIVE', activatedAt: null },

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
@@ -6,6 +6,7 @@ import { OtpModal } from './OtpModal';
 import { PhoneInput } from './PhoneInput';
 import { api, ApiError } from '../lib/api';
 import { auth } from '../lib/firebase';
+import { removeAvatar, uploadAvatar, useMyAvatar } from '../lib/avatar';
 import { fetchBrandedQrPngBlob, triggerBlobDownload, stickerSizeForVehicleType } from '../lib/qrSticker';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import {
@@ -19,6 +20,7 @@ import {
 } from '../lib/validation';
 import {
   Camera,
+  User,
   Lock,
   Laptop,
   Sliders,
@@ -110,9 +112,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [isEditingIdentity, setIsEditingIdentity] = useState(false);
   const [draftFullName, setDraftFullName] = useState('');
   const [isSavingIdentity, setIsSavingIdentity] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState(
-    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80'
-  );
+  // Profile photo — stored on the backend, shared with the mobile app.
+  const avatarUrl = useMyAvatar(isLoggedIn);
+  const [avatarFailed, setAvatarFailed] = useState(false); // true until the user uploads a photo
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarError, setAvatarError] = useState('');
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => setAvatarFailed(false), [avatarUrl]);
 
   const [isLinkMobileOpen, setIsLinkMobileOpen] = useState(false);
 
@@ -378,13 +384,32 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     }
   };
 
-  const handleAvatarChange = () => {
-    const newAvatar = prompt(
-      'Enter new image URL for profile photo:',
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
-    );
-    if (newAvatar) {
-      setAvatarUrl(newAvatar);
+  const handleAvatarChange = () => avatarInputRef.current?.click();
+
+  const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-selecting the same file later
+    if (!file) return;
+    setAvatarError('');
+    setIsUploadingAvatar(true);
+    try {
+      await uploadAvatar(file);
+    } catch (err) {
+      setAvatarError(err instanceof Error ? err.message : 'Failed to upload photo');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleAvatarRemove = async () => {
+    setAvatarError('');
+    setIsUploadingAvatar(true);
+    try {
+      await removeAvatar();
+    } catch (err) {
+      setAvatarError(err instanceof Error ? err.message : 'Failed to remove photo');
+    } finally {
+      setIsUploadingAvatar(false);
     }
   };
 
@@ -482,22 +507,53 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8">
 
                   {/* Profile Photo with Camera Overlay Badge */}
-                  <div className="relative shrink-0 w-[128px] h-[128px]">
-                    <div className="w-[128px] h-[128px] bg-[#EFEDED] border-2 border-[#CCC7AA] rounded-xl overflow-hidden flex items-center justify-center">
-                      <img
-                        src={avatarUrl}
-                        alt="Profile Avatar"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover"
+                  <div className="shrink-0 flex flex-col items-center gap-2">
+                    <div className="relative w-[128px] h-[128px]">
+                      <div className="w-[128px] h-[128px] bg-[#EFEDED] border-2 border-[#CCC7AA] rounded-xl overflow-hidden flex items-center justify-center">
+                        {avatarUrl && !avatarFailed ? (
+                          <img
+                            src={avatarUrl}
+                            alt="Profile Avatar"
+                            onError={() => setAvatarFailed(true)}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-14 h-14 text-[#9CA3AF]" />
+                        )}
+                        {isUploadingAvatar && (
+                          <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+                            <div className="w-6 h-6 border-2 border-[#1B1C1C] border-t-transparent rounded-full animate-spin" />
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={handleAvatarChange}
+                        disabled={isUploadingAvatar}
+                        title="Update profile picture"
+                        className="absolute -bottom-2 -right-2 w-[30px] h-[32px] rounded-lg bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] flex items-center justify-center shadow-md transition-transform active:scale-95 cursor-pointer border border-white disabled:opacity-60"
+                      >
+                        <Camera className="w-3.5 h-3.5 stroke-[2.5]" />
+                      </button>
+                      <input
+                        ref={avatarInputRef}
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        className="hidden"
+                        onChange={handleAvatarFile}
                       />
                     </div>
-                    <button
-                      onClick={handleAvatarChange}
-                      title="Update profile picture"
-                      className="absolute -bottom-2 -right-2 w-[30px] h-[32px] rounded-lg bg-[#FFED00] hover:bg-[#e0ac00] text-[#1B1C1C] flex items-center justify-center shadow-md transition-transform active:scale-95 cursor-pointer border border-white"
-                    >
-                      <Camera className="w-3.5 h-3.5 stroke-[2.5]" />
-                    </button>
+                    {avatarUrl && !avatarFailed && (
+                      <button
+                        onClick={handleAvatarRemove}
+                        disabled={isUploadingAvatar}
+                        className="text-xs font-semibold text-[#5D5F5F] hover:text-red-600 underline disabled:opacity-60 cursor-pointer"
+                      >
+                        Remove photo
+                      </button>
+                    )}
+                    {avatarError && (
+                      <p className="text-xs text-red-600 max-w-[140px] text-center">{avatarError}</p>
+                    )}
                   </div>
 
                   {/* Form Inputs Grid */}

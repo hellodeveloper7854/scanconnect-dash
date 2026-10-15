@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Bell, HelpCircle, LogOut, ShieldAlert, User, Menu, X, ChevronDown, Package } from 'lucide-react';
 import { UserFormData } from '../types';
 import { api, ApiError } from '../lib/api';
+import { useMyAvatar } from '../lib/avatar';
 import logoImg from '../assets/images/logo.png';
 
 interface DashboardHeaderProps {
@@ -32,6 +33,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [sosActive, setSosActive] = useState(false);
+  const avatarSrc = useMyAvatar(isLoggedIn);
+  const [avatarFailed, setAvatarFailed] = useState(false);
+  useEffect(() => setAvatarFailed(false), [avatarSrc]);
 
   // Real, per-user notifications — only ever fetched while signed in. Signing
   // out clears everything back to empty so a stale badge/list from the
@@ -239,12 +243,18 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   title="View My Profile"
                   className="flex items-center p-0.5 rounded-xl hover:ring-2 hover:ring-white/40 transition-all cursor-pointer group"
                 >
-                  <img
-                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80"
-                    alt="User Avatar"
-                    referrerPolicy="no-referrer"
-                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-cover border-2 border-white/80 shadow-xs group-hover:scale-105 transition-transform"
-                  />
+                  {avatarSrc && !avatarFailed ? (
+                    <img
+                      src={avatarSrc}
+                      alt="User Avatar"
+                      onError={() => setAvatarFailed(true)}
+                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-cover border-2 border-white/80 shadow-xs group-hover:scale-105 transition-transform"
+                    />
+                  ) : (
+                    <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/70 border-2 border-white/80 flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <User className="w-5 h-5 text-[#1B1C1C]" />
+                    </span>
+                  )}
                 </button>
 
                 <button
