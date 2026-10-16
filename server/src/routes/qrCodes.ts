@@ -8,7 +8,7 @@ import { env } from '../lib/env.js';
 import { requireAuth, requireAdmin, requirePartnerApiKey } from '../middleware/auth.js';
 import { toCsv } from '../lib/csv.js';
 import { notify } from '../lib/notify.js';
-import { last10Digits, toE164India } from '../lib/phone.js';
+import { isValidIndianMobile, last10Digits, toE164India } from '../lib/phone.js';
 import { isKnowlarityConfigured, getMaskedNumber } from '../lib/knowlarity.js';
 import { isGupshupConfigured, sendTemplateMessage, GupshupError } from '../lib/gupshup.js';
 import type { Prisma } from '@prisma/client';
@@ -932,8 +932,11 @@ qrCodesRouter.post('/partner/call-logs', async (req, res) => {
 
   const data: Prisma.CallLogUncheckedCreateInput = {
     maskedCallRequestId: matchId,
-    callerNumber: callerNumberRaw ? toE164India(callerNumberRaw) : undefined,
-    destinationNumber: destinationNumberRaw ? toE164India(destinationNumberRaw) : undefined,
+    // Knowlarity sends placeholders like "False" / "None" when there is no agent
+    // (e.g. the transfer never happened) — those must not become a bogus "+91".
+    callerNumber: callerNumberRaw && isValidIndianMobile(callerNumberRaw) ? toE164India(callerNumberRaw) : undefined,
+    destinationNumber:
+      destinationNumberRaw && isValidIndianMobile(destinationNumberRaw) ? toE164India(destinationNumberRaw) : undefined,
     providerCallId,
     status,
     durationSeconds,
