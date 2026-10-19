@@ -2,6 +2,23 @@ import { auth } from './firebase';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
+/**
+ * Which backend database this build talks to — set VITE_APP_ENV=test for a
+ * test build; anything else (or unset) is live. Sent on every API request so
+ * the server can route it to the matching database.
+ */
+export const APP_ENV: 'test' | 'live' = import.meta.env.VITE_APP_ENV === 'test' ? 'test' : 'live';
+
+/** Headers every API call must carry. Spread into any raw fetch() to the backend. */
+export function appEnvHeaders(): Record<string, string> {
+  return { 'X-App-Env': APP_ENV };
+}
+
+/** Appends ?appEnv=test to a backend URL for requests that can't carry headers, like <img src>. */
+export function withAppEnv(url: string): string {
+  return APP_ENV === 'test' ? `${url}${url.includes('?') ? '&' : '?'}appEnv=test` : url;
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const idToken = await auth.currentUser?.getIdToken();
 
@@ -9,6 +26,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...options,
     headers: {
       'Content-Type': 'application/json',
+      ...appEnvHeaders(),
       ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
       ...options.headers,
     },
@@ -51,7 +69,7 @@ export const api = {
 export async function downloadFile(path: string, filename: string): Promise<void> {
   const idToken = await auth.currentUser?.getIdToken();
   const res = await fetch(`${API_BASE_URL}${path}`, {
-    headers: idToken ? { Authorization: `Bearer ${idToken}` } : {},
+    headers: { ...appEnvHeaders(), ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}) },
   });
   if (!res.ok) {
     throw new ApiError('Failed to download file', res.status);

@@ -26,6 +26,9 @@ export const env = {
   port: Number(process.env.PORT ?? 4000),
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
   databaseUrl: required('DATABASE_URL'),
+  // Optional second database used when the frontend declares VITE_APP_ENV=test
+  // (sent as the X-App-Env header). Requests that don't declare it use DATABASE_URL.
+  testDatabaseUrl: process.env.TEST_DATABASE_URL,
   firebase: {
     projectId: required('FIREBASE_PROJECT_ID'),
     clientEmail: required('FIREBASE_CLIENT_EMAIL'),

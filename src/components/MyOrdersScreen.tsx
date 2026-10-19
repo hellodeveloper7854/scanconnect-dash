@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
-import { api, ApiError } from '../lib/api';
+import { api, ApiError, withAppEnv } from '../lib/api';
 import { auth } from '../lib/firebase';
 import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize } from '../lib/qrSticker';
 import { Package, ShoppingBag, Download } from 'lucide-react';
@@ -121,7 +121,7 @@ export const MyOrdersScreen: React.FC<MyOrdersScreenProps> = ({ userData, onLogo
                     <div className="flex items-center gap-4">
                       {order.tags.length > 0 ? (
                         <img
-                          src={`${API_BASE_URL}/api/order-contact/${order.tags[0].qrToken}/qr.png`}
+                          src={withAppEnv(`${API_BASE_URL}/api/order-contact/${order.tags[0].qrToken}/qr.png`)}
                           alt="Order QR tag"
                           className="w-11 h-11 rounded-lg shrink-0"
                         />

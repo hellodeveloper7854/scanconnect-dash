@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
-import { api, ApiError } from '../lib/api';
+import { api, ApiError, withAppEnv } from '../lib/api';
 import { auth } from '../lib/firebase';
 import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize, type StickerLang } from '../lib/qrSticker';
 import { PhoneInput } from './PhoneInput';
@@ -1500,7 +1500,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                     className="bg-white border border-[#E4E2E2] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] rounded-[12px] p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6"
                   >
                     <img
-                      src={`${API_BASE_URL}/api/order-contact/${tag.qrToken}/qr.png`}
+                      src={withAppEnv(`${API_BASE_URL}/api/order-contact/${tag.qrToken}/qr.png`)}
                       alt={`Your Scan Connect QR tag (${TAG_SIZE_LABEL[tag.size]})`}
                       className="w-40 h-40 shrink-0 rounded-lg"
                     />

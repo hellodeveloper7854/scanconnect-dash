@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { env } from './lib/env.js';
+import { appEnvMiddleware } from './middleware/appEnv.js';
 import { authRouter } from './routes/auth.js';
 import { ordersRouter, razorpayWebhookHandler } from './routes/orders.js';
 import { adminRouter } from './routes/admin.js';
@@ -33,6 +34,9 @@ app.use(cors({ origin: env.corsOrigin, credentials: true }));
 app.post('/api/orders/webhook', express.raw({ type: 'application/json' }), razorpayWebhookHandler);
 
 app.use(express.json());
+
+// Pins each request to the live or test database (see lib/prisma.ts).
+app.use(appEnvMiddleware);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 

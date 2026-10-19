@@ -1,3 +1,5 @@
+import { appEnvHeaders } from './api';
+
 export type StickerLang = 'en' | 'hi';
 export type StickerSize = 'bike' | 'car' | 'transport' | 'helmet';
 
@@ -776,7 +778,7 @@ export async function fetchBrandedQrPngBlob(
   idToken: string | undefined,
   opts: { lang: StickerLang; size: StickerSize; displayId?: string },
 ): Promise<Blob> {
-  const res = await fetch(url, { headers: idToken ? { Authorization: `Bearer ${idToken}` } : {} });
+  const res = await fetch(url, { headers: { ...appEnvHeaders(), ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}) } });
   const rawBlob = await res.blob();
   const canvas = await drawBrandedQrCanvas(rawBlob, opts);
   return canvasToBlob(canvas);

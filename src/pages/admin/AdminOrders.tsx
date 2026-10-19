@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { QrCode, Download } from 'lucide-react';
-import { api } from '../../lib/api';
+import { api, withAppEnv } from '../../lib/api';
 import { auth } from '../../lib/firebase';
 import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize } from '../../lib/qrSticker';
 
@@ -199,7 +199,7 @@ export const AdminOrders: React.FC = () => {
           >
             <p className="text-neutral-900 font-bold text-sm">Scan to view customer contact details</p>
             <img
-              src={`${API_BASE_URL}/api/order-contact/${previewToken}/qr.png`}
+              src={withAppEnv(`${API_BASE_URL}/api/order-contact/${previewToken}/qr.png`)}
               alt="Order QR code"
               className="w-full h-auto"
             />

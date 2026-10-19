@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ScanResultCard } from '../components/ScanResultCard';
+import { appEnvHeaders } from '../lib/api';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -24,7 +25,7 @@ export const OrderContactPage: React.FC<{ token: string }> = ({ token }) => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/order-contact/${token}`)
+    fetch(`${API_BASE_URL}/api/order-contact/${token}`, { headers: appEnvHeaders() })
       .then(async (res) => {
         if (!res.ok) throw new Error((await res.json().catch(() => null))?.error ?? 'Not found');
         return res.json();

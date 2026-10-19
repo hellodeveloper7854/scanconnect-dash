@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import JSZip from 'jszip';
 import { Download, Printer, X, Search, FileArchive, Trash2, AlertTriangle, ShieldOff, ShieldCheck } from 'lucide-react';
-import { api, downloadFile } from '../../lib/api';
+import { api, appEnvHeaders, downloadFile } from '../../lib/api';
 import { auth } from '../../lib/firebase';
 import {
   StickerLang,
@@ -46,7 +46,7 @@ export const AuthedQrImage: React.FC<{
       const qrUrl = `${API_BASE_URL}/api/admin/qr-codes/${id}/qr.png`;
       const blob = branded
         ? await fetchBrandedQrPngBlob(qrUrl, idToken, { lang, size, displayId })
-        : await fetch(qrUrl, { headers: idToken ? { Authorization: `Bearer ${idToken}` } : {} }).then((r) => r.blob());
+        : await fetch(qrUrl, { headers: { ...appEnvHeaders(), ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}) } }).then((r) => r.blob());
       if (cancelled) return;
       objectUrl = URL.createObjectURL(blob);
       setSrc(objectUrl);
