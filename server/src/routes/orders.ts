@@ -2,7 +2,8 @@ import { Router, type Request, type Response } from 'express';
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
-import { razorpay } from '../lib/razorpay.js';
+import { getRazorpay, getRazorpayCredentials, PaymentsNotConfiguredError } from '../lib/razorpay.js';
+import { runWithAppEnv, isTestDatabaseConfigured, type AppEnv } from '../lib/prisma.js';
 import { env } from '../lib/env.js';
 import { requireAuth } from '../middleware/auth.js';
 import { notify } from '../lib/notify.js';
@@ -245,11 +246,19 @@ ordersRouter.post('/', requireAuth, async (req, res) => {
     include: { items: true },
   });
 
-  const razorpayOrder = await razorpay.orders.create({
-    amount: totalInPaise,
-    currency: 'INR',
-    receipt: order.id,
-  });
+  let razorpayOrder;
+  try {
+    razorpayOrder = await getRazorpay().orders.create({
+      amount: totalInPaise,
+      currency: 'INR',
+      receipt: order.id,
+    });
+  } catch (err) {
+    if (err instanceof PaymentsNotConfiguredError) {
+      return res.status(503).json({ error: 'Payments are not available right now.' });
+    }
+    throw err;
+  }
 
   const updated = await prisma.order.update({
     where: { id: order.id },
@@ -259,7 +268,7 @@ ordersRouter.post('/', requireAuth, async (req, res) => {
   res.status(201).json({
     order: updated,
     razorpayOrderId: razorpayOrder.id,
-    razorpayKeyId: env.razorpay.keyId,
+    razorpayKeyId: getRazorpayCredentials().keyId,
     amount: totalInPaise,
     currency: 'INR',
   });
@@ -370,7 +379,13 @@ ordersRouter.post('/verify', requireAuth, async (req, res) => {
 
   const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = parsed.data;
 
-  const expected = createHmac('sha256', env.razorpay.keySecret)
+  let keySecret: string;
+  try {
+    keySecret = getRazorpayCredentials().keySecret;
+  } catch {
+    return res.status(503).json({ error: 'Payments are not available right now.' });
+  }
+  const expected = createHmac('sha256', keySecret)
     .update(`${razorpayOrderId}|${razorpayPaymentId}`)
     .digest('hex');
 
@@ -488,30 +503,42 @@ export async function razorpayWebhookHandler(req: Request, res: Response) {
     return res.status(400).json({ error: 'Missing signature or body' });
   }
 
-  const expected = createHmac('sha256', env.razorpay.webhookSecret).update(rawBody).digest('hex');
-  const valid =
-    expected.length === signature.length && timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  // Live and test Razorpay webhooks hit this same URL, each signed with its own
+  // secret — the signature that verifies tells us which mode (and so which
+  // database) the event belongs to.
+  const matchedMode = (['live', 'test'] as AppEnv[]).find((mode) => {
+    const creds = env.razorpay[mode];
+    if (!creds) return false;
+    const expected = createHmac('sha256', creds.webhookSecret).update(rawBody).digest('hex');
+    return expected.length === signature.length && timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  });
 
-  if (!valid) {
+  if (!matchedMode) {
     return res.status(400).json({ error: 'Invalid webhook signature' });
+  }
+  if (matchedMode === 'test' && !isTestDatabaseConfigured()) {
+    // Acknowledge so Razorpay stops retrying; there's no test database to record it in.
+    return res.json({ received: true, ignored: 'test database not configured' });
   }
 
   const event = JSON.parse(rawBody.toString('utf8'));
 
-  if (event.event === 'payment.captured') {
-    const orderId = event.payload?.payment?.entity?.order_id;
-    if (orderId) {
-      await markOrderPaidAndRedeemCoupon(orderId, {});
+  await runWithAppEnv(matchedMode, async () => {
+    if (event.event === 'payment.captured') {
+      const orderId = event.payload?.payment?.entity?.order_id;
+      if (orderId) {
+        await markOrderPaidAndRedeemCoupon(orderId, {});
+      }
+    } else if (event.event === 'payment.failed') {
+      const orderId = event.payload?.payment?.entity?.order_id;
+      if (orderId) {
+        await prisma.order.updateMany({
+          where: { razorpayOrderId: orderId },
+          data: { status: 'FAILED' },
+        });
+      }
     }
-  } else if (event.event === 'payment.failed') {
-    const orderId = event.payload?.payment?.entity?.order_id;
-    if (orderId) {
-      await prisma.order.updateMany({
-        where: { razorpayOrderId: orderId },
-        data: { status: 'FAILED' },
-      });
-    }
-  }
+  });
 
   res.json({ received: true });
 }

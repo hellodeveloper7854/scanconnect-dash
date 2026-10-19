@@ -8,18 +8,38 @@ function required(name: string): string {
   return value;
 }
 
-// PAYMENT_MODE picks which Razorpay credential set to load — 'live' reads
-// RAZORPAY_LIVE_*, anything else (including unset, so local dev is safe by
-// default) reads RAZORPAY_TEST_*. The key id's rzp_test_/rzp_live_ prefix is
-// checked against the declared mode so a mismatched pair (e.g. a live secret
-// pasted next to a test key id) fails fast at boot instead of at checkout.
-const paymentMode = process.env.PAYMENT_MODE === 'live' ? 'live' : 'test';
-const razorpayKeyId = required(paymentMode === 'live' ? 'RAZORPAY_LIVE_KEY_ID' : 'RAZORPAY_TEST_KEY_ID');
-const expectedPrefix = paymentMode === 'live' ? 'rzp_live_' : 'rzp_test_';
-if (!razorpayKeyId.startsWith(expectedPrefix)) {
-  throw new Error(
-    `PAYMENT_MODE=${paymentMode} but the configured Razorpay key id does not start with "${expectedPrefix}". Check your .env.`,
-  );
+// Razorpay credentials for both modes. Which set a request uses is decided per
+// request by the environment the frontend declares (X-App-Env, see
+// middleware/appEnv.ts): test requests use RAZORPAY_TEST_*, everything else
+// uses RAZORPAY_LIVE_*. A set may be left out entirely (that mode's payments
+// then return 503), but a set that is present must be complete and its key id's
+// rzp_test_/rzp_live_ prefix must match the mode — so a mismatched pair (e.g. a
+// live key pasted into the test slot) fails fast at boot, not at checkout.
+export interface RazorpayCredentials {
+  keyId: string;
+  keySecret: string;
+  webhookSecret: string;
+}
+
+function razorpayCredentials(mode: 'live' | 'test'): RazorpayCredentials | null {
+  const prefix = `RAZORPAY_${mode.toUpperCase()}_`;
+  const keyId = process.env[`${prefix}KEY_ID`];
+  if (!keyId) return null;
+  const expectedPrefix = mode === 'live' ? 'rzp_live_' : 'rzp_test_';
+  if (!keyId.startsWith(expectedPrefix)) {
+    throw new Error(`${prefix}KEY_ID must start with "${expectedPrefix}". Check your .env.`);
+  }
+  return {
+    keyId,
+    keySecret: required(`${prefix}KEY_SECRET`),
+    webhookSecret: required(`${prefix}WEBHOOK_SECRET`),
+  };
+}
+
+const razorpayLive = razorpayCredentials('live');
+const razorpayTest = razorpayCredentials('test');
+if (!razorpayLive && !razorpayTest) {
+  throw new Error('Missing Razorpay credentials: set RAZORPAY_LIVE_* and/or RAZORPAY_TEST_* in .env');
 }
 
 export const env = {
@@ -46,12 +66,7 @@ export const env = {
     clientEmail: required('FIREBASE_CLIENT_EMAIL'),
     privateKey: required('FIREBASE_PRIVATE_KEY').replace(/\\n/g, '\n'),
   },
-  razorpay: {
-    mode: paymentMode,
-    keyId: razorpayKeyId,
-    keySecret: required(paymentMode === 'live' ? 'RAZORPAY_LIVE_KEY_SECRET' : 'RAZORPAY_TEST_KEY_SECRET'),
-    webhookSecret: required(paymentMode === 'live' ? 'RAZORPAY_LIVE_WEBHOOK_SECRET' : 'RAZORPAY_TEST_WEBHOOK_SECRET'),
-  },
+  razorpay: { live: razorpayLive, test: razorpayTest },
   adminBootstrapEmails: (process.env.ADMIN_BOOTSTRAP_EMAILS ?? '')
     .split(',')
     .map((e) => e.trim().toLowerCase())
