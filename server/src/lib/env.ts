@@ -25,6 +25,15 @@ if (!razorpayKeyId.startsWith(expectedPrefix)) {
 export const env = {
   port: Number(process.env.PORT ?? 4000),
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
+  // Extra browser origins allowed to call the API (comma-separated), on top of
+  // corsOrigin — e.g. a test frontend on Netlify. corsOrigin stays the single
+  // primary URL because QR links are built from it.
+  corsAllowedOrigins: [
+    process.env.CORS_ORIGIN ?? 'http://localhost:3000',
+    ...(process.env.CORS_ALLOWED_ORIGINS ?? '').split(','),
+  ]
+    .map((o) => o.trim().replace(/\/+$/, ''))
+    .filter(Boolean),
   databaseUrl: required('DATABASE_URL'),
   // Optional second database used when the frontend declares VITE_APP_ENV=test
   // (sent as the X-App-Env header). Requests that don't declare it use DATABASE_URL.

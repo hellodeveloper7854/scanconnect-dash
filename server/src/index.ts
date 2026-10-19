@@ -27,7 +27,13 @@ const app = express();
 // frontend (a different origin/port) from loading images like the QR PNGs
 // via <img src>, so relax it to allow cross-origin reads of our own assets.
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ origin: env.corsOrigin, credentials: true }));
+app.use(
+  cors({
+    // Browsers send no Origin for same-origin/server-to-server calls (webhooks, curl) — those pass.
+    origin: (origin, callback) => callback(null, !origin || env.corsAllowedOrigins.includes(origin)),
+    credentials: true,
+  }),
+);
 
 // Razorpay webhook needs the raw request body for HMAC signature verification,
 // so it's handled standalone here, before the JSON body parser touches the stream.
