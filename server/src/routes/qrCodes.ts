@@ -5,6 +5,7 @@ import { ZipArchive } from 'archiver';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { env } from '../lib/env.js';
+import { frontendBaseUrl } from '../lib/frontendUrl.js';
 import { requireAuth, requireAdmin, requirePartnerApiKey } from '../middleware/auth.js';
 import { toCsv } from '../lib/csv.js';
 import { notify } from '../lib/notify.js';
@@ -284,7 +285,7 @@ adminQrCodesRouter.get('/:batchId/download.csv', async (req, res) => {
   const rows = codes.map((c) => ({
     displayId: formatDisplayId(c.batchName, c.batchSeq),
     code: c.code,
-    url: `${env.corsOrigin}/qr/${c.code}`,
+    url: `${frontendBaseUrl()}/qr/${c.code}`,
     status: c.status,
     createdAt: c.createdAt.toISOString(),
   }));
@@ -325,7 +326,7 @@ adminQrCodesRouter.get('/download.zip', async (req, res) => {
   archive.pipe(res);
 
   for (const code of codes) {
-    const url = `${env.corsOrigin}/qr/${code.code}`;
+    const url = `${frontendBaseUrl()}/qr/${code.code}`;
     const png = await QRCode.toBuffer(url, { type: 'png', width: 300, margin: 2 });
     const safeBatchName = code.batchName.replace(/[^a-zA-Z0-9 _-]/g, '').trim() || 'batch';
     archive.append(png, { name: `${safeBatchName}/${code.code}.png` });
@@ -340,7 +341,7 @@ adminQrCodesRouter.get('/:id/qr.png', async (req, res) => {
     return res.status(404).json({ error: 'QR code not found' });
   }
 
-  const url = `${env.corsOrigin}/qr/${code.code}`;
+  const url = `${frontendBaseUrl()}/qr/${code.code}`;
   const png = await QRCode.toBuffer(url, { type: 'png', width: 300, margin: 2 });
   res.setHeader('Content-Type', 'image/png');
   res.send(png);
@@ -526,7 +527,7 @@ qrCodesRouter.get('/:code/qr.png', requireAuth, async (req, res) => {
     return res.status(404).json({ error: 'QR code not found' });
   }
 
-  const url = `${env.corsOrigin}/qr/${qrCode.code}`;
+  const url = `${frontendBaseUrl()}/qr/${qrCode.code}`;
   const png = await QRCode.toBuffer(url, { type: 'png', width: 300, margin: 2 });
   res.setHeader('Content-Type', 'image/png');
   res.send(png);

@@ -32,6 +32,11 @@ export function runWithAppEnv<T>(appEnv: AppEnv, fn: () => T): T {
   return requestEnv.run(appEnv, fn);
 }
 
+/** The environment the current request was pinned to (live outside a request). */
+export function currentAppEnv(): AppEnv {
+  return requestEnv.getStore() === 'test' ? 'test' : 'live';
+}
+
 function currentClient(): PrismaClient {
   return requestEnv.getStore() === 'test' ? getTestClient() : liveClient;
 }

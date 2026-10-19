@@ -2,6 +2,7 @@ import { Router } from 'express';
 import QRCode from 'qrcode';
 import { prisma } from '../lib/prisma.js';
 import { env } from '../lib/env.js';
+import { frontendBaseUrl } from '../lib/frontendUrl.js';
 
 /**
  * Public, unauthenticated by design: the order QR is meant to be scanned by
@@ -64,7 +65,7 @@ orderContactRouter.get('/:token/qr.png', async (req, res) => {
     return res.status(404).json({ error: 'No order found for this QR code' });
   }
 
-  const url = `${env.corsOrigin}/order-contact/${req.params.token}`;
+  const url = `${frontendBaseUrl()}/order-contact/${req.params.token}`;
   const png = await QRCode.toBuffer(url, { type: 'png', width: 300, margin: 2 });
   res.setHeader('Content-Type', 'image/png');
   res.send(png);

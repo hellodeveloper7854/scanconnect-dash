@@ -38,6 +38,9 @@ export const env = {
   // Optional second database used when the frontend declares VITE_APP_ENV=test
   // (sent as the X-App-Env header). Requests that don't declare it use DATABASE_URL.
   testDatabaseUrl: process.env.TEST_DATABASE_URL,
+  // Public URL of the test frontend. QR links built during a test-environment
+  // request point here instead of corsOrigin, so scanning a test QR opens the test site.
+  testFrontendUrl: process.env.TEST_FRONTEND_URL?.trim().replace(/\/+$/, ''),
   firebase: {
     projectId: required('FIREBASE_PROJECT_ID'),
     clientEmail: required('FIREBASE_CLIENT_EMAIL'),
