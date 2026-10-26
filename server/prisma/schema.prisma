@@ -12,6 +12,15 @@ enum UserRole {
   ADMIN
 }
 
+/// Where a paid order is in dispatch/delivery, set by admins in the dashboard
+/// and shown to the customer in the Order Details timeline.
+enum FulfillmentStatus {
+  PROCESSING
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+}
+
 enum OrderStatus {
   PENDING
   PAID
@@ -297,6 +306,11 @@ model Order {
   /// Language ('en' | 'hi') the customer chose on the product page for the
   /// printed QR sticker text — used when downloading each tag's sticker.
   stickerLanguage     String            @default("en")
+  fulfillmentStatus   FulfillmentStatus @default(PROCESSING)
+  courierName         String?
+  trackingId          String?
+  shippedAt           DateTime?
+  deliveredAt         DateTime?
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 
@@ -418,6 +432,7 @@ model SosAlert {
 enum NotificationType {
   ORDER_PAID
   MASKED_CALL
+  ORDER_UPDATE
 }
 
 /// Real per-user notification, shown in the header bell — only ever created

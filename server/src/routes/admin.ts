@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
 import { toCsv } from '../lib/csv.js';
+import { notify } from '../lib/notify.js';
 
 export const adminRouter = Router();
 adminRouter.use(requireAuth, requireAdmin);
@@ -142,6 +143,66 @@ adminRouter.patch('/orders/:id/status', async (req, res) => {
     where: { id: req.params.id },
     data: { status: parsed.data.status },
   });
+
+  res.json({ order });
+});
+
+const fulfillmentSchema = z.object({
+  status: z.enum(['PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED']),
+  courierName: z.string().trim().max(80).optional(),
+  trackingId: z.string().trim().max(80).optional(),
+});
+
+const FULFILLMENT_MESSAGES: Record<string, { title: string; body: string } | undefined> = {
+  SHIPPED: { title: 'Order shipped', body: 'Your Scan Connect order is on its way.' },
+  OUT_FOR_DELIVERY: { title: 'Out for delivery', body: 'Your Scan Connect order will be delivered today.' },
+  DELIVERED: { title: 'Order delivered', body: 'Your Scan Connect order has been delivered. Assign your tags to start using them.' },
+};
+
+/**
+ * Dispatch/delivery progress of an order, shown to the customer in the app's
+ * Order Details timeline. Moving to SHIPPED / DELIVERED stamps the time once,
+ * and the customer gets a notification on each real change.
+ */
+adminRouter.patch('/orders/:id/fulfillment', async (req, res) => {
+  const parsed = fulfillmentSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const existing = await prisma.order.findUnique({ where: { id: req.params.id } });
+  if (!existing) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+  if (existing.status !== 'PAID') {
+    return res.status(400).json({ error: 'Only paid orders can be dispatched.' });
+  }
+
+  const { status, courierName, trackingId } = parsed.data;
+  const now = new Date();
+  const order = await prisma.order.update({
+    where: { id: existing.id },
+    data: {
+      fulfillmentStatus: status,
+      ...(courierName !== undefined ? { courierName: courierName || null } : {}),
+      ...(trackingId !== undefined ? { trackingId: trackingId || null } : {}),
+      ...(status !== 'PROCESSING' && !existing.shippedAt ? { shippedAt: now } : {}),
+      ...(status === 'DELIVERED' ? { deliveredAt: existing.deliveredAt ?? now } : {}),
+      ...(status !== 'DELIVERED' ? { deliveredAt: null } : {}),
+      ...(status === 'PROCESSING' ? { shippedAt: null } : {}),
+    },
+  });
+
+  const message = FULFILLMENT_MESSAGES[status];
+  if (message && existing.fulfillmentStatus !== status) {
+    await notify({
+      userId: existing.userId,
+      type: 'ORDER_UPDATE',
+      title: message.title,
+      body: message.body,
+      linkPath: '/orders',
+    });
+  }
 
   res.json({ order });
 });

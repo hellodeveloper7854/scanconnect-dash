@@ -6,6 +6,15 @@ import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize } from '..
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
+type FulfillmentStatus = 'PROCESSING' | 'SHIPPED' | 'OUT_FOR_DELIVERY' | 'DELIVERED';
+
+const FULFILLMENT_OPTIONS: { value: FulfillmentStatus; label: string }[] = [
+  { value: 'PROCESSING', label: 'Processing' },
+  { value: 'SHIPPED', label: 'Shipped' },
+  { value: 'OUT_FOR_DELIVERY', label: 'Out for delivery' },
+  { value: 'DELIVERED', label: 'Delivered' },
+];
+
 interface OrderRow {
   id: string;
   status: 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED' | 'REFUNDED';
@@ -13,6 +22,9 @@ interface OrderRow {
   createdAt: string;
   qrToken: string | null;
   stickerLanguage: 'en' | 'hi';
+  fulfillmentStatus: FulfillmentStatus;
+  courierName: string | null;
+  trackingId: string | null;
   tags: { id: string; size: StickerSize; sequence: number; qrToken: string }[];
   user: { fullName: string; email: string; mobileNumber: string | null };
   items: { quantity: number; product: { name: string } }[];
@@ -28,6 +40,85 @@ const statusColor: Record<OrderRow['status'], string> = {
   FAILED: 'text-rose-400 bg-rose-400/10',
   CANCELLED: 'text-white/50 bg-white/5',
   REFUNDED: 'text-sky-400 bg-sky-400/10',
+};
+
+/**
+ * Dispatch status for one paid order: status, courier and tracking ID. The
+ * customer sees these in the app's Order Details timeline (and gets a
+ * notification when the status changes).
+ */
+const DeliveryEditor: React.FC<{ order: OrderRow; onSaved: () => void }> = ({ order, onSaved }) => {
+  const [status, setStatus] = useState<FulfillmentStatus>(order.fulfillmentStatus);
+  const [courier, setCourier] = useState(order.courierName ?? '');
+  const [trackingId, setTrackingId] = useState(order.trackingId ?? '');
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  if (order.status !== 'PAID') {
+    return <span className="text-xs text-white/30">Not paid</span>;
+  }
+
+  const dirty =
+    status !== order.fulfillmentStatus ||
+    courier !== (order.courierName ?? '') ||
+    trackingId !== (order.trackingId ?? '');
+
+  const save = async () => {
+    setSaving(true);
+    setMessage('');
+    try {
+      await api.patch(`/api/admin/orders/${order.id}/fulfillment`, {
+        status,
+        courierName: courier,
+        trackingId,
+      });
+      onSaved();
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Failed to save');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-1.5 min-w-[170px]">
+      <select
+        value={status}
+        onChange={(e) => setStatus(e.target.value as FulfillmentStatus)}
+        className="w-full bg-white/10 border border-white/10 text-white text-xs rounded px-2 py-1"
+      >
+        {FULFILLMENT_OPTIONS.map((o) => (
+          <option key={o.value} value={o.value} className="text-black">
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <input
+        value={courier}
+        onChange={(e) => setCourier(e.target.value)}
+        placeholder="Courier"
+        maxLength={80}
+        className="w-full bg-white/10 border border-white/10 text-white text-xs rounded px-2 py-1 placeholder:text-white/30"
+      />
+      <input
+        value={trackingId}
+        onChange={(e) => setTrackingId(e.target.value)}
+        placeholder="Tracking ID"
+        maxLength={80}
+        className="w-full bg-white/10 border border-white/10 text-white text-xs rounded px-2 py-1 placeholder:text-white/30"
+      />
+      {dirty && (
+        <button
+          onClick={save}
+          disabled={saving}
+          className="w-full text-xs font-bold bg-[#FFED00] text-black rounded px-2 py-1 disabled:opacity-60 cursor-pointer"
+        >
+          {saving ? 'Saving...' : 'Save'}
+        </button>
+      )}
+      {message && <div className="text-[11px] text-rose-400">{message}</div>}
+    </div>
+  );
 };
 
 export const AdminOrders: React.FC = () => {
@@ -89,6 +180,7 @@ export const AdminOrders: React.FC = () => {
                 <th className="px-4 py-3">Emergency Contact</th>
                 <th className="px-4 py-3">Total</th>
                 <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Delivery</th>
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">QR</th>
               </tr>
@@ -142,6 +234,9 @@ export const AdminOrders: React.FC = () => {
                         </option>
                       ))}
                     </select>
+                  </td>
+                  <td className="px-4 py-3">
+                    <DeliveryEditor order={order} onSaved={load} />
                   </td>
                   <td className="px-4 py-3 text-white/50 text-xs">
                     {new Date(order.createdAt).toLocaleDateString()}
