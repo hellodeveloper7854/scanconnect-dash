@@ -397,6 +397,36 @@ ordersRouter.post('/verify', requireAuth, async (req, res) => {
     return res.status(400).json({ error: 'Payment signature verification failed' });
   }
 
+  // A valid signature only proves the checkout *reported* a payment. Ask
+  // Razorpay itself whether the money was actually captured for this order and
+  // amount, so a UPI intent that was abandoned or failed (the app returning
+  // from Google Pay without paying) can never mark an order as paid.
+  const pending = await prisma.order.findUnique({ where: { razorpayOrderId } });
+  if (!pending) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+  try {
+    const razorpay = getRazorpay();
+    const payment = await razorpay.payments.fetch(razorpayPaymentId);
+    if (payment.order_id !== razorpayOrderId || Number(payment.amount) !== pending.totalInPaise) {
+      return res.status(400).json({ error: 'This payment does not match the order.' });
+    }
+    let status = payment.status;
+    if (status === 'authorized') {
+      // Accounts without auto-capture leave a successful payment "authorized".
+      const captured = await razorpay.payments.capture(razorpayPaymentId, pending.totalInPaise, 'INR');
+      status = captured.status;
+    }
+    if (status !== 'captured') {
+      return res.status(402).json({
+        error: 'Your payment has not been completed. If money was deducted, it will be confirmed automatically.',
+      });
+    }
+  } catch (err) {
+    console.error('Razorpay payment confirmation failed:', err);
+    return res.status(502).json({ error: 'Could not confirm your payment right now. Please try again in a moment.' });
+  }
+
   const order = await markOrderPaidAndRedeemCoupon(razorpayOrderId, { razorpayPaymentId, razorpaySignature });
   if (!order) {
     return res.status(404).json({ error: 'Order not found' });
