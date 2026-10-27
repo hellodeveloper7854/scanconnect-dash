@@ -32,11 +32,11 @@ export const AdminDashboard: React.FC = () => {
   }, []);
 
   if (error) {
-    return <div className="p-8 text-rose-400">{error}</div>;
+    return <div className="p-4 md:p-8 text-rose-400">{error}</div>;
   }
 
   if (!stats) {
-    return <div className="p-8 text-white/60">Loading dashboard...</div>;
+    return <div className="p-4 md:p-8 text-white/60">Loading dashboard...</div>;
   }
 
   const revenue = (stats.orders.revenueInPaise / 100).toLocaleString('en-IN', {
@@ -46,7 +46,7 @@ export const AdminDashboard: React.FC = () => {
   });
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-4 md:p-8 space-y-8">
       <h1 className="text-2xl font-black text-white uppercase tracking-wide">Dashboard</h1>
 
       <div>

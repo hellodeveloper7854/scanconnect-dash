@@ -3,6 +3,7 @@ import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { OtpModal } from './OtpModal';
+import { ToastHost, NoticeState } from './Toast';
 import { PhoneInput } from './PhoneInput';
 import { api, ApiError } from '../lib/api';
 import { auth } from '../lib/firebase';
@@ -126,7 +127,20 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const loadProfile = () => {
     api
       .get<{ user: BackendUser }>('/api/auth/me')
-      .then((res) => setProfile(res.user))
+      .then(async (res) => {
+        setProfile(res.user);
+        // Self-heal: the phone is verified & linked on the Firebase account but the backend never
+        // recorded it (e.g. the link-mobile sync failed after OTP) — sync it now so it shows as linked.
+        if (!res.user.mobileNumber && auth.currentUser?.phoneNumber) {
+          try {
+            const idToken = await auth.currentUser.getIdToken(true);
+            const synced = await api.post<{ user: BackendUser }>('/api/auth/link-mobile', { idToken });
+            setProfile(synced.user);
+          } catch {
+            /* leave as "Not linked"; the Link button lets the user retry */
+          }
+        }
+      })
       .catch((err) => setProfileError(err instanceof ApiError ? err.message : 'Failed to load profile'));
   };
 
@@ -177,6 +191,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
   // Security: password reset via Firebase, 2FA reflects real mobile-link status
   const [isSendingReset, setIsSendingReset] = useState(false);
+  const [notice, setNotice] = useState<NoticeState | null>(null);
+  const dismissNotice = React.useCallback(() => setNotice(null), []);
 
   // Preferences — fetched from backend, auto-saved on each change
   const [preferences, setPreferences] = useState<Preferences>(DEFAULT_PREFERENCES);
@@ -267,7 +283,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [vehicleFormError, setVehicleFormError] = useState('');
   const [vehicleRegTouched, setVehicleRegTouched] = useState(false);
 
-  const vehicleRegistrationError = vehicleRegistration.trim() ? '' : 'Vehicle registration number is required';
+  const normalizedPlate = vehicleRegistration.toUpperCase().replace(/[\s-]/g, '');
+  const vehicleRegistrationError = !vehicleRegistration.trim()
+    ? 'Vehicle registration number is required'
+    : /^[A-Z]{2}\d{1,2}[A-Z]{1,3}\d{4}$/.test(normalizedPlate) || /^\d{2}BH\d{4}[A-Z]{1,2}$/.test(normalizedPlate)
+      ? ''
+      : 'Enter a valid number plate, e.g. MH12AB1234';
 
   const openAddVehicle = () => {
     setEditingVehicleId(null);
@@ -309,7 +330,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setIsSavingVehicle(true);
     try {
       const payload = {
-        registration: vehicleRegistration.trim(),
+        registration: vehicleRegistration.trim().toUpperCase(),
         nickname: vehicleNickname || undefined,
         vehicleType: vehicleType || undefined,
         brand: vehicleBrand || undefined,
@@ -376,7 +397,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
     if (navItem === 'How it works') {
-      onNavigate('dashboard');
+      onNavigate('dashboard#how-it-works');
     } else if (navItem === 'QR Scan') {
       onNavigate('qr-scan');
     } else if (navItem === 'About' || navItem === 'about') {
@@ -390,7 +411,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     } else if (navItem === 'My Orders') {
       onNavigate('orders');
     } else {
-      alert(`Navigating to ${navItem}`);
+      setNotice({ kind: 'info', message: `${navItem} is coming soon.` });
     }
   };
 
@@ -428,9 +449,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setIsSendingReset(true);
     try {
       await sendPasswordResetEmail(auth, profile.email);
-      alert(`Password reset instructions sent to ${profile.email}.`);
+      setNotice({ kind: 'success', message: `Password reset instructions sent to ${profile.email}.` });
     } catch (err) {
-      alert(getAuthErrorMessage(err, 'Failed to send reset email.'));
+      setNotice({ kind: 'error', message: getAuthErrorMessage(err, 'Failed to send reset email.') });
     } finally {
       setIsSendingReset(false);
     }
@@ -447,11 +468,16 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
     setIsSavingContact(true);
     try {
-      const payload = {
-        name: newContactName,
-        role: newContactRole || undefined,
-        phone: newContactPhone,
-        email: newContactEmail || undefined,
+      // Blank optional fields must never block a save. On edit, an empty relationship is sent as ''
+      // so it can be cleared (server accepts any string up to 120); on create it is simply omitted.
+      // Email must be a valid address when present, so a blank email is omitted.
+      const trimmedRole = newContactRole.trim();
+      const trimmedEmail = newContactEmail.trim();
+      const payload: { name: string; phone: string; role?: string; email?: string } = {
+        name: newContactName.trim(),
+        phone: newContactPhone.trim(),
+        ...(trimmedRole ? { role: trimmedRole } : editingContactId ? { role: '' } : {}),
+        ...(trimmedEmail ? { email: trimmedEmail } : {}),
       };
       if (editingContactId) {
         await api.patch(`/api/profile/emergency-contacts/${editingContactId}`, payload);
@@ -469,6 +495,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f8f9fa] text-neutral-900 font-sans antialiased">
+      <ToastHost notice={notice} onDismiss={dismissNotice} />
       {/* Top Header */}
       <DashboardHeader
         userData={userData}
@@ -604,6 +631,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                         </label>
                         <div className="w-full h-[50px] px-4 flex items-center justify-between gap-3 bg-[#F8F8F8] border border-[#EEEEEE] rounded-lg text-[#5D5F5F] font-normal text-base">
                           <span className="font-mono truncate">{profile?.mobileNumber || 'Not linked'}</span>
+                          {profile?.mobileNumber && profile.mobileVerified && (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-green-700 shrink-0">
+                              <Check className="w-3.5 h-3.5" /> Verified
+                            </span>
+                          )}
                           {profile && !profile.mobileNumber && (
                             <button
                               onClick={() => setIsLinkMobileOpen(true)}
@@ -1035,7 +1067,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   </label>
                   <select
                     value={preferences.systemLanguage}
-                    onChange={(e) => savePreferences({ systemLanguage: e.target.value })}
+                    onChange={(e) => {
+                      savePreferences({ systemLanguage: e.target.value });
+                      if (!e.target.value.startsWith('English')) {
+                        setNotice({ kind: 'info', message: 'Interface language support is coming soon. Your preference is saved.' });
+                      }
+                    }}
                     disabled={!preferencesLoaded}
                     className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#1B1C1C] font-normal text-base focus:ring-2 focus:ring-[#FFED00] outline-none cursor-pointer"
                   >
@@ -1044,6 +1081,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     <option value="Hindi (India)">Hindi (India)</option>
                     <option value="French (France)">French (France)</option>
                   </select>
+                  {!preferences.systemLanguage.startsWith('English') && (
+                    <p className="text-xs text-[#5D5F5F]">Interface language support is coming soon. The site is currently shown in English.</p>
+                  )}
                 </div>
 
                 {/* Global Notifications Toggles */}
@@ -1151,37 +1191,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
               </div>
 
-
-              {/* 2. ENTERPRISE ADMIN PRO CARD */}
-              <div className="bg-[#000000] text-white rounded-xl p-8 shadow-xl relative overflow-hidden space-y-6">
-                
-                {/* Dot Badge */}
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#FFED00]" />
-                  <span className="text-xs font-bold uppercase tracking-[1.2px] text-white">
-                    ENTERPRISE ADMIN
-                  </span>
-                </div>
-
-                {/* Title & Desc */}
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-normal text-white font-sans">
-                    SCAN ME Pro
-                  </h3>
-                  <p className="text-sm text-[#DBDAD9] leading-relaxed font-normal">
-                    Unlimited vehicle monitoring and priority emergency response active.
-                  </p>
-                </div>
-
-                {/* Manage Subscription Button */}
-                <button
-                  onClick={() => alert('Manage Subscription: Redirecting to Enterprise Billing Portal...')}
-                  className="w-full h-10 bg-white hover:bg-neutral-100 text-[#000000] font-bold text-sm rounded-lg transition-all cursor-pointer shadow-md text-center"
-                >
-                  Manage Subscription
-                </button>
-
-              </div>
 
             </div>
 

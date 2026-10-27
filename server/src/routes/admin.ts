@@ -272,7 +272,13 @@ adminRouter.get('/payments', async (req, res) => {
   const pageSize = Math.min(100, Number(req.query.pageSize ?? 25));
   const status = typeof req.query.status === 'string' ? req.query.status : undefined;
 
-  const where = status ? { status: status as never } : {};
+  // hasPaymentId=true limits the list to orders that actually produced a
+  // Razorpay payment (applied before paging, so pages aren't half-empty).
+  const onlyWithPayment = req.query.hasPaymentId === 'true';
+  const where = {
+    ...(status ? { status: status as never } : {}),
+    ...(onlyWithPayment ? { razorpayPaymentId: { not: null } } : {}),
+  };
 
   const [payments, total, revenueAgg, refundedAgg] = await Promise.all([
     prisma.order.findMany({
@@ -475,6 +481,9 @@ adminRouter.get('/reports/reviews.csv', async (_req, res) => {
  * Management" screen and the checkout page's apply-coupon flow
  * (server/src/routes/orders.ts POST /apply-coupon and POST /).
  */
+/** Minimum time a new coupon must stay valid. Change here to require longer (e.g. 30). */
+const MIN_COUPON_VALIDITY_DAYS = 1;
+
 const couponBodySchema = z
   .object({
     code: z
@@ -490,7 +499,12 @@ const couponBodySchema = z
     minOrderInPaise: z.number().int().min(0).optional(),
     usageLimit: z.number().int().min(1).optional(),
     isActive: z.boolean().optional(),
-    expiresAt: z.coerce.date().optional(),
+    expiresAt: z.coerce
+      .date()
+      .refine((d) => d.getTime() >= Date.now() + MIN_COUPON_VALIDITY_DAYS * 24 * 60 * 60 * 1000, {
+        message: `Expiry must be at least ${MIN_COUPON_VALIDITY_DAYS} day(s) from now.`,
+      })
+      .optional(),
   })
   .refine((v) => (v.type === 'PERCENTAGE' ? v.percentageValue != null : v.fixedValueInPaise != null), {
     message: 'percentageValue is required for PERCENTAGE coupons, fixedValueInPaise for FIXED coupons',

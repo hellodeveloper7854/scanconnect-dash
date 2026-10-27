@@ -19,6 +19,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
   const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [infoMsg, setInfoMsg] = useState('');
   const [touched, setTouched] = useState({ vehicleEmail: false, accessKey: false });
 
   const fieldErrors = {
@@ -71,8 +72,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
     }
     try {
       await sendPasswordResetEmail(auth, vehicleEmail);
-      alert('Password reset instructions sent to your registered email.');
+      setErrorMsg('');
+      setInfoMsg('Password reset instructions sent to your registered email.');
     } catch (err) {
+      setInfoMsg('');
       setErrorMsg(getAuthErrorMessage(err, 'Could not send reset email.'));
     }
   };
@@ -205,7 +208,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
             </div>
 
             {errorMsg && (
-              <p className="text-xs font-semibold text-rose-600">{errorMsg}</p>
+              <p role="alert" className="text-xs font-semibold text-rose-600">{errorMsg}</p>
+            )}
+            {infoMsg && (
+              <p role="status" className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg p-2.5">{infoMsg}</p>
             )}
 
             {/* Login Button */}

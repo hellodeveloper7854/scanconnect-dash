@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
-import { api, ApiError, withAppEnv } from '../lib/api';
+import { api, ApiError, withAppEnv, isAuthError, SIGN_IN_REQUIRED_MESSAGE } from '../lib/api';
 import { auth } from '../lib/firebase';
 import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize, type StickerLang } from '../lib/qrSticker';
 import { PhoneInput } from './PhoneInput';
@@ -53,7 +53,6 @@ const VEHICLE_TYPES = ['Car', 'Bike', 'Scooter', 'Truck', 'Bus', 'Other'];
 
 // Mirrors the backend's registration format expectations loosely: letters,
 // digits, spaces and hyphens only, at least 4 characters.
-const REGISTRATION_PATTERN = /^[A-Za-z0-9 -]{4,}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Shipping fields — must mirror server/src/routes/orders.ts exactly so the
@@ -65,7 +64,7 @@ const SHIPPING_PINCODE_PATTERN = /^\d{6}$/;
 
 declare global {
   interface Window {
-    Razorpay: new (options: Record<string, unknown>) => { open: () => void };
+    Razorpay: new (options: Record<string, unknown>) => { open: () => void; on?: (event: string, cb: (response: unknown) => void) => void };
   }
 }
 
@@ -117,6 +116,14 @@ interface AvailableCoupon {
   minOrderInPaise: number | null;
   expiresAt: string | null;
   discountInPaise: number;
+}
+
+interface CreatedOrder {
+  order: OrderRecord;
+  razorpayOrderId: string;
+  razorpayKeyId: string;
+  amount: number;
+  currency: string;
 }
 
 interface CheckoutFlowScreenProps {
@@ -266,6 +273,11 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   // Payment (Step 2) — Razorpay handles the actual payment method selection
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState('');
+  const [needsSignIn, setNeedsSignIn] = useState(false);
+  // Reuse the already-created (unpaid) order when the user retries with the same cart/address,
+  // so a failed or dismissed attempt never creates a duplicate order/charge.
+  const pendingOrderRef = useRef<{ key: string; created: CreatedOrder } | null>(null);
+  const payInFlightRef = useRef(false);
   const [completedOrder, setCompletedOrder] = useState<OrderRecord | null>(null);
 
   // Assign step — pick or add the vehicle + emergency contact for each of this
@@ -357,15 +369,16 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
       setVehicleFormError('Please enter a registration number.');
       return;
     }
-    if (!REGISTRATION_PATTERN.test(registration)) {
-      setVehicleFormError('Registration number should be at least 4 characters (letters, numbers, spaces or hyphens only).');
+    const plate = registration.toUpperCase().replace(/[\s-]/g, '');
+    if (!/^[A-Z]{2}\d{1,2}[A-Z]{1,3}\d{4}$/.test(plate) && !/^\d{2}BH\d{4}[A-Z]{1,2}$/.test(plate)) {
+      setVehicleFormError('Enter a valid number plate, e.g. MH12AB1234.');
       return;
     }
 
     setIsSavingVehicle(true);
     try {
       const res = await api.post<{ vehicle: VehicleOption }>('/api/profile/vehicles', {
-        registration,
+        registration: registration.toUpperCase(),
         nickname: newVehicleNickname.trim() || undefined,
         vehicleType: newVehicleType || undefined,
         brand: newVehicleBrand.trim() || undefined,
@@ -498,7 +511,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
     if (navItem === 'How it works') {
-      onNavigate('dashboard');
+      onNavigate('dashboard#how-it-works');
     } else if (navItem === 'QR Scan') {
       onNavigate('qr-scan');
     } else if (navItem === 'About' || navItem === 'about') {
@@ -515,16 +528,22 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
   };
 
   const handlePayNow = async () => {
+    if (payInFlightRef.current) return;
     setPaymentError('');
+    setNeedsSignIn(false);
+    if (isLoggedIn === false) {
+      setPaymentError(`${SIGN_IN_REQUIRED_MESSAGE}. You need to be signed in to pay for your order.`);
+      setNeedsSignIn(true);
+      return;
+    }
+    payInFlightRef.current = true;
     setIsProcessingPayment(true);
+    const finish = () => {
+      payInFlightRef.current = false;
+      setIsProcessingPayment(false);
+    };
     try {
-      const created = await api.post<{
-        order: OrderRecord;
-        razorpayOrderId: string;
-        razorpayKeyId: string;
-        amount: number;
-        currency: string;
-      }>('/api/orders', {
+      const orderPayload = {
         items: orderItems,
         shipping: {
           name: fullName.trim(),
@@ -535,7 +554,15 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
         },
         couponCode: appliedCoupon?.code,
         stickerLanguage: stickerLang,
-      });
+      };
+      const key = JSON.stringify(orderPayload);
+      let created: CreatedOrder;
+      if (pendingOrderRef.current && pendingOrderRef.current.key === key) {
+        created = pendingOrderRef.current.created;
+      } else {
+        created = await api.post<CreatedOrder>('/api/orders', orderPayload);
+        pendingOrderRef.current = { key, created };
+      }
 
       const razorpay = new window.Razorpay({
         key: created.razorpayKeyId,
@@ -556,24 +583,32 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
             });
+            pendingOrderRef.current = null;
             setCompletedOrder(verified.order);
             setStep(3);
           } catch (err) {
             setPaymentError(err instanceof ApiError ? err.message : 'Payment verification failed. Please contact support.');
+            setNeedsSignIn(isAuthError(err));
           } finally {
-            setIsProcessingPayment(false);
+            finish();
           }
         },
         modal: {
-          ondismiss: () => setIsProcessingPayment(false),
+          ondismiss: () => finish(),
         },
         theme: { color: '#FFED00' },
+      });
+
+      razorpay.on?.('payment.failed', () => {
+        setPaymentError('Your payment could not be completed and you have not been charged. Please try again.');
+        finish();
       });
 
       razorpay.open();
     } catch (err) {
       setPaymentError(err instanceof ApiError ? err.message : 'Failed to start payment. Please try again.');
-      setIsProcessingPayment(false);
+      setNeedsSignIn(isAuthError(err));
+      finish();
     }
   };
 
@@ -1074,7 +1109,18 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                 </div>
 
                 {paymentError && (
-                  <p className="text-sm font-semibold text-red-600">{paymentError}</p>
+                  <div role="alert" className="space-y-2">
+                    <p className="text-sm font-semibold text-red-600">{paymentError}</p>
+                    {needsSignIn && (
+                      <button
+                        type="button"
+                        onClick={() => onNavigate('login')}
+                        className="h-11 px-5 rounded-lg bg-[#1B1C1C] text-white text-sm font-bold cursor-pointer"
+                      >
+                        Sign in to continue
+                      </button>
+                    )}
+                  </div>
                 )}
 
                 {/* Pay Now Button */}

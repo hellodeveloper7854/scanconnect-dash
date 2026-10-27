@@ -3,6 +3,7 @@ import { DashboardHeader } from '../components/DashboardHeader';
 import { DashboardFooter } from '../components/DashboardFooter';
 import { BLOG_POSTS } from '../lib/blogPosts';
 import { ArrowRight } from 'lucide-react';
+import { BlogCover } from '../components/BlogCover';
 
 export const BlogListPage: React.FC = () => {
   return (
@@ -14,7 +15,7 @@ export const BlogListPage: React.FC = () => {
         isLoggedIn={false}
         onNavClick={(nav) => {
           const path =
-            nav === 'How it works' ? '/' : nav === 'QR Scan' ? '/qr-scan' : `/${nav.toLowerCase()}`;
+            nav === 'How it works' ? '/#how-it-works' : nav === 'QR Scan' ? '/qr-scan' : `/${nav.toLowerCase()}`;
           window.location.href = path;
         }}
       />
@@ -33,15 +34,13 @@ export const BlogListPage: React.FC = () => {
                 href={`/blog/${post.slug}`}
                 className="group bg-white rounded-2xl border border-neutral-200/60 overflow-hidden hover:shadow-lg transition-shadow"
               >
-                <div className="h-[180px] bg-neutral-100 flex items-center justify-center text-neutral-400 text-xs font-semibold px-4 text-center">
-                  {post.title}
-                </div>
+                <BlogCover src={post.image} title={post.title} className="h-[180px]" />
                 <div className="p-6 space-y-3">
                   <p className="text-xs font-bold uppercase tracking-wide text-neutral-400">{post.date}</p>
                   <h2 className="text-xl font-black text-neutral-900 leading-snug group-hover:text-[#B58500] transition-colors">
                     {post.title}
                   </h2>
-                  <p className="text-sm text-neutral-500 line-clamp-2">{post.excerpt}</p>
+                  <p className="text-sm text-neutral-500 ">{post.excerpt}</p>
                   <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-[#FFED00] decoration-2 underline-offset-4">
                     Read article
                     <ArrowRight className="w-4 h-4" />

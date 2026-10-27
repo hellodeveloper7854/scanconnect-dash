@@ -4,12 +4,13 @@ import { firebaseAuth } from '../lib/firebase.js';
 import { registerUser, registerPhoneUser, syncLinkedMobile, findUserByFirebaseUid } from '../services/authService.js';
 import { requireAuth } from '../middleware/auth.js';
 import { prisma } from '../lib/prisma.js';
+import { fullNameSchema } from '../lib/validation.js';
 
 export const authRouter = Router();
 
 const registerSchema = z.object({
   idToken: z.string().min(1),
-  fullName: z.string().min(1).max(120),
+  fullName: fullNameSchema,
   email: z.string().email(),
   mobileNumber: z.string().min(8).max(20).optional(),
 });
@@ -95,7 +96,10 @@ authRouter.post('/link-mobile', async (req, res) => {
       return res.status(400).json({ error: 'Token does not contain a verified phone number' });
     }
     res.json({ user });
-  } catch {
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('Unique constraint')) {
+      return res.status(409).json({ error: 'This mobile number is already registered to another account.' });
+    }
     res.status(401).json({ error: 'Invalid Firebase token' });
   }
 });
@@ -129,7 +133,7 @@ authRouter.get('/me', requireAuth, async (req, res) => {
 });
 
 const updateMeSchema = z.object({
-  fullName: z.string().min(1).max(120).optional(),
+  fullName: fullNameSchema.optional(),
   email: z.string().email().optional(),
 });
 

@@ -27,30 +27,52 @@ export const AdminPayments: React.FC = () => {
   const [summary, setSummary] = useState<{ totalRevenueInPaise: number; totalRefundedInPaise: number } | null>(null);
   const [statusFilter, setStatusFilter] = useState('');
   const [error, setError] = useState('');
+  const [showUnpaid, setShowUnpaid] = useState(false);
+  const [total, setTotal] = useState(0);
 
   const load = () => {
-    const query = statusFilter ? `?status=${statusFilter}` : '';
+    // Server-side filter, applied before paging, when unpaid attempts are hidden.
+    const query = `?pageSize=100${statusFilter ? `&status=${statusFilter}` : ''}${showUnpaid ? '' : '&hasPaymentId=true'}`;
     api
-      .get<{ payments: PaymentRow[]; summary: typeof summary }>(`/api/admin/payments${query}`)
+      .get<{ payments: PaymentRow[]; summary: typeof summary; total?: number }>(`/api/admin/payments${query}`)
       .then((res) => {
         setPayments(res.payments);
         setSummary(res.summary);
+        setTotal(res.total ?? res.payments.length);
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load payments'));
   };
 
-  useEffect(load, [statusFilter]);
+  useEffect(load, [statusFilter, showUnpaid]);
 
-  if (error) return <div className="p-8 text-rose-400">{error}</div>;
+  // The API lists every order. Orders that never produced a Razorpay payment
+  // (PENDING / FAILED / abandoned checkouts) have no payment id, so by default
+  // only records with a payment id are shown.
+  const hasPaymentId = (p: PaymentRow) => !!p.razorpayPaymentId?.trim();
+  const visible = payments ? (showUnpaid ? payments : payments.filter(hasPaymentId)) : null;
+  const hiddenCount = payments && visible ? payments.length - visible.length : 0;
+  const listedPaise = visible ? visible.reduce((sum, p) => sum + p.totalInPaise, 0) : 0;
+
+  if (error) return <div className="p-4 md:p-8 text-rose-400">{error}</div>;
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 md:p-8 space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-black text-white uppercase tracking-wide">Payments</h1>
+        <div className="flex flex-wrap items-center gap-4">
+        <label className="flex items-center gap-2 min-h-11 text-sm text-white/70 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={showUnpaid}
+            onChange={(e) => setShowUnpaid(e.target.checked)}
+            className="w-4 h-4 accent-[#FFED00] cursor-pointer"
+          />
+          Show unpaid attempts
+        </label>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-white/10 border border-white/10 text-white text-sm rounded-md px-3 py-2"
+          className="bg-white/10 border border-white/10 text-white text-sm rounded-md px-3 min-h-11"
         >
           <option value="">All statuses</option>
           <option value="PAID">Paid</option>
@@ -58,6 +80,7 @@ export const AdminPayments: React.FC = () => {
           <option value="REFUNDED">Refunded</option>
           <option value="PENDING">Pending</option>
         </select>
+        </div>
       </div>
 
       {summary && (
@@ -79,13 +102,22 @@ export const AdminPayments: React.FC = () => {
         </div>
       )}
 
-      {!payments ? (
+      {visible && (
+        <p className="text-xs text-white/50">
+          Showing {visible.length} {showUnpaid ? 'record(s)' : 'payment(s) with a payment ID'} · listed amount{' '}
+          {formatMoney(listedPaise)}
+          {!showUnpaid && hiddenCount > 0 && ` · ${hiddenCount} unpaid attempt(s) hidden`}
+          {total > (payments?.length ?? 0) && ` · latest ${payments?.length} of ${total} orders loaded`}
+        </p>
+      )}
+
+      {!visible ? (
         <div className="text-white/60">Loading payments...</div>
-      ) : payments.length === 0 ? (
+      ) : visible.length === 0 ? (
         <div className="text-white/60">No payments found.</div>
       ) : (
         <div className="overflow-x-auto border border-white/10 rounded-xl">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm [&_th:first-child]:sticky [&_td:first-child]:sticky [&_th:first-child]:left-0 [&_td:first-child]:left-0 [&_th:first-child]:bg-neutral-950 [&_td:first-child]:bg-neutral-950">
             <thead>
               <tr className="text-left text-white/50 uppercase text-xs border-b border-white/10">
                 <th className="px-4 py-3">Customer</th>
@@ -96,13 +128,19 @@ export const AdminPayments: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {payments.map((p) => (
+              {visible.map((p) => (
                 <tr key={p.id} className="border-b border-white/5">
                   <td className="px-4 py-3">
-                    <div className="text-white">{p.user.fullName}</div>
-                    <div className="text-white/40 text-xs">{p.user.email}</div>
+                    <div className="text-white">{p.user?.fullName || '—'}</div>
+                    <div className="text-white/40 text-xs">{p.user?.email || '—'}</div>
                   </td>
-                  <td className="px-4 py-3 font-mono text-white/70">{p.razorpayPaymentId ?? '—'}</td>
+                  <td className="px-4 py-3 font-mono text-white/70">
+                    {hasPaymentId(p) ? (
+                      p.razorpayPaymentId
+                    ) : (
+                      <span className="font-sans text-xs italic text-white/40">No payment (abandoned)</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-white">{formatMoney(p.totalInPaise)}</td>
                   <td className="px-4 py-3">
                     <span className={`text-xs font-bold uppercase px-2 py-1 rounded ${statusColor[p.status]}`}>

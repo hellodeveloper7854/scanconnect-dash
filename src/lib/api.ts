@@ -19,8 +19,57 @@ export function withAppEnv(url: string): string {
   return APP_ENV === 'test' ? `${url}${url.includes('?') ? '&' : '?'}appEnv=test` : url;
 }
 
+/** Waits for Firebase to restore the persisted session, then returns a fresh ID token (or null if signed out). */
+export async function getIdTokenOrNull(): Promise<string | null> {
+  try {
+    await auth.authStateReady();
+  } catch {
+    /* fall through to currentUser */
+  }
+  const user = auth.currentUser;
+  if (!user) return null;
+  try {
+    return await user.getIdToken();
+  } catch {
+    return null;
+  }
+}
+
+export const SIGN_IN_REQUIRED_MESSAGE = 'Please sign in to continue';
+
+/** Raw server auth errors → friendly copy shown to users. */
+export function friendlyMessage(message: string, status: number): string {
+  const m = (message || '').toLowerCase();
+  if (m.includes('missing bearer token') || m.includes('invalid or expired token') || m.includes('invalid firebase token') || m.includes('id-token-expired')) {
+    return m.includes('expired') ? 'Your session has expired. Please sign in again.' : SIGN_IN_REQUIRED_MESSAGE;
+  }
+  if (status === 401 && (!message || message === 'Request failed')) return SIGN_IN_REQUIRED_MESSAGE;
+  return message;
+}
+
+/** Server errors are either a string or a zod `flatten()` object ({ formErrors, fieldErrors }); turn either into text. */
+export function extractErrorMessage(data: unknown, fallback = 'Request failed'): string {
+  const err = (data as { error?: unknown } | null)?.error;
+  if (typeof err === 'string') return err;
+  if (err && typeof err === 'object') {
+    const { formErrors, fieldErrors } = err as { formErrors?: string[]; fieldErrors?: Record<string, string[] | undefined> };
+    if (formErrors?.length) return formErrors[0];
+    if (fieldErrors) {
+      for (const [field, msgs] of Object.entries(fieldErrors)) {
+        if (msgs?.length) return `${field}: ${msgs[0]}`;
+      }
+    }
+  }
+  return fallback;
+}
+
+/** True when the error means the user is not (or no longer) signed in. */
+export function isAuthError(err: unknown): boolean {
+  return err instanceof ApiError && (err.status === 401 || err.message === SIGN_IN_REQUIRED_MESSAGE);
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const idToken = await auth.currentUser?.getIdToken();
+  const idToken = await getIdTokenOrNull();
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
@@ -35,7 +84,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
-    throw new ApiError(data?.error ?? 'Request failed', res.status, data);
+    throw new ApiError(friendlyMessage(extractErrorMessage(data), res.status), res.status, data);
   }
 
   return data as T;
@@ -67,12 +116,12 @@ export const api = {
  * response as a blob instead.
  */
 export async function downloadFile(path: string, filename: string): Promise<void> {
-  const idToken = await auth.currentUser?.getIdToken();
+  const idToken = await getIdTokenOrNull();
   const res = await fetch(`${API_BASE_URL}${path}`, {
     headers: { ...appEnvHeaders(), ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}) },
   });
   if (!res.ok) {
-    throw new ApiError('Failed to download file', res.status);
+    throw new ApiError(res.status === 401 ? SIGN_IN_REQUIRED_MESSAGE : 'Failed to download file', res.status);
   }
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);

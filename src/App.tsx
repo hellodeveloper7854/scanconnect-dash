@@ -57,12 +57,12 @@ export default function App() {
     return <QrLandingPage code={code} />;
   }
 
-  if (path === '/blog') {
+  if (path === '/blog' || path === '/blog/') {
     return <BlogListPage />;
   }
 
   if (path.startsWith('/blog/')) {
-    const slug = window.location.pathname.split('/').pop() ?? '';
+    const slug = window.location.pathname.replace(/^\/blog\//i, '');
     return <BlogPostPage slug={slug} />;
   }
 
@@ -185,7 +185,8 @@ function MainApp() {
   }, [activeScreen]);
 
   const handleGlobalNavigate = (nav: string) => {
-    const normalized = nav.toLowerCase().trim().replace(/^\//, '');
+    const [navBase, navHash = ''] = nav.toLowerCase().trim().replace(/^\//, '').split('#');
+    const normalized = navBase;
     let targetScreen: ScreenType = 'dashboard';
 
     if (normalized === 'about') {
@@ -215,12 +216,17 @@ function MainApp() {
     // Update window URL location path
     const pathByScreen: Partial<Record<ScreenType, string>> = { dashboard: '/', 'login-options': '/login' };
     const targetPath = pathByScreen[targetScreen] ?? `/${targetScreen}`;
-    if (window.location.pathname !== targetPath) {
-      window.history.pushState(null, '', targetPath);
+    const targetUrl = navHash ? `${targetPath}#${navHash}` : targetPath;
+    if (window.location.pathname + window.location.hash !== targetUrl) {
+      window.history.pushState(null, '', targetUrl);
     }
 
-    // Scroll to top when opening a new screen
-    window.scrollTo(0, 0);
+    // Scroll to top when opening a new screen, unless a section anchor (e.g. #how-it-works) was requested.
+    if (navHash) {
+      setTimeout(() => document.getElementById(navHash)?.scrollIntoView({ behavior: 'smooth' }), 80);
+    } else {
+      window.scrollTo(0, 0);
+    }
   };
 
   const handleRegisterSuccess = (data: UserFormData) => {

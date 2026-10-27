@@ -25,7 +25,7 @@ export const AdminReports: React.FC = () => {
   };
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 md:p-8 space-y-6">
       <h1 className="text-2xl font-black text-white uppercase tracking-wide">Reports</h1>
       <p className="text-white/50 text-sm">Export live data as CSV files.</p>
 

@@ -30,7 +30,7 @@ export const InvestorsPage: React.FC = () => {
         isLoggedIn={false}
         onNavClick={(nav) => {
           const path =
-            nav === 'How it works' ? '/' : nav === 'QR Scan' ? '/qr-scan' : `/${nav.toLowerCase()}`;
+            nav === 'How it works' ? '/#how-it-works' : nav === 'QR Scan' ? '/qr-scan' : `/${nav.toLowerCase()}`;
           window.location.href = path;
         }}
       />

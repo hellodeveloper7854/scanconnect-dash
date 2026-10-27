@@ -16,6 +16,18 @@ interface CouponRow {
   createdAt: string;
 }
 
+/** Minimum days from today a coupon's expiry date must be (1 = tomorrow). */
+const MIN_COUPON_VALIDITY_DAYS = 1;
+
+const toLocalDateStr = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+const minExpiryDate = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + MIN_COUPON_VALIDITY_DAYS);
+  return toLocalDateStr(d);
+};
+
 const CODE_PATTERN = /^[A-Za-z0-9-]{3,40}$/;
 
 interface CouponFormState {
@@ -59,6 +71,7 @@ export const AdminCoupons: React.FC = () => {
 
   const [modalMode, setModalMode] = useState<'create' | 'edit' | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [originalExpiry, setOriginalExpiry] = useState('');
   const [form, setForm] = useState<CouponFormState>(emptyForm());
   const [formError, setFormError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -66,7 +79,7 @@ export const AdminCoupons: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; code: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const [touched, setTouched] = useState({ code: false, value: false, usageLimit: false, minOrder: false });
+  const [touched, setTouched] = useState({ code: false, value: false, usageLimit: false, minOrder: false, expiresAt: false });
   const markTouched = (field: keyof typeof touched) => setTouched((t) => ({ ...t, [field]: true }));
 
   const load = () => {
@@ -82,16 +95,18 @@ export const AdminCoupons: React.FC = () => {
 
   const openCreate = () => {
     setForm(emptyForm());
+    setOriginalExpiry('');
     setFormError('');
-    setTouched({ code: false, value: false, usageLimit: false, minOrder: false });
+    setTouched({ code: false, value: false, usageLimit: false, minOrder: false, expiresAt: false });
     setEditingId(null);
     setModalMode('create');
   };
 
   const openEdit = (c: CouponRow) => {
     setForm(rowToForm(c));
+    setOriginalExpiry(c.expiresAt ? c.expiresAt.slice(0, 10) : '');
     setFormError('');
-    setTouched({ code: false, value: false, usageLimit: false, minOrder: false });
+    setTouched({ code: false, value: false, usageLimit: false, minOrder: false, expiresAt: false });
     setEditingId(c.id);
     setModalMode('edit');
   };
@@ -110,11 +125,20 @@ export const AdminCoupons: React.FC = () => {
         ? Number(form.percentageValue) >= 1 && Number(form.percentageValue) <= 100 && form.percentageValue.trim() !== ''
           ? ''
           : 'Enter a percentage between 1 and 100'
-        : Number(form.fixedValueInRupees) >= 1 && form.fixedValueInRupees.trim() !== ''
+        : Number(form.fixedValueInRupees) > 0 && form.fixedValueInRupees.trim() !== ''
           ? ''
           : 'Enter a discount amount greater than 0',
     usageLimit:
-      form.usageLimit.trim() === '' || Number(form.usageLimit) >= 1 ? '' : 'Usage limit must be at least 1',
+      form.usageLimit.trim() === '' || (Number.isInteger(Number(form.usageLimit)) && Number(form.usageLimit) >= 1) ? '' : 'Usage limit must be at least 1',
+    // Only enforced when the date is new/changed, so an already-set expiry can still be edited around.
+    expiresAt:
+      form.expiresAt === '' || (modalMode === 'edit' && form.expiresAt === originalExpiry)
+        ? ''
+        : form.expiresAt >= minExpiryDate()
+          ? ''
+          : MIN_COUPON_VALIDITY_DAYS <= 1
+            ? 'Expiry date must be in the future (tomorrow or later)'
+            : `Expiry date must be at least ${MIN_COUPON_VALIDITY_DAYS} days from today`,
     minOrder:
       form.minOrderInRupees.trim() === '' || Number(form.minOrderInRupees) >= 0
         ? ''
@@ -171,8 +195,8 @@ export const AdminCoupons: React.FC = () => {
   };
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 md:p-8 space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black text-white uppercase tracking-wide">Coupon Management</h1>
           <p className="text-white/50 text-sm mt-1">
@@ -181,7 +205,7 @@ export const AdminCoupons: React.FC = () => {
         </div>
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-1.5 h-10 px-4 bg-[#FFED00] hover:bg-[#e0ac00] text-neutral-950 font-black text-xs uppercase tracking-wide rounded-md cursor-pointer"
+          className="inline-flex items-center gap-1.5 h-11 px-4 bg-[#FFED00] hover:bg-[#e0ac00] text-neutral-950 font-black text-xs uppercase tracking-wide rounded-md cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5" /> New Coupon
         </button>
@@ -202,10 +226,10 @@ export const AdminCoupons: React.FC = () => {
         <div className="text-white/60">No coupons yet. Create one to get started.</div>
       ) : (
         <div className="overflow-x-auto border border-white/10 rounded-xl">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="text-left text-white/50 uppercase text-xs border-b border-white/10">
-                <th className="px-4 py-3">Code</th>
+                <th className="px-4 py-3 sticky left-0 bg-neutral-950">Code</th>
                 <th className="px-4 py-3">Discount</th>
                 <th className="px-4 py-3">Min Order</th>
                 <th className="px-4 py-3">Used</th>
@@ -220,7 +244,7 @@ export const AdminCoupons: React.FC = () => {
                 const limitReached = c.usageLimit != null && c.usedCount >= c.usageLimit;
                 return (
                   <tr key={c.id} className="border-b border-white/5">
-                    <td className="px-4 py-3 text-white font-mono">{c.code}</td>
+                    <td className="px-4 py-3 text-white font-mono sticky left-0 bg-neutral-950">{c.code}</td>
                     <td className="px-4 py-3 text-white/70">
                       {c.type === 'PERCENTAGE' ? `${c.percentageValue}%` : money(c.fixedValueInPaise ?? 0)}
                     </td>
@@ -253,7 +277,7 @@ export const AdminCoupons: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => openEdit(c)}
-                        className="p-1.5 text-white/50 hover:text-[#FFED00] cursor-pointer inline-block"
+                        className="p-3 text-white/50 hover:text-[#FFED00] cursor-pointer inline-block"
                         title="Edit coupon"
                       >
                         <Pencil className="w-4 h-4" />
@@ -261,7 +285,7 @@ export const AdminCoupons: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setDeleteTarget({ id: c.id, code: c.code })}
-                        className="p-1.5 text-white/50 hover:text-rose-400 cursor-pointer inline-block"
+                        className="p-3 text-white/50 hover:text-rose-400 cursor-pointer inline-block"
                         title="Delete coupon"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -278,10 +302,10 @@ export const AdminCoupons: React.FC = () => {
       {/* Create/Edit modal */}
       {modalMode && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-neutral-900 border border-white/10 rounded-xl max-w-md w-full p-6 space-y-4">
+          <div className="bg-neutral-900 border border-white/10 rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-black text-lg text-white">{modalMode === 'create' ? 'New Coupon' : 'Edit Coupon'}</h2>
-              <button onClick={closeModal} className="text-white/50 hover:text-white cursor-pointer">
+              <button onClick={closeModal} className="min-w-11 min-h-11 flex items-center justify-center text-white/50 hover:text-white cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -295,7 +319,7 @@ export const AdminCoupons: React.FC = () => {
                   onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '') }))}
                   onBlur={() => markTouched('code')}
                   placeholder="WELCOME10"
-                  className={`w-full h-10 px-3 bg-white/10 border text-white font-mono text-sm rounded-md focus:outline-none focus:ring-2 ${
+                  className={`w-full h-11 px-3 bg-white/10 border text-white font-mono text-sm rounded-md focus:outline-none focus:ring-2 ${
                     touched.code && fieldErrors.code
                       ? 'border-rose-500 focus:ring-rose-500'
                       : 'border-white/10 focus:ring-[#FFED00]'
@@ -314,7 +338,7 @@ export const AdminCoupons: React.FC = () => {
                       key={t}
                       type="button"
                       onClick={() => setForm((f) => ({ ...f, type: t }))}
-                      className={`flex-1 h-10 text-xs font-bold uppercase cursor-pointer ${
+                      className={`flex-1 h-11 text-xs font-bold uppercase cursor-pointer ${
                         form.type === t ? 'bg-[#FFED00] text-neutral-950' : 'bg-white/10 text-white/70 hover:bg-white/15'
                       }`}
                     >
@@ -335,7 +359,7 @@ export const AdminCoupons: React.FC = () => {
                     onChange={(e) => setForm((f) => ({ ...f, percentageValue: e.target.value }))}
                     onBlur={() => markTouched('value')}
                     placeholder="10"
-                    className={`w-full h-10 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
+                    className={`w-full h-11 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
                       touched.value && fieldErrors.value
                         ? 'border-rose-500 focus:ring-rose-500'
                         : 'border-white/10 focus:ring-[#FFED00]'
@@ -350,12 +374,13 @@ export const AdminCoupons: React.FC = () => {
                   <label className="block text-xs font-bold text-white/50 uppercase mb-1.5">Discount Amount (₹)</label>
                   <input
                     type="number"
-                    min={1}
+                    min={0.01}
+                    step="0.01"
                     value={form.fixedValueInRupees}
                     onChange={(e) => setForm((f) => ({ ...f, fixedValueInRupees: e.target.value }))}
                     onBlur={() => markTouched('value')}
                     placeholder="100"
-                    className={`w-full h-10 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
+                    className={`w-full h-11 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
                       touched.value && fieldErrors.value
                         ? 'border-rose-500 focus:ring-rose-500'
                         : 'border-white/10 focus:ring-[#FFED00]'
@@ -376,7 +401,7 @@ export const AdminCoupons: React.FC = () => {
                   onChange={(e) => setForm((f) => ({ ...f, minOrderInRupees: e.target.value }))}
                   onBlur={() => markTouched('minOrder')}
                   placeholder="No minimum"
-                  className={`w-full h-10 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
+                  className={`w-full h-11 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
                     touched.minOrder && fieldErrors.minOrder
                       ? 'border-rose-500 focus:ring-rose-500'
                       : 'border-white/10 focus:ring-[#FFED00]'
@@ -387,7 +412,7 @@ export const AdminCoupons: React.FC = () => {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-white/50 uppercase mb-1.5">Usage Limit</label>
                   <input
@@ -397,7 +422,7 @@ export const AdminCoupons: React.FC = () => {
                     onChange={(e) => setForm((f) => ({ ...f, usageLimit: e.target.value }))}
                     onBlur={() => markTouched('usageLimit')}
                     placeholder="Unlimited"
-                    className={`w-full h-10 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
+                    className={`w-full h-11 px-3 bg-white/10 border text-white text-sm rounded-md focus:outline-none focus:ring-2 ${
                       touched.usageLimit && fieldErrors.usageLimit
                         ? 'border-rose-500 focus:ring-rose-500'
                         : 'border-white/10 focus:ring-[#FFED00]'
@@ -412,9 +437,18 @@ export const AdminCoupons: React.FC = () => {
                   <input
                     type="date"
                     value={form.expiresAt}
+                    min={minExpiryDate()}
                     onChange={(e) => setForm((f) => ({ ...f, expiresAt: e.target.value }))}
-                    className="w-full h-10 px-3 bg-white/10 border border-white/10 text-white text-sm rounded-md cursor-pointer [color-scheme:dark] focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
+                    onBlur={() => markTouched('expiresAt')}
+                    className={`w-full h-11 px-3 bg-white/10 border text-white text-sm rounded-md cursor-pointer [color-scheme:dark] focus:outline-none focus:ring-2 ${
+                      touched.expiresAt && fieldErrors.expiresAt
+                        ? 'border-rose-500 focus:ring-rose-500'
+                        : 'border-white/10 focus:ring-[#FFED00]'
+                    }`}
                   />
+                  {touched.expiresAt && fieldErrors.expiresAt && (
+                    <p className="text-xs font-semibold text-rose-400 mt-1">{fieldErrors.expiresAt}</p>
+                  )}
                 </div>
               </div>
 
@@ -436,7 +470,7 @@ export const AdminCoupons: React.FC = () => {
                 type="button"
                 onClick={closeModal}
                 disabled={isSaving}
-                className="h-10 px-4 text-white/70 hover:text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50"
+                className="h-11 px-4 text-white/70 hover:text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -444,7 +478,7 @@ export const AdminCoupons: React.FC = () => {
                 type="button"
                 onClick={handleSave}
                 disabled={isSaving}
-                className="h-10 px-4 bg-[#FFED00] hover:bg-[#e0ac00] text-neutral-950 text-sm font-bold rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-11 px-4 bg-[#FFED00] hover:bg-[#e0ac00] text-neutral-950 text-sm font-bold rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSaving ? 'Saving...' : modalMode === 'create' ? 'Create Coupon' : 'Save Changes'}
               </button>
@@ -472,7 +506,7 @@ export const AdminCoupons: React.FC = () => {
                 type="button"
                 onClick={() => setDeleteTarget(null)}
                 disabled={isDeleting}
-                className="h-10 px-4 text-white/70 hover:text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50"
+                className="h-11 px-4 text-white/70 hover:text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -480,7 +514,7 @@ export const AdminCoupons: React.FC = () => {
                 type="button"
                 onClick={confirmDelete}
                 disabled={isDeleting}
-                className="h-10 px-4 bg-rose-500 hover:bg-rose-400 text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-11 px-4 bg-rose-500 hover:bg-rose-400 text-white text-sm font-bold rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isDeleting ? 'Deleting...' : 'Delete'}
               </button>

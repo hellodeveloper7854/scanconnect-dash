@@ -2,6 +2,7 @@ import { Router, type NextFunction, type Request, type RequestHandler, type Resp
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { requireAdmin, requireAuth } from '../middleware/auth.js';
+import { isValidPersonName } from '../lib/validation.js';
 
 /**
  * Support live chat between a user (website or mobile app) and the admin team.
@@ -97,6 +98,11 @@ chatRouter.post(
     const parsed = messageSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ error: `Message must be 1-${MAX_BODY} characters.` });
+    }
+    if (!isValidPersonName(req.user!.fullName)) {
+      return res.status(403).json({
+        error: 'Please update your name in Personal Information (letters only) before starting a chat.',
+      });
     }
     if (tooManySends(req.user!.id)) {
       return res.status(429).json({ error: 'You are sending messages too fast. Please wait a moment.' });

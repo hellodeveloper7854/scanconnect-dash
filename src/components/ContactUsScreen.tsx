@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { api, ApiError } from '../lib/api';
 import { PhoneInput } from './PhoneInput';
+import { ToastHost, NoticeState } from './Toast';
 import {
   Mail,
   Phone,
@@ -34,6 +35,10 @@ interface ContactUsScreenProps {
 // something the frontend already accepted.
 const NAME_PATTERN = /^[A-Za-z][A-Za-z .'-]{1,79}$/;
 const PHONE_PATTERN = /^[6-9]\d{9}$/;
+// Obvious dummy numbers (6666666666, 9898989898, 9876543210) — mirrors the server's isDummyPhone.
+const isDummyPhone = (digits: string) =>
+  new Set(digits.split('')).size <= 2 || digits === '9876543210' || digits === '0123456789';
+const WHATSAPP_SUPPORT_URL = `https://wa.me/919973878399?text=${encodeURIComponent('Hi Scan Connect, I need some help.')}`;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Interactive Embedded Google Map for Jamshedpur Head Office
@@ -78,6 +83,8 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
   isLoggedIn,
 }) => {
   const [activeNav, setActiveNav] = useState('Contact');
+  const [notice, setNotice] = useState<NoticeState | null>(null);
+  const dismissNotice = React.useCallback(() => setNotice(null), []);
 
   // Form State
   const [fullName, setFullName] = useState(userData.fullName || '');
@@ -86,7 +93,10 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
   const [subject, setSubject] = useState('General Enquiry');
   const [message, setMessage] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitted] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showAllFeatures, setShowAllFeatures] = useState(false);
+  const featuresListId = useId();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [inquiryTouched, setInquiryTouched] = useState<Record<string, boolean>>({});
@@ -94,7 +104,13 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
   const inquiryFieldErrors = {
     fullName: NAME_PATTERN.test(fullName.trim()) ? '' : 'Enter a valid full name (letters only, at least 2 characters)',
     email: EMAIL_PATTERN.test(email.trim()) ? '' : 'Enter a valid email address',
-    phone: !phone.trim() || PHONE_PATTERN.test(phone.trim()) ? '' : 'Enter a valid 10-digit mobile number',
+    phone: !phone.trim()
+      ? 'Phone number is required'
+      : !PHONE_PATTERN.test(phone.trim())
+        ? 'Enter a valid 10-digit mobile number'
+        : isDummyPhone(phone.trim())
+          ? 'Enter a real mobile number'
+          : '',
     message: message.trim().length >= 10 ? '' : 'Message must be at least 10 characters',
   };
   const isInquiryFormValid = Object.values(inquiryFieldErrors).every((e) => !e) && agreeTerms;
@@ -103,7 +119,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
     if (navItem === 'How it works') {
-      onNavigate('dashboard');
+      onNavigate('dashboard#how-it-works');
     } else if (navItem === 'QR Scan') {
       onNavigate('qr-scan');
     } else if (navItem === 'About' || navItem === 'about') {
@@ -117,7 +133,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
     } else if (navItem === 'My Orders') {
       onNavigate('orders');
     } else {
-      alert(`Navigating to ${navItem}`);
+      setNotice({ kind: 'info', message: `${navItem} is coming soon.` });
     }
   };
 
@@ -135,20 +151,19 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
     setIsSubmitting(true);
     setSubmitError('');
+    setSuccessMessage('');
     try {
       await api.post('/api/contact', {
         fullName: fullName.trim(),
         email: email.trim(),
-        phone: phone.trim() || undefined,
+        phone: phone.trim(),
         subject,
         message: message.trim(),
       });
-      setIsSubmitted(true);
-      setTimeout(() => {
-        alert(`Thank you, ${fullName}! Your inquiry regarding "${subject}" has been submitted successfully to Scan Connect support.`);
-        setMessage('');
-        setIsSubmitted(false);
-      }, 800);
+      setSuccessMessage(`Thank you, ${fullName.trim()}! Your inquiry regarding "${subject}" has been submitted successfully. Our support team will get back to you soon.`);
+      setMessage('');
+      setAgreeTerms(false);
+      setInquiryTouched({});
     } catch (err) {
       setSubmitError(err instanceof ApiError ? err.message : 'Failed to submit your inquiry. Please try again.');
     } finally {
@@ -172,6 +187,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#1B1C1C] font-sans antialiased">
+      <ToastHost notice={notice} onDismiss={dismissNotice} />
       {/* Top Header */}
       <DashboardHeader
         userData={userData}
@@ -298,8 +314,9 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 <div className="flex items-center justify-center lg:justify-start gap-4 pt-1">
                   <button
                     type="button"
-                    onClick={() => alert('Launching Scan Connect WhatsApp Live Assistant...')}
-                    title="Live Support Chat"
+                    onClick={() => window.open(WHATSAPP_SUPPORT_URL, '_blank', 'noopener,noreferrer')}
+                    title="Live Support Chat on WhatsApp"
+                    aria-label="Chat with support on WhatsApp"
                     className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <MessageSquare className="w-5 h-5 stroke-[1.8]" />
@@ -307,21 +324,22 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
                   <button
                     type="button"
-                    onClick={() => alert('Redirecting to official web portal https://scanconnect.com')}
+                    onClick={() => window.open('https://scanconnect.co.in', '_blank', 'noopener,noreferrer')}
                     title="Web Portal"
+                    aria-label="Open the Scan Connect website"
                     className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <Globe className="w-5 h-5 stroke-[1.8]" />
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => alert('Social Handles: @scanconnect')}
-                    title="Email & Social Tag"
+                  <a
+                    href="mailto:info@scanconnect.co.in"
+                    title="Email us"
+                    aria-label="Email info@scanconnect.co.in"
                     className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <AtSign className="w-5 h-5 stroke-[1.8]" />
-                  </button>
+                  </a>
 
                   <a
                     href="/terms"
@@ -455,9 +473,10 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               {/* Phone Number (Optional) */}
               <div className="space-y-2">
                 <label className="block font-['Manrope',sans-serif] font-bold text-xs text-[#1B1C1C] uppercase tracking-wide">
-                  Phone Number <span className="text-[#9CA3AF] font-medium normal-case">(Optional)</span>
+                  Phone Number <span className="text-rose-500" aria-hidden="true">*</span>
                 </label>
                 <PhoneInput
+                  required
                   value={phone}
                   onChange={setPhone}
                   onBlur={() => markInquiryTouched('phone')}
@@ -539,7 +558,12 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               </div>
 
               {submitError && (
-                <p className="text-xs font-semibold text-rose-500 text-center">{submitError}</p>
+                <p role="alert" className="text-xs font-semibold text-rose-500 text-center">{submitError}</p>
+              )}
+              {successMessage && (
+                <p role="status" className="text-sm font-semibold text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                  {successMessage}
+                </p>
               )}
 
               {/* Send Inquiry Button */}
@@ -575,14 +599,28 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {whyContact.map((item) => (
-                <div key={item} className="flex items-center gap-3 bg-neutral-50/70 border border-[#E3E2E2] rounded-xl p-4">
+            <ul id={featuresListId} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {(showAllFeatures ? whyContact : whyContact.slice(0, 4)).map((item) => (
+                <li key={item} className="flex items-center gap-3 bg-neutral-50/70 border border-[#E3E2E2] rounded-xl p-4">
                   <Check className="w-4 h-4 text-[#1B1C1C] stroke-[3] shrink-0" />
                   <span className="font-['Hanken_Grotesk'] font-medium text-sm text-[#1B1C1C]">{item}</span>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
+            {whyContact.length > 4 && (
+              <div className="flex justify-center mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowAllFeatures((v) => !v)}
+                  aria-expanded={showAllFeatures}
+                  aria-controls={featuresListId}
+                  className="inline-flex items-center gap-1.5 min-h-[44px] px-5 rounded-lg border border-[#1B1C1C] text-sm font-bold text-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] transition-colors cursor-pointer"
+                >
+                  {showAllFeatures ? 'Show less' : 'View all features'}
+                  <ChevronDown className={`w-4 h-4 transition-transform ${showAllFeatures ? 'rotate-180' : ''}`} />
+                </button>
+              </div>
+            )}
           </div>
         </section>
 

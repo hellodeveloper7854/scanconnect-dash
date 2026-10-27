@@ -62,7 +62,7 @@ export const DashboardFooter: React.FC = () => {
               {[
                 { label: 'Bike tag', href: '/shop?product=3' },
                 { label: 'Scan Connect Car Tag', href: '/shop?product=1' },
-                { label: 'How it works', href: '/' },
+                { label: 'How it works', href: '/#how-it-works' },
                 { label: 'eTag', href: '/shop#products' },
               ].map(({ label, href }) => (
                 <li key={label}>
@@ -95,9 +95,7 @@ export const DashboardFooter: React.FC = () => {
                       {label}
                     </button>
                   ) : (
-                    <button onClick={() => alert(`About: ${label}`)} className="hover:underline cursor-pointer text-left">
-                      {label}
-                    </button>
+                    <span className="text-left">{label}</span>
                   )}
                 </li>
               ))}
@@ -122,9 +120,10 @@ export const DashboardFooter: React.FC = () => {
                       {label}
                     </a>
                   ) : (
-                    <button onClick={() => alert(`Tool: ${label}`)} className="hover:underline cursor-pointer text-left">
+                    <span className="text-left inline-flex items-center gap-2 cursor-default">
                       {label}
-                    </button>
+                      <span className="text-[10px] font-bold uppercase tracking-wide bg-black/10 rounded-full px-2 py-0.5">Coming soon</span>
+                    </span>
                   )}
                 </li>
               ))}

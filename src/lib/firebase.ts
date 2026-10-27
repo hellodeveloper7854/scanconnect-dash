@@ -15,6 +15,19 @@ export const auth = getAuth(firebaseApp);
 
 const recaptchaVerifiers = new Map<string, RecaptchaVerifier>();
 
+/** Tears down the verifier for a container (call on unmount / when starting over). */
+export function clearRecaptchaVerifier(containerId: string): void {
+  const existing = recaptchaVerifiers.get(containerId);
+  if (existing) {
+    try {
+      existing.clear();
+    } catch {
+      /* already cleared */
+    }
+    recaptchaVerifiers.delete(containerId);
+  }
+}
+
 /**
  * Always creates a fresh verifier bound to the given container, clearing any
  * prior instance first. A cached verifier can outlive its DOM node (e.g. a

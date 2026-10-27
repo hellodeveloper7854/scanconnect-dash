@@ -48,6 +48,26 @@ const MAX_LEN = 2000;
 const LIST_POLL_MS = 8000;
 const THREAD_POLL_MS = 4000;
 
+/** A valid human name contains at least one letter (any script). */
+const hasValidName = (name: string | null | undefined): boolean => !!name && /\p{L}/u.test(name);
+
+/** Defensive display name: real name, else email / phone, else a neutral label. Never throws. */
+const displayName = (u: Partial<ChatUser> | null | undefined): string => {
+  if (u && hasValidName(u.fullName)) return (u.fullName as string).trim();
+  return u?.email || u?.mobileNumber || 'Unnamed user';
+};
+
+const isInvalidName = (u: Partial<ChatUser> | null | undefined): boolean => !!u && !hasValidName(u.fullName);
+
+const InvalidNameBadge: React.FC = () => (
+  <span
+    title="This user's registered name is not a valid name (no letters)."
+    className="text-[10px] uppercase font-bold text-amber-400 border border-amber-400/40 bg-amber-400/10 rounded px-1 shrink-0"
+  >
+    Invalid name
+  </span>
+);
+
 const errMsg = (err: unknown, fallback: string) => (err instanceof Error && err.message ? err.message : fallback);
 
 const relativeTime = (iso: string | null): string => {
@@ -224,7 +244,7 @@ export const AdminLiveChat: React.FC = () => {
   const showConversation = !!selectedId;
 
   return (
-    <div className="h-screen flex flex-col p-4 md:p-8 gap-4 print:hidden">
+    <div className="h-[calc(100vh-3.5rem)] md:h-screen flex flex-col p-4 md:p-8 gap-4 print:hidden">
       <h1 className="text-2xl font-black text-white uppercase tracking-wide shrink-0">Live Chat</h1>
 
       <div className="flex-1 min-h-0 flex border border-white/10 rounded-xl overflow-hidden">
@@ -237,7 +257,7 @@ export const AdminLiveChat: React.FC = () => {
               <button
                 key={f.key}
                 onClick={() => setFilter(f.key)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
+                className={`px-3 min-h-11 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                   filter === f.key ? 'bg-[#FFED00] text-[#1B1C1C]' : 'bg-white/5 text-white/70 hover:bg-white/10'
                 }`}
               >
@@ -256,16 +276,19 @@ export const AdminLiveChat: React.FC = () => {
                 <button
                   key={t.id}
                   onClick={() => setSelectedId(t.id)}
-                  className={`w-full text-left px-4 py-3 border-b border-white/5 cursor-pointer transition-colors ${
+                  className={`w-full text-left px-4 py-3 min-h-11 border-b border-white/5 cursor-pointer transition-colors ${
                     selectedId === t.id ? 'bg-[#FFED00]/10' : 'hover:bg-white/5'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-semibold text-white truncate">{t.user.fullName || 'Unnamed user'}</span>
+                    <span className="flex items-center gap-1.5 min-w-0">
+                      <span className="font-semibold text-white truncate">{displayName(t.user)}</span>
+                      {isInvalidName(t.user) && <InvalidNameBadge />}
+                    </span>
                     <span className="text-xs text-white/40 shrink-0">{relativeTime(t.lastMessage?.createdAt ?? t.lastMessageAt ?? t.createdAt)}</span>
                   </div>
                   <div className="text-xs text-white/40 truncate">
-                    {[t.user.mobileNumber, t.user.email].filter(Boolean).join(' · ') || '—'}
+                    {[t.user?.mobileNumber, t.user?.email].filter(Boolean).join(' · ') || '—'}
                   </div>
                   <div className="flex items-center justify-between gap-2 mt-1">
                     <span className="text-sm text-white/60 truncate">
@@ -300,22 +323,34 @@ export const AdminLiveChat: React.FC = () => {
               <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10 shrink-0">
                 <button
                   onClick={() => setSelectedId(null)}
-                  className="md:hidden p-1 text-white/70 hover:text-white cursor-pointer"
+                  className="md:hidden min-w-11 min-h-11 flex items-center justify-center text-white/70 hover:text-white cursor-pointer"
                   aria-label="Back to conversations"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
                 <div className="min-w-0 flex-1">
-                  <div className="font-bold text-white truncate">{thread?.user.fullName || 'Unnamed user'}</div>
-                  <div className="text-xs text-white/50 truncate">
-                    {[thread?.user.mobileNumber, thread?.user.email].filter(Boolean).join(' · ')}
-                  </div>
+                  {thread ? (
+                    <>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="font-bold text-white truncate">{displayName(thread.user)}</span>
+                        {isInvalidName(thread.user) && <InvalidNameBadge />}
+                      </div>
+                      <div className="text-xs text-white/50 truncate">
+                        {[thread.user?.mobileNumber, thread.user?.email].filter(Boolean).join(' · ')}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="space-y-1.5 animate-pulse" aria-busy="true" aria-label="Loading conversation">
+                      <div className="h-4 w-40 rounded bg-white/10" />
+                      <div className="h-3 w-56 rounded bg-white/5" />
+                    </div>
+                  )}
                 </div>
                 {thread && (
                   <button
                     onClick={() => setStatus(thread.status === 'OPEN' ? 'CLOSED' : 'OPEN')}
                     disabled={statusBusy}
-                    className="px-3 py-1.5 rounded-lg text-sm font-semibold bg-white/5 text-white/80 hover:bg-white/10 disabled:opacity-50 cursor-pointer shrink-0"
+                    className="px-3 min-h-11 rounded-lg text-sm font-semibold bg-white/5 text-white/80 hover:bg-white/10 disabled:opacity-50 cursor-pointer shrink-0"
                   >
                     {thread.status === 'OPEN' ? 'Close conversation' : 'Reopen'}
                   </button>
@@ -364,7 +399,7 @@ export const AdminLiveChat: React.FC = () => {
                   <button
                     onClick={send}
                     disabled={sending || !draft.trim()}
-                    className="h-10 px-4 rounded-lg bg-[#FFED00] text-[#1B1C1C] font-bold text-sm flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+                    className="h-11 px-4 rounded-lg bg-[#FFED00] text-[#1B1C1C] font-bold text-sm flex items-center gap-2 disabled:opacity-50 cursor-pointer"
                   >
                     <Send className="w-4 h-4" /> {sending ? 'Sending' : 'Send'}
                   </button>

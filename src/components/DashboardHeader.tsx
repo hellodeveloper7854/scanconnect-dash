@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Bell, HelpCircle, LogOut, ShieldAlert, User, Menu, X, ChevronDown, Package } from 'lucide-react';
 import { UserFormData } from '../types';
-import { api, ApiError } from '../lib/api';
+import { api, ApiError, isAuthError } from '../lib/api';
 import { useMyAvatar } from '../lib/avatar';
 import logoImg from '../assets/images/logo.png';
 
@@ -33,6 +33,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [sosActive, setSosActive] = useState(false);
+  const [sosNotice, setSosNotice] = useState<{ type: 'success' | 'error'; text: string; showSignIn?: boolean } | null>(null);
+  useEffect(() => {
+    if (!sosNotice) return;
+    const t = setTimeout(() => setSosNotice(null), 8000);
+    return () => clearTimeout(t);
+  }, [sosNotice]);
   const avatarSrc = useMyAvatar(isLoggedIn);
   const [avatarFailed, setAvatarFailed] = useState(false);
   useEffect(() => setAvatarFailed(false), [avatarSrc]);
@@ -102,7 +108,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
   const triggerSosAlert = () => {
     if (!isLoggedIn) {
-      alert('Please sign in to use the SOS emergency alert.');
+      setSosNotice({ type: 'error', text: 'Please sign in to use the SOS emergency alert.', showSignIn: true });
       return;
     }
 
@@ -110,9 +116,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       setSosActive(true);
       try {
         await api.post('/api/sos', coords);
-        alert('🚨 EMERGENCY SOS DISPATCHED: Alert sent to emergency contacts & nearby ScanConnect response team!');
+        setSosNotice({ type: 'success', text: 'Emergency SOS dispatched: alert sent to your emergency contacts and the nearby Scan Connect response team.' });
       } catch (err) {
-        alert(err instanceof ApiError ? err.message : 'Failed to dispatch SOS alert. Please try again.');
+        setSosNotice({
+          type: 'error',
+          text: err instanceof ApiError ? err.message : 'Failed to dispatch SOS alert. Please try again.',
+          showSignIn: isAuthError(err),
+        });
       } finally {
         setTimeout(() => setSosActive(false), 5000);
       }
@@ -130,12 +140,31 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   };
 
   return (
+    <>
+    {sosNotice && (
+      <div
+        role="alert"
+        className={`fixed top-20 left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-md rounded-xl px-4 py-3 shadow-xl text-sm font-semibold flex items-start gap-3 ${
+          sosNotice.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+        }`}
+      >
+        <span className="flex-1">
+          {sosNotice.text}{' '}
+          {sosNotice.showSignIn && (
+            <a href="/login" className="underline font-bold">Sign in</a>
+          )}
+        </span>
+        <button onClick={() => setSosNotice(null)} aria-label="Dismiss" className="shrink-0">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    )}
     <header className="sticky top-0 z-50 bg-[#FFED00] text-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           
           {/* Left Brand Logo */}
-          <div className="flex items-center gap-3 cursor-pointer min-w-0" onClick={() => handleNav('How it works')}>
+          <div className="flex items-center gap-3 cursor-pointer min-w-0" onClick={() => { window.location.href = '/'; }}>
             <img src={logoImg} alt="Scan Connect" className="h-5 sm:h-7 md:h-11 w-auto object-contain max-w-[140px] sm:max-w-[170px] md:max-w-none" />
           </div>
 
@@ -225,7 +254,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
             {/* Help / FAQ Icon — desktop only, moved into hamburger drawer on mobile */}
             <button
-              onClick={() => alert('ScanConnect Helpdesk:\nCall 080-473-59856 or email support@scanconnect.co.in for 24/7 driver support.')}
+              onClick={() => { window.location.href = '/faq'; }}
               className="hidden md:inline-flex p-2 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
               title="Support & FAQ"
             >
@@ -401,7 +430,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                alert('ScanConnect Helpdesk:\nCall 080-473-59856 or email support@scanconnect.co.in for 24/7 driver support.');
+                window.location.href = '/faq';
               }}
               className="w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 flex items-center gap-2.5"
             >
@@ -446,5 +475,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         </div>
       )}
     </header>
+    </>
   );
 };

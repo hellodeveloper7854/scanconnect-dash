@@ -4,17 +4,19 @@ export interface BlogPost {
   date: string;
   category: string;
   excerpt: string;
+  /** Optional cover image URL; a branded fallback is shown when absent or it fails to load. */
+  image?: string;
   body: string[];
 }
 
 export const BLOG_POSTS: BlogPost[] = [
   {
-    slug: 'how-fastag-businesses-can-advertise-to-car-owners-on-Scan Connect',
+    slug: 'how-fastag-businesses-can-advertise-to-car-owners-on-scan-connect',
     title: 'How FASTag Businesses Can Advertise to Car Owners on Scan Connect',
     date: 'August 9, 2026',
     category: 'Guides & Tips',
     excerpt:
-      'Understanding the financial side of your digital ad strategy is the first step toward connecting with millions of car owners. For fastag.',
+      'Understanding the financial side of your digital ad strategy is the first step toward connecting with millions of car owners.',
     body: [
       'Understanding the financial side of your digital ad strategy is the first step toward connecting with millions of car owners. For fastag businesses looking to scale, the process of getting started is simple and direct. You can begin by reaching out to the Scan Connect team to discuss your specific goals and requirements.',
       'Most companies find that a budget between ₹30,000 and ₹1,00,000 is ideal for launching a pilot campaign. This investment allows you to test different approaches while targeting car owners with ads that resonate with their daily driving habits. By focusing on effective marketing on Scan Connect, you ensure that your brand stays top of mind across India.',
@@ -27,7 +29,7 @@ export const BLOG_POSTS: BlogPost[] = [
     title: '5 Common Car Maintenance Mistakes Made In Delhi That Cost Thousands',
     date: 'August 5, 2026',
     category: 'Guides & Tips',
-    excerpt: 'One of the most frequent car maintenance mistakes...',
+    excerpt: 'Skipping winter servicing, ignoring small chips and using the wrong oil grade are among the costliest mistakes Delhi drivers make.',
     body: [
       'One of the most frequent car maintenance mistakes Delhi drivers make is skipping regular servicing during the winter smog season, when engines are already under extra strain.',
       'Ignoring small windshield chips, delaying tyre rotation, and using the wrong engine oil grade for extreme temperature swings can all add thousands of rupees to your annual maintenance bill.',
@@ -35,11 +37,11 @@ export const BLOG_POSTS: BlogPost[] = [
     ],
   },
   {
-    slug: 'why-every-garage-owner-should-give-customers-a-car-Scan Connect-tag-after-service',
+    slug: 'why-every-garage-owner-should-give-customers-a-car-scan-connect-tag-after-service',
     title: 'Why Every Garage Owner Should Give Customers a Car Scan Connect Tag After Service',
     date: 'August 3, 2026',
     category: 'Guides & Tips',
-    excerpt: 'Think back to the last time you picked up ...',
+    excerpt: 'A Car Scan Connect Tag handed over at pickup builds trust and gives customers a private way to reach the garage.',
     body: [
       'Think back to the last time you picked up your car after a service. Chances are, no one gave you an easy way to be reached if something needed attention afterward.',
       'Handing customers a Car Scan Connect Tag at pickup builds trust — it shows you care about what happens after they drive off the lot, and gives them (and anyone near their parked car) a private, direct way to reach them if needed.',
@@ -47,7 +49,7 @@ export const BLOG_POSTS: BlogPost[] = [
     ],
   },
   {
-    slug: 'how-car-Scan Connect-tag-helps-with-parking-during-diwali-celebrations',
+    slug: 'how-car-scan-connect-tag-helps-with-parking-during-diwali-celebrations',
     title: 'How Car Scan Connect Tag Helps With Parking During Diwali Celebrations',
     date: 'July 28, 2026',
     category: 'Guides & Tips',
@@ -58,7 +60,7 @@ export const BLOG_POSTS: BlogPost[] = [
     ],
   },
   {
-    slug: 'how-car-Scan Connect-tag-helps-during-protests',
+    slug: 'how-car-scan-connect-tag-helps-during-protests',
     title: 'How Car Scan Connect Tag Helps During Protests',
     date: 'July 22, 2026',
     category: 'Guides & Tips',
@@ -69,7 +71,7 @@ export const BLOG_POSTS: BlogPost[] = [
     ],
   },
   {
-    slug: '5-situations-where-Scan Connect-tag-scan-location-tracking-can-be-useful',
+    slug: '5-situations-where-scan-connect-tag-scan-location-tracking-can-be-useful',
     title: '5 Situations Where Scan Connect Tag Scan Location Tracking Can Be Useful',
     date: 'July 15, 2026',
     category: 'Guides & Tips',
@@ -81,6 +83,18 @@ export const BLOG_POSTS: BlogPost[] = [
   },
 ];
 
+/** Lowercases, decodes %20 and turns spaces into hyphens so old/encoded URLs still resolve. */
+export function normalizeSlug(raw: string): string {
+  let value = raw;
+  try {
+    value = decodeURIComponent(raw);
+  } catch {
+    /* keep raw */
+  }
+  return value.trim().toLowerCase().replace(/\s+/g, '-').replace(/-+/g, '-').replace(/\/+$/, '');
+}
+
 export function getBlogPost(slug: string): BlogPost | undefined {
-  return BLOG_POSTS.find((p) => p.slug === slug);
+  const wanted = normalizeSlug(slug);
+  return BLOG_POSTS.find((p) => p.slug === wanted);
 }

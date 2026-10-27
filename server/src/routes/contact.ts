@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
+import { fullNameSchema, isDummyPhone } from '../lib/validation.js';
 
 /**
  * Public, unauthenticated by design: the Contact Us form is open to any site
@@ -12,9 +13,14 @@ const NAME_PATTERN = /^[A-Za-z][A-Za-z .'-]{1,79}$/;
 const PHONE_PATTERN = /^[6-9]\d{9}$/;
 
 const createContactRequestSchema = z.object({
-  fullName: z.string().trim().regex(NAME_PATTERN, 'Enter a valid full name (letters only)'),
+  fullName: z.string().trim().regex(NAME_PATTERN, 'Enter a valid full name (letters only)').pipe(fullNameSchema),
   email: z.string().trim().email(),
-  phone: z.union([z.string().trim().regex(PHONE_PATTERN, 'Enter a valid 10-digit Indian mobile number'), z.literal('')]).optional(),
+  // Required so the team can always reach the sender by phone as well as email.
+  phone: z
+    .string()
+    .trim()
+    .regex(PHONE_PATTERN, 'Enter a valid 10-digit Indian mobile number')
+    .refine((v) => !isDummyPhone(v), { message: 'Enter a real mobile number' }),
   subject: z.string().trim().min(1),
   message: z.string().trim().min(10, 'Message must be at least 10 characters'),
 });
@@ -27,7 +33,7 @@ contactRouter.post('/', async (req, res) => {
 
   const { fullName, email, phone, subject, message } = parsed.data;
   const contactRequest = await prisma.contactRequest.create({
-    data: { fullName, email, phone: phone || undefined, subject, message },
+    data: { fullName, email, phone, subject, message },
   });
   res.status(201).json({ contactRequest });
 });

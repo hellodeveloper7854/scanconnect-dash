@@ -320,7 +320,7 @@ export const ShippingPolicyPage: React.FC = () => {
         activeNav="Shipping Policy"
         isLoggedIn={false}
         onNavClick={(nav) => {
-          const path = nav === 'How it works' ? '/' : nav === 'QR Scan' ? '/qr-scan' : `/${nav.toLowerCase()}`;
+          const path = nav === 'How it works' ? '/#how-it-works' : nav === 'QR Scan' ? '/qr-scan' : `/${nav.toLowerCase()}`;
           window.location.href = path;
         }}
       />

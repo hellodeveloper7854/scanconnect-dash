@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ArrowRight, Check, RefreshCw, ShieldCheck, X } from 'lucide-react';
-import { signInWithPhoneNumber, type ConfirmationResult } from 'firebase/auth';
-import { auth, getRecaptchaVerifier } from '../lib/firebase';
+import React, { useState } from 'react';
+import { ArrowRight, Check, RefreshCw, ShieldCheck, X, Pencil } from 'lucide-react';
+import { auth } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
 import { ScreenType, UserFormData } from '../types';
 import logoImg from '../assets/images/logo.png';
-import { isValidPhone, getAuthErrorMessage, toE164Phone } from '../lib/validation';
+import { isValidPhone } from '../lib/validation';
+import { formatCountdown, useOtpSession } from '../lib/useOtpSession';
 import { PhoneInput } from './PhoneInput';
+import { OtpDigitsInput } from './OtpDigitsInput';
 
 interface SendOtpScreenProps {
   onVerifySuccess: (data: Partial<UserFormData>) => void;
@@ -14,107 +15,92 @@ interface SendOtpScreenProps {
 }
 
 const RECAPTCHA_CONTAINER_ID = 'send-otp-recaptcha';
+const EMPTY_OTP = ['', '', '', '', '', ''];
 
 export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, onNavigate }) => {
   const [mobileNumber, setMobileNumber] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isOtpSent, setIsOtpSent] = useState(false);
-  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
-  const [timer, setTimer] = useState(30);
+  const [otpDigits, setOtpDigits] = useState<string[]>(EMPTY_OTP);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
   const [phoneTouched, setPhoneTouched] = useState(false);
-  const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [formError, setFormError] = useState('');
+  const [noAccount, setNoAccount] = useState(false);
 
-  const phoneError = isValidPhone(mobileNumber)
-    ? ''
-    : 'Enter a valid 10-digit mobile number';
+  const otp = useOtpSession(RECAPTCHA_CONTAINER_ID, 'login');
+  const isOtpSent = !!otp.confirmation;
+  const errorMsg = formError || otp.error;
 
-  useEffect(() => {
-    if (!isOtpSent || timer <= 0) return;
-    const interval = setInterval(() => {
-      setTimer((prev) => prev - 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isOtpSent, timer]);
-
-  const sendOtp = async () => {
-    setErrorMsg('');
-    try {
-      const verifier = getRecaptchaVerifier(RECAPTCHA_CONTAINER_ID);
-      const result = await signInWithPhoneNumber(auth, toE164Phone(mobileNumber), verifier);
-      setConfirmation(result);
-      setIsOtpSent(true);
-      setOtpDigits(['', '', '', '', '', '']);
-      setTimer(30);
-      setTimeout(() => inputRefs.current[0]?.focus(), 100);
-    } catch (err) {
-      setErrorMsg(getAuthErrorMessage(err, 'Failed to send OTP.'));
-    }
-  };
+  const phoneError = isValidPhone(mobileNumber) ? '' : 'Enter a valid 10-digit mobile number';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPhoneTouched(true);
+    setNoAccount(false);
     if (phoneError) {
-      setErrorMsg('Please fix the highlighted field before continuing.');
+      setFormError('Please fix the highlighted field before continuing.');
       return;
     }
-    setIsSubmitting(true);
-    await sendOtp();
-    setIsSubmitting(false);
+    setFormError('');
+    const ok = await otp.send(mobileNumber);
+    if (ok) setOtpDigits(EMPTY_OTP);
   };
 
-  const handleOtpChange = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return;
-    const newDigits = [...otpDigits];
-    newDigits[index] = value.slice(-1);
-    setOtpDigits(newDigits);
-    setErrorMsg('');
-
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
+  const handleResend = async () => {
+    setFormError('');
+    setOtpDigits(EMPTY_OTP);
+    await otp.send(mobileNumber);
   };
 
-  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
+  const handleChangeNumber = () => {
+    otp.changeNumber();
+    setOtpDigits(EMPTY_OTP);
+    setFormError('');
+    setNoAccount(false);
   };
 
   const handleVerify = async () => {
     const code = otpDigits.join('');
     if (code.length < 6) {
-      setErrorMsg('Please enter all 6 digits of the OTP code.');
+      setFormError('Please enter all 6 digits of the OTP code.');
       return;
     }
-    if (!confirmation) {
-      setErrorMsg('OTP session expired. Please resend the code.');
-      return;
-    }
-
     setIsVerifying(true);
-    setErrorMsg('');
+    setFormError('');
     try {
-      const credential = await confirmation.confirm(code);
-      const idToken = await credential.user.getIdToken();
-      const { user } = await api.post<{ user: { fullName: string; email: string; mobileNumber: string | null } }>(
-        '/api/auth/session',
-        { idToken },
-      );
-      onVerifySuccess({ email: user.email, fullName: user.fullName, mobileNumber: user.mobileNumber ?? '' });
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setErrorMsg(err.message);
-      } else {
-        setErrorMsg(getAuthErrorMessage(err, 'Verification failed. Please try again.'));
+      const user = await otp.confirmCode(code);
+      if (!user) {
+        setOtpDigits(EMPTY_OTP);
+        return;
+      }
+      try {
+        const idToken = await user.getIdToken();
+        const { user: backendUser } = await api.post<{
+          user: { fullName: string; email: string; mobileNumber: string | null };
+        }>('/api/auth/session', { idToken });
+        onVerifySuccess({
+          email: backendUser.email,
+          fullName: backendUser.fullName,
+          mobileNumber: backendUser.mobileNumber ?? '',
+        });
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 404) {
+          // Verified phone but no Scan Connect account: drop the orphan Firebase phone user.
+          setNoAccount(true);
+          setFormError('No account found for this mobile number.');
+          try {
+            await user.delete();
+          } catch {
+            await auth.signOut();
+          }
+        } else {
+          setFormError(err instanceof ApiError ? err.message : 'Verification failed. Please try again.');
+        }
       }
     } finally {
       setIsVerifying(false);
     }
   };
+
+  const lockedMsg = otp.isLocked ? `Locked. Try again in ${formatCountdown(otp.lockSecondsLeft)}` : '';
 
   return (
     <div
@@ -179,25 +165,50 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
                 <p className="text-xs font-normal text-neutral-400 mt-1">
                   We&apos;ll send a 6-digit code via SMS
                 </p>
-              ) : null}
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleChangeNumber}
+                  className="inline-flex items-center gap-1 text-xs font-bold text-[#0F0F0F] hover:underline cursor-pointer min-h-[44px]"
+                >
+                  <Pencil className="w-3 h-3" /> Wrong number? Change it
+                </button>
+              )}
             </div>
 
             {!isOtpSent ? (
-              /* Send OTP Button */
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                {isSubmitting ? (
-                  <span>Sending SMS...</span>
-                ) : (
-                  <>
-                    <span>Send OTP</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
+              <>
+                {errorMsg && (
+                  <p role="alert" className="text-xs font-semibold text-rose-600">
+                    {errorMsg}{' '}
+                    {noAccount && (
+                      <button
+                        type="button"
+                        onClick={() => onNavigate('register')}
+                        className="underline font-bold text-[#0F0F0F] cursor-pointer"
+                      >
+                        Register now
+                      </button>
+                    )}
+                  </p>
                 )}
-              </button>
+                {lockedMsg && <p className="text-xs font-bold text-[#B58500]">{lockedMsg}</p>}
+                {/* Send OTP Button */}
+                <button
+                  type="submit"
+                  disabled={otp.isSending || otp.isLocked}
+                  className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                >
+                  {otp.isSending ? (
+                    <span>Sending SMS...</span>
+                  ) : (
+                    <>
+                      <span>Send OTP</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </>
             ) : (
               /* Inline OTP Entry */
               <div className="space-y-4">
@@ -205,33 +216,39 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
                   <label className="block text-xs font-semibold tracking-wide text-[#0F0F0F] uppercase">
                     Enter OTP Code
                   </label>
-                  <div className="flex justify-between gap-2">
-                    {otpDigits.map((digit, index) => (
-                      <input
-                        key={index}
-                        type="text"
-                        maxLength={1}
-                        value={digit}
-                        ref={(el) => (inputRefs.current[index] = el)}
-                        onChange={(e) => handleOtpChange(index, e.target.value)}
-                        onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                        className="w-full h-14 text-center text-xl font-bold bg-white border border-neutral-300 text-[#0F0F0F] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-transparent transition-all"
-                      />
-                    ))}
-                  </div>
+                  <OtpDigitsInput
+                    digits={otpDigits}
+                    onChange={(d) => {
+                      setOtpDigits(d);
+                      setFormError('');
+                      otp.setError('');
+                    }}
+                    disabled={otp.isLocked}
+                    inputClassName="w-full h-14 text-center text-xl font-bold bg-white border border-neutral-300 text-[#0F0F0F] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-transparent transition-all disabled:opacity-50"
+                  />
                 </div>
 
                 {errorMsg && (
-                  <p className="text-xs font-semibold text-rose-600">
-                    {errorMsg}
+                  <p role="alert" className="text-xs font-semibold text-rose-600">
+                    {errorMsg}{' '}
+                    {noAccount && (
+                      <button
+                        type="button"
+                        onClick={() => onNavigate('register')}
+                        className="underline font-bold text-[#0F0F0F] cursor-pointer"
+                      >
+                        Register now
+                      </button>
+                    )}
                   </p>
                 )}
+                {lockedMsg && <p className="text-xs font-bold text-[#B58500]">{lockedMsg}</p>}
 
                 <button
                   type="button"
                   onClick={handleVerify}
-                  disabled={isVerifying}
-                  className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  disabled={isVerifying || otp.isLocked}
+                  className="w-full h-[52px] bg-[#FFED00] hover:bg-[#e0ac00] text-[#0F0F0F] font-bold text-sm uppercase tracking-wide rounded-xl shadow-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                 >
                   {isVerifying ? (
                     <span>Verifying code...</span>
@@ -245,17 +262,16 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
 
                 <div className="flex items-center justify-between text-xs text-neutral-500">
                   <span>Didn&apos;t receive code?</span>
-                  {timer > 0 ? (
-                    <span className="font-bold text-[#0F0F0F]">
-                      Resend in {timer}s
-                    </span>
+                  {otp.timer > 0 ? (
+                    <span className="font-bold text-[#0F0F0F]">Resend in {otp.timer}s</span>
                   ) : (
                     <button
                       type="button"
-                      onClick={sendOtp}
-                      className="flex items-center gap-1 text-[#0F0F0F] font-bold hover:underline cursor-pointer"
+                      onClick={handleResend}
+                      disabled={otp.isSending || otp.isLocked}
+                      className="flex items-center gap-1 text-[#0F0F0F] font-bold hover:underline cursor-pointer disabled:opacity-60 min-h-[44px]"
                     >
-                      <RefreshCw className="w-3.5 h-3.5" /> Resend OTP
+                      <RefreshCw className="w-3.5 h-3.5" /> {otp.isSending ? 'Sending...' : 'Resend OTP'}
                     </button>
                   )}
                 </div>
@@ -267,13 +283,14 @@ export const SendOtpScreen: React.FC<SendOtpScreenProps> = ({ onVerifySuccess, o
             {/* Contact Support */}
             <div className="text-center text-sm text-neutral-500 font-normal">
               Trouble logging in?{' '}
-              <button
-                type="button"
-                onClick={() => alert('Support team notified. We will reach out to your registered phone number.')}
+              <a
+                href="https://wa.me/919973878399?text=Hi%20Scan%20Connect%2C%20I%20need%20help%20logging%20in."
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-[#0F0F0F] font-bold hover:underline cursor-pointer"
               >
                 Contact Support
-              </button>
+              </a>
             </div>
           </form>
         </div>

@@ -109,7 +109,7 @@ export const RefundReturnsPage: React.FC = () => {
         activeNav="Refund & Returns"
         isLoggedIn={false}
         onNavClick={(nav) => {
-          const path = nav === 'How it works' ? '/' : nav === 'QR Scan' ? '/qr-scan' : `/${nav.toLowerCase()}`;
+          const path = nav === 'How it works' ? '/#how-it-works' : nav === 'QR Scan' ? '/qr-scan' : `/${nav.toLowerCase()}`;
           window.location.href = path;
         }}
       />

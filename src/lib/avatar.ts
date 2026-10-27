@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { auth } from './firebase';
-import { api, API_BASE_URL, ApiError, appEnvHeaders } from './api';
+import { api, API_BASE_URL, ApiError, appEnvHeaders, friendlyMessage, getIdTokenOrNull } from './api';
 
 /**
  * Profile photo helpers. The photo lives on the backend (`/api/avatar`), shared
@@ -41,7 +41,7 @@ export async function uploadAvatar(file: File): Promise<void> {
     throw new Error('Please choose an image file.');
   }
   const blob = await resizeToJpeg(file);
-  const idToken = await auth.currentUser?.getIdToken();
+  const idToken = await getIdTokenOrNull();
   const res = await fetch(`${API_BASE_URL}/api/avatar`, {
     method: 'PUT',
     headers: { 'Content-Type': 'image/jpeg', ...appEnvHeaders(), ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}) },
@@ -49,7 +49,7 @@ export async function uploadAvatar(file: File): Promise<void> {
   });
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
-    throw new ApiError(data?.error ?? 'Failed to upload photo', res.status, data);
+    throw new ApiError(friendlyMessage(typeof data?.error === 'string' ? data.error : 'Failed to upload photo', res.status), res.status, data);
   }
   notifyChanged();
 }

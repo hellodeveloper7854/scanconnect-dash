@@ -319,7 +319,7 @@ export const AdminQrCodes: React.FC = () => {
   };
 
   return (
-    <div className="p-8 space-y-6 print:p-0 print:space-y-0">
+    <div className="p-4 md:p-8 space-y-6 print:p-0 print:space-y-0">
       <div className="print:hidden space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black text-white uppercase tracking-wide">QR Code Management</h1>
@@ -545,7 +545,7 @@ export const AdminQrCodes: React.FC = () => {
         <div className="text-white/60">No QR codes found.</div>
       ) : (
         <div className="overflow-x-auto border border-white/10 rounded-xl">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm [&_th:first-child]:sticky [&_td:first-child]:sticky [&_th:first-child]:left-0 [&_td:first-child]:left-0 [&_th:first-child]:bg-neutral-950 [&_td:first-child]:bg-neutral-950">
             <thead>
               <tr className="text-left text-white/50 uppercase text-xs border-b border-white/10">
                 <th className="px-4 py-3">ID</th>

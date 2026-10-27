@@ -37,7 +37,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
     if (navItem === 'How it works') {
-      onNavigate('dashboard');
+      onNavigate('dashboard#how-it-works');
     } else if (navItem === 'QR Scan') {
       onNavigate('qr-scan');
     } else if (navItem === 'About' || navItem === 'about') {
@@ -96,7 +96,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
               </button>
 
               <button
-                onClick={() => onNavigate('dashboard')}
+                onClick={() => onNavigate('dashboard#how-it-works')}
                 className="btn-shimmer h-[52px] px-8 bg-[#0F0F0F] hover:bg-neutral-800 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 border border-[#0F0F0F] text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
               >
                 HOW IT WORKS
@@ -252,12 +252,12 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                   </p>
                 </div>
 
-                <button
-                  onClick={() => alert('Garage Co-branding Inquiry sent!')}
-                  className="text-sm font-bold text-[#1B1C1C] hover:text-neutral-700 tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                <a
+                  href="mailto:sales@scanconnect.co.in?subject=Garage%20Co-branding%20Inquiry"
+                  className="text-sm font-bold text-[#1B1C1C] hover:text-neutral-700 tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors min-h-[44px]"
                 >
                   <span>PARTNER NOW</span> <ArrowRight className="w-4 h-4" />
-                </button>
+                </a>
               </div>
 
               {/* Solution 3: Commercial Parking Hubs */}
@@ -274,12 +274,12 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                   </p>
                 </div>
 
-                <button
-                  onClick={() => alert('Parking Hubs Demo Request sent!')}
-                  className="text-sm font-bold text-[#1B1C1C] hover:text-neutral-700 tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                <a
+                  href="mailto:sales@scanconnect.co.in?subject=Parking%20Hubs%20Demo%20Request"
+                  className="text-sm font-bold text-[#1B1C1C] hover:text-neutral-700 tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors min-h-[44px]"
                 >
                   <span>VIEW DEMO</span> <ArrowRight className="w-4 h-4" />
-                </button>
+                </a>
               </div>
             </div>
           </div>

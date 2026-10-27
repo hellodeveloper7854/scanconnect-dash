@@ -127,7 +127,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
     if (navItem === 'How it works') {
-      onNavigate('dashboard');
+      onNavigate('dashboard#how-it-works');
     } else if (navItem === 'QR Scan') {
       onNavigate('qr-scan');
     } else if (navItem === 'About' || navItem === 'about') {

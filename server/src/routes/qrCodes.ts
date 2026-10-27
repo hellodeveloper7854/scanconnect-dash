@@ -13,6 +13,8 @@ import { isValidIndianMobile, last10Digits, toE164India } from '../lib/phone.js'
 import { isKnowlarityConfigured, getMaskedNumber } from '../lib/knowlarity.js';
 import { isGupshupConfigured, sendTemplateMessage, GupshupError } from '../lib/gupshup.js';
 import type { Prisma } from '@prisma/client';
+import { hasVehicleWithRegistration } from './profile.js';
+import { contactPhoneSchema, fullNameSchema, normalizeRegistration, registrationSchema, vehicleTextSchema } from '../lib/validation.js';
 
 /**
  * Masks the last 4 characters of a plate number (e.g. "JH05CY0377" ->
@@ -963,15 +965,15 @@ qrCodesRouter.post('/partner/call-logs', async (req, res) => {
 
 const activateSchema = z.object({
   personal: z.object({
-    fullName: z.string().min(1).max(120),
+    fullName: fullNameSchema,
   }),
   emergencyContacts: z.array(
     z.discriminatedUnion('kind', [
       z.object({ kind: z.literal('existing'), id: z.string().uuid() }),
       z.object({
         kind: z.literal('new'),
-        name: z.string().min(1).max(120),
-        phone: z.string().min(6).max(20),
+        name: fullNameSchema,
+        phone: contactPhoneSchema,
         role: z.string().max(120).optional(),
         email: z.string().email().optional(),
       }),
@@ -980,11 +982,11 @@ const activateSchema = z.object({
   vehicleId: z.string().uuid().optional(),
   vehicle: z
     .object({
-      registration: z.string().min(1).max(30),
+      registration: registrationSchema,
       nickname: z.string().max(60).optional(),
       vehicleType: z.string().min(1).max(40),
-      brand: z.string().max(60).optional(),
-      model: z.string().max(60).optional(),
+      brand: vehicleTextSchema.optional(),
+      model: vehicleTextSchema.optional(),
       fuelType: z.string().max(30).optional(),
       color: z.string().max(30).optional(),
     })
@@ -1010,6 +1012,12 @@ qrCodesRouter.post('/:code/activate', requireAuth, async (req, res) => {
   }
   if (qrCode.status !== 'INACTIVE') {
     return res.status(409).json({ error: 'This QR code has already been activated' });
+  }
+
+  if (parsed.data.vehicle && (await hasVehicleWithRegistration(req.user!.id, parsed.data.vehicle.registration))) {
+    return res.status(409).json({
+      error: 'You have already added a vehicle with this registration number. Choose it from your saved vehicles instead.',
+    });
   }
 
   try {

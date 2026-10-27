@@ -44,6 +44,9 @@ import {
   Award
 } from 'lucide-react';
 import { BLOG_POSTS } from '../lib/blogPosts';
+import { BlogCover } from './BlogCover';
+import { NearbySearchPanel } from './NearbySearchPanel';
+import { NEARBY_CATEGORIES } from '../lib/nearbySearch';
 import { useRevealOnScroll } from '../lib/useRevealOnScroll';
 import banner from '../assets/images/howitworksbanner.png'
 import bannerMobile from '../assets/images/howitworksbannermobile.png'
@@ -100,6 +103,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
   const [scannedTagId, setScannedTagId] = useState('');
   const [isScanSuccess, setIsScanSuccess] = useState(false);
+  const [demoNotice, setDemoNotice] = useState('');
   const [servicesPerView, setServicesPerView] = useState(4);
   const [servicesPage, setServicesPage] = useState(0);
   const [videosPerView, setVideosPerView] = useState(3);
@@ -255,7 +259,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
   // Smart Vehicle Services
   const vehicleServices = [
-    { id: 'fuel', title: 'Nearby Fuel Stations', icon: Fuel, detail: 'Find nearest petrol, diesel & EV charging pumps near your vehicle location.' },
+    { id: 'fuel', title: 'Nearby Fuel Stations', icon: Fuel, detail: 'Find the nearest petrol and diesel fuel stations near your vehicle location.' },
     { id: 'police', title: 'Police Assistance', icon: Shield, detail: 'Instant contact numbers & directions for nearest traffic and city police stations.' },
     { id: 'hospital', title: 'Hospitals & Emergency Care', icon: HeartPulse, detail: 'Emergency trauma centers & ambulance contacts available 24/7.' },
     { id: 'puncture', title: 'Tyre & Puncture Repair', icon: Wrench, detail: '24x7 roadside tyre repair, puncture fix & battery jumpstart services.' },
@@ -324,6 +328,13 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
     'Made for Indian roads and conditions',
   ];
 
+  // Landing on /#how-it-works (from another page's "How it works" link) scrolls to that section.
+  React.useEffect(() => {
+    if (window.location.hash !== '#how-it-works') return;
+    const t = setTimeout(() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }), 120);
+    return () => clearTimeout(t);
+  }, []);
+
   const handleSimulateScan = () => {
     setIsScanSuccess(true);
   };
@@ -338,7 +349,9 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         isLoggedIn={isLoggedIn}
         onNavClick={(nav) => {
           setActiveNav(nav);
-          if ((nav === 'About' || nav === 'about') && onNavigate) {
+          if (nav === 'How it works') {
+            document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+          } else if ((nav === 'About' || nav === 'about') && onNavigate) {
             onNavigate('about');
           } else if ((nav === 'Shop' || nav === 'shop') && onNavigate) {
             onNavigate('shop');
@@ -902,12 +915,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
               {/* Left column — copy + highlight cards */}
               <RevealCard className="space-y-8 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
-                  <span className="relative flex h-2 w-2">
+                <div className="inline-flex max-w-full items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
+                  <span className="relative flex h-2 w-2 shrink-0">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFED00] opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FFED00]" />
                   </span>
-                  <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
+                  <span className="font-['Inter'] font-bold text-xs tracking-[1.5px] sm:tracking-[2px] uppercase text-[#FFED00] whitespace-normal break-words text-left">
                     SOS EMERGENCY ASSISTANCE
                   </span>
                 </div>
@@ -924,12 +937,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                   {sosHighlights.map(({ icon: Icon, label }) => (
                     <div
                       key={label}
-                      className="group bg-white/5 border border-white/10 rounded-xl p-5 flex flex-row items-center gap-4 sm:flex-col sm:items-start sm:gap-3 hover:border-[#FFED00]/60 hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all"
+                      className="group min-w-0 bg-white/5 border border-white/10 rounded-xl p-4 sm:p-5 flex flex-row items-center gap-4 sm:flex-col sm:items-start sm:gap-3 hover:border-[#FFED00]/60 hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all"
                     >
                       <div className="w-10 h-10 rounded-lg bg-[#FFED00]/15 flex items-center justify-center group-hover:bg-[#FFED00]/25 group-hover:scale-110 transition-all shrink-0">
                         <Icon className="w-5 h-5 text-[#FFED00]" />
                       </div>
-                      <span className="font-['Hanken_Grotesk'] font-semibold text-sm text-white leading-snug">{label}</span>
+                      <span className="min-w-0 break-words font-['Hanken_Grotesk'] font-semibold text-sm text-white leading-snug">{label}</span>
                     </div>
                   ))}
                 </div>
@@ -959,11 +972,11 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                   </div>
 
                   {/* Bottom caption overlay */}
-                  <div className="absolute bottom-0 inset-x-0 p-5 sm:p-6 flex items-center gap-3">
+                  <div className="absolute bottom-0 inset-x-0 p-4 sm:p-6 flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-[#FFED00] flex items-center justify-center shrink-0">
                       <ShieldAlert className="w-4.5 h-4.5 text-[#1B1C1C]" />
                     </div>
-                    <p className="font-['Hanken_Grotesk'] font-bold text-white text-sm sm:text-base">
+                    <p className="min-w-0 font-['Hanken_Grotesk'] font-bold text-white text-sm sm:text-base leading-snug">
                       24&times;7 Emergency Response, Anywhere in India
                     </p>
                   </div>
@@ -971,15 +984,15 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               </RevealCard>
             </div>
 
-            <RevealCard delayMs={250} className="mt-14 bg-gradient-to-r from-white/[0.06] to-white/[0.02] border border-white/10 rounded-2xl p-8 sm:p-10 text-center space-y-3 max-w-4xl mx-auto">
+            <RevealCard delayMs={250} className="mt-14 bg-gradient-to-r from-white/[0.06] to-white/[0.02] border border-white/10 rounded-2xl p-5 sm:p-10 break-words text-center space-y-3 max-w-4xl mx-auto">
               <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-xl sm:text-2xl text-white">
                 Stay Safe Wherever You Go
               </h3>
               <p className="font-['Hanken_Grotesk'] font-normal text-base text-neutral-300 leading-[28px] max-w-2xl mx-auto">
                 Whether you&apos;re driving through a busy city, travelling on highways, or parking in unfamiliar locations, the Scan Connect SOS feature ensures that help is always just a tap away.
               </p>
-              <p className="font-['Hanken_Grotesk'] font-bold text-lg text-[#FFED00] pt-2 inline-flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5" />
+              <p className="font-['Hanken_Grotesk'] font-bold text-base sm:text-lg text-[#FFED00] pt-2 flex items-center justify-center gap-2 text-left sm:text-center">
+                <ShieldAlert className="w-5 h-5 shrink-0" />
                 Your Safety. Your Family&apos;s Peace of Mind. Always Connected.
               </p>
             </RevealCard>
@@ -1015,7 +1028,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                   return item.differentiator ? (
                     <span
                       key={item.label}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#1B1C1C] border border-[#1B1C1C] rounded-full text-sm font-bold text-white shadow-[0_6px_18px_rgba(0,0,0,0.25)]"
+                      className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 px-4 py-2 bg-[#1B1C1C] border border-[#1B1C1C] rounded-full text-sm font-bold text-white shadow-[0_6px_18px_rgba(0,0,0,0.25)]"
                     >
                       <ItemIcon className="w-4 h-4 text-[#FFED00]" />
                       {item.label}
@@ -1120,14 +1133,14 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 {/* App Store / Google Play Buttons */}
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <button
-                    onClick={() => alert('Download ScanConnect for iOS on App Store')}
+                    onClick={() => window.open('https://apps.apple.com/search?term=ScanConnect', '_blank', 'noopener,noreferrer')}
                     className="cursor-pointer transition-transform hover:scale-105"
                   >
                     <img src={appStoreImg} alt="Download on the App Store" className="h-11 sm:h-12" />
                   </button>
 
                   <button
-                    onClick={() => alert('Download ScanConnect for Android on Google Play')}
+                    onClick={() => window.open('https://play.google.com/store/search?q=ScanConnect&c=apps', '_blank', 'noopener,noreferrer')}
                     className="cursor-pointer transition-transform hover:scale-105"
                   >
                     <img src={playStoreImg} alt="Get it on Google Play" className="h-11 sm:h-12" />
@@ -1172,15 +1185,13 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                   href={`/blog/${post.slug}`}
                   className="group bg-white rounded-2xl border border-neutral-200/60 overflow-hidden hover:shadow-lg transition-shadow"
                 >
-                  <div className="h-[180px] bg-neutral-100 flex items-center justify-center text-neutral-400 text-xs font-semibold px-4 text-center">
-                    {post.title}
-                  </div>
+                  <BlogCover src={post.image} title={post.title} className="h-[180px]" />
                   <div className="p-6 space-y-3">
                     <p className="text-xs font-bold uppercase tracking-wide text-neutral-400">{post.date}</p>
                     <h3 className="text-xl font-black text-neutral-900 leading-snug group-hover:text-[#FFED00] transition-colors">
                       {post.title}
                     </h3>
-                    <p className="text-sm text-neutral-500 line-clamp-2">{post.excerpt}</p>
+                    <p className="text-sm text-neutral-500 ">{post.excerpt}</p>
                     <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-[#FFED00] decoration-2 underline-offset-4">
                       Read article
                       <ArrowRight className="w-4 h-4" />
@@ -1382,21 +1393,27 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <button
-                    onClick={() => alert('📞 Initiating Privacy-Masked Voice Call to Vehicle Owner...')}
+                    onClick={() => setDemoNotice('Demo only: on a real tag, this places a privacy-masked call to the vehicle owner.')}
                     className="py-3 bg-[#FFED00] text-neutral-950 font-black text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 cursor-pointer hover:bg-[#e0ac00]"
                   >
                     <PhoneCall className="w-4 h-4" /> Masked Call
                   </button>
                   <button
-                    onClick={() => alert('💬 Opening Anonymous WhatsApp Proxy Chat with Vehicle Owner...')}
+                    onClick={() => setDemoNotice('Demo only: on a real tag, this opens a private WhatsApp message to the vehicle owner.')}
                     className="py-3 bg-emerald-500 text-neutral-950 font-black text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 cursor-pointer hover:bg-emerald-400"
                   >
                     <MessageCircle className="w-4 h-4" /> WhatsApp
                   </button>
                 </div>
 
+                {demoNotice && (
+                  <p role="status" className="text-xs text-[#FFED00] bg-white/5 border border-white/10 rounded-lg p-2.5">
+                    {demoNotice}
+                  </p>
+                )}
+
                 <button
-                  onClick={() => setIsScanSuccess(false)}
+                  onClick={() => { setIsScanSuccess(false); setDemoNotice(''); }}
                   className="text-xs text-neutral-400 hover:text-white underline cursor-pointer pt-2"
                 >
                   Scan Another Vehicle Tag
@@ -1434,19 +1451,15 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     {svc.detail}
                   </p>
 
-                  <div className="pt-4 border-t border-neutral-100 flex gap-3">
-                    <button
-                      onClick={() => {
-                        alert(`Searching live location database for ${svc.title}...`);
-                        setSelectedService(null);
-                      }}
-                      className="flex-1 py-3 bg-[#FFED00] hover:bg-[#FFED00] text-neutral-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-md cursor-pointer"
-                    >
-                      SEARCH NEARBY
-                    </button>
+                  <div className="pt-4 border-t border-neutral-100 space-y-3">
+                    {NEARBY_CATEGORIES[svc.id] ? (
+                      <NearbySearchPanel key={svc.id} categoryId={svc.id} />
+                    ) : (
+                      <p className="text-xs text-neutral-500">Nearby search is not available for this service.</p>
+                    )}
                     <button
                       onClick={() => setSelectedService(null)}
-                      className="px-4 py-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-bold text-xs uppercase tracking-wider rounded-xl cursor-pointer"
+                      className="w-full px-4 py-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-bold text-xs uppercase tracking-wider rounded-xl cursor-pointer"
                     >
                       CLOSE
                     </button>
