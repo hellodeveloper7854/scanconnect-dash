@@ -22,6 +22,7 @@ import { BlogPostPage } from './pages/BlogPostPage';
 import { InvestorsPage } from './pages/InvestorsPage';
 import { HelpDemoPage } from './pages/HelpDemoPage';
 import { FaqPage } from './pages/FaqPage';
+import { SupportPage } from './pages/SupportPage';
 import { TermsAndConditionsPage } from './pages/TermsAndConditionsPage';
 import { ShippingPolicyPage } from './pages/ShippingPolicyPage';
 import { RefundReturnsPage } from './pages/RefundReturnsPage';
@@ -76,6 +77,10 @@ export default function App() {
 
   if (path === '/faq') {
     return <FaqPage />;
+  }
+
+  if (path === '/support' || path.startsWith('/support/')) {
+    return <SupportPage />;
   }
 
   if (path === '/terms') {

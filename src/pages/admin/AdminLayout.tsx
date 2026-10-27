@@ -17,6 +17,7 @@ import {
   PhoneCall,
   CreditCard,
   Ticket,
+  LifeBuoy,
   Bell,
   FileText,
   Image,
@@ -67,6 +68,7 @@ const SECTIONS: NavSection[] = [
       { to: '/admin/resellers', label: 'Resellers', icon: Handshake },
       { to: '/admin/contact-requests', label: 'Contact Requests', icon: Mail },
       { to: '/admin/live-chat', label: 'Live Chat', icon: MessageCircle },
+      { to: '/admin/tickets', label: 'Support Tickets', icon: LifeBuoy },
       { to: '/admin/coupons', label: 'Coupons', icon: Ticket },
     ],
   },
@@ -107,6 +109,7 @@ export const AdminLayout: React.FC = () => {
   const mainRef = useRef<HTMLElement>(null);
   const { pathname } = useLocation();
   const [chatUnread, setChatUnread] = useState(0);
+  const [ticketUnread, setTicketUnread] = useState(0);
   const [navOpen, setNavOpen] = useState(false);
   const activeTo = findActiveTo(pathname);
 
@@ -119,6 +122,10 @@ export const AdminLayout: React.FC = () => {
       api
         .get<{ count: number }>('/api/admin/chat/unread-count')
         .then((res) => !cancelled && setChatUnread(res.count))
+        .catch(() => {});
+      api
+        .get<{ count: number }>('/api/admin/tickets/unread-count')
+        .then((res) => !cancelled && setTicketUnread(res.count))
         .catch(() => {});
     };
     fetchCount();
@@ -194,6 +201,11 @@ export const AdminLayout: React.FC = () => {
                   {to === '/admin/live-chat' && chatUnread > 0 && (
                     <span className="min-w-5 h-5 px-1.5 rounded-full bg-[#FFED00] text-[#1B1C1C] text-xs font-black flex items-center justify-center">
                       {chatUnread > 99 ? '99+' : chatUnread}
+                    </span>
+                  )}
+                  {to === '/admin/tickets' && ticketUnread > 0 && (
+                    <span className="min-w-5 h-5 px-1.5 rounded-full bg-[#FFED00] text-[#1B1C1C] text-xs font-black flex items-center justify-center">
+                      {ticketUnread > 99 ? '99+' : ticketUnread}
                     </span>
                   )}
                 </NavLink>

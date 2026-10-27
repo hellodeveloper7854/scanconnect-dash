@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { DashboardHeader } from '../components/DashboardHeader';
 import { DashboardFooter } from '../components/DashboardFooter';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, Search, X } from 'lucide-react';
 
 const FAQS = [
   {
@@ -33,6 +33,12 @@ const FAQS = [
 
 export const FaqPage: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [query, setQuery] = useState('');
+  const q = query.trim().toLowerCase();
+  const results = useMemo(
+    () => FAQS.filter((f) => !q || f.question.toLowerCase().includes(q) || f.answer.toLowerCase().includes(q)),
+    [q],
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-neutral-900 font-sans antialiased">
@@ -59,12 +65,34 @@ export const FaqPage: React.FC = () => {
         </div>
 
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 space-y-4">
-          {FAQS.map((faq, idx) => {
-            const isOpen = openIndex === idx;
+          <div className="relative">
+            <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="Search FAQs"
+              placeholder="Search questions and answers"
+              className="w-full min-h-[48px] rounded-full border border-neutral-300 bg-white pl-11 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-[#FFED00] focus:border-neutral-900"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery('')}
+                aria-label="Clear search"
+                className="absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-neutral-500 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {results.map((faq, idx) => {
+            const isOpen = q ? true : openIndex === idx;
             return (
               <div key={faq.question} className="border border-neutral-200 rounded-2xl overflow-hidden">
                 <button
-                  onClick={() => setOpenIndex(isOpen ? null : idx)}
+                  onClick={() => !q && setOpenIndex(isOpen ? null : idx)}
+                  aria-expanded={isOpen}
                   className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left cursor-pointer"
                 >
                   <span className="font-black text-neutral-900">{faq.question}</span>
@@ -80,6 +108,25 @@ export const FaqPage: React.FC = () => {
               </div>
             );
           })}
+
+          {q && results.length === 0 && (
+            <p role="status" className="text-center text-neutral-500 py-6">
+              No results for &ldquo;{query.trim()}&rdquo;.
+            </p>
+          )}
+
+          <div className="border border-neutral-200 bg-[#f8f9fa] rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <p className="font-black text-neutral-900">Still need help?</p>
+              <p className="text-sm text-neutral-500">Can&apos;t find your answer? Our support team will get back to you.</p>
+            </div>
+            <a
+              href="/support#new"
+              className="inline-flex items-center justify-center min-h-[44px] px-5 rounded-full bg-[#FFED00] text-[#1B1C1C] font-bold text-sm hover:brightness-95"
+            >
+              Raise a ticket
+            </a>
+          </div>
         </div>
       </main>
 

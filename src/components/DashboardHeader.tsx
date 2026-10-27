@@ -254,9 +254,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
             {/* Help / FAQ Icon — desktop only, moved into hamburger drawer on mobile */}
             <button
-              onClick={() => { window.location.href = '/faq'; }}
+              onClick={() => { window.location.href = '/support'; }}
               className="hidden md:inline-flex p-2 text-[#1B1C1C] hover:bg-black/10 rounded-full transition-colors cursor-pointer"
-              title="Support & FAQ"
+              title="Support"
             >
               <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
             </button>
@@ -430,11 +430,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                window.location.href = '/faq';
+                window.location.href = '/support';
               }}
               className="w-full text-left py-2 px-3 rounded-lg hover:bg-black/10 flex items-center gap-2.5"
             >
-              <HelpCircle className="w-4.5 h-4.5 stroke-[2.2]" /> Support &amp; FAQ
+              <HelpCircle className="w-4.5 h-4.5 stroke-[2.2]" /> Support
             </button>
           </div>
 

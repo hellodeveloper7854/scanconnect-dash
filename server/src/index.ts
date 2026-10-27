@@ -20,6 +20,7 @@ import { appAccountRouter } from './routes/appAccount.js';
 import { appVehicleLookupRouter } from './routes/appVehicleLookup.js';
 import { appAvatarRouter } from './routes/appAvatar.js';
 import { adminChatRouter, chatRouter } from './routes/appChat.js';
+import { adminTicketsRouter, ticketsRouter } from './routes/appTickets.js';
 
 const app = express();
 
@@ -65,6 +66,8 @@ app.use('/api/app/vehicle-lookup', appVehicleLookupRouter);
 app.use('/api/avatar', appAvatarRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/admin/chat', adminChatRouter);
+app.use('/api/tickets', ticketsRouter);
+app.use('/api/admin/tickets', adminTicketsRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   // express.json() throws a SyntaxError (with a `body` property) when the

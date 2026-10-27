@@ -30,17 +30,17 @@ enum OrderStatus {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  firebaseUid   String   @unique
-  fullName      String
-  email         String   @unique
-  emailVerified Boolean  @default(false)
-  mobileNumber  String?  @unique
-  mobileVerified Boolean @default(false)
-  role          UserRole @default(USER)
-  isSuspended   Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id             String   @id @default(uuid())
+  firebaseUid    String   @unique
+  fullName       String
+  email          String   @unique
+  emailVerified  Boolean  @default(false)
+  mobileNumber   String?  @unique
+  mobileVerified Boolean  @default(false)
+  role           UserRole @default(USER)
+  isSuspended    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   vehicles          Vehicle[]
   orders            Order[]
@@ -50,6 +50,7 @@ model User {
   sosAlerts         SosAlert[]
   notifications     Notification[]
   chatThreads       ChatThread[]
+  supportTickets    SupportTicket[]
 
   @@index([email])
   @@index([mobileNumber])
@@ -150,7 +151,7 @@ model QrCode {
   /// that trash view.
   deletedAt      DateTime?
 
-  emergencyContacts EmergencyContact[]
+  emergencyContacts  EmergencyContact[]
   maskedCallRequests MaskedCallRequest[]
 
   @@index([batchId])
@@ -169,8 +170,8 @@ model MaskedCallRequest {
   id            String   @id @default(uuid())
   qrCodeId      String
   qrCode        QrCode   @relation(fields: [qrCodeId], references: [id], onDelete: Cascade)
-  targetKind    String   // 'owner' | 'contact'
-  targetIndex   Int?     // emergency contact index, when targetKind is 'contact'
+  targetKind    String // 'owner' | 'contact'
+  targetIndex   Int? // emergency contact index, when targetKind is 'contact'
   callerPhone   String
   virtualNumber String?
   createdAt     DateTime @default(now())
@@ -188,7 +189,6 @@ model MaskedCallRequest {
  * /:code/masked-call endpoint created for that caller, when a match is found
  * by phone number; it's nullable because a CDR can still arrive (and must
  * still be stored) for a call log our matching couldn't resolve.
- *
  * No field on this model is required by the partner endpoint itself — every
  * typed column below is nullable because Knowlarity's payload shape isn't
  * fixed. `providerCallId` is no longer unique (not guaranteed to be sent);
@@ -198,18 +198,18 @@ model MaskedCallRequest {
  * columns could be filled in.
  */
 model CallLog {
-  id                   String             @id @default(uuid())
-  maskedCallRequestId  String?
-  maskedCallRequest    MaskedCallRequest? @relation(fields: [maskedCallRequestId], references: [id], onDelete: SetNull)
-  callerNumber         String?            // E.164, e.g. +919458594043, when the payload included one
-  destinationNumber    String?            // E.164, when the payload included one
-  providerCallId       String?            // Knowlarity's own call/session id, when sent — used for idempotency + support lookups
-  status               String?
-  durationSeconds      Int?
-  startedAt            DateTime?
-  endedAt              DateTime?
-  rawPayload           Json               // full payload exactly as received, kept for audit/debugging and to preserve any fields with no typed column
-  createdAt            DateTime           @default(now())
+  id                  String             @id @default(uuid())
+  maskedCallRequestId String?
+  maskedCallRequest   MaskedCallRequest? @relation(fields: [maskedCallRequestId], references: [id], onDelete: SetNull)
+  callerNumber        String? // E.164, e.g. +919458594043, when the payload included one
+  destinationNumber   String? // E.164, when the payload included one
+  providerCallId      String? // Knowlarity's own call/session id, when sent — used for idempotency + support lookups
+  status              String?
+  durationSeconds     Int?
+  startedAt           DateTime?
+  endedAt             DateTime?
+  rawPayload          Json // full payload exactly as received, kept for audit/debugging and to preserve any fields with no typed column
+  createdAt           DateTime           @default(now())
 
   @@index([maskedCallRequestId])
   @@index([callerNumber])
@@ -226,7 +226,6 @@ model CallLog {
  * stored as-is in `eventType` since Gupshup's exact set of values isn't
  * fixed and validating against a strict enum would just turn any new event
  * type into a dropped webhook delivery.
- *
  * Same shape as CallLog's approach to an unpredictable partner payload:
  * `rawPayload` always has the complete original JSON body, and a
  * best-effort set of common fields is lifted into typed columns for
@@ -235,11 +234,11 @@ model CallLog {
  */
 model WhatsAppEvent {
   id               String   @id @default(uuid())
-  eventType        String   // Gupshup's top-level "type": "message" | "message-event" | "account-event" | ...
-  gupshupMessageId String?  // payload.id / payload.gsId, when present — used for idempotency
-  phoneNumber      String?  // sender's or destination's number (E.164), when the payload included one
-  status           String?  // for message-event: "enqueued" | "sent" | "delivered" | "read" | "failed" | "deleted"
-  rawPayload       Json     // full payload exactly as received, kept for audit/debugging and to preserve any fields with no typed column
+  eventType        String // Gupshup's top-level "type": "message" | "message-event" | "account-event" | ...
+  gupshupMessageId String? // payload.id / payload.gsId, when present — used for idempotency
+  phoneNumber      String? // sender's or destination's number (E.164), when the payload included one
+  status           String? // for message-event: "enqueued" | "sent" | "delivered" | "read" | "failed" | "deleted"
+  rawPayload       Json // full payload exactly as received, kept for audit/debugging and to preserve any fields with no typed column
   createdAt        DateTime @default(now())
 
   @@index([eventType])
@@ -249,12 +248,12 @@ model WhatsAppEvent {
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
+  id           String   @id @default(uuid())
+  name         String
+  description  String?
   priceInPaise Int
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
 
   /// Structured breakdown of the physical tags one unit of this product
   /// contains, e.g. `[{"size":"car","count":2}]` for a "Car Tag (Pack of 2)",
@@ -272,19 +271,19 @@ model Product {
 }
 
 model Order {
-  id                  String            @id @default(uuid())
-  userId              String
-  user                User              @relation(fields: [userId], references: [id])
-  status              OrderStatus       @default(PENDING)
-  subtotalInPaise     Int               @default(0)
-  discountInPaise     Int               @default(0)
-  totalInPaise        Int
-  couponId            String?
-  coupon              Coupon?           @relation(fields: [couponId], references: [id])
-  couponCode          String?
-  razorpayOrderId     String?           @unique
-  razorpayPaymentId   String?
-  razorpaySignature   String?
+  id                 String            @id @default(uuid())
+  userId             String
+  user               User              @relation(fields: [userId], references: [id])
+  status             OrderStatus       @default(PENDING)
+  subtotalInPaise    Int               @default(0)
+  discountInPaise    Int               @default(0)
+  totalInPaise       Int
+  couponId           String?
+  coupon             Coupon?           @relation(fields: [couponId], references: [id])
+  couponCode         String?
+  razorpayOrderId    String?           @unique
+  razorpayPaymentId  String?
+  razorpaySignature  String?
   /// Legacy single-tag fields — kept (not dropped) for backward compatibility
   /// with orders placed before per-tag QR codes (see OrderTag below) existed.
   /// No longer written for new orders; new orders express every physical tag
@@ -293,26 +292,26 @@ model Order {
   /// the migration, so old orders keep working unchanged through the new
   /// per-tag endpoints without needing these columns anymore — they remain
   /// only so nothing that still reads them directly breaks.
-  qrToken             String?           @unique
-  vehicleId           String?
-  vehicle             Vehicle?          @relation(fields: [vehicleId], references: [id])
-  emergencyContactId  String?
-  emergencyContact    EmergencyContact? @relation(fields: [emergencyContactId], references: [id])
-  shippingName        String?
-  shippingPhone       String?
-  shippingCity        String?
-  shippingPincode     String?
-  shippingAddress     String?
+  qrToken            String?           @unique
+  vehicleId          String?
+  vehicle            Vehicle?          @relation(fields: [vehicleId], references: [id])
+  emergencyContactId String?
+  emergencyContact   EmergencyContact? @relation(fields: [emergencyContactId], references: [id])
+  shippingName       String?
+  shippingPhone      String?
+  shippingCity       String?
+  shippingPincode    String?
+  shippingAddress    String?
   /// Language ('en' | 'hi') the customer chose on the product page for the
   /// printed QR sticker text — used when downloading each tag's sticker.
-  stickerLanguage     String            @default("en")
-  fulfillmentStatus   FulfillmentStatus @default(PROCESSING)
-  courierName         String?
-  trackingId          String?
-  shippedAt           DateTime?
-  deliveredAt         DateTime?
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  stickerLanguage    String            @default("en")
+  fulfillmentStatus  FulfillmentStatus @default(PROCESSING)
+  courierName        String?
+  trackingId         String?
+  shippedAt          DateTime?
+  deliveredAt        DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
 
   items  OrderItem[]
   tags   OrderTag[]
@@ -330,23 +329,23 @@ model Order {
 /// single qrToken/vehicleId/emergencyContactId that used to live directly on
 /// Order (kept there only for pre-migration orders — see the comment above).
 model OrderTag {
-  id                  String            @id @default(uuid())
-  orderId             String
-  order               Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderItemId         String
-  orderItem           OrderItem         @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  id                 String            @id @default(uuid())
+  orderId            String
+  order              Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderItemId        String
+  orderItem          OrderItem         @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
   /// StickerSize value ('car' | 'bike' | 'helmet' | 'transport') — see src/lib/qrSticker.ts.
-  size                String
+  size               String
   /// 1-indexed position among this order's tags, purely for stable display
   /// ordering ("Tag 1 of 4") — not a uniqueness constraint on its own.
-  sequence            Int
-  qrToken             String            @unique
-  vehicleId           String?
-  vehicle             Vehicle?          @relation(fields: [vehicleId], references: [id])
-  emergencyContactId  String?
-  emergencyContact    EmergencyContact? @relation(fields: [emergencyContactId], references: [id])
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  sequence           Int
+  qrToken            String            @unique
+  vehicleId          String?
+  vehicle            Vehicle?          @relation(fields: [vehicleId], references: [id])
+  emergencyContactId String?
+  emergencyContact   EmergencyContact? @relation(fields: [emergencyContactId], references: [id])
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
 
   @@index([orderId])
   @@index([orderItemId])
@@ -363,20 +362,20 @@ enum CouponType {
 /// fixedValueInPaise for FIXED coupons, so the meaning of the discount never
 /// depends on reading `type` first.
 model Coupon {
-  id                 String     @id @default(uuid())
-  code               String     @unique
-  type               CouponType
-  percentageValue    Int?
-  fixedValueInPaise  Int?
+  id                String     @id @default(uuid())
+  code              String     @unique
+  type              CouponType
+  percentageValue   Int?
+  fixedValueInPaise Int?
   /// Optional floor — order subtotal must be at least this much for the
   /// coupon to apply. Null means no minimum.
-  minOrderInPaise    Int?
-  usageLimit         Int?
-  usedCount          Int        @default(0)
-  isActive           Boolean    @default(true)
-  expiresAt          DateTime?
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
+  minOrderInPaise   Int?
+  usageLimit        Int?
+  usedCount         Int        @default(0)
+  isActive          Boolean    @default(true)
+  expiresAt         DateTime?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 
   orders Order[]
 
@@ -397,12 +396,12 @@ model Review {
 }
 
 model OrderItem {
-  id        String  @id @default(uuid())
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-  quantity  Int
+  id           String  @id @default(uuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product @relation(fields: [productId], references: [id])
+  quantity     Int
   priceInPaise Int
 
   tags OrderTag[]
@@ -416,13 +415,13 @@ enum SosAlertStatus {
 }
 
 model SosAlert {
-  id        String         @id @default(uuid())
-  userId    String
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status    SosAlertStatus @default(ACTIVE)
-  latitude  Float?
-  longitude Float?
-  createdAt DateTime       @default(now())
+  id         String         @id @default(uuid())
+  userId     String
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status     SosAlertStatus @default(ACTIVE)
+  latitude   Float?
+  longitude  Float?
+  createdAt  DateTime       @default(now())
   resolvedAt DateTime?
 
   @@index([userId])
@@ -433,6 +432,7 @@ enum NotificationType {
   ORDER_PAID
   MASKED_CALL
   ORDER_UPDATE
+  TICKET_REPLY
 }
 
 /// Real per-user notification, shown in the header bell — only ever created
@@ -529,13 +529,13 @@ model DemoIvrNumber {
 }
 
 model DemoSubscriptionPlan {
-  id            String   @id @default(uuid())
-  name          String
-  priceInPaise  Int
-  durationDays  Int
-  features      String[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(uuid())
+  name         String
+  priceInPaise Int
+  durationDays Int
+  features     String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 enum DemoCouponType {
@@ -562,13 +562,13 @@ enum DemoNotificationStatus {
 }
 
 model DemoNotificationCampaign {
-  id        String                  @id @default(uuid())
+  id        String                 @id @default(uuid())
   title     String
   audience  String
-  status    DemoNotificationStatus  @default(DRAFT)
+  status    DemoNotificationStatus @default(DRAFT)
   sentAt    DateTime?
-  createdAt DateTime                @default(now())
-  updatedAt DateTime                @updatedAt
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
 }
 
 model DemoCmsPage {
@@ -616,15 +616,15 @@ model DemoCallLog {
 }
 
 model DemoSystemConfig {
-  id                        String  @id @default("singleton")
-  smtpConfigured            Boolean @default(false)
-  smsGatewayConfigured      Boolean @default(false)
-  pushNotificationsConfigured Boolean @default(true)
-  paymentGatewayConfigured  Boolean @default(true)
-  cloudIvrConfigured        Boolean @default(false)
-  maintenanceMode           Boolean @default(false)
-  appVersion                String  @default("1.0.0")
-  updatedAt                 DateTime @updatedAt
+  id                          String   @id @default("singleton")
+  smtpConfigured              Boolean  @default(false)
+  smsGatewayConfigured        Boolean  @default(false)
+  pushNotificationsConfigured Boolean  @default(true)
+  paymentGatewayConfigured    Boolean  @default(true)
+  cloudIvrConfigured          Boolean  @default(false)
+  maintenanceMode             Boolean  @default(false)
+  appVersion                  String   @default("1.0.0")
+  updatedAt                   DateTime @updatedAt
 }
 
 /// Profile photo, kept apart from `User` so the image bytes never ride along
@@ -680,4 +680,67 @@ model ChatMessage {
   createdAt DateTime   @default(now())
 
   @@index([threadId, createdAt])
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+/// A support request raised by a user (website or app) and handled by admins.
+/// Unlike live chat it is asynchronous: it has a subject/category, a status
+/// lifecycle, a human-readable number (SC-1001) and optional attachments.
+model SupportTicket {
+  id            String       @id @default(uuid())
+  /// Sequential number shown to people as "SC-<number>" (starts at 1001).
+  ticketNumber  Int          @unique @default(autoincrement())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject       String
+  /// ORDER | TAG | PAYMENT | ACCOUNT | OTHER
+  category      String       @default("OTHER")
+  status        TicketStatus @default(OPEN)
+  /// Unseen messages from the other side.
+  userUnread    Int          @default(0)
+  adminUnread   Int          @default(0)
+  lastMessageAt DateTime     @default(now())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  messages TicketMessage[]
+
+  @@index([userId])
+  @@index([status, lastMessageAt])
+}
+
+model TicketMessage {
+  id        String        @id @default(uuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender    ChatSender
+  /// The admin who replied (null for USER messages) — staff-only.
+  adminId   String?
+  body      String
+  createdAt DateTime      @default(now())
+
+  attachments TicketAttachment[]
+
+  @@index([ticketId, createdAt])
+}
+
+/// Small uploaded file (image or PDF) attached to a ticket message, stored in
+/// the database like profile photos so no file storage service is needed.
+model TicketAttachment {
+  id        String        @id @default(uuid())
+  messageId String
+  message   TicketMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  fileName  String
+  mimeType  String
+  sizeBytes Int
+  data      Bytes
+  createdAt DateTime      @default(now())
+
+  @@index([messageId])
 }
