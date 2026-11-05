@@ -49,7 +49,8 @@ export function normalizeRegistration(value: string): string {
   return value.toUpperCase().replace(/[\s-]/g, '');
 }
 
-const PLATE = /^[A-Z]{2}\d{1,2}[A-Z]{1,3}\d{4}$/; // MH12AB1234, DL1CAB1234
+// 2-letter state, 1-2 digit RTO, 0-3 letter series, 4-digit number: MH12AB1234, DL1CAB1234, GJ011234
+const PLATE = /^[A-Z]{2}\d{1,2}[A-Z]{0,3}\d{4}$/;
 const BH_PLATE = /^\d{2}BH\d{4}[A-Z]{1,2}$/; // Bharat series 22BH1234AA
 
 export function isValidRegistration(value: string): boolean {
@@ -61,7 +62,9 @@ export const registrationSchema = z
   .string()
   .min(1)
   .max(30)
-  .refine(isValidRegistration, { message: 'Enter a valid number plate, e.g. MH12AB1234.' });
+  .refine(isValidRegistration, { message: 'Enter a valid number plate, e.g. MH12AB1234.' })
+  // Stored upper-cased with spaces/hyphens removed, so "gj01 ab-1234" and "GJ01AB1234" are one plate.
+  .transform(normalizeRegistration);
 
 /** Vehicle make / model: letters, digits, space, dot, hyphen; at least one letter. */
 export const vehicleTextSchema = z

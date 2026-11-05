@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { env } from './env.js';
-import { last10Digits } from './phone.js';
+import { toWhatsAppNumber } from './phone.js';
 
 /**
  * Gupshup WhatsApp Enterprise "Send a Template Notification" client
@@ -20,7 +20,7 @@ export async function sendTemplateMessage(phone: string, vars: string[]): Promis
   const { userId, token, templateId, baseUrl } = env.gupshup;
 
   const form = new URLSearchParams({
-    send_to: `91${last10Digits(phone)}`, // Gupshup wants country code, no "+"
+    send_to: toWhatsAppNumber(phone), // country code first, no "+"; other countries keep their own code
     msg_type: 'text',
     userid: userId!,
     auth_scheme: 'plain',

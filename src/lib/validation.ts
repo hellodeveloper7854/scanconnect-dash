@@ -41,6 +41,18 @@ export const getFullNameError = (value: string) => {
   return '';
 };
 export const isValidPhone = (value: string) => PHONE_PATTERN.test(value.trim());
+// Indian number plate: 2-letter state, 1-2 digit RTO, 0-3 letter series, 4-digit number
+// (MH12AB1234, DL1CAB1234, GJ011234), or Bharat series (22BH1234AA).
+export const PLATE_PATTERN = /^[A-Z]{2}\d{1,2}[A-Z]{0,3}\d{4}$/;
+export const BH_PLATE_PATTERN = /^\d{2}BH\d{4}[A-Z]{1,2}$/;
+export const PLATE_MAX_LENGTH = 10;
+/** Upper-cases and strips everything but letters and digits (spaces, hyphens, symbols), capped at the max length. */
+export const cleanPlateInput = (value: string) => value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, PLATE_MAX_LENGTH);
+export const isValidPlate = (value: string) => {
+  const plate = value.toUpperCase().replace(/[\s-]/g, '');
+  return PLATE_PATTERN.test(plate) || BH_PLATE_PATTERN.test(plate);
+};
+
 export const isValidEmail = (value: string) => EMAIL_PATTERN.test(value.trim());
 export const isValidPincode = (value: string) => PINCODE_PATTERN.test(value.trim());
 // Generic TLDs that never legitimately follow one another ("gmail.com.com").

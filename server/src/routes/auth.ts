@@ -128,6 +128,19 @@ authRouter.post('/session', async (req, res) => {
     if (user.isSuspended) {
       return res.status(403).json({ error: SUSPENDED_MESSAGE });
     }
+    // Once the customer opens the verification link Firebase holds the new email;
+    // bring Postgres in line (unless that address now belongs to someone else).
+    const tokenEmail = decoded.email?.trim().toLowerCase();
+    if (tokenEmail && decoded.email_verified && tokenEmail !== user.email) {
+      const clash = await prisma.user.findUnique({ where: { email: tokenEmail } });
+      if (!clash) {
+        const synced = await prisma.user.update({
+          where: { id: user.id },
+          data: { email: tokenEmail, emailVerified: true },
+        });
+        return res.json({ user: synced });
+      }
+    }
     res.json({ user });
   } catch (err) {
     console.error('verifyIdToken failed:', err);
@@ -144,10 +157,19 @@ const updateMeSchema = z.object({
   email: z.string().email().optional(),
 });
 
+const PLACEHOLDER_EMAIL_SUFFIX = '@phone.scanconnect.placeholder';
+
 /**
- * Email changes are mirrored to the Firebase user first (it's the account's
- * identity for email/password login), then to Postgres. Phone-only accounts
- * start with a placeholder email, so this is how they add a real one.
+ * Name edits, and a phone-only account adding its FIRST real email.
+ *
+ * Changing an existing email is deliberately not done here: updating a user's
+ * email through the Admin SDK revokes their sessions, which logged people out
+ * ("redirected to re-login") right after saving. A real email change goes through
+ * Firebase's verify-before-update link instead (sent from the client), which keeps
+ * the session and proves the customer owns the new address; /session then syncs
+ * the new address to Postgres. Adding the first email (placeholder -> real) has no
+ * existing address to protect, so it is applied here, and a fresh custom token is
+ * returned so the client can sign straight back in without a visible logout.
  * Mobile number changes go through the OTP link-mobile flow.
  */
 authRouter.patch('/me', requireAuth, async (req, res) => {
@@ -160,7 +182,13 @@ authRouter.patch('/me', requireAuth, async (req, res) => {
   if (parsed.data.fullName !== undefined) data.fullName = parsed.data.fullName;
 
   const newEmail = parsed.data.email?.trim().toLowerCase();
+  let customToken: string | undefined;
   if (newEmail && newEmail !== req.user!.email) {
+    if (!req.user!.email.endsWith(PLACEHOLDER_EMAIL_SUFFIX)) {
+      return res.status(400).json({
+        error: 'To change your email, a verification link is sent to the new address. Use the change-email option in your profile.',
+      });
+    }
     const taken = await prisma.user.findUnique({ where: { email: newEmail } });
     if (taken && taken.id !== req.user!.id) {
       return res.status(409).json({ error: 'This email is already in use by another account' });
@@ -177,9 +205,21 @@ authRouter.patch('/me', requireAuth, async (req, res) => {
     }
     data.email = newEmail;
     data.emailVerified = false;
+    customToken = await firebaseAuth.createCustomToken(req.user!.firebaseUid);
   }
 
   const user = await prisma.user.update({ where: { id: req.user!.id }, data });
 
-  res.json({ user });
+  res.json({ user, ...(customToken ? { customToken } : {}) });
+});
+
+/** Is this email free to use? Lets the profile form say "already in use" before a link is sent. */
+authRouter.post('/me/email-available', requireAuth, async (req, res) => {
+  const parsed = z.object({ email: z.string().email() }).safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: 'Enter a valid email address' });
+  }
+  const email = parsed.data.email.trim().toLowerCase();
+  const taken = await prisma.user.findUnique({ where: { email } });
+  res.json({ available: !taken || taken.id === req.user!.id });
 });

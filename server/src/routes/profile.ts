@@ -185,7 +185,7 @@ profileRouter.post('/vehicles', async (req, res) => {
   }
 
   if (await hasVehicleWithRegistration(req.user!.id, parsed.data.registration)) {
-    return res.status(409).json({ error: 'You have already added a vehicle with this registration number.' });
+    return res.status(409).json({ error: 'Vehicle already exists: you have already added a vehicle with this registration number.' });
   }
 
   if (parsed.data.isPrimary) {
@@ -244,7 +244,7 @@ profileRouter.patch('/vehicles/:id', async (req, res) => {
     parsed.data.registration &&
     (await hasVehicleWithRegistration(req.user!.id, parsed.data.registration, req.params.id))
   ) {
-    return res.status(409).json({ error: 'You have already added a vehicle with this registration number.' });
+    return res.status(409).json({ error: 'Vehicle already exists: you have already added a vehicle with this registration number.' });
   }
 
   if (parsed.data.isPrimary) {

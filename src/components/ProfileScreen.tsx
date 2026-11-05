@@ -9,11 +9,20 @@ import { api, ApiError } from '../lib/api';
 import { auth } from '../lib/firebase';
 import { removeAvatar, uploadAvatar, useMyAvatar } from '../lib/avatar';
 import { fetchBrandedQrPngBlob, triggerBlobDownload, stickerSizeForVehicleType } from '../lib/qrSticker';
-import { sendPasswordResetEmail } from 'firebase/auth';
+import {
+  sendPasswordResetEmail,
+  verifyBeforeUpdateEmail,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  signInWithCustomToken,
+  sendEmailVerification,
+} from 'firebase/auth';
 import {
   isValidName,
   isValidPhone,
   isValidEmail,
+  getNewEmailError,
+  isValidPlate,
   VALIDATION_MESSAGES,
   NAME_PLACEHOLDER,
   getAuthErrorMessage,
@@ -165,7 +174,79 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   };
 
   const identityNameError = isValidName(draftFullName) ? '' : VALIDATION_MESSAGES.name;
-  const identityEmailError = !draftEmail.trim() || isValidEmail(draftEmail) ? '' : VALIDATION_MESSAGES.email;
+  const identityEmailError = !draftEmail.trim() ? '' : getNewEmailError(draftEmail);
+
+  // Changing an email needs the user to prove they own the new address (a link is emailed to it) and,
+  // for security, a recent password check. The signed-in session is kept throughout.
+  const [reauthEmail, setReauthEmail] = useState<string | null>(null);
+  const [reauthPassword, setReauthPassword] = useState('');
+
+  const applyEmailChange = async (email: string, password?: string) => {
+    const fbUser = auth.currentUser;
+    if (!fbUser) throw new ApiError('Your session has ended. Please sign in again.', 401);
+
+    if (!displayEmail) {
+      // A mobile-only account adding its first email: the server records it and returns a fresh sign-in
+      // token, so the user stays logged in; a verification link goes to the new address.
+      const res = await api.patch<{ user: BackendUser; customToken?: string }>('/api/auth/me', { email });
+      setProfile(res.user);
+      if (res.customToken) {
+        await signInWithCustomToken(auth, res.customToken);
+        if (auth.currentUser) await sendEmailVerification(auth.currentUser);
+      }
+      setNotice({ kind: 'success', message: `Email added. We sent a verification link to ${email}.` });
+      return;
+    }
+
+    const { available } = await api.post<{ available: boolean }>('/api/auth/me/email-available', { email });
+    if (!available) throw new ApiError('This email is already in use by another account.', 409);
+    if (password && fbUser.email) {
+      await reauthenticateWithCredential(fbUser, EmailAuthProvider.credential(fbUser.email, password));
+    }
+    await verifyBeforeUpdateEmail(fbUser, email);
+    setNotice({
+      kind: 'success',
+      message: `Verification link sent to ${email}. Your email changes once you open it. You stay signed in.`,
+    });
+  };
+
+  /** Turns a failed email change into a message (or the password prompt), never a forced logout. */
+  const handleEmailChangeError = (err: unknown, email: string) => {
+    const code = (err as { code?: string })?.code;
+    if (code === 'auth/requires-recent-login') {
+      const hasPassword = auth.currentUser?.providerData.some((p) => p.providerId === 'password');
+      if (hasPassword) {
+        setReauthEmail(email);
+        setProfileError('For your security, enter your current password to change your email.');
+      } else {
+        setProfileError('For your security, sign out and sign in again, then change your email.');
+      }
+      return;
+    }
+    if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+      setProfileError('That password is incorrect.');
+      return;
+    }
+    setProfileError(
+      err instanceof ApiError ? err.message : getAuthErrorMessage(err, 'Could not change your email. Please try again.'),
+    );
+  };
+
+  const confirmReauth = async () => {
+    if (!reauthEmail || !reauthPassword) return;
+    setProfileError('');
+    setIsSavingIdentity(true);
+    try {
+      await applyEmailChange(reauthEmail, reauthPassword);
+      setReauthEmail(null);
+      setReauthPassword('');
+      setIsEditingIdentity(false);
+    } catch (err) {
+      handleEmailChangeError(err, reauthEmail);
+    } finally {
+      setIsSavingIdentity(false);
+    }
+  };
 
   const saveIdentity = async () => {
     const error = identityNameError || identityEmailError;
@@ -175,12 +256,21 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     }
     setProfileError('');
     setIsSavingIdentity(true);
+    const email = draftEmail.trim();
+    const emailChanged = !!email && email.toLowerCase() !== displayEmail.toLowerCase();
     try {
-      const body: { fullName: string; email?: string } = { fullName: draftFullName.trim() };
-      const email = draftEmail.trim();
-      if (email && email.toLowerCase() !== displayEmail.toLowerCase()) body.email = email;
-      const res = await api.patch<{ user: BackendUser }>('/api/auth/me', body);
+      // The name saves on its own, so it is kept even if the email step needs another action.
+      const res = await api.patch<{ user: BackendUser }>('/api/auth/me', { fullName: draftFullName.trim() });
       setProfile(res.user);
+      if (emailChanged) {
+        try {
+          await applyEmailChange(email);
+        } catch (err) {
+          handleEmailChangeError(err, email);
+          return; // stay in edit mode so the user can finish the email step
+        }
+      }
+      setReauthEmail(null);
       setIsEditingIdentity(false);
     } catch (err) {
       setProfileError(err instanceof ApiError ? err.message : 'Failed to save changes');
@@ -286,7 +376,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const normalizedPlate = vehicleRegistration.toUpperCase().replace(/[\s-]/g, '');
   const vehicleRegistrationError = !vehicleRegistration.trim()
     ? 'Vehicle registration number is required'
-    : /^[A-Z]{2}\d{1,2}[A-Z]{1,3}\d{4}$/.test(normalizedPlate) || /^\d{2}BH\d{4}[A-Z]{1,2}$/.test(normalizedPlate)
+    : isValidPlate(normalizedPlate)
       ? ''
       : 'Enter a valid number plate, e.g. MH12AB1234';
 
@@ -669,6 +759,29 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                           />
                           {draftEmail && identityEmailError && (
                             <p className="text-xs font-semibold text-red-600 mt-1">{identityEmailError}</p>
+                          )}
+                          {reauthEmail && (
+                            <div className="space-y-2 pt-2">
+                              <label className="block text-xs font-bold tracking-[1.2px] text-[#5D5F5F] uppercase">
+                                CURRENT PASSWORD
+                              </label>
+                              <input
+                                type="password"
+                                value={reauthPassword}
+                                onChange={(e) => setReauthPassword(e.target.value)}
+                                placeholder="Enter your current password"
+                                autoComplete="current-password"
+                                className="w-full h-[50px] px-4 bg-white border border-[#CCC7AA] rounded-lg text-[#1B1C1C] text-base focus:ring-2 focus:ring-[#FFED00] outline-none"
+                              />
+                              <button
+                                type="button"
+                                onClick={confirmReauth}
+                                disabled={isSavingIdentity || !reauthPassword}
+                                className="h-[42px] px-4 bg-[#1B1C1C] text-white font-bold text-xs rounded-lg cursor-pointer disabled:opacity-60"
+                              >
+                                Confirm and send link
+                              </button>
+                            </div>
                           )}
                         </>
                       ) : (

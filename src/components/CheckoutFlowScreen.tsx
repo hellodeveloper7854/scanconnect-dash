@@ -6,7 +6,7 @@ import { api, ApiError, withAppEnv, isAuthError, SIGN_IN_REQUIRED_MESSAGE } from
 import { auth } from '../lib/firebase';
 import { fetchBrandedQrPngBlob, triggerBlobDownload, type StickerSize, type StickerLang } from '../lib/qrSticker';
 import { PhoneInput } from './PhoneInput';
-import { toBare10DigitPhone, isValidPhone, isValidName } from '../lib/validation';
+import { toBare10DigitPhone, isValidPhone, isValidName, isValidPlate } from '../lib/validation';
 import baseQrImage from '../assets/images/qrimage.png';
 import transportQrImage from '../assets/images/transportqrimage.png';
 import hindiQrImage from '../assets/images/hindiqrimage.png';
@@ -371,8 +371,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
       setVehicleFormError('Please enter a registration number.');
       return;
     }
-    const plate = registration.toUpperCase().replace(/[\s-]/g, '');
-    if (!/^[A-Z]{2}\d{1,2}[A-Z]{1,3}\d{4}$/.test(plate) && !/^\d{2}BH\d{4}[A-Z]{1,2}$/.test(plate)) {
+    if (!isValidPlate(registration)) {
       setVehicleFormError('Enter a valid number plate, e.g. MH12AB1234.');
       return;
     }
