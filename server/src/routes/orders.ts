@@ -480,6 +480,87 @@ ordersRouter.post('/verify', requireAuth, async (req, res) => {
   res.json({ order });
 });
 
+/**
+ * Resumes payment for an order that was created but never paid (shown as
+ * "Pending", or "Failed" after an abandoned attempt). Reuses the order's existing
+ * Razorpay order when that is still payable, so no second order or price is made;
+ * if Razorpay says it was in fact already paid, the order is confirmed instead of
+ * charging twice; and if the Razorpay order is gone (expired, or created under the
+ * other test/live key set) a fresh one is created for the same stored total.
+ * Responds in the same shape as POST / so clients open checkout the same way.
+ */
+ordersRouter.post('/:id/resume-payment', requireAuth, async (req, res) => {
+  const order = await prisma.order.findUnique({ where: { id: req.params.id } });
+  if (!order || order.userId !== req.user!.id) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+  if (order.status === 'PAID') {
+    return res.json({ order, alreadyPaid: true });
+  }
+  if (order.status !== 'PENDING' && order.status !== 'FAILED') {
+    return res.status(409).json({ error: 'This order can no longer be paid.' });
+  }
+  if (order.totalInPaise === 0) {
+    const paid = await markOrderPaid({ id: order.id }, {});
+    return res.json({ order: paid, alreadyPaid: true });
+  }
+
+  let keyId: string;
+  let razorpay: ReturnType<typeof getRazorpay>;
+  try {
+    keyId = getRazorpayCredentials().keyId;
+    razorpay = getRazorpay();
+  } catch {
+    return res.status(503).json({ error: 'Payments are not available right now.' });
+  }
+
+  let razorpayOrderId = order.razorpayOrderId;
+  try {
+    if (razorpayOrderId) {
+      try {
+        const existing = await razorpay.orders.fetch(razorpayOrderId);
+        if (existing.status === 'paid') {
+          // The money did arrive (e.g. the app was closed before confirming): confirm, don't charge again.
+          const payments = await razorpay.orders.fetchPayments(razorpayOrderId);
+          const captured = payments.items.find((p) => p.status === 'captured');
+          if (captured) {
+            const paid = await markOrderPaidAndRedeemCoupon(razorpayOrderId, { razorpayPaymentId: captured.id });
+            return res.json({ order: paid, alreadyPaid: true });
+          }
+        }
+        if (Number(existing.amount) !== order.totalInPaise) razorpayOrderId = null;
+      } catch {
+        razorpayOrderId = null; // not found for the current key set: start a new Razorpay order
+      }
+    }
+
+    if (!razorpayOrderId) {
+      const created = await razorpay.orders.create({
+        amount: order.totalInPaise,
+        currency: 'INR',
+        receipt: order.id,
+      });
+      razorpayOrderId = created.id;
+    }
+  } catch (err) {
+    console.error('resume-payment failed:', err);
+    return res.status(502).json({ error: 'Could not restart the payment right now. Please try again in a moment.' });
+  }
+
+  const updated = await prisma.order.update({
+    where: { id: order.id },
+    data: { razorpayOrderId, status: 'PENDING' },
+  });
+  res.json({
+    order: updated,
+    alreadyPaid: false,
+    razorpayOrderId,
+    razorpayKeyId: keyId,
+    amount: order.totalInPaise,
+    currency: 'INR',
+  });
+});
+
 ordersRouter.get('/mine', requireAuth, async (req, res) => {
   const orders = await prisma.order.findMany({
     where: { userId: req.user!.id },
