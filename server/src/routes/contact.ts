@@ -21,7 +21,14 @@ const createContactRequestSchema = z.object({
     .trim()
     .regex(PHONE_PATTERN, 'Enter a valid 10-digit Indian mobile number')
     .refine((v) => !isDummyPhone(v), { message: 'Enter a real mobile number' }),
-  subject: z.string().trim().min(1),
+  // At least 5 characters and some real words, so "1234" can't go out as an email subject.
+  subject: z
+    .string()
+    .trim()
+    .min(5, 'Subject must be at least 5 characters')
+    .refine((v) => (v.match(/[A-Za-z]/g) ?? []).length >= 3, {
+      message: 'Enter a meaningful subject (use words, not just numbers or symbols)',
+    }),
   message: z.string().trim().min(10, 'Message must be at least 10 characters'),
 });
 
