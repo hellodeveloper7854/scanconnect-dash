@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
+import { cityMatchesPincode, lookupPincode, pincodeMismatchMessage } from '../lib/pincode.js';
 import { getRazorpay, getRazorpayCredentials, PaymentsNotConfiguredError } from '../lib/razorpay.js';
 import { runWithAppEnv, isTestDatabaseConfigured, type AppEnv } from '../lib/prisma.js';
 import { env } from '../lib/env.js';
@@ -233,6 +234,17 @@ ordersRouter.post('/', requireAuth, async (req, res) => {
   }
 
   const { shipping } = parsed.data;
+
+  // The city and pincode must belong together (e.g. not Bengaluru + 110001), or the
+  // parcel can't be delivered. If India Post can't be reached this check is skipped
+  // rather than blocking the customer's order.
+  const pinInfo = await lookupPincode(shipping.pincode);
+  if (pinInfo === 'invalid') {
+    return res.status(400).json({ error: 'This pincode was not found. Please check your pincode.' });
+  }
+  if (pinInfo && !cityMatchesPincode(shipping.city, pinInfo)) {
+    return res.status(400).json({ error: pincodeMismatchMessage(shipping.city, pinInfo) });
+  }
   const order = await prisma.order.create({
     data: {
       userId: req.user!.id,

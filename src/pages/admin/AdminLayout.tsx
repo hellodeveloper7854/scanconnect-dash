@@ -10,6 +10,7 @@ import {
   FileSpreadsheet,
   Star,
   Siren,
+  Truck,
   QrCode,
   BarChart3,
   Package,
@@ -70,6 +71,7 @@ const SECTIONS: NavSection[] = [
       { to: '/admin/live-chat', label: 'Live Chat', icon: MessageCircle },
       { to: '/admin/tickets', label: 'Support Tickets', icon: LifeBuoy },
       { to: '/admin/coupons', label: 'Coupons', icon: Ticket },
+      { to: '/admin/delivery', label: 'Delivery Estimates', icon: Truck },
     ],
   },
   {

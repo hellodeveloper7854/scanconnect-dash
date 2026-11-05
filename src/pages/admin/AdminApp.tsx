@@ -9,6 +9,7 @@ import { AdminVehicles } from './AdminVehicles';
 import { AdminQrCodes } from './AdminQrCodes';
 import { AdminQrCodesTrash } from './AdminQrCodesTrash';
 import { AdminCoupons } from './AdminCoupons';
+import { AdminDelivery } from './AdminDelivery';
 import { AdminPayments } from './AdminPayments';
 import { AdminEmergencyContacts } from './AdminEmergencyContacts';
 import { AdminReports } from './AdminReports';
@@ -55,6 +56,7 @@ export const AdminApp: React.FC = () => (
           <Route path="qr-codes"element={<AdminQrCodes />} />
           <Route path="qr-codes/recover" element={<AdminQrCodesTrash />} />
           <Route path="coupons" element={<AdminCoupons />} />
+          <Route path="delivery" element={<AdminDelivery />} />
           <Route path="qr-analytics" element={<AdminQrAnalytics />} />
           <Route path="stickers" element={<AdminStickers />} />
           <Route path="ivr" element={<AdminIvr />} />

@@ -615,6 +615,18 @@ model DemoCallLog {
   createdAt DateTime @default(now())
 }
 
+/// Admin-editable delivery-time rules behind the "Deliver to <pincode>" estimate
+/// (a rule of thumb, not a courier quote). One row, keyed "singleton". `rules` is a
+/// JSON array of { match: city/district/state name, minDays, maxDays } checked
+/// in order; anything unmatched uses the default range. Working days, Sundays skipped.
+model DeliverySetting {
+  id             String   @id @default("singleton")
+  defaultMinDays Int      @default(4)
+  defaultMaxDays Int      @default(7)
+  rules          Json     @default("[]")
+  updatedAt      DateTime @updatedAt
+}
+
 model DemoSystemConfig {
   id                          String   @id @default("singleton")
   smtpConfigured              Boolean  @default(false)
