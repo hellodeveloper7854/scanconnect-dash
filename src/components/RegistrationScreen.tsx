@@ -6,9 +6,9 @@ import { api, ApiError } from '../lib/api';
 import { ScreenType, UserFormData } from '../types';
 import logoImg from '../assets/images/logo.png';
 import {
-  isValidName,
-  isValidEmail,
-  isValidPassword,
+  getFullNameError,
+  getNewEmailError,
+  getPasswordError,
   VALIDATION_MESSAGES,
   NAME_PLACEHOLDER,
   PASSWORD_HINT,
@@ -33,9 +33,9 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onNaviga
   const [touched, setTouched] = useState({ fullName: false, email: false, password: false });
 
   const fieldErrors = {
-    fullName: isValidName(formData.fullName) ? '' : VALIDATION_MESSAGES.name,
-    email: isValidEmail(formData.email) ? '' : VALIDATION_MESSAGES.email,
-    password: isValidPassword(formData.password) ? '' : VALIDATION_MESSAGES.password,
+    fullName: getFullNameError(formData.fullName),
+    email: getNewEmailError(formData.email),
+    password: getPasswordError(formData.password),
   };
   const isFormValid = !fieldErrors.fullName && !fieldErrors.email && !fieldErrors.password;
   const markTouched = (field: keyof typeof touched) => setTouched((t) => ({ ...t, [field]: true }));

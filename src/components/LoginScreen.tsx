@@ -12,6 +12,9 @@ interface LoginScreenProps {
   onSubmitSuccess: (data: Partial<UserFormData>) => void;
 }
 
+const RESET_EMAIL_NEUTRAL_MESSAGE =
+  'If this email is registered with us, a reset link has been sent. Please check your inbox and spam.';
+
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSuccess }) => {
   const [vehicleEmail, setVehicleEmail] = useState('');
   const [accessKey, setAccessKey] = useState('');
@@ -73,8 +76,15 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
     try {
       await sendPasswordResetEmail(auth, vehicleEmail);
       setErrorMsg('');
-      setInfoMsg('Password reset instructions sent to your registered email.');
+      setInfoMsg(RESET_EMAIL_NEUTRAL_MESSAGE);
     } catch (err) {
+      // An unknown email gets the same neutral answer as a known one, so this form
+      // can't be used to find out which addresses have an account.
+      if (err && typeof err === 'object' && (err as { code?: string }).code === 'auth/user-not-found') {
+        setErrorMsg('');
+        setInfoMsg(RESET_EMAIL_NEUTRAL_MESSAGE);
+        return;
+      }
       setInfoMsg('');
       setErrorMsg(getAuthErrorMessage(err, 'Could not send reset email.'));
     }

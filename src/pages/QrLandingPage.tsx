@@ -37,7 +37,8 @@ import {
   isValidName,
   isValidPhone,
   isValidEmail,
-  isValidPassword,
+  getNewEmailError,
+  getPasswordError,
   VALIDATION_MESSAGES,
   PASSWORD_HINT,
   getAuthErrorMessage,
@@ -575,8 +576,8 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
   const step4Errors = {
     firstName: isValidName(firstName) ? '' : 'Enter a valid first name (letters only)',
     lastName: isValidName(lastName) ? '' : 'Enter a valid last name (letters only)',
-    email: isValidEmail(email) ? '' : VALIDATION_MESSAGES.email,
-    password: isValidPassword(password) ? '' : VALIDATION_MESSAGES.password,
+    email: getNewEmailError(email),
+    password: getPasswordError(password),
     confirmPassword: password === confirmPassword ? '' : VALIDATION_MESSAGES.passwordMismatch,
   };
   const step4Valid =
