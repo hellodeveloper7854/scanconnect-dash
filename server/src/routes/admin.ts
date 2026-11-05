@@ -238,6 +238,9 @@ adminRouter.get('/vehicles', async (req, res) => {
         OR: [
           { registration: { contains: search, mode: 'insensitive' as const } },
           { qrCode: { contains: search, mode: 'insensitive' as const } },
+          // The tag actually linked to the vehicle (Vehicle.qrCode is a legacy column that is never filled).
+          { qrCodeRecord: { is: { code: { contains: search, mode: 'insensitive' as const } } } },
+          { qrCodeRecord: { is: { batchName: { contains: search, mode: 'insensitive' as const } } } },
         ],
       }
     : {};
@@ -245,7 +248,10 @@ adminRouter.get('/vehicles', async (req, res) => {
   const [vehicles, total] = await Promise.all([
     prisma.vehicle.findMany({
       where,
-      include: { user: { select: { fullName: true, email: true, mobileNumber: true } } },
+      include: {
+        user: { select: { fullName: true, email: true, mobileNumber: true } },
+        qrCodeRecord: { select: { code: true, status: true, batchName: true, batchSeq: true, activatedAt: true } },
+      },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * pageSize,
       take: pageSize,

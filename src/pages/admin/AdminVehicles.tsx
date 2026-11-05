@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Trash2 } from 'lucide-react';
 import { api } from '../../lib/api';
+import { formatQrDisplayId } from '../../lib/qrSticker';
 
 interface VehicleRow {
   id: string;
   registration: string;
-  qrCode: string;
+  qrCode: string | null;
+  /** The tag actually linked to this vehicle (set when an owner activates a QR code). */
+  qrCodeRecord: {
+    code: string;
+    status: 'ACTIVE' | 'INACTIVE' | 'DISABLED';
+    batchName: string;
+    batchSeq: number;
+    activatedAt: string | null;
+  } | null;
   createdAt: string;
   user: { fullName: string; email: string; mobileNumber: string | null };
 }
@@ -45,7 +54,7 @@ export const AdminVehicles: React.FC = () => {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search registration, QR code"
+            placeholder="Search registration, QR ID"
             className="pl-9 pr-3 h-10 bg-white/10 border border-white/10 text-white text-sm rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-[#FFED00]"
           />
         </div>
@@ -71,7 +80,30 @@ export const AdminVehicles: React.FC = () => {
               {vehicles.map((v) => (
                 <tr key={v.id} className="border-b border-white/5">
                   <td className="px-4 py-3 text-white font-mono">{v.registration}</td>
-                  <td className="px-4 py-3 text-white/70 font-mono">{v.qrCode}</td>
+                  <td className="px-4 py-3">
+                    {v.qrCodeRecord ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-white/80 font-mono text-xs">
+                          {formatQrDisplayId(v.qrCodeRecord.batchName, v.qrCodeRecord.batchSeq)}
+                        </span>
+                        <span
+                          className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                            v.qrCodeRecord.status === 'ACTIVE'
+                              ? 'text-emerald-300 bg-emerald-300/10'
+                              : v.qrCodeRecord.status === 'DISABLED'
+                                ? 'text-rose-300 bg-rose-300/10'
+                                : 'text-white/50 bg-white/10'
+                          }`}
+                        >
+                          {v.qrCodeRecord.status === 'ACTIVE' ? 'Activated' : v.qrCodeRecord.status.toLowerCase()}
+                        </span>
+                      </div>
+                    ) : v.qrCode ? (
+                      <span className="text-white/70 font-mono text-xs">{v.qrCode}</span>
+                    ) : (
+                      <span className="text-white/30 text-xs">No QR linked</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <div className="text-white/80">{v.user.fullName}</div>
                     <div className="text-white/40 text-xs">{v.user.email}</div>
