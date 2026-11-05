@@ -120,8 +120,10 @@ interface AvailableCoupon {
 
 interface CreatedOrder {
   order: OrderRecord;
-  razorpayOrderId: string;
-  razorpayKeyId: string;
+  /** True when the total was ₹0: the order is already confirmed and there is nothing to pay. */
+  free?: boolean;
+  razorpayOrderId: string | null;
+  razorpayKeyId: string | null;
   amount: number;
   currency: string;
 }
@@ -562,6 +564,15 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
       } else {
         created = await api.post<CreatedOrder>('/api/orders', orderPayload);
         pendingOrderRef.current = { key, created };
+      }
+
+      if (created.free) {
+        // Nothing to pay: the server already confirmed the order.
+        pendingOrderRef.current = null;
+        setCompletedOrder(created.order);
+        setStep(3);
+        finish();
+        return;
       }
 
       const razorpay = new window.Razorpay({
@@ -1129,7 +1140,7 @@ export const CheckoutFlowScreen: React.FC<CheckoutFlowScreenProps> = ({
                   disabled={isProcessingPayment}
                   className="w-full h-[68px] bg-[#FFED00] hover:bg-[#e0ac00] rounded-[12px] flex items-center justify-center gap-[8px] font-['Hanken_Grotesk'] font-bold text-[18px] leading-[28px] text-[#736B00] shadow-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
                 >
-                  <span>{isProcessingPayment ? 'Processing...' : 'Pay Now'}</span>
+                  <span>{isProcessingPayment ? 'Processing...' : totalInPaise === 0 ? 'Place Free Order' : 'Pay Now'}</span>
                   {!isProcessingPayment && <ArrowRight className="w-[16px] h-[16px] text-[#736B00]" />}
                 </button>
 

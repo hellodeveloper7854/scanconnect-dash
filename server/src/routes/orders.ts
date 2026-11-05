@@ -226,6 +226,12 @@ ordersRouter.post('/', requireAuth, async (req, res) => {
   }
   const totalInPaise = subtotalInPaise - discountInPaise;
 
+  // Razorpay's minimum charge is ₹1; anything between ₹0 and ₹1 can be neither
+  // paid nor treated as free, so refuse it before an order row is created.
+  if (totalInPaise > 0 && totalInPaise < 100) {
+    return res.status(400).json({ error: 'The order total after the coupon must be ₹0 or at least ₹1.' });
+  }
+
   const { shipping } = parsed.data;
   const order = await prisma.order.create({
     data: {
@@ -245,6 +251,22 @@ ordersRouter.post('/', requireAuth, async (req, res) => {
     },
     include: { items: true },
   });
+
+  // A fully discounted order (e.g. a 100% coupon) needs no payment, and Razorpay
+  // cannot create a zero-amount order at all (that was the "server had a problem"
+  // error on "Pay ₹0"). Confirm it straight away: coupon usage and tags are
+  // handled exactly as for a paid order.
+  if (totalInPaise === 0) {
+    const paid = await markOrderPaid({ id: order.id }, {});
+    return res.status(201).json({
+      order: paid,
+      free: true,
+      razorpayOrderId: null,
+      razorpayKeyId: null,
+      amount: 0,
+      currency: 'INR',
+    });
+  }
 
   let razorpayOrder;
   try {
@@ -332,13 +354,21 @@ async function markOrderPaidAndRedeemCoupon(
   razorpayOrderId: string,
   paymentFields: { razorpayPaymentId?: string; razorpaySignature?: string },
 ) {
+  return markOrderPaid({ razorpayOrderId }, paymentFields);
+}
+
+/** Same as markOrderPaidAndRedeemCoupon, but the order can be found by its own id (free orders have no Razorpay order). */
+export async function markOrderPaid(
+  where: { razorpayOrderId: string } | { id: string },
+  paymentFields: { razorpayPaymentId?: string; razorpaySignature?: string },
+) {
   const { order, wasAlreadyPaid } = await prisma.$transaction(async (tx) => {
-    const existing = await tx.order.findUnique({ where: { razorpayOrderId } });
+    const existing = await tx.order.findUnique({ where });
     if (!existing) return { order: null, wasAlreadyPaid: false };
 
     const wasAlreadyPaid = existing.status === 'PAID';
     const order = await tx.order.update({
-      where: { razorpayOrderId },
+      where,
       data: { status: 'PAID', ...paymentFields },
     });
 
@@ -356,8 +386,11 @@ async function markOrderPaidAndRedeemCoupon(
     await notify({
       userId: order.userId,
       type: 'ORDER_PAID',
-      title: 'Payment successful',
-      body: `Your payment of ${(order.totalInPaise / 100).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} was received. Your order is being prepared.`,
+      title: order.totalInPaise === 0 ? 'Order placed' : 'Payment successful',
+      body:
+        order.totalInPaise === 0
+          ? 'Your order was placed (no payment was needed). Your order is being prepared.'
+          : `Your payment of ${(order.totalInPaise / 100).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} was received. Your order is being prepared.`,
       linkPath: '/orders',
     });
   }

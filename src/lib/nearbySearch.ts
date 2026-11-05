@@ -1,4 +1,8 @@
-// Nearby place search backed by OpenStreetMap's public Overpass API.
+// Nearby place search. The primary source is our own backend (/api/nearby: Geoapify,
+// cached, with an Overpass fallback server-side). The browser only talks to the public
+// Overpass servers directly as a last resort, because those are often at capacity.
+
+import { API_BASE_URL, appEnvHeaders } from './api';
 
 export interface NearbyCategory {
   /** OSM tag filters, each becomes its own nwr[...] clause. */
@@ -106,6 +110,43 @@ const runQuery = async (query: string, deadline: number, outer?: AbortSignal): P
   throw lastErr;
 };
 
+/** Asks our backend; returns null (so the caller can fall back) on any failure. */
+async function searchViaBackend(
+  catId: string,
+  lat: number,
+  lon: number,
+  signal?: AbortSignal,
+): Promise<NearbyResult | null> {
+  try {
+    const params = new URLSearchParams({ category: catId, lat: String(lat), lon: String(lon) });
+    const res = await fetch(`${API_BASE_URL}/api/nearby?${params}`, {
+      headers: appEnvHeaders(),
+      signal: signal ?? AbortSignal.timeout(15000),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      places?: { id: string; name: string; lat: number; lon: number; distanceM: number; open24x7: boolean }[];
+      radiusM?: number;
+    };
+    if (!Array.isArray(json.places)) return null;
+    return {
+      places: json.places.map((p) => ({
+        id: p.id,
+        name: p.name,
+        lat: p.lat,
+        lon: p.lon,
+        distanceKm: p.distanceM / 1000,
+        open24x7: p.open24x7,
+      })),
+      radiusM: json.radiusM ?? RADII[0],
+      fetchedAt: Date.now(),
+    };
+  } catch (err) {
+    if (signal?.aborted) throw err; // the user cancelled: don't start another search
+    return null;
+  }
+}
+
 export async function searchNearby(
   catId: string,
   lat: number,
@@ -114,6 +155,13 @@ export async function searchNearby(
 ): Promise<NearbyResult> {
   const cat = NEARBY_CATEGORIES[catId];
   if (!cat) throw new Error('This category cannot be searched.');
+
+  const viaBackend = await searchViaBackend(catId, lat, lon, signal);
+  if (viaBackend) {
+    cache.set(cacheKey(catId, lat, lon), viaBackend);
+    return viaBackend;
+  }
+
   const deadline = Date.now() + OVERALL_DEADLINE_MS;
   let radiusUsed = RADII[0];
   let places: NearbyPlace[] = [];

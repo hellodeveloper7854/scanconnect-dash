@@ -260,7 +260,9 @@ const AttachmentChip: React.FC<{ att: Attachment; mine: boolean; onImage: (url: 
 };
 
 export const AdminTickets: React.FC = () => {
-  const [filter, setFilter] = useState<Filter>('OPEN');
+  // 'ALL' by default: a ticket an admin already touched is IN_PROGRESS, and an 'Open'-only
+  // default made user-raised tickets look missing from the list.
+  const [filter, setFilter] = useState<Filter>('ALL');
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
   const [tickets, setTickets] = useState<TicketRow[] | null>(null);
