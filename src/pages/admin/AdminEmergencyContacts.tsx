@@ -35,13 +35,14 @@ export const AdminEmergencyContacts: React.FC = () => {
         <div className="text-white/60">No emergency contacts have been added yet.</div>
       ) : (
         <div className="overflow-x-auto border border-white/10 rounded-xl">
-          <table className="w-full min-w-[640px] text-sm [&_th:first-child]:sticky [&_td:first-child]:sticky [&_th:first-child]:left-0 [&_td:first-child]:left-0 [&_th:first-child]:bg-neutral-950 [&_td:first-child]:bg-neutral-950">
+          <table className="w-full min-w-[760px] text-sm [&_th:first-child]:sticky [&_td:first-child]:sticky [&_th:first-child]:left-0 [&_td:first-child]:left-0 [&_th:first-child]:bg-neutral-950 [&_td:first-child]:bg-neutral-950">
             <thead>
               <tr className="text-left text-white/50 uppercase text-xs border-b border-white/10">
                 <th className="px-4 py-3">Account Owner</th>
                 <th className="px-4 py-3">Contact</th>
                 <th className="px-4 py-3">Relationship</th>
                 <th className="px-4 py-3">Phone</th>
+                <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Priority</th>
               </tr>
             </thead>
@@ -55,6 +56,7 @@ export const AdminEmergencyContacts: React.FC = () => {
                   <td className="px-4 py-3 text-white/80">{c.name}</td>
                   <td className="px-4 py-3 text-white/70">{c.role ?? '—'}</td>
                   <td className="px-4 py-3 text-white/70 font-mono">{c.phone}</td>
+                  <td className="px-4 py-3 text-white/70 break-all">{c.email ?? '—'}</td>
                   <td className="px-4 py-3">
                     {c.isPrimary && (
                       <span className="text-xs font-bold uppercase px-2 py-1 rounded text-[#FFED00] bg-[#FFED00]/10">

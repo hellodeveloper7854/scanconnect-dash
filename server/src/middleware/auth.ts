@@ -4,6 +4,9 @@ import { prisma } from '../lib/prisma.js';
 import { env } from '../lib/env.js';
 import type { User } from '@prisma/client';
 
+/** Shown at sign-in and on every restricted action, so customers see one consistent message. */
+export const SUSPENDED_MESSAGE = 'Your account is suspended. Contact administration.';
+
 declare global {
   namespace Express {
     interface Request {
@@ -30,7 +33,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
       return res.status(404).json({ error: 'No account found for this token. Complete registration first.' });
     }
     if (user.isSuspended) {
-      return res.status(403).json({ error: 'This account has been suspended. Contact support.' });
+      return res.status(403).json({ error: SUSPENDED_MESSAGE });
     }
 
     req.user = user;

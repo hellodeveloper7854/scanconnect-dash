@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, ArrowRight, ShieldCheck, Eye, EyeOff, X } from 'lucide-react';
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { api, ApiError } from '../lib/api';
 import { ScreenType, UserFormData } from '../types';
@@ -59,6 +59,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate, onSubmitSu
       });
     } catch (err) {
       if (err instanceof ApiError) {
+        // The password was right but the backend refused the session (e.g. the account is
+        // suspended): drop the Firebase sign-in too, so the user isn't half signed in.
+        await signOut(auth).catch(() => undefined);
         setErrorMsg(err.message);
       } else {
         setErrorMsg(getAuthErrorMessage(err, 'Login failed. Please try again.'));

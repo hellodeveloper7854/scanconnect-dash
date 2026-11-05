@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { firebaseAuth } from '../lib/firebase.js';
 import { registerUser, registerPhoneUser, syncLinkedMobile, findUserByFirebaseUid } from '../services/authService.js';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth, SUSPENDED_MESSAGE } from '../middleware/auth.js';
 import { prisma } from '../lib/prisma.js';
 import { fullNameSchema } from '../lib/validation.js';
 
@@ -64,6 +64,9 @@ authRouter.post('/phone-session', async (req, res) => {
   try {
     const decoded = await firebaseAuth.verifyIdToken(parsed.data.idToken);
     const user = await registerPhoneUser(decoded);
+    if (user.isSuspended) {
+      return res.status(403).json({ error: SUSPENDED_MESSAGE });
+    }
     res.status(201).json({ user });
   } catch (err) {
     if (err instanceof Error && err.message === 'NO_PHONE_NUMBER') {
@@ -120,6 +123,10 @@ authRouter.post('/session', async (req, res) => {
     const user = await findUserByFirebaseUid(decoded.uid);
     if (!user) {
       return res.status(404).json({ error: 'No account found. Please register first.' });
+    }
+    // Say so at sign-in, not only when the customer later tries to do something.
+    if (user.isSuspended) {
+      return res.status(403).json({ error: SUSPENDED_MESSAGE });
     }
     res.json({ user });
   } catch (err) {
