@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { sosNotifiedSummary, type SosNotified } from '../lib/sos';
 import { Bell, HelpCircle, LogOut, ShieldAlert, User, Menu, X, ChevronDown, Package } from 'lucide-react';
 import { UserFormData } from '../types';
 import { api, ApiError, isAuthError } from '../lib/api';
@@ -115,8 +116,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     const sendAlert = async (coords?: { latitude: number; longitude: number }) => {
       setSosActive(true);
       try {
-        await api.post('/api/sos', coords);
-        setSosNotice({ type: 'success', text: 'Emergency SOS dispatched: alert sent to your emergency contacts and the nearby Scan Connect response team.' });
+        const res = await api.post<{ notified?: SosNotified }>('/api/sos', coords);
+        setSosNotice({
+          type: 'success',
+          text: `SOS alert recorded${coords ? ' with your location' : ' (without a location: it was unavailable or blocked)'}. ${sosNotifiedSummary(res.notified)} Nobody is phoned automatically: dial 112 for immediate help.`,
+        });
       } catch (err) {
         setSosNotice({
           type: 'error',

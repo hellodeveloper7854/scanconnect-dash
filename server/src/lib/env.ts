@@ -102,7 +102,9 @@ export const env = {
   gupshup: {
     userId: process.env.GUPSHUP_USER_ID, // client id, e.g. 2000XXXXXX
     token: process.env.GUPSHUP_TOKEN, // secret token (Bearer)
-    templateId: process.env.GUPSHUP_TEMPLATE_ID, // whatsAppTemplateId of the approved template
+    templateId: process.env.GUPSHUP_TEMPLATE_ID,
+    // Approved Utility template for the SOS alert to emergency contacts (see routes/sos.ts).
+    sosTemplateId: process.env.GUPSHUP_SOS_TEMPLATE_ID, // whatsAppTemplateId of the approved template
     baseUrl: process.env.GUPSHUP_BASE_URL ?? 'https://mediaapi.smsgupshup.com',
   },
 };

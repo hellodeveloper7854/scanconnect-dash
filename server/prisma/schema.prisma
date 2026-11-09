@@ -77,6 +77,11 @@ model EmergencyContact {
   phone     String
   email     String?
   isPrimary Boolean  @default(false)
+  /// The owner confirmed this person agreed to receive WhatsApp alerts (SOS with the
+  /// owner's location). WhatsApp requires opt-in before business messages, so SOS
+  /// alerts are only ever sent to contacts with this set. Cleared when the number changes.
+  whatsappOptIn   Boolean  @default(false)
+  whatsappOptInAt DateTime?
   createdAt DateTime @default(now())
 
   orders    Order[]

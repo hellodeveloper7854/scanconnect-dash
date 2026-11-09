@@ -13,11 +13,25 @@ export function isGupshupConfigured(): boolean {
   return Boolean(g.userId && g.token && g.templateId);
 }
 
+/** True when SOS alerts can be sent (credentials + the approved SOS template id). */
+export function isSosAlertConfigured(): boolean {
+  const g = env.gupshup;
+  return Boolean(g.userId && g.token && g.sosTemplateId);
+}
+
 export class GupshupError extends Error {}
 
-/** Sends the configured template to `phone`. Throws GupshupError on any non-success response. */
-export async function sendTemplateMessage(phone: string, vars: string[]): Promise<void> {
-  const { userId, token, templateId, baseUrl } = env.gupshup;
+/**
+ * Sends a template to `phone` (the order-message template by default, or the one
+ * given as `templateIdOverride`). Throws GupshupError on any non-success response.
+ */
+export async function sendTemplateMessage(
+  phone: string,
+  vars: string[],
+  templateIdOverride?: string,
+): Promise<void> {
+  const { userId, token, baseUrl } = env.gupshup;
+  const templateId = templateIdOverride ?? env.gupshup.templateId;
 
   const form = new URLSearchParams({
     send_to: toWhatsAppNumber(phone), // country code first, no "+"; other countries keep their own code

@@ -976,6 +976,7 @@ const activateSchema = z.object({
         phone: contactPhoneSchema,
         role: z.string().max(120).optional(),
         email: z.string().email().optional(),
+        whatsappOptIn: z.boolean().optional(),
       }),
     ]),
   ),
@@ -1067,6 +1068,8 @@ qrCodesRouter.post('/:code/activate', requireAuth, async (req, res) => {
               phone: entry.phone,
               role: entry.role,
               email: entry.email,
+              whatsappOptIn: entry.whatsappOptIn === true,
+              whatsappOptInAt: entry.whatsappOptIn === true ? new Date() : null,
             },
           });
           contactIds.push(created.id);

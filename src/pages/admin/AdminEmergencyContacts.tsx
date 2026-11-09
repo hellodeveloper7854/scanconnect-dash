@@ -8,6 +8,7 @@ interface ContactRow {
   phone: string;
   email: string | null;
   isPrimary: boolean;
+  whatsappOptIn?: boolean;
   createdAt: string;
   user: { fullName: string; email: string };
 }
@@ -43,6 +44,7 @@ export const AdminEmergencyContacts: React.FC = () => {
                 <th className="px-4 py-3">Relationship</th>
                 <th className="px-4 py-3">Phone</th>
                 <th className="px-4 py-3">Email</th>
+                <th className="px-4 py-3">WhatsApp SOS</th>
                 <th className="px-4 py-3">Priority</th>
               </tr>
             </thead>
@@ -57,6 +59,11 @@ export const AdminEmergencyContacts: React.FC = () => {
                   <td className="px-4 py-3 text-white/70">{c.role ?? '—'}</td>
                   <td className="px-4 py-3 text-white/70 font-mono">{c.phone}</td>
                   <td className="px-4 py-3 text-white/70 break-all">{c.email ?? '—'}</td>
+                  <td className="px-4 py-3">
+                    <span className={c.whatsappOptIn ? 'text-emerald-300 text-xs font-bold' : 'text-white/30 text-xs'}>
+                      {c.whatsappOptIn ? 'Consented' : 'Off'}
+                    </span>
+                  </td>
                   <td className="px-4 py-3">
                     {c.isPrimary && (
                       <span className="text-xs font-bold uppercase px-2 py-1 rounded text-[#FFED00] bg-[#FFED00]/10">

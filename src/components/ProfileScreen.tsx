@@ -75,6 +75,8 @@ interface EmergencyContact {
   phone: string;
   email: string | null;
   isPrimary: boolean;
+  /** The owner confirmed this person agreed to receive WhatsApp SOS alerts. */
+  whatsappOptIn?: boolean;
 }
 
 interface Vehicle {
@@ -449,6 +451,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [newContactRole, setNewContactRole] = useState('');
   const [newContactPhone, setNewContactPhone] = useState('');
   const [newContactEmail, setNewContactEmail] = useState('');
+  const [newContactWhatsapp, setNewContactWhatsapp] = useState(false);
   const [isSavingContact, setIsSavingContact] = useState(false);
   const [contactFormError, setContactFormError] = useState('');
   const [contactTouched, setContactTouched] = useState({ name: false, phone: false, email: false });
@@ -468,6 +471,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setNewContactRole('');
     setNewContactPhone('');
     setNewContactEmail('');
+    setNewContactWhatsapp(false);
     setContactFormError('');
     setContactTouched({ name: false, phone: false, email: false });
     setIsContactModalOpen(true);
@@ -479,6 +483,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setNewContactRole(contact.role ?? '');
     setNewContactPhone(toBare10DigitPhone(contact.phone));
     setNewContactEmail(contact.email ?? '');
+    setNewContactWhatsapp(contact.whatsappOptIn === true);
     setContactFormError('');
     setContactTouched({ name: false, phone: false, email: false });
     setIsContactModalOpen(true);
@@ -563,9 +568,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       // Email must be a valid address when present, so a blank email is omitted.
       const trimmedRole = newContactRole.trim();
       const trimmedEmail = newContactEmail.trim();
-      const payload: { name: string; phone: string; role?: string; email?: string } = {
+      const payload: { name: string; phone: string; role?: string; email?: string; whatsappOptIn: boolean } = {
         name: newContactName.trim(),
         phone: newContactPhone.trim(),
+        whatsappOptIn: newContactWhatsapp,
         ...(trimmedRole ? { role: trimmedRole } : editingContactId ? { role: '' } : {}),
         ...(trimmedEmail ? { email: trimmedEmail } : {}),
       };
@@ -984,6 +990,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                                 <span className="truncate text-[#1B1C1C]">{contact.email}</span>
                               </div>
                             )}
+                            <p className="text-xs text-[#5D5F5F]">
+                              WhatsApp SOS alerts: {contact.whatsappOptIn ? 'on' : 'off (edit to turn on)'}
+                            </p>
                           </div>
                         </div>
                       );
@@ -1393,6 +1402,21 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   <p className="text-xs font-semibold text-red-600">{contactFieldErrors.email}</p>
                 )}
               </div>
+
+              {/* WhatsApp needs the recipient's consent before business messages, so SOS alerts only go to
+                  contacts the owner confirms here. */}
+              <label className="flex items-start gap-3 rounded-lg bg-[#F8F6E8] border border-[#CCC7AA] p-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={newContactWhatsapp}
+                  onChange={(e) => setNewContactWhatsapp(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 accent-[#B58500]"
+                />
+                <span className="text-xs text-[#1B1C1C] leading-relaxed">
+                  <span className="font-bold block">Send SOS alerts on WhatsApp</span>
+                  I confirm this person agreed to receive WhatsApp alerts, including my location, if I press SOS.
+                </span>
+              </label>
 
               {contactFormError && (
                 <p className="text-xs font-semibold text-red-600">{contactFormError}</p>

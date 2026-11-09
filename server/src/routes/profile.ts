@@ -67,6 +67,8 @@ const createContactSchema = z.object({
   phone: contactPhoneSchema,
   email: z.string().email().optional(),
   isPrimary: z.boolean().optional(),
+  // The owner confirms this person agreed to receive WhatsApp alerts (SOS with location).
+  whatsappOptIn: z.boolean().optional(),
 });
 
 profileRouter.post('/emergency-contacts', async (req, res) => {
@@ -90,6 +92,8 @@ profileRouter.post('/emergency-contacts', async (req, res) => {
       phone: parsed.data.phone,
       email: parsed.data.email,
       isPrimary: parsed.data.isPrimary,
+      whatsappOptIn: parsed.data.whatsappOptIn === true,
+      whatsappOptInAt: parsed.data.whatsappOptIn === true ? new Date() : null,
     },
   });
 
@@ -103,6 +107,7 @@ const updateContactSchema = z.object({
   // '' or null clears the email.
   email: z.union([z.string().email(), z.literal(''), z.null()]).optional(),
   isPrimary: z.boolean().optional(),
+  whatsappOptIn: z.boolean().optional(),
 });
 
 profileRouter.patch('/emergency-contacts/:id', async (req, res) => {
@@ -123,9 +128,18 @@ profileRouter.patch('/emergency-contacts/:id', async (req, res) => {
     });
   }
 
+  // Consent belongs to a person at a number: a changed number needs it confirmed again.
+  const numberChanged = parsed.data.phone !== undefined && parsed.data.phone !== existing.phone;
+  const optIn = parsed.data.whatsappOptIn ?? (numberChanged ? false : existing.whatsappOptIn);
+
   const contact = await prisma.emergencyContact.update({
     where: { id: req.params.id },
-    data: { ...parsed.data, ...(parsed.data.email === '' ? { email: null } : {}) },
+    data: {
+      ...parsed.data,
+      ...(parsed.data.email === '' ? { email: null } : {}),
+      whatsappOptIn: optIn,
+      whatsappOptInAt: optIn ? (existing.whatsappOptIn && !numberChanged ? existing.whatsappOptInAt : new Date()) : null,
+    },
   });
 
   res.json({ contact });
