@@ -26,6 +26,7 @@ import { SupportPage } from './pages/SupportPage';
 import { TermsAndConditionsPage } from './pages/TermsAndConditionsPage';
 import { ShippingPolicyPage } from './pages/ShippingPolicyPage';
 import { RefundReturnsPage } from './pages/RefundReturnsPage';
+import { DeleteAccountPage } from './pages/DeleteAccountPage';
 import { AdminApp } from './pages/admin/AdminApp';
 
 const getInitialScreenFromUrl = (): ScreenType => {
@@ -93,6 +94,10 @@ export default function App() {
 
   if (path === '/refund-returns') {
     return <RefundReturnsPage />;
+  }
+
+  if (path === '/delete-account') {
+    return <DeleteAccountPage />;
   }
 
   return <MainApp />;

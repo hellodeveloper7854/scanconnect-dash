@@ -154,6 +154,12 @@ export const DashboardFooter: React.FC = () => {
                   Refund &amp; returns
                 </a>
               </li>
+
+              <li>
+                <a href="/delete-account" className="hover:underline cursor-pointer text-left">
+                  Delete account
+                </a>
+              </li>
             </ul>
           </div>
 
