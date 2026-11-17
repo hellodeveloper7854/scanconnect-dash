@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { sosNotifiedSummary, type SosNotified } from '../lib/sos';
+import { SiteBanners } from './SiteBanners';
 import { Bell, HelpCircle, LogOut, ShieldAlert, User, Menu, X, ChevronDown, Package } from 'lucide-react';
 import { UserFormData } from '../types';
 import { api, ApiError, isAuthError } from '../lib/api';
@@ -163,6 +164,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         </button>
       </div>
     )}
+    {/* Announcement strip managed in the admin panel (Content -> Banners, placement "Top bar"). */}
+    <SiteBanners placement="TOP_BAR" />
     <header className="sticky top-0 z-50 bg-[#FFED00] text-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">

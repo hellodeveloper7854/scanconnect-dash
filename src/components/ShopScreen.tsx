@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
+import { SiteBanners } from './SiteBanners';
 import { DashboardFooter } from './DashboardFooter';
 import { ProductDetailScreen } from './ProductDetailScreen';
 import { BulkOrderModal } from './BulkOrderModal';
-import shopBannerImg from '../assets/images/shopbanner.png';
+import { useSiteContent } from '../lib/useSiteContent';
 import {
   ArrowRight,
   ChevronRight,
@@ -40,6 +41,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
   isLoggedIn,
 }) => {
   const [activeNav, setActiveNav] = useState('Shop');
+  const c = useSiteContent('shop');
   const [visibleProductsCount, setVisibleProductsCount] = useState(6);
   const [isBulkOrderModalOpen, setIsBulkOrderModalOpen] = useState(false);
   const heroImageRef = useRef<HTMLDivElement>(null);
@@ -149,25 +151,18 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
   // Trusted Across India trust bar
   const trustBar = [
-    { icon: Truck, label: 'Free Delivery Across India' },
-    { icon: Lock, label: 'Privacy Protected' },
-    { icon: Zap, label: 'Instant Activation' },
-    { icon: PhoneCall, label: 'Secure Call Routing' },
-    { icon: MapPin, label: 'Made for Indian Roads' },
+    { icon: Truck, label: c.t('trusted.1.label') },
+    { icon: Lock, label: c.t('trusted.2.label') },
+    { icon: Zap, label: c.t('trusted.3.label') },
+    { icon: PhoneCall, label: c.t('trusted.4.label') },
+    { icon: MapPin, label: c.t('trusted.5.label') },
   ];
 
   // SCAN CONNECT TAG — Perfect For list
-  const perfectFor = [
-    'Emergency Family Contact',
-    'Wrong Parking Alerts',
-    'Vehicle Safety Notifications',
-    'Lost Vehicle Assistance',
-    'Society & Office Parking',
-    'Commercial Fleets',
-  ];
+  const perfectFor = Array.from({ length: 6 }, (_, i) => c.t(`tag.perfect.${i + 1}`));
 
   // Our Products — 4 distinct product cards
-  const products = [
+  const productsBase = [
     {
       id: 1,
       icon: Car,
@@ -283,14 +278,26 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
     },
   ];
 
+  // Wording editable in the admin panel. Titles, prices, features and sizes stay in code because orders and checkout depend on them.
+  const productText: Record<number, Record<string, any>> = {
+    1: { badge: c.t('products.1.badge'), rating: c.t('products.1.rating'), desc: c.t('products.1.desc'), cta: c.t('products.1.cta'), idealFor: c.t('products.1.ideal').split(',').map((x) => x.trim()).filter(Boolean) },
+    2: { rating: c.t('products.2.rating'), desc: c.t('products.2.desc'), cta: c.t('products.2.cta'), idealFor: c.t('products.2.ideal').split(',').map((x) => x.trim()).filter(Boolean) },
+    6: { badge: c.t('products.6.badge'), rating: c.t('products.6.rating'), desc: c.t('products.6.desc'), cta: c.t('products.6.cta'), idealFor: c.t('products.6.ideal').split(',').map((x) => x.trim()).filter(Boolean) },
+    7: { rating: c.t('products.7.rating'), desc: c.t('products.7.desc'), cta: c.t('products.7.cta'), idealFor: c.t('products.7.ideal').split(',').map((x) => x.trim()).filter(Boolean) },
+    4: { desc: c.t('products.4.desc'), cta: c.t('products.4.cta'), idealFor: c.t('products.4.ideal').split(',').map((x) => x.trim()).filter(Boolean) },
+    5: { desc: c.t('products.5.desc'), cta: c.t('products.5.cta'), idealFor: c.t('products.5.ideal').split(',').map((x) => x.trim()).filter(Boolean) },
+    9: { desc: c.t('products.9.desc'), cta: c.t('products.9.cta'), idealFor: c.t('products.9.ideal').split(',').map((x) => x.trim()).filter(Boolean) },
+  };
+  const products = productsBase.map((p) => ({ ...p, ...(productText[p.id] ?? {}) }));
+
   // What's in the Box — product-specific unboxing contents, not a generic brand checklist
   const boxContents = [
-    { icon: Package, title: '1x Premium QR Tag', desc: 'Waterproof, UV-resistant tag pre-printed with your unique secure QR code.' },
-    { icon: Zap, title: 'Lifetime Activation', desc: 'One-time setup linking the tag to your mobile number — no renewals, ever.' },
-    { icon: Lock, title: 'Privacy-First Routing', desc: 'Calls & WhatsApp reach you without revealing your real number.' },
-    { icon: Truck, title: 'Free Express Delivery', desc: 'Shipped across India at no extra cost, typically within 3-5 business days.' },
-    { icon: PhoneCall, title: 'Quick-Start Guide', desc: 'Simple instructions to activate and attach your tag in under a minute.' },
-    { icon: MapPin, title: 'Priority Support Access', desc: 'Dedicated help for setup, replacements, or activation issues.' },
+    { icon: Package, title: c.t('box.1.title'), desc: c.t('box.1.desc') },
+    { icon: Zap, title: c.t('box.2.title'), desc: c.t('box.2.desc') },
+    { icon: Lock, title: c.t('box.3.title'), desc: c.t('box.3.desc') },
+    { icon: Truck, title: c.t('box.4.title'), desc: c.t('box.4.desc') },
+    { icon: PhoneCall, title: c.t('box.5.title'), desc: c.t('box.5.desc') },
+    { icon: MapPin, title: c.t('box.6.title'), desc: c.t('box.6.desc') },
   ];
 
   if (selectedProduct) {
@@ -319,6 +326,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
       {/* Main Content */}
       <main className="flex-1">
+        {/* Banners managed in the admin panel (Content -> Banners). */}
+        <SiteBanners placement="SHOP" />
         {/* 1. SHOP HERO BANNER SECTION — asymmetric split with an interactive tilt image */}
         <section className="py-12 sm:py-16 lg:py-20 bg-[#F8F9FB] overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -335,30 +344,25 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                   <Store className="w-3.5 h-3.5 text-[#1B1C1C]" />
                   <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                    OFFICIAL STORE
+                    {c.t('hero.badge')}
                   </span>
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-[46px] lg:leading-[1.1] font-black text-[#0F0F0F] tracking-tight font-sans max-w-3xl">
-                  Smart Protection for Every Journey
+                  {c.t('hero.title')}
                 </h1>
 
                 <p className="text-[#5D5F5F] text-lg sm:text-xl font-semibold">
-                  Privacy-First QR Tags for Cars, Bikes &amp; Fleets
+                  {c.t('hero.subtitle')}
                 </p>
 
                 <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal max-w-3xl">
-                  Protect your personal phone number while staying instantly reachable whenever someone needs to contact you. Whether it&apos;s wrong parking, a vehicle emergency, or a helpful alert, Scan Connect ensures secure communication without revealing your identity.
+                  {c.t('hero.body')}
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 max-w-2xl">
-                  {[
-                    'One-Time Purchase • Lifetime Activation',
-                    'No Monthly Subscription',
-                    'Free Express Delivery Across India',
-                    'Made in India',
-                  ].map((line) => (
-                    <div key={line} className="flex items-center gap-2">
+                  {[1, 2, 3, 4].map((n) => c.t(`hero.benefit.${n}`)).filter(Boolean).map((line, lineIdx) => (
+                    <div key={lineIdx} className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-[#1B1C1C] stroke-[3] shrink-0" />
                       <span className="text-[#1B1C1C] text-sm sm:text-base font-medium">{line}</span>
                     </div>
@@ -370,7 +374,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
                     className="btn-shimmer h-[52px] px-8 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
                   >
-                    <span>View Products</span>
+                    <span>{c.t('hero.cta')}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -385,7 +389,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                   className="relative w-full max-w-none sm:max-w-[240px] lg:max-w-[360px] [perspective:1000px]"
                 >
                   <img
-                    src={shopBannerImg}
+                    src={c.img('hero.image')}
                     alt="ScanConnect Tag Product"
                     style={{
                       transform: `rotateX(${heroTilt.x}deg) rotateY(${heroTilt.y}deg) scale(${heroTilt.x || heroTilt.y ? 1.03 : 1})`,
@@ -400,10 +404,10 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
             {/* Trusted Across India */}
             <div className="mt-16 border-t border-neutral-200 pt-10 text-center space-y-4">
               <h2 className="text-2xl sm:text-3xl font-black text-[#0F0F0F]">
-                Trusted Across India
+                {c.t('trusted.title')}
               </h2>
               <p className="text-[#5D5F5F] text-sm sm:text-base max-w-2xl mx-auto">
-                Helping vehicle owners, businesses, and organizations stay connected with secure, privacy-first communication.
+                {c.t('trusted.body')}
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 {trustBar.map((item) => {
@@ -432,19 +436,19 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
               <QrCode className="w-3.5 h-3.5 text-[#1B1C1C]" />
               <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                SCAN CONNECT TAG
+                {c.t('tag.badge')}
               </span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0F0F0F] font-sans">
-              The Smart QR Tag That Protects Your Privacy
+              {c.t('tag.title')}
             </h2>
             <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal">
-              From wrong parking notifications to emergency assistance, Scan Connect lets anyone contact you instantly&mdash;without ever revealing your personal phone number.
+              {c.t('tag.body')}
             </p>
 
             <div className="pt-4">
               <span className="font-bold text-sm uppercase tracking-wider text-[#0F0F0F] block mb-4">
-                Perfect For
+                {c.t('tag.perfect_label')}
               </span>
               <div className="flex flex-wrap items-center justify-center gap-3">
                 {perfectFor.map((item) => (
@@ -475,11 +479,11 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               </div>
 
               <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-[#0F0F0F] font-sans">
-                Find the Perfect Scan Connect Tag
+                {c.t('catalogue.title')}
               </h2>
 
               <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal">
-                Premium QR-based contact tags designed for individuals, families, businesses, and commercial fleets.
+                {c.t('catalogue.body')}
               </p>
             </div>
 
@@ -686,14 +690,14 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                 <Package className="w-3.5 h-3.5 text-[#1B1C1C]" />
                 <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                  WHAT'S IN THE BOX
+                  {c.t('box.badge')}
                 </span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0F0F0F] font-sans">
-                Everything You Need, Included
+                {c.t('box.title')}
               </h2>
               <p className="text-[#5D5F5F] text-base sm:text-lg">
-                No hidden add-ons or renewal fees — every order ships ready to activate.
+                {c.t('box.body')}
               </p>
             </div>
 
@@ -718,10 +722,10 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
         <section className="py-16 sm:py-20 bg-white border-t border-neutral-100">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0F0F0F]">
-              Need More Than One?
+              {c.t('bulk.title')}
             </h2>
             <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed">
-              Whether you&apos;re an individual, business, apartment association, dealership, or fleet operator, we offer bulk orders, reseller programs, franchise opportunities, and enterprise solutions tailored to your needs.
+              {c.t('bulk.body')}
             </p>
             <button
               onClick={() => onNavigate('contact')}

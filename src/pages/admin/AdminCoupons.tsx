@@ -147,7 +147,7 @@ export const AdminCoupons: React.FC = () => {
   const isFormValid = Object.values(fieldErrors).every((e) => !e);
 
   const handleSave = async () => {
-    setTouched({ code: true, value: true, usageLimit: true, minOrder: true });
+    setTouched({ code: true, value: true, usageLimit: true, minOrder: true, expiresAt: true });
     if (!isFormValid) {
       setFormError('Please fix the highlighted fields.');
       return;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
+import { SiteBanners } from './SiteBanners';
 import { DashboardFooter } from './DashboardFooter';
 import {
   Building2,
@@ -48,8 +49,7 @@ import { BlogCover } from './BlogCover';
 import { NearbySearchPanel } from './NearbySearchPanel';
 import { NEARBY_CATEGORIES } from '../lib/nearbySearch';
 import { useRevealOnScroll } from '../lib/useRevealOnScroll';
-import banner from '../assets/images/howitworksbanner.png'
-import bannerMobile from '../assets/images/howitworksbannermobile.png'
+import { useSiteContent, withBreaks } from '../lib/useSiteContent'
 import sosEmergencyImg from '../assets/images/sosemmergencyimg.png'
 import videoWalkImg from '../assets/images/howitworks/videowalkimg.png'
 import tutorialVideoPreviewImg from '../assets/images/howitworks/tutorialvideopreview.png'
@@ -98,6 +98,7 @@ const RevealTimelineBar: React.FC<{ className?: string }> = ({ className = '' })
 
 export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, onLogout, onNavigate, isLoggedIn }) => {
   const [activeNav, setActiveNav] = useState('How it works');
+  const c = useSiteContent('how-it-works');
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
@@ -138,135 +139,128 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
   }, []);
 
   // Why Choose Scan Connect — situations list
-  const whyChooseScenarios = [
-    'Someone blocking your vehicle',
-    'Headlights left ON',
-    'Windows left open',
-    'A parking emergency',
-    'An accident or damage',
-    'A security concern',
-  ];
+  const whyChooseScenarios = Array.from({ length: 6 }, (_, i) => c.t(`why.scenario.${i + 1}`));
 
   // How It Works — 3 Steps
   const howItWorksSteps = [
     {
       num: '01',
       icon: QrCode,
-      title: 'Activate Your Tag',
-      desc: 'Attach the premium waterproof QR tag to your car or bike and activate it once by linking your mobile number securely.',
+      title: c.t('steps.1.title'),
+      desc: c.t('steps.1.desc'),
     },
     {
       num: '02',
       icon: Scan,
-      title: 'Anyone Scans & Connects',
-      desc: 'Using any smartphone camera—no app, no registration—they simply scan and choose to Call or WhatsApp you instantly.',
+      title: c.t('steps.2.title'),
+      desc: c.t('steps.2.desc'),
     },
     {
       num: '03',
       icon: ShieldCheck,
-      title: 'Your Privacy Stays Protected, Anywhere',
-      desc: 'Neither party ever sees the other’s number. Stay reachable at airports, malls, offices, or the roadside—anywhere in India.',
+      title: c.t('steps.3.title'),
+      desc: c.t('steps.3.desc'),
     },
   ];
 
   // SOS Emergency Assistance highlights
   const sosHighlights = [
-    { icon: Users, label: 'Notify Family & Friends' },
-    { icon: Clock, label: 'Available 24×7' },
-    { icon: ShieldAlert, label: 'Designed for Roadside Emergencies' },
-    { icon: Globe2, label: 'Works Across India' },
+    { icon: Users, label: c.t('sos.point.1.label') },
+    { icon: Clock, label: c.t('sos.point.2.label') },
+    { icon: ShieldAlert, label: c.t('sos.point.3.label') },
+    { icon: Globe2, label: c.t('sos.point.4.label') },
   ];
 
   // Second SOS block — Emergency Help When Every Second Counts. "Emergency Family
   // Contact" leads the list and is flagged `differentiator: true` since it's unique
   // to Scan Connect, unlike the generic services (ambulance, police, etc.) that follow.
   const emergencyQuickAccess = [
-    { label: 'Emergency Family Contact', icon: Users, differentiator: true },
-    { label: 'Ambulance', icon: Ambulance, differentiator: false },
-    { label: 'Police', icon: Shield, differentiator: false },
-    { label: 'Fire Department', icon: Flame, differentiator: false },
-    { label: 'Hospitals', icon: HeartPulse, differentiator: false },
-    { label: 'Roadside Assistance', icon: Wrench, differentiator: false },
+    { label: c.t('quick.1.label'), icon: Users, differentiator: true },
+    { label: c.t('quick.2.label'), icon: Ambulance, differentiator: false },
+    { label: c.t('quick.3.label'), icon: Shield, differentiator: false },
+    { label: c.t('quick.4.label'), icon: Flame, differentiator: false },
+    { label: c.t('quick.5.label'), icon: HeartPulse, differentiator: false },
+    { label: c.t('quick.6.label'), icon: Wrench, differentiator: false },
   ];
 
   // Video library — each card opens the tutorial modal with its own content.
   const videoLibrary = [
     {
       id: 'walkthrough',
-      title: 'Scan Connect Video Walkthrough',
-      description: 'A quick 90-second walkthrough of activating your tag and staying reachable.',
-      thumbnail: tutorialVideoPreviewImg,
-      duration: '1:30',
-      caption: 'Walkthrough Video Playing: Activate your QR tag, receive secure calls, protect your privacy, and handle parking emergencies',
+      title: c.t('video.1.title'),
+      description: c.t('video.1.desc'),
+      thumbnail: c.img('video.1.thumb'),
+      duration: c.t('video.1.duration'),
+      caption: c.t('video.1.caption'),
     },
     {
       id: 'installation',
-      title: 'How to Install Your QR Tag',
-      description: 'Step-by-step guide to placing and activating your Scan Connect tag.',
-      thumbnail: videoWalkImg2,
-      duration: '1:10',
-      caption: 'Installation Video Playing: Peel, stick, and activate your Scan Connect QR tag in under two minutes',
+      title: c.t('video.2.title'),
+      description: c.t('video.2.desc'),
+      thumbnail: c.img('video.2.thumb'),
+      duration: c.t('video.2.duration'),
+      caption: c.t('video.2.caption'),
     },
     {
       id: 'sos-demo',
-      title: 'SOS & Emergency Family Contact Demo',
-      description: 'See how family and emergency family contacts are reached in a single tap.',
-      thumbnail: videoWalkImg3,
-      duration: '0:55',
-      caption: 'SOS Demo Playing: One tap connects a scanner to your emergency family contact and nearby help services',
+      title: c.t('video.3.title'),
+      description: c.t('video.3.desc'),
+      thumbnail: c.img('video.3.thumb'),
+      duration: c.t('video.3.duration'),
+      caption: c.t('video.3.caption'),
     },
     {
       id: 'privacy',
-      title: 'How Your Number Stays Private',
-      description: 'A look at the masked-call technology that keeps both sides anonymous.',
-      thumbnail: scanBannerImg,
-      duration: '1:05',
-      caption: 'Privacy Demo Playing: Masked calling routes every conversation without exposing either phone number',
+      title: c.t('video.4.title'),
+      description: c.t('video.4.desc'),
+      thumbnail: c.img('video.4.thumb'),
+      duration: c.t('video.4.duration'),
+      caption: c.t('video.4.caption'),
     },
     {
       id: 'industries',
-      title: 'Scan Connect Across India',
-      description: 'From malls to airports, see where Scan Connect tags are used every day.',
-      thumbnail: scanBanner1Img,
-      duration: '1:20',
-      caption: 'Industries Demo Playing: Municipal corporations, malls, airports, and campuses using Scan Connect tags',
+      title: c.t('video.5.title'),
+      description: c.t('video.5.desc'),
+      thumbnail: c.img('video.5.thumb'),
+      duration: c.t('video.5.duration'),
+      caption: c.t('video.5.caption'),
     },
     {
       id: 'testimonial',
-      title: 'Real Owners, Real Stories',
-      description: 'Vehicle owners share how Scan Connect helped in real parking emergencies.',
-      thumbnail: scanBanner2Img,
-      duration: '1:40',
-      caption: 'Testimonial Playing: Vehicle owners describe how Scan Connect resolved real parking situations',
+      title: c.t('video.6.title'),
+      description: c.t('video.6.desc'),
+      thumbnail: c.img('video.6.thumb'),
+      duration: c.t('video.6.duration'),
+      caption: c.t('video.6.caption'),
     },
   ];
 
   // Why Thousands Choose — benefits checklist. `core: true` marks the strongest
   // differentiators, which get an emphasized visual treatment in the grid.
   const thousandsChooseBenefits = [
-    { label: 'Emergency Family Contact', core: true },
-    { label: 'Privacy-Protected Communication', core: true },
-    { label: 'Premium Waterproof QR Tag', core: false },
-    { label: 'No Monthly Subscription', core: true },
-    { label: 'Lifetime QR Activation', core: true },
-    { label: 'No App Required for Visitors', core: false },
-    { label: 'Instant Call', core: false },
-    { label: 'Secure Contact Routing', core: true },
-    { label: 'Fast Delivery Across India', core: false },
-    { label: 'Easy Self Activation', core: false },
-    { label: 'Works 24×7', core: false },
+    { label: c.t('trust.1.label'), core: true },
+    { label: c.t('trust.2.label'), core: true },
+    { label: c.t('trust.3.label'), core: false },
+    { label: c.t('trust.4.label'), core: true },
+    { label: c.t('trust.5.label'), core: true },
+    { label: c.t('trust.6.label'), core: false },
+    { label: c.t('trust.7.label'), core: false },
+    { label: c.t('trust.8.label'), core: true },
+    { label: c.t('trust.9.label'), core: false },
+    { label: c.t('trust.10.label'), core: false },
+    { label: c.t('trust.11.label'), core: false },
   ];
 
   // Smart Vehicle Services
   const vehicleServices = [
-    { id: 'fuel', title: 'Nearby Fuel Stations', icon: Fuel, detail: 'Find the nearest petrol and diesel fuel stations near your vehicle location.' },
-    { id: 'police', title: 'Police Assistance', icon: Shield, detail: 'Instant contact numbers & directions for nearest traffic and city police stations.' },
-    { id: 'hospital', title: 'Hospitals & Emergency Care', icon: HeartPulse, detail: 'Emergency trauma centers & ambulance contacts available 24/7.' },
-    { id: 'puncture', title: 'Tyre & Puncture Repair', icon: Wrench, detail: '24x7 roadside tyre repair, puncture fix & battery jumpstart services.' },
-    { id: 'fastag', title: 'FASTag Recharge', icon: Zap, detail: 'Instant FASTag balance check & toll recharge via UPI/Netbanking.' },
-    { id: 'challan', title: 'Traffic Challan Check', icon: FileWarning, detail: 'Check pending traffic fines & pay challans online instantly by VIN.' },
-    { id: 'vehicle', title: 'Vehicle Information', icon: Car, detail: 'Verify RTO RC status, insurance expiry & vehicle ownership details.' },
-    { id: 'licence', title: 'Driving Licence Verification', icon: IdCard, detail: 'Check DL validity, endorsement records & renewal timelines.' },
+    { id: 'fuel', title: c.t('services.1.title'), icon: Fuel, detail: c.t('services.1.desc') },
+    { id: 'police', title: c.t('services.2.title'), icon: Shield, detail: c.t('services.2.desc') },
+    { id: 'hospital', title: c.t('services.3.title'), icon: HeartPulse, detail: c.t('services.3.desc') },
+    { id: 'puncture', title: c.t('services.4.title'), icon: Wrench, detail: c.t('services.4.desc') },
+    { id: 'fastag', title: c.t('services.5.title'), icon: Zap, detail: c.t('services.5.desc') },
+    { id: 'challan', title: c.t('services.6.title'), icon: FileWarning, detail: c.t('services.6.desc') },
+    { id: 'vehicle', title: c.t('services.7.title'), icon: Car, detail: c.t('services.7.desc') },
+    { id: 'licence', title: c.t('services.8.title'), icon: IdCard, detail: c.t('services.8.desc') },
   ];
 
   // Industries We Serve — 6 industries with benefits sub-lists
@@ -274,59 +268,49 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
     {
       id: 'municipal',
       icon: Building2,
-      title: 'Municipal Corporations',
-      desc: 'Digitize urban parking with intelligent vehicle identification, real-time communication, and efficient parking management designed for high-density cities.',
-      benefits: ['Smart Parking Management', 'Digital Vehicle Communication', 'Reduced Traffic Congestion', 'Better Citizen Experience'],
+      title: c.t('industries.1.title'),
+      desc: c.t('industries.1.desc'),
+      benefits: Array.from({ length: 4 }, (_, j) => c.t(`industries.1.benefit.${j + 1}`)),
     },
     {
       id: 'retail',
       icon: ShoppingBag,
-      title: 'Shopping Centres & Retail',
-      desc: 'Improve customer satisfaction with seamless parking communication while gaining valuable operational insights to enhance retail experiences.',
-      benefits: ['Better Customer Convenience', 'Improved Parking Flow', 'Increased Visitor Satisfaction', 'Enhanced Merchant Experience'],
+      title: c.t('industries.2.title'),
+      desc: c.t('industries.2.desc'),
+      benefits: Array.from({ length: 4 }, (_, j) => c.t(`industries.2.benefit.${j + 1}`)),
     },
     {
       id: 'airports',
       icon: Plane,
-      title: 'Airports',
-      desc: 'Transform airport parking through digital vehicle communication, faster customer assistance, and intelligent parking operations.',
-      benefits: ['Efficient Parking Management', 'Improved Traveler Experience', 'Real-Time Communication', 'Smart Digital Infrastructure'],
+      title: c.t('industries.3.title'),
+      desc: c.t('industries.3.desc'),
+      benefits: Array.from({ length: 4 }, (_, j) => c.t(`industries.3.benefit.${j + 1}`)),
     },
     {
       id: 'supermarkets',
       icon: ShoppingCart,
-      title: 'Supermarkets',
-      desc: 'Offer shoppers a hassle-free parking experience with quick owner notifications and improved vehicle safety.',
-      benefits: ['Faster Customer Assistance', 'Safer Parking Areas', 'Convenient Shopping Experience', 'Better Parking Utilization'],
+      title: c.t('industries.4.title'),
+      desc: c.t('industries.4.desc'),
+      benefits: Array.from({ length: 4 }, (_, j) => c.t(`industries.4.benefit.${j + 1}`)),
     },
     {
       id: 'railways',
       icon: Train,
-      title: 'Railway Stations',
-      desc: 'Simplify commuter parking with secure vehicle identification, monthly pass integration, and seamless communication.',
-      benefits: ['Daily Commuter Convenience', 'Digital Permit Management', 'Smart Parking Solutions', 'Efficient Operations'],
+      title: c.t('industries.5.title'),
+      desc: c.t('industries.5.desc'),
+      benefits: Array.from({ length: 4 }, (_, j) => c.t(`industries.5.benefit.${j + 1}`)),
     },
     {
       id: 'universities',
       icon: GraduationCap,
-      title: 'Universities & Educational Campuses',
-      desc: 'Create safer campuses with intelligent vehicle management for students, faculty, and visitors.',
-      benefits: ['Campus Parking Management', 'Student & Staff Convenience', 'Visitor Vehicle Communication', 'Data & Analytics Dashboard'],
+      title: c.t('industries.6.title'),
+      desc: c.t('industries.6.desc'),
+      benefits: Array.from({ length: 4 }, (_, j) => c.t(`industries.6.benefit.${j + 1}`)),
     },
   ];
 
   // Customer Benefits
-  const customerBenefits = [
-    'Protect your personal phone number',
-    'Avoid unnecessary spam calls',
-    'Receive genuine parking-related alerts',
-    'Easy installation in under one minute',
-    'Weatherproof premium quality',
-    'Works with any smartphone',
-    'No battery required',
-    'Lifetime usability',
-    'Made for Indian roads and conditions',
-  ];
+  const customerBenefits = Array.from({ length: 9 }, (_, i) => c.t(`customer.${i + 1}`));
 
   // Landing on /#how-it-works (from another page's "How it works" link) scrolls to that section.
   React.useEffect(() => {
@@ -373,6 +357,8 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
       {/* MAIN DASHBOARD CONTENT */}
       <main className="flex-1">
+        {/* Banners managed in the admin panel (Content -> Banners). */}
+        <SiteBanners placement="HOMEPAGE" />
 
         {/* 1. HERO SECTION — width is always 100% (plain block, no aspect-ratio
              on the section itself, since combining `aspect-ratio` with
@@ -391,12 +377,12 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="relative w-full bg-[#1B1C1C] text-white flex items-center overflow-hidden h-auto min-h-0 md:h-[75vh] md:min-h-[315px]">
           <div className="absolute inset-0 z-0">
             <img
-              src={bannerMobile}
+              src={c.img('hero.image_mobile')}
               alt="Scan Connect Vehicle Protection"
               className="md:hidden w-full h-full object-cover object-[75%_0%]"
             />
             <img
-              src={banner}
+              src={c.img('hero.image')}
               alt="Scan Connect Vehicle Protection"
               className="hidden md:block w-full h-full object-cover object-[75%_0%]"
             />
@@ -408,19 +394,18 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             <div className="grid grid-cols-1 items-center">
               <div className="max-w-xl space-y-5">
                 <h1 className="font-['Rubik'] font-bold text-3xl sm:text-5xl lg:text-[56px] tracking-[-1px] leading-[1.15] text-white">
-                  Protect Your Privacy. <br></br><span className="text-[#FFED00]">Stay Reachable.</span>
+                  {c.t('hero.title_1')} <br></br><span className="text-[#FFED00]">{c.t('hero.title_2')}</span>
                 </h1>
                 <p className="font-['Rubik'] font-semibold text-xl sm:text-2xl text-white leading-[1.3]">
-                  The Smart QR Tag for Every Vehicle.
+                  {c.t('hero.subtitle')}
                 </p>
 
                 <p className="font-['Rubik'] font-normal text-sm sm:text-base text-[#D1D5DB] leading-[26px] max-w-md pt-1">
-                  Whether it&apos;s a blocked driveway, headlights left on, or an <span className="text-[#FFED00] font-semibold">accidental emergency</span>, anyone can contact you or your <span className="text-[#FFED00] font-semibold">family members</span> instantly&mdash;without ever seeing
-                  your phone number.
+                  {c.rich('hero.body', 'text-[#FFED00] font-semibold')}
                 </p>
 
                 <p className="font-['Inter'] font-bold text-sm tracking-[1.5px] uppercase text-[#FFED00]">
-                  Privacy-First &bull; Instant Contact &bull; No App Required &bull; Lifetime Access &bull; No Monthly Subscription
+                  {c.t('hero.tagline')}
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -428,14 +413,14 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     onClick={() => { window.location.href = '/shop#products'; }}
                     className="btn-shimmer h-[52px] px-8 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
                   >
-                    <span>Buy Now</span>
+                    <span>{c.t('hero.cta_primary')}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
                     className="h-[52px] px-8 bg-transparent border border-white/60 hover:bg-white/10 text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
                   >
-                    How It Works
+                    {c.t('hero.cta_secondary')}
                   </button>
                 </div>
               </div>
@@ -452,17 +437,17 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                   <Award className="w-3.5 h-3.5 text-[#1B1C1C]" />
                   <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                    WHY CHOOSE SCAN CONNECT?
+                    {c.t('why.badge')}
                   </span>
                 </div>
                 <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[40px] tracking-tight text-[#1B1C1C] leading-tight">
-                  Privacy Meets Convenience
+                  {c.t('why.title')}
                 </h2>
                 <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
-                  Traditional parking contact stickers expose your personal phone number to everyone. Scan Connect changes that.
+                  {c.t('why.p1')}
                 </p>
                 <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
-                  Your vehicle becomes instantly reachable while your identity stays protected through our secure communication platform.
+                  {c.t('why.p2')}
                 </p>
               </div>
 
@@ -471,7 +456,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 className="relative rounded-2xl overflow-hidden shadow-lg border border-[#E5E7EB] group cursor-pointer block w-full"
               >
                 <img
-                  src={videoWalkImg}
+                  src={c.img('why.image')}
                   alt="Scan Connect walkthrough: scan the QR code and instantly contact the vehicle owner"
                   className="w-full h-auto object-cover group-hover:scale-[1.02] transition-transform duration-500"
                 />
@@ -488,7 +473,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
             <div className="mt-16 sm:mt-20 bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-10 shadow-xs">
               <p className="font-['Hanken_Grotesk'] font-bold text-base text-[#1B1C1C] mb-5">
-                Whether it&apos;s:
+                {c.t('why.scenarios_label')}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
                 {whyChooseScenarios.map((item) => (
@@ -501,7 +486,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 ))}
               </div>
               <p className="font-['Hanken_Grotesk'] font-semibold text-sm text-[#5F5E5E] pt-5 mt-5 border-t border-neutral-100">
-                People can reach you instantly without compromising your privacy.
+                {c.t('why.footer')}
               </p>
             </div>
           </div>
@@ -515,11 +500,11 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                 <Workflow className="w-3.5 h-3.5 text-[#1B1C1C]" />
                 <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                  HOW IT WORKS
+                  {c.t('steps.badge')}
                 </span>
               </div>
               <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
-                Simple. Secure. Instant.
+                {c.t('steps.title')}
               </h2>
             </RevealCard>
 
@@ -575,14 +560,14 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                       <Play className="w-3.5 h-3.5 text-[#1B1C1C]" />
                       <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                        VIDEO SECTION
+                        {c.t('video.badge')}
                       </span>
                     </div>
                     <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-5xl text-[#1B1C1C] tracking-tight">
-                      See Scan Connect in Action
+                      {c.t('video.title')}
                     </h2>
                     <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] leading-[26px] max-w-2xl mx-auto">
-                      Watch our quick walkthroughs and discover how Scan Connect helps people reach you without revealing your phone number.
+                      {c.t('video.body')}
                     </p>
                   </div>
 
@@ -704,11 +689,11 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                 <Gift className="w-3.5 h-3.5 text-[#1B1C1C]" />
                 <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                  CUSTOMER BENEFITS
+                  {c.t('customer.badge')}
                 </span>
               </div>
               <h2 className="font-['Rubik'] font-semibold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
-                More Than Just a QR Sticker
+                {c.t('customer.title')}
               </h2>
             </div>
 
@@ -731,11 +716,11 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                 <Building2 className="w-3.5 h-3.5 text-[#1B1C1C]" />
                 <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                  INDUSTRIES WE SERVE
+                  {c.t('industries.badge')}
                 </span>
               </div>
               <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
-                Smart Mobility Solutions for Every Parking Ecosystem
+                {c.t('industries.title')}
               </h2>
             </div>
 
@@ -759,7 +744,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                       </p>
                       <div className="pt-2 space-y-1.5">
                         <span className="text-[10px] font-bold tracking-widest text-[#9CA3AF] uppercase block">
-                          Benefits
+                          {c.t('industries.benefits_label')}
                         </span>
                         {ind.benefits.map((b) => (
                           <div key={b} className="flex items-center gap-2">
@@ -792,11 +777,11 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                       <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                         <Car className="w-3.5 h-3.5 text-[#1B1C1C]" />
                         <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                          SMART VEHICLE SERVICES
+                          {c.t('services.badge')}
                         </span>
                       </div>
                       <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-[38px] text-[#1B1C1C]">
-                        Everything Your Vehicle Needs in One Place
+                        {c.t('services.title')}
                       </h2>
                     </div>
 
@@ -830,7 +815,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     </div>
                   </div>
                   <p className="font-['Hanken_Grotesk'] font-normal text-base text-[#5F5E5E] max-w-2xl mb-12">
-                    Access useful automotive services directly from the Scan Connect ecosystem.
+                    {c.t('services.body')}
                   </p>
 
                   {/* Sliding carousel track — width driven by number of pages, offset by currentPage.
@@ -921,16 +906,16 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FFED00]" />
                   </span>
                   <span className="font-['Inter'] font-bold text-xs tracking-[1.5px] sm:tracking-[2px] uppercase text-[#FFED00] whitespace-normal break-words text-left">
-                    SOS EMERGENCY ASSISTANCE
+                    {c.t('sos.badge')}
                   </span>
                 </div>
 
                 <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-white leading-tight">
-                  Help is Just <span className="text-[#FFED00]">One Tap</span> Away
+                  {c.rich('sos.title', 'text-[#FFED00]')}
                 </h2>
 
                 <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-neutral-300 leading-[28px]">
-                  In an emergency, every second matters. The SOS button in the Scan Connect app gives you instant access to critical emergency services and your trusted contacts&mdash;without wasting time searching for phone numbers.
+                  {c.t('sos.body')}
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
@@ -953,7 +938,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 <div className="absolute -inset-4 bg-gradient-to-tr from-[#FFED00]/25 via-red-500/15 to-transparent rounded-[28px] blur-2xl pointer-events-none animate-sos-glow" />
                 <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5)] group">
                   <img
-                    src={sosEmergencyImg}
+                    src={c.img('sos.image')}
                     alt="Scan Connect SOS emergency assistance"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
@@ -967,7 +952,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
                     </span>
                     <span className="font-['Inter'] font-extrabold text-xs tracking-[1.5px] text-white uppercase">
-                      Live SOS
+                      {c.t('sos.live')}
                     </span>
                   </div>
 
@@ -977,7 +962,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                       <ShieldAlert className="w-4.5 h-4.5 text-[#1B1C1C]" />
                     </div>
                     <p className="min-w-0 font-['Hanken_Grotesk'] font-bold text-white text-sm sm:text-base leading-snug">
-                      24&times;7 Emergency Response, Anywhere in India
+                      {c.t('sos.caption')}
                     </p>
                   </div>
                 </div>
@@ -986,14 +971,14 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
 
             <RevealCard delayMs={250} className="mt-14 bg-gradient-to-r from-white/[0.06] to-white/[0.02] border border-white/10 rounded-2xl p-5 sm:p-10 break-words text-center space-y-3 max-w-4xl mx-auto">
               <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-xl sm:text-2xl text-white">
-                Stay Safe Wherever You Go
+                {c.t('sos.safe_title')}
               </h3>
               <p className="font-['Hanken_Grotesk'] font-normal text-base text-neutral-300 leading-[28px] max-w-2xl mx-auto">
-                Whether you&apos;re driving through a busy city, travelling on highways, or parking in unfamiliar locations, the Scan Connect SOS feature ensures that help is always just a tap away.
+                {c.t('sos.safe_body')}
               </p>
               <p className="font-['Hanken_Grotesk'] font-bold text-base sm:text-lg text-[#FFED00] pt-2 flex items-center justify-center gap-2 text-left sm:text-center">
                 <ShieldAlert className="w-5 h-5 shrink-0" />
-                Your Safety. Your Family&apos;s Peace of Mind. Always Connected.
+                {c.t('sos.safe_tagline')}
               </p>
             </RevealCard>
           </div>
@@ -1006,21 +991,21 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
               <ShieldAlert className="w-4 h-4 text-[#1B1C1C]" />
               <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                QUICK EMERGENCY ACCESS
+                {c.t('quick.badge')}
               </span>
             </div>
 
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-4xl tracking-tight text-[#1B1C1C] leading-tight">
-              Emergency Help When Every Second Counts
+              {c.t('quick.title')}
             </h2>
 
             <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
-              Access important emergency services directly from the Scan Connect platform.
+              {c.t('quick.body')}
             </p>
 
             <div className="pt-2">
               <span className="font-bold text-sm uppercase tracking-wider text-[#1B1C1C] block mb-4">
-                Quick access to:
+                {c.t('quick.label')}
               </span>
               <div className="flex flex-wrap items-center justify-center gap-3">
                 {emergencyQuickAccess.map((item) => {
@@ -1033,7 +1018,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                       <ItemIcon className="w-4 h-4 text-[#FFED00]" />
                       {item.label}
                       <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-[#FFED00] text-[#1B1C1C] text-[9px] font-extrabold uppercase tracking-wide">
-                        Only Here
+                        {c.t('quick.only_here')}
                       </span>
                     </span>
                   ) : (
@@ -1050,7 +1035,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             </div>
 
             <p className="font-['Hanken_Grotesk'] font-bold text-lg text-[#1B1C1C] pt-2">
-              Because emergencies shouldn&apos;t wait.
+              {c.t('quick.closing')}
             </p>
           </div>
         </section>
@@ -1063,11 +1048,11 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#1B1C1C]" />
                 <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                  TRUSTED BY THOUSANDS OF VEHICLE OWNERS
+                  {c.t('trust.badge')}
                 </span>
               </div>
               <h2 className="font-['Rubik'] font-bold text-3xl sm:text-[40px] text-[#1B1C1C] leading-tight">
-                One Purchase. Lifetime Peace of Mind.
+                {c.t('trust.title')}
               </h2>
             </div>
 
@@ -1114,33 +1099,33 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
                   <Zap className="w-3.5 h-3.5 text-[#1B1C1C]" />
                   <span className="font-['Inter'] font-bold text-xs tracking-[2px] text-[#1B1C1C] uppercase">
-                    DOWNLOAD THE APP
+                    {c.t('app.badge')}
                   </span>
                 </div>
 
                 <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[40px] text-[#1A1A1A] tracking-tight leading-tight">
-                  Manage Your Vehicle Anytime
+                  {c.t('app.title')}
                 </h2>
 
                 <p className="font-['Inter'] font-semibold text-base sm:text-lg text-[#6B7280] leading-[26px]">
-                  Access your Scan Connect dashboard to manage multiple vehicles, update contact details, view scan history, receive instant notifications, access vehicle services, and manage SOS settings.
+                  {c.t('app.body')}
                 </p>
 
                 <p className="font-['Inter'] font-bold text-sm text-[#1B1C1C]">
-                  Available for Android and iOS.
+                  {c.t('app.note')}
                 </p>
 
                 {/* App Store / Google Play Buttons */}
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <button
-                    onClick={() => window.open('https://apps.apple.com/search?term=ScanConnect', '_blank', 'noopener,noreferrer')}
+                    onClick={() => window.open(c.link('app.ios_link'), '_blank', 'noopener,noreferrer')}
                     className="cursor-pointer transition-transform hover:scale-105"
                   >
                     <img src={appStoreImg} alt="Download on the App Store" className="h-11 sm:h-12" />
                   </button>
 
                   <button
-                    onClick={() => window.open('https://play.google.com/store/search?q=ScanConnect&c=apps', '_blank', 'noopener,noreferrer')}
+                    onClick={() => window.open(c.link('app.android_link'), '_blank', 'noopener,noreferrer')}
                     className="cursor-pointer transition-transform hover:scale-105"
                   >
                     <img src={playStoreImg} alt="Get it on Google Play" className="h-11 sm:h-12" />
@@ -1151,7 +1136,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               {/* Left Graphic Banner Poster */}
               <div className="lg:col-span-6 lg:order-1 flex justify-center">
                 <img
-                  src={videoWalkImg}
+                  src={c.img('app.image')}
                   alt="Scan Connect - Get Started"
                   className="w-full max-w-md "
                 />
@@ -1167,13 +1152,13 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
             <div className="flex items-center justify-between">
               <h2 className="font-['Plus_Jakarta_Sans'] font-black text-3xl sm:text-4xl text-neutral-900 tracking-tight">
-                Guides & articles
+                {c.t('guides.title')}
               </h2>
               <a
                 href="/blog"
                 className="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-[#FFED00] decoration-2 underline-offset-4"
               >
-                View more
+                {c.t('guides.view_more')}
                 <ArrowRight className="w-4 h-4" />
               </a>
             </div>
@@ -1193,7 +1178,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
                     </h3>
                     <p className="text-sm text-neutral-500 ">{post.excerpt}</p>
                     <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-[#FFED00] decoration-2 underline-offset-4">
-                      Read article
+                      {c.t('guides.read')}
                       <ArrowRight className="w-4 h-4" />
                     </span>
                   </div>
@@ -1205,7 +1190,7 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
               href="/blog"
               className="sm:hidden inline-flex items-center gap-1.5 text-sm font-bold text-neutral-900 underline decoration-[#FFED00] decoration-2 underline-offset-4"
             >
-              View more
+              {c.t('guides.view_more')}
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>
@@ -1218,17 +1203,17 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00]/15 border border-[#FFED00]/40">
               <Info className="w-3.5 h-3.5 text-[#FFED00]" />
               <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#FFED00]">
-                ABOUT COMPANY
+                {c.t('company.badge')}
               </span>
             </div>
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[40px] tracking-tight text-white leading-tight">
-              Made in India. Built for Smarter Mobility.
+              {c.t('company.title')}
             </h2>
             <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-neutral-300 leading-[28px]">
-              Scan Connect is developed by Creative Frameworks with one mission: to make vehicle communication secure, simple, and privacy-first.
+              {c.t('company.p1')}
             </p>
             <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-neutral-300 leading-[28px]">
-              We&apos;re committed to helping millions of vehicle owners stay connected without compromising personal information.
+              {c.t('company.p2')}
             </p>
           </div>
         </section>
@@ -1240,22 +1225,20 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
               <Sparkles className="w-3.5 h-3.5 text-[#1B1C1C]" />
               <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                ABOUT SCAN CONNECT
+                {c.t('about.badge')}
               </span>
             </div>
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-[42px] tracking-tight text-[#1B1C1C] leading-tight">
-              The Smarter Way to Connect with Your Parked Vehicle
+              {c.t('about.title')}
             </h2>
             <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
-              Your vehicle is often left unattended&mdash;in parking lots, offices, shopping malls, railway stations, hospitals, or on the roadside. Unexpected situations can happen anytime.
+              {c.t('about.p1')}
             </p>
             <p className="font-['Hanken_Grotesk'] font-normal text-base sm:text-lg text-[#5F5E5E] leading-[28px]">
-              With Scan Connect, anyone can safely reach you by simply scanning the QR code attached to your vehicle. Your phone number always remains private while you receive instant calls or WhatsApp notifications.
+              {c.t('about.p2')}
             </p>
             <p className="font-['Hanken_Grotesk'] font-bold text-lg sm:text-xl text-[#1B1C1C] leading-[30px] pt-2">
-              No complicated setup. No app required for the person scanning.
-              <br />
-              Just smart, secure communication whenever it matters.
+              {withBreaks(c.lines('about.p3'))}
             </p>
           </div>
         </section>
@@ -1265,24 +1248,24 @@ export const VehicleDashboard: React.FC<VehicleDashboardProps> = ({ userData, on
         <section className="py-20 bg-white border-t border-neutral-100">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1B1C1C] leading-tight">
-              Ready to Protect Your Privacy?
+              {c.t('cta.title')}
             </h2>
             <p className="font-['Hanken_Grotesk'] font-medium text-base sm:text-lg text-[#5F5E5E] leading-[28px] max-w-2xl mx-auto">
-              Join thousands of vehicle owners who trust Scan Connect every day. Secure your vehicle with a smart QR contact tag today.
+              {c.t('cta.body')}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <button
                 onClick={() => { window.location.href = '/shop#products'; }}
                 className="btn-shimmer h-[56px] px-9 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
               >
-                <span>Buy Now</span>
+                <span>{c.t('cta.button_1')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
                 className="btn-shimmer h-[56px] px-9 bg-[#1B1C1C] hover:bg-neutral-800 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 border border-[#1B1C1C] text-white font-bold text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
               >
-                Learn More
+                {c.t('cta.button_2')}
               </button>
             </div>
           </div>

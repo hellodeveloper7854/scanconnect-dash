@@ -7,6 +7,10 @@ export interface UserFormData {
   vehicleId?: string;
   accessKey?: string;
   rememberMe?: boolean;
+  // Saved delivery details used to prefill checkout.
+  city?: string;
+  pincode?: string;
+  address?: string;
 }
 
 export interface OtpState {

@@ -32,6 +32,7 @@ import {
   MessageCircle,
   Menu,
   X,
+  LayoutTemplate,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../lib/api';
@@ -75,6 +76,15 @@ const SECTIONS: NavSection[] = [
     ],
   },
   {
+    title: 'Website Content',
+    items: [
+      { to: '/admin/page-content', label: 'Page Content', icon: LayoutTemplate },
+      { to: '/admin/cms', label: 'CMS Pages', icon: FileText },
+      { to: '/admin/banners', label: 'Banners', icon: Image },
+      { to: '/admin/faqs', label: 'FAQs', icon: HelpCircle },
+    ],
+  },
+  {
     title: 'Demo Sections',
     items: [
       { to: '/admin/qr-analytics', label: 'QR Analytics', icon: BarChart3 },
@@ -83,9 +93,6 @@ const SECTIONS: NavSection[] = [
       { to: '/admin/call-logs', label: 'Call Logs', icon: PhoneCall },
       { to: '/admin/subscription-plans', label: 'Subscription Plans', icon: CreditCard },
       { to: '/admin/notifications', label: 'Notifications', icon: Bell },
-      { to: '/admin/cms', label: 'CMS Pages', icon: FileText },
-      { to: '/admin/banners', label: 'Banners', icon: Image },
-      { to: '/admin/faqs', label: 'FAQs', icon: HelpCircle },
       { to: '/admin/audit-logs', label: 'Audit Logs', icon: ShieldCheck },
       { to: '/admin/system-config', label: 'System Config', icon: Settings },
     ],

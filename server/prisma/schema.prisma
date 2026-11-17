@@ -576,6 +576,93 @@ model DemoNotificationCampaign {
   updatedAt DateTime               @updatedAt
 }
 
+/// Website content managed from the admin panel (Content section). These replace the old
+/// DemoCmsPage / DemoBanner / DemoFaq tables, which are no longer used.
+///
+/// CmsPage: Markdown content served at /p/:slug, and - for the built-in `isSystem` pages
+/// (terms, shipping-policy, refund-returns) - used in place of the website's built-in text
+/// once the page is published with content. Until then the site keeps showing its built-in text.
+model CmsPage {
+  id              String   @id @default(uuid())
+  slug            String   @unique
+  title           String
+  content         String   @default("")
+  metaDescription String?
+  published       Boolean  @default(false)
+  isSystem        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+/// Editable text and images for the website's main pages (How it works / Shop / About / QR Scan /
+/// Contact), managed under Website Content -> Page Content in the admin panel. One row per edited
+/// field, keyed by page + field key; a field with no row shows the website's built-in default.
+/// For image fields `imageId` points at the uploaded image (SiteImage); for text fields `value` is the text.
+model SiteContent {
+  id        String     @id @default(uuid())
+  page      String
+  key       String
+  value     String?
+  imageId   String?
+  image     SiteImage? @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  updatedAt DateTime   @updatedAt
+
+  @@unique([page, key])
+  @@index([page])
+}
+
+/// An image uploaded from the admin panel, stored in the database (bytes + metadata) and served at
+/// /api/content/images/:id. Rows are immutable: replacing an image uploads a new one, and images no
+/// longer used by any field are cleaned up after a day.
+model SiteImage {
+  id        String   @id @default(uuid())
+  fileName  String
+  mimeType  String
+  sizeBytes Int
+  width     Int
+  height    Int
+  data      Bytes
+  createdAt DateTime @default(now())
+
+  usedBy SiteContent[]
+}
+
+/// Promotional banner shown on the website. placement: TOP_BAR (thin strip on every page),
+/// HOMEPAGE (under the header on the home page) or SHOP (top of the shop). Shown while
+/// `active` and between startsAt/endsAt (either may be empty), lowest sortOrder first.
+model Banner {
+  id        String    @id @default(uuid())
+  title     String
+  message   String    @default("")
+  ctaLabel  String?
+  linkUrl   String?
+  imageUrl  String?
+  placement String
+  active    Boolean   @default(true)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([placement, active])
+}
+
+/// A question on the website's FAQ page. Grouped by `category`; shown when `published`,
+/// in ascending sortOrder.
+model Faq {
+  id        String   @id @default(uuid())
+  category  String
+  question  String
+  answer    String
+  sortOrder Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder])
+}
+
 model DemoCmsPage {
   id        String   @id @default(uuid())
   title     String

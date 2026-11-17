@@ -1,30 +1,42 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { fetchFaqs, type SiteFaq } from '../lib/content';
 import { DashboardHeader } from '../components/DashboardHeader';
 import { DashboardFooter } from '../components/DashboardFooter';
 import { Plus, Minus, Search, X } from 'lucide-react';
 
-const FAQS = [
+// Shown only if the FAQs can't be loaded from the server (they are managed in the admin panel).
+const FALLBACK_FAQS: SiteFaq[] = [
   {
+    id: 'fallback-0',
+    category: '',
     question: 'How do I transfer a car RC to a new owner in India?',
     answer:
       'Both buyer and seller apply through the RTO with Form 29 & 30, NOC (if interstate), PUC, insurance and ID proof. The RTO updates ownership in the VAHAN database. Allow 2–4 weeks depending on the state.',
   },
   {
+    id: 'fallback-1',
+    category: '',
     question: 'What is PUC and how often do I need it?',
     answer:
       'A Pollution Under Control (PUC) certificate confirms your vehicle meets emission norms. Petrol/CNG vehicles typically renew every 6 months, and diesel every 6–12 months depending on the state.',
   },
   {
+    id: 'fallback-2',
+    category: '',
     question: 'Is FASTag mandatory on highways?',
     answer:
       'Yes. FASTag is mandatory for all four-wheelers on national and state highways in India. Vehicles without a valid FASTag are charged double the toll fee at plazas.',
   },
   {
+    id: 'fallback-3',
+    category: '',
     question: 'How does a Scan Connect Tag protect my privacy?',
     answer:
       'When someone scans your tag, they can call or WhatsApp you through a masked number. Your real phone number is never shown to the person scanning, and theirs is never shown to you.',
   },
   {
+    id: 'fallback-4',
+    category: '',
     question: 'What happens if my Scan Connect Tag is lost or damaged?',
     answer:
       'You can report a lost or damaged tag from your Profile page and order a replacement. Your existing QR activation and contact settings carry over to the new tag.',
@@ -32,13 +44,36 @@ const FAQS = [
 ];
 
 export const FaqPage: React.FC = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [faqs, setFaqs] = useState<SiteFaq[] | null>(null); // null = still loading
+  const [openId, setOpenId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();
+
+  useEffect(() => {
+    let alive = true;
+    fetchFaqs().then((list) => {
+      if (!alive) return;
+      const shown = list ?? FALLBACK_FAQS;
+      setFaqs(shown);
+      setOpenId(shown[0]?.id ?? null);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const results = useMemo(
-    () => FAQS.filter((f) => !q || f.question.toLowerCase().includes(q) || f.answer.toLowerCase().includes(q)),
-    [q],
+    () => (faqs ?? []).filter((f) => !q || f.question.toLowerCase().includes(q) || f.answer.toLowerCase().includes(q)),
+    [faqs, q],
   );
+
+  // Questions grouped by category, in the order the categories first appear.
+  const groups = useMemo(() => {
+    const map = new Map<string, SiteFaq[]>();
+    for (const f of results) map.set(f.category, [...(map.get(f.category) ?? []), f]);
+    return [...map.entries()];
+  }, [results]);
+  const showHeadings = groups.length > 1 || (groups.length === 1 && groups[0][0] !== '');
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-neutral-900 font-sans antialiased">
@@ -86,12 +121,24 @@ export const FaqPage: React.FC = () => {
             )}
           </div>
 
-          {results.map((faq, idx) => {
-            const isOpen = q ? true : openIndex === idx;
+          {faqs === null && <p className="text-center text-neutral-400 py-6">Loading…</p>}
+          {faqs !== null && faqs.length === 0 && (
+            <p role="status" className="text-center text-neutral-500 py-6">
+              No questions have been added yet.
+            </p>
+          )}
+
+          {groups.map(([category, items]) => (
+            <section key={category || 'all'} className="space-y-4">
+              {showHeadings && category && (
+                <h2 className="pt-4 text-sm font-black uppercase tracking-wider text-neutral-400">{category}</h2>
+              )}
+              {items.map((faq) => {
+            const isOpen = q ? true : openId === faq.id;
             return (
-              <div key={faq.question} className="border border-neutral-200 rounded-2xl overflow-hidden">
+              <div key={faq.id} className="border border-neutral-200 rounded-2xl overflow-hidden">
                 <button
-                  onClick={() => !q && setOpenIndex(isOpen ? null : idx)}
+                  onClick={() => !q && setOpenId(isOpen ? null : faq.id)}
                   aria-expanded={isOpen}
                   className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left cursor-pointer"
                 >
@@ -103,13 +150,15 @@ export const FaqPage: React.FC = () => {
                   )}
                 </button>
                 {isOpen && (
-                  <div className="px-6 pb-5 text-neutral-500 leading-relaxed">{faq.answer}</div>
+                  <div className="px-6 pb-5 text-neutral-500 leading-relaxed whitespace-pre-line">{faq.answer}</div>
                 )}
               </div>
             );
-          })}
+              })}
+            </section>
+          ))}
 
-          {q && results.length === 0 && (
+          {q && faqs !== null && results.length === 0 && (
             <p role="status" className="text-center text-neutral-500 py-6">
               No results for &ldquo;{query.trim()}&rdquo;.
             </p>

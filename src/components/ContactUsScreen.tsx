@@ -4,6 +4,7 @@ import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
 import { api, ApiError } from '../lib/api';
 import { PhoneInput } from './PhoneInput';
+import { useSiteContent, withBreaks } from '../lib/useSiteContent';
 import { ToastHost, NoticeState } from './Toast';
 import {
   Mail,
@@ -38,11 +39,12 @@ const PHONE_PATTERN = /^[6-9]\d{9}$/;
 // Obvious dummy numbers (6666666666, 9898989898, 9876543210) — mirrors the server's isDummyPhone.
 const isDummyPhone = (digits: string) =>
   new Set(digits.split('')).size <= 2 || digits === '9876543210' || digits === '0123456789';
-const WHATSAPP_SUPPORT_URL = `https://wa.me/919973878399?text=${encodeURIComponent('Hi Scan Connect, I need some help.')}`;
+const whatsappSupportUrl = (digits: string) => `https://wa.me/${digits.replace(/\D/g, '')}?text=${encodeURIComponent('Hi Scan Connect, I need some help.')}`;
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Interactive Embedded Google Map for Jamshedpur Head Office
-const GoogleMapEmbed = () => (
+const GoogleMapEmbed: React.FC<{ mapLink: string }> = ({ mapLink }) => (
   <div className="w-full h-full min-h-[420px] rounded-xl border border-[#E3E2E2] overflow-hidden relative shadow-sm group bg-neutral-100 flex flex-col">
     {/* Map Header Bar matching Google Maps UI */}
     <div className="bg-white/95 backdrop-blur-md px-3.5 py-2 border-b border-neutral-200 flex items-center justify-between text-xs z-10 shadow-2xs">
@@ -51,7 +53,7 @@ const GoogleMapEmbed = () => (
         <span className="font-semibold text-neutral-800 truncate">Sonari, Jamshedpur</span>
       </div>
       <a
-        href="https://maps.app.goo.gl/taLjuXVuYUhTaQ6aA"
+        href={mapLink}
         target="_blank"
         rel="noopener noreferrer"
         className="text-[11px] font-medium text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 shrink-0"
@@ -171,19 +173,10 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
     }
   };
 
+  const c = useSiteContent('contact');
+
   // Why Contact Scan Connect?
-  const whyContact = [
-    'Product Information',
-    'QR Tag Activation',
-    'Order Tracking',
-    'Technical Support',
-    'Bulk & Corporate Orders',
-    'Fleet Solutions',
-    'Reseller & Franchise Opportunities',
-    'Enterprise Parking Solutions',
-    'Returns & Warranty Assistance',
-    'General Questions',
-  ];
+  const whyContact = Array.from({ length: 10 }, (_, i) => c.t(`why.${i + 1}`));
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#1B1C1C] font-sans antialiased">
@@ -204,16 +197,16 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
           {/* SECTION 1: TITLE & SUBTITLE */}
           <div className="space-y-4">
             <h1 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-black text-4xl sm:text-5xl text-[#1B1C1C] tracking-tight">
-              Contact Us
+              {c.t('hero.title')}
             </h1>
             <p className="font-['Hanken_Grotesk'] font-bold text-xl sm:text-2xl text-[#1B1C1C]">
-              We&apos;re Here to Help
+              {c.t('hero.subtitle')}
             </p>
             <p className="font-['Inter',sans-serif] font-normal text-lg sm:text-xl text-[#6B7280] leading-relaxed max-w-4xl">
-              Have a question about Scan Connect, your QR tag, an order, or our business solutions? Our support team is ready to assist you with quick, reliable, and personalized service.
+              {c.t('hero.body')}
             </p>
             <p className="font-['Inter',sans-serif] font-normal text-lg sm:text-xl text-[#6B7280] leading-relaxed max-w-4xl">
-              Whether you&apos;re an individual customer, reseller, fleet operator, or enterprise partner, we&apos;re just a call or message away.
+              {c.t('hero.body2')}
             </p>
           </div>
 
@@ -228,35 +221,35 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
               <div className="space-y-4">
                 <h3 className="font-['Noto_Serif',serif] font-semibold text-2xl text-[#1B1C1C]">
-                  Email Us
+                  {c.t('email.title')}
                 </h3>
                 <p className="font-['Manrope',sans-serif] text-sm text-[#5F5E5E]">
-                  For faster assistance, contact the appropriate team:
+                  {c.t('email.intro')}
                 </p>
 
                 <div className="space-y-3 font-['Manrope',sans-serif] text-sm text-[#1B1C1C]">
                   <div>
                     <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
-                      General Enquiries
+                      {c.t('email.1.label')}
                     </span>
-                    <a href="mailto:info@scanconnect.co.in" className="block hover:text-[#B58500] transition-colors text-base">
-                      info@scanconnect.co.in
+                    <a href={`mailto:${c.t('email.1.address')}`} className="block hover:text-[#B58500] transition-colors text-base">
+                      {c.t('email.1.address')}
                     </a>
                   </div>
                   <div>
                     <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
-                      Customer Support
+                      {c.t('email.2.label')}
                     </span>
-                    <a href="mailto:support@scanconnect.co.in" className="block hover:text-[#B58500] transition-colors text-base">
-                      support@scanconnect.co.in
+                    <a href={`mailto:${c.t('email.2.address')}`} className="block hover:text-[#B58500] transition-colors text-base">
+                      {c.t('email.2.address')}
                     </a>
                   </div>
                   <div>
                     <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
-                      Sales &amp; Business Partnerships
+                      {c.t('email.3.label')}
                     </span>
-                    <a href="mailto:sales@scanconnect.co.in" className="block hover:text-[#B58500] transition-colors text-base">
-                      sales@scanconnect.co.in
+                    <a href={`mailto:${c.t('email.3.address')}`} className="block hover:text-[#B58500] transition-colors text-base">
+                      {c.t('email.3.address')}
                     </a>
                   </div>
                 </div>
@@ -271,24 +264,23 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
               <div className="space-y-4">
                 <h3 className="font-['Noto_Serif',serif] font-semibold text-2xl text-[#1B1C1C]">
-                  Chat with our WhatsApp support team
+                  {c.t('whatsapp.title')}
                 </h3>
 
                 <div className="space-y-2 font-['Manrope',sans-serif]">
-                  <a href="https://wa.me/919973878399" target="_blank" rel="noopener noreferrer" className="text-lg font-semibold text-[#1B1C1C] block hover:text-[#B58500] transition-colors">
-                    +91 99738 78399
+                  <a href={`https://wa.me/${c.t('whatsapp.number').replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-lg font-semibold text-[#1B1C1C] block hover:text-[#B58500] transition-colors">
+                    {c.t('whatsapp.display')}
                   </a>
                   <div className="pt-1">
                     <span className="font-['Manrope',sans-serif] font-semibold text-xs tracking-[0.7px] text-[#9CA3AF] uppercase block">
-                      Support Hours
+                      {c.t('whatsapp.hours_label')}
                     </span>
                     <p className="text-sm font-normal text-[#5F5E5E]">
-                      Monday &ndash; Saturday <br />
-                      09:00 AM &ndash; 06:00 PM (IST)
+                      {withBreaks(c.lines('whatsapp.hours'))}
                     </p>
                   </div>
                   <p className="text-xs font-medium text-[#5F5E5E] pt-1">
-                    Need immediate assistance? Our team is happy to help with product information, activation support, order tracking, and technical queries.
+                    {c.t('whatsapp.note')}
                   </p>
                 </div>
               </div>
@@ -303,10 +295,10 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
               <div className="space-y-6 text-center lg:text-left w-full">
                 <div className="space-y-2">
                   <h3 className="font-['Noto_Serif',serif] font-semibold text-2xl text-[#1B1C1C]">
-                    Connect
+                    {c.t('connect.title')}
                   </h3>
                   <p className="font-['Manrope',sans-serif] text-sm text-[#5F5E5E]">
-                    Reach us instantly through live chat, our web portal, social handles, or review our terms &amp; conditions.
+                    {c.t('connect.body')}
                   </p>
                 </div>
 
@@ -314,7 +306,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 <div className="flex items-center justify-center lg:justify-start gap-4 pt-1">
                   <button
                     type="button"
-                    onClick={() => window.open(WHATSAPP_SUPPORT_URL, '_blank', 'noopener,noreferrer')}
+                    onClick={() => window.open(whatsappSupportUrl(c.t('whatsapp.number')), '_blank', 'noopener,noreferrer')}
                     title="Live Support Chat on WhatsApp"
                     aria-label="Chat with support on WhatsApp"
                     className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
@@ -333,9 +325,9 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                   </button>
 
                   <a
-                    href="mailto:info@scanconnect.co.in"
+                    href={`mailto:${c.t('email.1.address')}`}
                     title="Email us"
-                    aria-label="Email info@scanconnect.co.in"
+                    aria-label={`Email ${c.t('email.1.address')}`}
                     className="btn-shimmer w-10 h-10 border border-[#1B1C1C] rounded-none bg-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] hover:shadow-[0_6px_16px_rgba(242,186,3,0.4)] hover:-translate-y-0.5 text-white hover:text-[#1B1C1C] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <AtSign className="w-5 h-5 stroke-[1.8]" />
@@ -362,25 +354,22 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                 {/* Office Addresses */}
                 <div className="lg:col-span-2 space-y-6 flex flex-col">
                   <h3 className="font-['Noto_Serif',serif] font-semibold text-2xl text-[#1B1C1C]">
-                    Visit Our Offices
+                    {c.t('office.title')}
                   </h3>
 
                   <div className="space-y-6">
                     {/* Office Address */}
                     <div className="space-y-1.5">
                       <h4 className="font-['Manrope',sans-serif] font-semibold text-sm tracking-[0.7px] text-[#9CA3AF] uppercase">
-                        Office Address
+                        {c.t('office.label')}
                       </h4>
                       <p className="font-['Manrope',sans-serif] font-normal text-base text-[#1B1C1C] leading-relaxed">
-                        House No. 1265, Dispensary Road, <br />
-                        Behind Vishwakarma Temple, Near Aerodrome, <br />
-                        Sonari, Jamshedpur, East Singhbhum, <br />
-                        Jharkhand &ndash; 831011
+                        {withBreaks(c.lines('office.address'))}
                       </p>
                     </div>
 
                     <a
-                      href="https://maps.app.goo.gl/taLjuXVuYUhTaQ6aA"
+                      href={c.link('office.map_link')}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-sm font-bold text-[#1B1C1C] hover:text-neutral-700 transition-colors"
@@ -393,7 +382,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
 
                 {/* Interactive Embedded Google Map — same row as addresses on laptop/desktop, wider column and taller than before */}
                 <div className="lg:col-span-3 w-full h-[420px]">
-                  <GoogleMapEmbed />
+                  <GoogleMapEmbed mapLink={c.link('office.map_link')} />
                 </div>
               </div>
             </div>
@@ -409,10 +398,10 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
             {/* Form Title */}
             <div className="text-center space-y-2">
               <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-bold text-3xl sm:text-[32px] text-[#1B1C1C]">
-                Send Us a Message
+                {c.t('form.title')}
               </h2>
               <p className="font-['Inter',sans-serif] text-base text-[#6B7280] max-w-xl mx-auto">
-                Have a specific question or need assistance? Fill out the form below, and our team will get back to you as soon as possible.
+                {c.t('form.body')}
               </p>
             </div>
 
@@ -592,10 +581,10 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-10 space-y-2">
               <h2 className="font-['Rubik','Plus_Jakarta_Sans',sans-serif] font-black text-3xl sm:text-4xl text-[#1B1C1C]">
-                Why Contact Scan Connect?
+                {c.t('why.title')}
               </h2>
               <p className="text-[#6B7280] text-base sm:text-lg">
-                Our dedicated support team can help you with:
+                {c.t('why.body')}
               </p>
             </div>
 
@@ -616,7 +605,7 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
                   aria-controls={featuresListId}
                   className="inline-flex items-center gap-1.5 min-h-[44px] px-5 rounded-lg border border-[#1B1C1C] text-sm font-bold text-[#1B1C1C] hover:bg-[#FFED00] hover:border-[#FFED00] transition-colors cursor-pointer"
                 >
-                  {showAllFeatures ? 'Show less' : 'View all features'}
+                  {showAllFeatures ? c.t('why.less') : c.t('why.more')}
                   <ChevronDown className={`w-4 h-4 transition-transform ${showAllFeatures ? 'rotate-180' : ''}`} />
                 </button>
               </div>
@@ -633,18 +622,14 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
             </div>
 
             <div className="space-y-3">
-              <span className="font-bold text-xs tracking-wider uppercase text-[#1B1C1C] block">Your Privacy Matters</span>
+              <span className="font-bold text-xs tracking-wider uppercase text-[#1B1C1C] block">{c.t('privacy.badge')}</span>
               <p className="text-[#6B7280] text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
-                Every inquiry is handled with the highest level of confidentiality. Your personal information is securely protected and used only to respond to your request&mdash;we never share your data with third parties.
+                {c.t('privacy.body')}
               </p>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
-              {[
-                'Data Encrypted in Transit',
-                'Never Sold or Shared',
-                'Used Only to Respond to You',
-              ].map((point) => (
+              {Array.from({ length: 3 }, (_, i) => c.t(`privacy.${i + 1}`)).map((point) => (
                 <span
                   key={point}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 rounded-full text-xs sm:text-sm font-semibold text-[#1B1C1C] shadow-xs"
@@ -662,20 +647,20 @@ export const ContactUsScreen: React.FC<ContactUsScreenProps> = ({
         <section className="py-16 sm:py-20 bg-white border-t border-[#E3E2E2] text-center">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl sm:text-4xl tracking-tight text-[#1B1C1C]">
-              Let&apos;s Build Smarter &amp; Safer Mobility Together
+              {c.t('closing.title')}
             </h2>
             <p className="text-[#5F5E5E] text-base sm:text-lg leading-relaxed">
-              Whether you&apos;re looking to secure a single vehicle or implement intelligent parking solutions for your organization, Scan Connect is here to help.
+              {c.t('closing.body')}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-['Hanken_Grotesk'] font-bold text-lg text-[#1B1C1C]">
-              <span className="inline-flex items-center gap-1.5"><Phone className="w-4 h-4" /> Call Us</span>
+              <span className="inline-flex items-center gap-1.5"><Phone className="w-4 h-4" /> {c.t('closing.1')}</span>
               <span className="text-[#5F5E5E]">&bull;</span>
-              <span className="inline-flex items-center gap-1.5"><Mail className="w-4 h-4" /> Email Us</span>
+              <span className="inline-flex items-center gap-1.5"><Mail className="w-4 h-4" /> {c.t('closing.2')}</span>
               <span className="text-[#5F5E5E]">&bull;</span>
-              <span className="inline-flex items-center gap-1.5"><MessageSquare className="w-4 h-4" /> Send a Message</span>
+              <span className="inline-flex items-center gap-1.5"><MessageSquare className="w-4 h-4" /> {c.t('closing.3')}</span>
             </div>
             <p className="text-[#6B7280] text-sm">
-              We&apos;re committed to delivering fast, friendly, and reliable support every step of the way.
+              {c.t('closing.note')}
             </p>
           </div>
         </section>

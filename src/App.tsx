@@ -22,6 +22,7 @@ import { BlogPostPage } from './pages/BlogPostPage';
 import { InvestorsPage } from './pages/InvestorsPage';
 import { HelpDemoPage } from './pages/HelpDemoPage';
 import { FaqPage } from './pages/FaqPage';
+import { CmsPage, CmsOverride } from './pages/CmsPage';
 import { SupportPage } from './pages/SupportPage';
 import { TermsAndConditionsPage } from './pages/TermsAndConditionsPage';
 import { ShippingPolicyPage } from './pages/ShippingPolicyPage';
@@ -84,16 +85,35 @@ export default function App() {
     return <SupportPage />;
   }
 
+  // Pages created in the admin panel (Content -> CMS Pages).
+  if (path.startsWith('/p/')) {
+    return <CmsPage slug={decodeURIComponent(path.replace(/^\/p\//, '').replace(/\/+$/, '')).toLowerCase()} />;
+  }
+
+  // The built-in legal pages show admin-edited content once an admin publishes it, and their
+  // original text until then.
   if (path === '/terms') {
-    return <TermsAndConditionsPage />;
+    return (
+      <CmsOverride slug="terms">
+        <TermsAndConditionsPage />
+      </CmsOverride>
+    );
   }
 
   if (path === '/shipping-policy') {
-    return <ShippingPolicyPage />;
+    return (
+      <CmsOverride slug="shipping-policy">
+        <ShippingPolicyPage />
+      </CmsOverride>
+    );
   }
 
   if (path === '/refund-returns') {
-    return <RefundReturnsPage />;
+    return (
+      <CmsOverride slug="refund-returns">
+        <RefundReturnsPage />
+      </CmsOverride>
+    );
   }
 
   if (path === '/delete-account') {

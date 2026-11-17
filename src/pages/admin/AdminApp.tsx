@@ -26,12 +26,13 @@ import {
   AdminCallLogs,
   AdminSubscriptionPlans,
   AdminNotifications,
-  AdminCms,
-  AdminBanners,
-  AdminFaqs,
   AdminAuditLogs,
   AdminSystemConfig,
 } from './AdminDemoSections';
+import { AdminCms } from './AdminCms';
+import { AdminBanners } from './AdminBanners';
+import { AdminFaqs } from './AdminFaqs';
+import { AdminPageContent } from './AdminPageContent';
 import { AdminLogin } from './AdminLogin';
 
 export const AdminApp: React.FC = () => (
@@ -66,6 +67,7 @@ export const AdminApp: React.FC = () => (
           <Route path="cms" element={<AdminCms />} />
           <Route path="banners" element={<AdminBanners />} />
           <Route path="faqs" element={<AdminFaqs />} />
+          <Route path="page-content" element={<AdminPageContent />} />
           <Route path="audit-logs" element={<AdminAuditLogs />} />
           <Route path="system-config" element={<AdminSystemConfig />} />
         </Route>

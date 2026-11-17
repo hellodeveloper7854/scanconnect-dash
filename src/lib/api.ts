@@ -110,6 +110,9 @@ export const api = {
   patch: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: 'PATCH', body: body ? JSON.stringify(body) : undefined }),
   delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
+  /** POST a file as the raw request body (used for image uploads). */
+  upload: <T>(path: string, file: Blob) =>
+    request<T>(path, { method: 'POST', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } }),
 };
 
 /**

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { UserFormData } from '../types';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardFooter } from './DashboardFooter';
-import aboutBannerImg from '../assets/images/aboutbanner.png';
+import { useSiteContent } from '../lib/useSiteContent';
 import {
   Lock,
   Zap,
@@ -33,6 +33,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
   isLoggedIn,
 }) => {
   const [activeNav, setActiveNav] = useState('About');
+  const c = useSiteContent('about');
 
   const handleHeaderNav = (navItem: string) => {
     setActiveNav(navItem);
@@ -73,16 +74,16 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFED00] border border-[#E6D400]">
               <Target className="w-3.5 h-3.5 text-[#1B1C1C]" />
               <span className="font-['Inter'] font-bold text-xs tracking-[2px] uppercase text-[#1B1C1C]">
-                OUR MISSION
+                {c.t('hero.badge')}
               </span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl lg:leading-[1.15] font-black text-[#0F0F0F] tracking-tight font-sans">
-              Privacy shouldn&apos;t cost you a phone call.
+              {c.t('hero.title')}
             </h1>
 
             <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed font-normal max-w-2xl mx-auto">
-              Scan Connect started with a simple frustration: leaving your phone number on your dashboard meant spam calls, harassment, and zero privacy. We built a smart QR tag that lets anyone reach you instantly — without ever seeing your actual phone number.
+              {c.t('hero.body')}
             </p>
 
             {/* CTA Buttons */}
@@ -91,7 +92,7 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                 onClick={() => onNavigate('shop')}
                 className="btn-shimmer h-[52px] px-8 bg-[#FFED00] hover:bg-[#e0ac00] hover:shadow-[0_8px_24px_rgba(242,186,3,0.45)] hover:-translate-y-0.5 text-[#1B1C1C] font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95"
               >
-                <span>GET YOUR TAG</span>
+                <span>{c.t('hero.cta_primary')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -99,14 +100,14 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                 onClick={() => onNavigate('dashboard#how-it-works')}
                 className="btn-shimmer h-[52px] px-8 bg-[#0F0F0F] hover:bg-neutral-800 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 border border-[#0F0F0F] text-white font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95"
               >
-                HOW IT WORKS
+                {c.t('hero.cta_secondary')}
               </button>
             </div>
 
             {/* Full-width banner image below the story, not beside it */}
             <div className="pt-8">
               <img
-                src={aboutBannerImg}
+                src={c.img('hero.image')}
                 alt="ScanConnect Tag on Car"
                 className="w-full h-[280px] sm:h-[400px] lg:h-[460px] object-cover rounded-3xl"
               />
@@ -119,10 +120,10 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-14 space-y-2">
               <h2 className="text-3xl sm:text-4xl font-black text-[#0F0F0F] tracking-tight font-sans">
-                What We Stand For
+                {c.t('values.title')}
               </h2>
               <p className="text-[#5D5F5F] text-base sm:text-lg max-w-2xl">
-                Building reliable, human-centric security products that empower everyday vehicle owners.
+                {c.t('values.body')}
               </p>
             </div>
 
@@ -130,51 +131,51 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
               {[
                 {
                   icon: PhoneCall,
-                  title: 'Emergency Family Contact',
-                  desc: 'In an accident or emergency, first responders or bystanders can instantly reach your family through the tag — without needing your phone or unlocking it.',
+                  title: c.t('values.1.title'),
+                  desc: c.t('values.1.desc'),
                   featured: true,
                 },
                 {
                   icon: Lock,
-                  title: 'Privacy by Default',
-                  desc: 'Your phone number is never shared or stored in plaintext. Everything we design ensures absolute privacy, keeping unwanted calls and scams at zero.',
+                  title: c.t('values.2.title'),
+                  desc: c.t('values.2.desc'),
                   featured: true,
                 },
                 {
                   icon: Zap,
-                  title: 'Instant & Frictionless',
-                  desc: 'No app downloads required for scanners. Anyone with a smartphone camera can scan the tag and alert you instantly.',
+                  title: c.t('values.3.title'),
+                  desc: c.t('values.3.desc'),
                   featured: false,
                 },
                 {
                   icon: Globe,
-                  title: 'Made in India',
-                  desc: 'Designed, manufactured, and supported locally by Creative Frameworks for fast-growing Indian cities.',
+                  title: c.t('values.4.title'),
+                  desc: c.t('values.4.desc'),
                   featured: false,
                 },
                 {
                   icon: ShieldCheck,
-                  title: 'Built to Last',
-                  desc: 'Weatherproof, UV-resistant tags. No batteries, no maintenance — just a tag that keeps working for years.',
+                  title: c.t('values.5.title'),
+                  desc: c.t('values.5.desc'),
                   featured: true,
                 },
                 {
                   icon: Clock,
-                  title: 'Always-On Support',
-                  desc: 'Our helpdesk and SOS response systems are available 24×7, never more than a call or message away.',
+                  title: c.t('values.6.title'),
+                  desc: c.t('values.6.desc'),
                   featured: false,
                 },
                 {
                   icon: HeartHandshake,
-                  title: 'Honest, Transparent Pricing',
-                  desc: 'One-time purchase, lifetime activation, no hidden subscriptions or renewal fees — ever.',
+                  title: c.t('values.7.title'),
+                  desc: c.t('values.7.desc'),
                   featured: false,
                 },
-              ].map((pillar) => {
+              ].map((pillar, pillarIdx) => {
                 const PillarIcon = pillar.icon;
                 return (
                   <div
-                    key={pillar.title}
+                    key={pillarIdx}
                     className={`group relative overflow-hidden rounded-2xl p-6 flex flex-col gap-4 transition-all hover:-translate-y-1 sm:col-span-1 lg:col-span-3 ${
                       pillar.featured
                         ? 'bg-[#1B1C1C] text-white shadow-[0_16px_40px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]'
@@ -213,10 +214,10 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-12">
               <h2 className="text-3xl sm:text-4xl font-black text-[#0F0F0F] tracking-tight font-sans">
-                Custom Solutions
+                {c.t('solutions.title')}
               </h2>
               <p className="text-[#5D5F5F] text-base sm:text-lg max-w-2xl">
-                Tailored vehicle tagging and access management for organizations and commercial hubs.
+                {c.t('solutions.body')}
               </p>
             </div>
 
@@ -228,10 +229,10 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                     <Building2 className="w-6 h-6 text-[#1B1C1C]" />
                   </div>
                   <h3 className="text-xl font-bold text-[#0F0F0F]">
-                    Housing Societies
+                    {c.t('solutions.1.title')}
                   </h3>
                   <p className="text-[#5D5F5F] text-base leading-relaxed">
-                    Streamline resident vehicle entry, resolve blocked parking disputes instantly, and maintain verified resident logs without public numbers.
+                    {c.t('solutions.1.desc')}
                   </p>
                 </div>
 
@@ -245,18 +246,18 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                     <Home className="w-6 h-6 text-[#1B1C1C]" />
                   </div>
                   <h3 className="text-xl font-bold text-[#0F0F0F]">
-                    Garages &amp; Workshops
+                    {c.t('solutions.2.title')}
                   </h3>
                   <p className="text-[#5D5F5F] text-base leading-relaxed">
-                    Boost repeat service requests with co-branded vehicle tags that keep your service helpline accessible on every customer vehicle.
+                    {c.t('solutions.2.desc')}
                   </p>
                 </div>
 
                 <a
-                  href="mailto:sales@scanconnect.co.in?subject=Garage%20Co-branding%20Inquiry"
+                  href={c.link('solutions.2.link')}
                   className="text-sm font-bold text-[#1B1C1C] hover:text-neutral-700 tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors min-h-[44px]"
                 >
-                  <span>PARTNER NOW</span> <ArrowRight className="w-4 h-4" />
+                  <span>{c.t('solutions.2.cta')}</span> <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
 
@@ -267,18 +268,18 @@ export const AboutUsScreen: React.FC<AboutUsScreenProps> = ({
                     <ParkingSquare className="w-6 h-6 text-[#1B1C1C]" />
                   </div>
                   <h3 className="text-xl font-bold text-[#0F0F0F]">
-                    Commercial Parking Hubs
+                    {c.t('solutions.3.title')}
                   </h3>
                   <p className="text-[#5D5F5F] text-base leading-relaxed">
-                    Manage valet queues and parking lot overflow with real-time driver notifications, instant emergency moves, and automated logs.
+                    {c.t('solutions.3.desc')}
                   </p>
                 </div>
 
                 <a
-                  href="mailto:sales@scanconnect.co.in?subject=Parking%20Hubs%20Demo%20Request"
+                  href={c.link('solutions.3.link')}
                   className="text-sm font-bold text-[#1B1C1C] hover:text-neutral-700 tracking-wide uppercase inline-flex items-center gap-1.5 cursor-pointer transition-colors min-h-[44px]"
                 >
-                  <span>VIEW DEMO</span> <ArrowRight className="w-4 h-4" />
+                  <span>{c.t('solutions.3.cta')}</span> <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
             </div>

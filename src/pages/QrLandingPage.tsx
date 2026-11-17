@@ -937,7 +937,9 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
                     type="text"
                     maxLength={1}
                     value={digit}
-                    ref={(el) => (otpInputRefs.current[index] = el)}
+                    ref={(el) => {
+                      otpInputRefs.current[index] = el;
+                    }}
                     onChange={(e) => handleOtpDigitChange(index, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(index, e)}
                     className="w-full h-12 text-center text-lg font-bold bg-white border border-[#CCC7AA] rounded-lg outline-none focus:ring-2 focus:ring-[#FFED00]"
@@ -1310,7 +1312,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
 export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
   const [stage, setStage] = useState<Stage>('loading');
   const [statusChecked, setStatusChecked] = useState(false);
-  const [pendingStage, setPendingStage] = useState<'inactive-prompt' | 'details' | null>(null);
+  const [pendingStage, setPendingStage] = useState<'inactive-prompt' | 'details' | 'disabled' | null>(null);
   const [detailsData, setDetailsData] = useState<DetailsData | null>(null);
   const [callChoice, setCallChoice] = useState<{ target: CallTarget; method: 'call' | 'message' } | null>(null);
 
