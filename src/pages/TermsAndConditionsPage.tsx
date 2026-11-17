@@ -472,6 +472,11 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
   },
 ];
 
+/** The page's opening paragraph and closing note, shared with the admin editor so it can show the current text. */
+export const POLICY_INTRO = 'Welcome to Scan Connect, operated by Creative Frameworks. These Terms govern your access to and use of the Scan Connect website, mobile application, QR contact tags, products, communication services, and related services. By accessing our website, purchasing a product, activating a Scan Connect tag, or using our Services, you agree to be bound by these Terms.';
+export const POLICY_OUTRO = 'By using Scan Connect, you acknowledge that you have read, understood, and agreed to these Terms & Conditions.';
+export const POLICY_SECTIONS = SECTIONS;
+
 export const TermsAndConditionsPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#0F0F0F] font-sans antialiased">
@@ -492,10 +497,7 @@ export const TermsAndConditionsPage: React.FC = () => {
             <h1 className="text-3xl sm:text-4xl font-black text-[#0F0F0F] tracking-tight">Terms &amp; Conditions</h1>
             <p className="text-[#5D5F5F] text-sm font-semibold uppercase tracking-wider">Last Updated: August 2026</p>
             <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed">
-              Welcome to Scan Connect, operated by Creative Frameworks. These Terms govern your access to
-              and use of the Scan Connect website, mobile application, QR contact tags, products, communication
-              services, and related services. By accessing our website, purchasing a product, activating a Scan
-              Connect tag, or using our Services, you agree to be bound by these Terms.
+{POLICY_INTRO}
             </p>
           </div>
         </div>

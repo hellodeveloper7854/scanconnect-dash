@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Bold, ExternalLink, Heading2, Italic, Link2, List, ListOrdered, Pencil, Plus, Trash2, Quote } from 'lucide-react';
+import { defaultPageMarkdown } from '../../lib/cmsDefaults';
+import { ArrowLeft, Bold, ExternalLink, Heading2, Italic, Link2, List, ListOrdered, Pencil, Plus, RotateCcw, Trash2, Quote } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import { Markdown } from '../../components/Markdown';
 
@@ -77,6 +78,7 @@ const PageEditor: React.FC<{ id: string | null; onClose: (saved?: string) => voi
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
   const [showHelp, setShowHelp] = useState(false);
+  const [prefilled, setPrefilled] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -85,9 +87,20 @@ const PageEditor: React.FC<{ id: string | null; onClose: (saved?: string) => voi
       .get<{ page: PageFull }>(`/api/admin/content/pages/${id}`)
       .then(({ page }) => {
         const f = { slug: page.slug, title: page.title, content: page.content, metaDescription: page.metaDescription ?? '', published: page.published };
-        setForm(f);
         setOriginal(JSON.stringify(f));
         setMeta({ isSystem: page.isSystem });
+        if (page.isSystem && !page.content.trim()) {
+          // Nothing saved yet: open the editor with the website's current text.
+          defaultPageMarkdown(page.slug)
+            .then((md) => {
+              setForm({ ...f, content: md ?? '' });
+              setPrefilled(!!md);
+            })
+            .catch(() => setForm(f))
+            .finally(() => setLoaded(true));
+          return;
+        }
+        setForm(f);
         setLoaded(true);
       })
       .catch((err) => setError(errorText(err)));
@@ -179,9 +192,26 @@ const PageEditor: React.FC<{ id: string | null; onClose: (saved?: string) => voi
       <h1 className="text-2xl font-black text-white uppercase tracking-wide">{id ? 'Edit page' : 'New page'}</h1>
 
       {meta.isSystem && (
-        <div className="rounded-xl border border-sky-300/20 bg-sky-300/5 p-4 text-sm text-sky-100/80">
-          This is a built-in page. Until you publish content here, the website keeps showing its original text. Publish to replace it with
-          what you write below; unpublish to go back to the original.
+        <div className="rounded-xl border border-sky-300/20 bg-sky-300/5 p-4 text-sm text-sky-100/80 flex flex-wrap items-center justify-between gap-3">
+          <span className="min-w-0 flex-1">
+            {prefilled
+              ? 'This is the page’s original text, loaded so you can edit it. Nothing changes on the website until you publish; unpublish later to go back to the original.'
+              : 'This is a built-in page. Publish to replace its original text with what you write below; unpublish to go back to the original.'}
+          </span>
+          <button
+            type="button"
+            onClick={async () => {
+              if (form.content.trim() && !confirm('Replace the text below with the website’s original text? Your current edits in this editor will be lost (nothing is saved until you press Save).')) return;
+              const md = await defaultPageMarkdown(form.slug);
+              if (md) {
+                set({ content: md });
+                setPrefilled(true);
+              }
+            }}
+            className="inline-flex items-center gap-1.5 shrink-0 rounded-lg border border-sky-300/30 px-3 py-1.5 text-xs font-bold text-sky-100 hover:bg-sky-300/10"
+          >
+            <RotateCcw className="w-3.5 h-3.5" /> Reset to original text
+          </button>
         </div>
       )}
 
@@ -417,13 +447,15 @@ export const AdminCms: React.FC = () => {
         {table(builtIn, 'No built-in pages found.')}
       </section>
 
+      {custom.length > 0 && (
       <section className="space-y-3">
         <div>
           <h2 className="text-sm font-bold uppercase tracking-wider text-white/60">Your pages</h2>
           <p className="text-xs text-white/40">Pages you create. Each one lives at /p/&lt;address&gt; and you can link to it from banners.</p>
         </div>
-        {table(custom, 'You haven’t created any pages yet.')}
+        {table(custom, '')}
       </section>
+      )}
 
       {toast && (
         <div role="status" className="fixed bottom-6 right-6 bg-neutral-800 text-white text-sm px-4 py-2.5 rounded-lg shadow-xl border border-white/10">

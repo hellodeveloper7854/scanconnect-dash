@@ -311,6 +311,11 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
   },
 ];
 
+/** The page's opening paragraph and closing note, shared with the admin editor so it can show the current text. */
+export const POLICY_INTRO = 'At Scan Connect, we aim to make your order experience simple, reliable, and transparent. This Shipping Policy explains how we process and deliver Scan Connect QR tags and other physical products purchased through our website.';
+export const POLICY_OUTRO = '**Scan Connect**\n\nSmart Protection. Secure Connection.\n\nOperated by Creative Frameworks';
+export const POLICY_SECTIONS = SECTIONS;
+
 export const ShippingPolicyPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#0F0F0F] font-sans antialiased">
@@ -331,9 +336,7 @@ export const ShippingPolicyPage: React.FC = () => {
             <h1 className="text-3xl sm:text-4xl font-black text-[#0F0F0F] tracking-tight">Shipping Policy</h1>
             <p className="text-[#5D5F5F] text-sm font-semibold uppercase tracking-wider">Last Updated: August 2026</p>
             <p className="text-[#5D5F5F] text-base sm:text-lg leading-relaxed">
-              At Scan Connect, we aim to make your order experience simple, reliable, and transparent. This Shipping
-              Policy explains how we process and deliver Scan Connect QR tags and other physical products purchased
-              through our website.
+{POLICY_INTRO}
             </p>
           </div>
         </div>
