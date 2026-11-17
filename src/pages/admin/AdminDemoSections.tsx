@@ -31,48 +31,6 @@ const Table: React.FC<{ headers: string[]; children: React.ReactNode }> = ({ hea
   </div>
 );
 
-interface QrAnalytics {
-  daily: number[];
-  weekly: number[];
-  monthly: number[];
-  byDevice: Record<string, number>;
-  byLocation: { city: string; scans: number }[];
-}
-
-export const AdminQrAnalytics: React.FC = () => {
-  const analytics = useDemoData<QrAnalytics>('/api/admin/demo/qr-analytics', 'analytics');
-  return (
-    <div className="p-4 md:p-8 space-y-6">
-      <h1 className="text-2xl font-black text-white uppercase tracking-wide">QR Analytics</h1>
-      <DemoBanner note="Scan tracking isn't implemented yet." />
-      {!analytics ? (
-        <div className="text-white/60">Loading...</div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Card>
-            <p className="text-xs uppercase text-white/50 mb-2">Daily Scans (last 7 days)</p>
-            <p className="text-white">{analytics.daily.join(', ')}</p>
-          </Card>
-          <Card>
-            <p className="text-xs uppercase text-white/50 mb-2">By Device</p>
-            <p className="text-white">
-              {Object.entries(analytics.byDevice)
-                .map(([k, v]) => `${k}: ${v}%`)
-                .join(', ')}
-            </p>
-          </Card>
-          <Card>
-            <p className="text-xs uppercase text-white/50 mb-2">By Location</p>
-            <p className="text-white">
-              {analytics.byLocation.map((l) => `${l.city} (${l.scans})`).join(', ')}
-            </p>
-          </Card>
-        </div>
-      )}
-    </div>
-  );
-};
-
 interface Sticker {
   id: string;
   vehicleNickname: string;
@@ -97,70 +55,6 @@ export const AdminStickers: React.FC = () => {
               <td className="px-4 py-3 first:sticky first:left-0 first:bg-neutral-950 text-white/70">{s.status}</td>
               <td className="px-4 py-3 first:sticky first:left-0 first:bg-neutral-950 text-white/70 font-mono">{s.trackingId}</td>
               <td className="px-4 py-3 first:sticky first:left-0 first:bg-neutral-950 text-white/50 text-xs">{s.createdAt}</td>
-            </tr>
-          ))}
-        </Table>
-      )}
-    </div>
-  );
-};
-
-interface IvrNumber {
-  id: string;
-  virtualNumber: string;
-  assignedTo: string;
-  status: string;
-}
-
-export const AdminIvr: React.FC = () => {
-  const numbers = useDemoData<IvrNumber[]>('/api/admin/demo/ivr-numbers', 'numbers');
-  return (
-    <div className="p-4 md:p-8 space-y-6">
-      <h1 className="text-2xl font-black text-white uppercase tracking-wide">IVR Management</h1>
-      <DemoBanner note="No Cloud IVR provider (Exotel/Knowlarity) connected yet." />
-      {!numbers ? (
-        <div className="text-white/60">Loading...</div>
-      ) : (
-        <Table headers={['Virtual Number', 'Assigned To', 'Status']}>
-          {numbers.map((n) => (
-            <tr key={n.id} className="border-b border-white/5">
-              <td className="px-4 py-3 first:sticky first:left-0 first:bg-neutral-950 text-white font-mono">{n.virtualNumber}</td>
-              <td className="px-4 py-3 first:sticky first:left-0 first:bg-neutral-950 text-white/70">{n.assignedTo}</td>
-              <td className="px-4 py-3 first:sticky first:left-0 first:bg-neutral-950 text-white/70">{n.status}</td>
-            </tr>
-          ))}
-        </Table>
-      )}
-    </div>
-  );
-};
-
-interface CallLog {
-  id: string;
-  from: string;
-  to: string;
-  duration: number;
-  status: string;
-  createdAt: string;
-}
-
-export const AdminCallLogs: React.FC = () => {
-  const calls = useDemoData<CallLog[]>('/api/admin/demo/call-logs', 'calls');
-  return (
-    <div className="p-4 md:p-8 space-y-6">
-      <h1 className="text-2xl font-black text-white uppercase tracking-wide">Call Management</h1>
-      <DemoBanner note="No Cloud IVR provider connected yet." />
-      {!calls ? (
-        <div className="text-white/60">Loading...</div>
-      ) : (
-        <Table headers={['From', 'To', 'Duration (s)', 'Status', 'Date']}>
-          {calls.map((c) => (
-            <tr key={c.id} className="border-b border-white/5">
-              <td className="px-4 py-3 first:sticky first:left-0 first:bg-neutral-950 text-white">{c.from}</td>
-              <td className="px-4 py-3 first:sticky first:left-0 first:bg-neutral-950 text-white/70">{c.to}</td>
-              <td className="px-4 py-3 first:sticky first:left-0 first:bg-neutral-950 text-white/70">{c.duration}</td>
-              <td className="px-4 py-3 first:sticky first:left-0 first:bg-neutral-950 text-white/70">{c.status}</td>
-              <td className="px-4 py-3 first:sticky first:left-0 first:bg-neutral-950 text-white/50 text-xs">{new Date(c.createdAt).toLocaleString()}</td>
             </tr>
           ))}
         </Table>

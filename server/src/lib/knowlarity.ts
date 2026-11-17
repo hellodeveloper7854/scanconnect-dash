@@ -1,5 +1,6 @@
 import { env } from './env.js';
 import { toE164India } from './phone.js';
+import { prisma } from './prisma.js';
 
 /**
  * Knowlarity "Get the list of bought numbers" client — the source of the
@@ -10,7 +11,18 @@ import { toE164India } from './phone.js';
 
 const CACHE_TTL_MS = 10 * 60 * 1000;
 
-let cache: { numbers: string[]; fetchedAt: number } | null = null;
+export interface AccountNumber {
+  /** E.164, e.g. +918037121389 */
+  number: string;
+  /** Knowlarity's "number_type": "1" = dialable SR (inbound) number, "0" = outbound caller-ID. */
+  numberType: string | null;
+  cliType: string | null;
+  isExpired: boolean;
+  /** Whether this number can be handed to scanners. */
+  dialable: boolean;
+}
+
+let cache: { numbers: AccountNumber[]; fetchedAt: number } | null = null;
 let nextIndex = 0;
 
 export class KnowlarityError extends Error {}
@@ -19,7 +31,7 @@ export function isKnowlarityConfigured(): boolean {
   return env.knowlarity.maskedNumbers.length > 0 || Boolean(env.knowlarity.apiKey && env.knowlarity.srApiKey);
 }
 
-async function fetchBoughtNumbers(): Promise<string[]> {
+async function fetchAccountNumbers(): Promise<AccountNumber[]> {
   const { apiKey, srApiKey, channel, baseUrl } = env.knowlarity;
 
   let response: Response;
@@ -44,30 +56,56 @@ async function fetchBoughtNumbers(): Promise<string[]> {
   // number (number_type "0", cli_type "OUTGOING") is outbound caller-ID only —
   // dialing it gives "not a correct number", so it must never be handed out.
   return body.objects
-    .filter((n) => n.phone_number && !n.is_expired && n.number_type === '1' && (n.cli_type ?? 'NONE') === 'NONE')
-    .map((n) => toE164India(n.phone_number!));
+    .filter((n) => n.phone_number)
+    .map((n) => ({
+      number: toE164India(n.phone_number!),
+      numberType: n.number_type ?? null,
+      cliType: n.cli_type ?? null,
+      isExpired: Boolean(n.is_expired),
+      dialable: !n.is_expired && n.number_type === '1' && (n.cli_type ?? 'NONE') === 'NONE',
+    }));
 }
 
-/**
- * Returns one of the account's active Knowlarity numbers (E.164), rotating
- * round-robin when there are several. The list is cached for 10 minutes; a
- * stale cache is used if a refresh fails.
- */
-export async function getMaskedNumber(): Promise<string> {
-  const override = env.knowlarity.maskedNumbers;
-  if (override.length > 0) {
-    return toE164India(override[nextIndex++ % override.length]);
-  }
-  if (!cache || Date.now() - cache.fetchedAt > CACHE_TTL_MS) {
+/** Every number on the Knowlarity account (cached for 10 minutes; `fresh` forces a refresh). A stale cache is used if a refresh fails. */
+export async function listAccountNumbers(fresh = false): Promise<AccountNumber[]> {
+  if (fresh || !cache || Date.now() - cache.fetchedAt > CACHE_TTL_MS) {
     try {
-      cache = { numbers: await fetchBoughtNumbers(), fetchedAt: Date.now() };
+      cache = { numbers: await fetchAccountNumbers(), fetchedAt: Date.now() };
     } catch (err) {
       if (!cache) throw err;
       console.error('Knowlarity number refresh failed, using cached list:', err);
     }
   }
-  if (cache.numbers.length === 0) {
+  return cache.numbers;
+}
+
+/** Numbers an admin switched off in the IVR Numbers page; they are skipped when handing one to a scanner. */
+async function disabledNumbers(): Promise<Set<string>> {
+  try {
+    const rows = await prisma.ivrNumberSetting.findMany({ where: { enabled: false }, select: { phoneNumber: true } });
+    return new Set(rows.map((r) => r.phoneNumber));
+  } catch {
+    return new Set(); // settings table unavailable: never block calling because of it
+  }
+}
+
+/**
+ * Returns one of the account's active Knowlarity numbers (E.164), rotating
+ * round-robin when there are several and skipping any an admin disabled.
+ */
+export async function getMaskedNumber(): Promise<string> {
+  const override = env.knowlarity.maskedNumbers;
+  const candidates =
+    override.length > 0
+      ? override.map((n) => toE164India(n))
+      : (await listAccountNumbers()).filter((n) => n.dialable).map((n) => n.number);
+  if (candidates.length === 0) {
     throw new KnowlarityError('No active Knowlarity numbers on this account');
   }
-  return cache.numbers[nextIndex++ % cache.numbers.length];
+  const disabled = await disabledNumbers();
+  const usable = candidates.filter((n) => !disabled.has(n));
+  if (usable.length === 0) {
+    throw new KnowlarityError('Every Knowlarity number is switched off in the admin panel');
+  }
+  return usable[nextIndex++ % usable.length];
 }

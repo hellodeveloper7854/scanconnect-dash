@@ -158,6 +158,7 @@ model QrCode {
 
   emergencyContacts  EmergencyContact[]
   maskedCallRequests MaskedCallRequest[]
+  scans              QrScan[]
 
   @@index([batchId])
   @@index([status])
@@ -847,4 +848,30 @@ model TicketAttachment {
   createdAt DateTime      @default(now())
 
   @@index([messageId])
+}
+
+/// One row per time a QR tag's landing page is opened by a scanner (bots
+/// excluded) — the source of the admin QR Analytics. Only coarse, non-identifying
+/// facts are kept: the device class and OS from the user-agent, never an IP.
+model QrScan {
+  id        String   @id @default(uuid())
+  qrCodeId  String
+  qrCode    QrCode   @relation(fields: [qrCodeId], references: [id], onDelete: Cascade)
+  device    String // 'mobile' | 'tablet' | 'desktop'
+  os        String?
+  createdAt DateTime @default(now())
+
+  @@index([qrCodeId])
+  @@index([createdAt])
+}
+
+/// Admin control over the Knowlarity numbers handed out to scanners: a label
+/// for the admin list, and an on/off switch to take a number out of the
+/// rotation. The numbers themselves come from the Knowlarity account; a number
+/// with no row here is enabled.
+model IvrNumberSetting {
+  phoneNumber String   @id // E.164, e.g. +918037121389
+  label       String?
+  enabled     Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
 }

@@ -11,6 +11,7 @@ import { toCsv } from '../lib/csv.js';
 import { notify } from '../lib/notify.js';
 import { isValidIndianMobile, last10Digits, toE164India } from '../lib/phone.js';
 import { isKnowlarityConfigured, getMaskedNumber } from '../lib/knowlarity.js';
+import { parseUserAgent } from '../lib/userAgent.js';
 import { isGupshupConfigured, sendTemplateMessage, GupshupError } from '../lib/gupshup.js';
 import type { Prisma } from '@prisma/client';
 import { hasVehicleWithRegistration } from './profile.js';
@@ -51,7 +52,7 @@ function slugifyBatchName(batchName: string): string {
 }
 
 /** Formats a QR code's human-readable ID as sc-{batchname}-0001 (batchSeq is 1-indexed within its batch). */
-function formatDisplayId(batchName: string, batchSeq: number): string {
+export function formatDisplayId(batchName: string, batchSeq: number): string {
   return `sc-${slugifyBatchName(batchName)}-${String(batchSeq).padStart(4, '0')}`.toUpperCase();
 }
 
@@ -539,6 +540,12 @@ qrCodesRouter.get('/:code', async (req, res) => {
   const qrCode = await prisma.qrCode.findUnique({ where: { code: req.params.code } });
   if (!qrCode) {
     return res.status(404).json({ error: 'This QR code is not recognized' });
+  }
+
+  // Count the scan for the admin QR Analytics. Fire-and-forget: analytics must never slow down or break a scan.
+  const ua = parseUserAgent(req.headers['user-agent']);
+  if (!ua.isBot) {
+    prisma.qrScan.create({ data: { qrCodeId: qrCode.id, device: ua.device, os: ua.os } }).catch((err) => console.error('QR scan not recorded:', err));
   }
 
   // Deliberately no vehicle/owner data here — INACTIVE codes have nothing

@@ -20,15 +20,13 @@ import { AdminContactRequests } from './AdminContactRequests';
 import { AdminLiveChat } from './AdminLiveChat';
 import { AdminTickets } from './AdminTickets';
 import {
-  AdminQrAnalytics,
   AdminStickers,
-  AdminIvr,
-  AdminCallLogs,
   AdminSubscriptionPlans,
   AdminNotifications,
   AdminAuditLogs,
   AdminSystemConfig,
 } from './AdminDemoSections';
+import { AdminQrAnalytics, AdminIvr, AdminCallLogs } from './AdminInsights';
 import { AdminCms } from './AdminCms';
 import { AdminBanners } from './AdminBanners';
 import { AdminFaqs } from './AdminFaqs';

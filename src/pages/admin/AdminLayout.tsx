@@ -85,12 +85,17 @@ const SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'Demo Sections',
+    title: 'Calls & Analytics',
     items: [
       { to: '/admin/qr-analytics', label: 'QR Analytics', icon: BarChart3 },
-      { to: '/admin/stickers', label: 'Stickers', icon: Package },
-      { to: '/admin/ivr', label: 'IVR Numbers', icon: Headset },
       { to: '/admin/call-logs', label: 'Call Logs', icon: PhoneCall },
+      { to: '/admin/ivr', label: 'IVR Numbers', icon: Headset },
+    ],
+  },
+  {
+    title: 'Demo Sections',
+    items: [
+      { to: '/admin/stickers', label: 'Stickers', icon: Package },
       { to: '/admin/subscription-plans', label: 'Subscription Plans', icon: CreditCard },
       { to: '/admin/notifications', label: 'Notifications', icon: Bell },
       { to: '/admin/audit-logs', label: 'Audit Logs', icon: ShieldCheck },

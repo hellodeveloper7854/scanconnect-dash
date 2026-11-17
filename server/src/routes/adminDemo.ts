@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
-import { demoQrScanAnalytics } from '../lib/demo.js';
 
 /**
  * Sections with no backing app infrastructure yet (real QR generation, an
@@ -58,8 +57,6 @@ function crudRouter(
   });
 }
 
-adminDemoRouter.get('/qr-analytics', (_req, res) => res.json({ isDemo: true, analytics: demoQrScanAnalytics }));
-
 // Stickers
 crudRouter(
   '/stickers',
@@ -76,29 +73,6 @@ crudRouter(
   }),
   'stickers',
 );
-
-// IVR numbers
-crudRouter(
-  '/ivr-numbers',
-  prisma.demoIvrNumber,
-  z.object({
-    virtualNumber: z.string().min(1),
-    assignedTo: z.string().optional(),
-    status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
-  }),
-  z.object({
-    virtualNumber: z.string().min(1).optional(),
-    assignedTo: z.string().optional(),
-    status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
-  }),
-  'numbers',
-);
-
-// Call logs — read-only demo data, no create/edit (nothing generates real calls yet)
-adminDemoRouter.get('/call-logs', async (_req, res) => {
-  const calls = await prisma.demoCallLog.findMany({ orderBy: { createdAt: 'desc' } });
-  res.json({ isDemo: true, calls });
-});
 
 // Subscription plans
 crudRouter(
