@@ -15,7 +15,7 @@ import { parseUserAgent } from '../lib/userAgent.js';
 import { isGupshupConfigured, sendTemplateMessage, GupshupError } from '../lib/gupshup.js';
 import type { Prisma } from '@prisma/client';
 import { hasVehicleWithRegistration } from './profile.js';
-import { contactPhoneSchema, fullNameSchema, normalizeRegistration, registrationSchema, vehicleTextSchema } from '../lib/validation.js';
+import { contactPhoneSchema, fullNameSchema, isPendingRegistration, normalizeRegistration, PENDING_REGISTRATION, registrationSchema, vehicleTextSchema } from '../lib/validation.js';
 
 /**
  * Masks the last 4 characters of a plate number (e.g. "JH05CY0377" ->
@@ -25,6 +25,7 @@ import { contactPhoneSchema, fullNameSchema, normalizeRegistration, registration
  * gate. Registrations of 4 chars or fewer are masked in full.
  */
 function maskRegistrationLast4(registration: string): string {
+  if (isPendingRegistration(registration)) return 'Not added yet';
   if (registration.length <= 4) {
     return '#'.repeat(registration.length);
   }
@@ -610,6 +611,10 @@ qrCodesRouter.post('/:code/verify', async (req, res) => {
     return res.status(404).json({ error: 'This QR code is not active' });
   }
 
+  if (isPendingRegistration(qrCode.vehicle.registration)) {
+    return res.status(409).json({ error: 'The owner has not added their vehicle number yet, so this tag cannot be verified for contact.' });
+  }
+
   const last4 = qrCode.vehicle.registration.slice(-4).toUpperCase();
   if (last4 !== parsed.data.last4.toUpperCase()) {
     return res.status(400).json({ error: 'Incorrect digits. Please try again.' });
@@ -662,6 +667,10 @@ qrCodesRouter.post('/:code/masked-call', async (req, res) => {
 
   if (!qrCode || qrCode.status !== 'ACTIVE' || !qrCode.vehicle) {
     return res.status(404).json({ error: 'This QR code is not active' });
+  }
+
+  if (isPendingRegistration(qrCode.vehicle.registration)) {
+    return res.status(409).json({ error: 'The owner has not added their vehicle number yet, so this tag cannot be verified for contact.' });
   }
 
   const last4 = qrCode.vehicle.registration.slice(-4).toUpperCase();
@@ -748,6 +757,9 @@ qrCodesRouter.post('/:code/message', async (req, res) => {
   }
 
   const registration = qrCode.vehicle.registration;
+  if (isPendingRegistration(registration)) {
+    return res.status(409).json({ error: 'The owner has not added their vehicle number yet, so this tag cannot be verified for contact.' });
+  }
   if (registration.slice(-4).toUpperCase() !== parsed.data.last4.toUpperCase()) {
     return res.status(400).json({ error: 'Incorrect digits. Please try again.' });
   }
@@ -990,7 +1002,8 @@ const activateSchema = z.object({
   vehicleId: z.string().uuid().optional(),
   vehicle: z
     .object({
-      registration: registrationSchema,
+      // PENDING = the owner chose to add the number plate later.
+      registration: registrationSchema.or(z.literal(PENDING_REGISTRATION)),
       nickname: z.string().max(60).optional(),
       vehicleType: z.string().min(1).max(40),
       brand: vehicleTextSchema.optional(),
@@ -1022,7 +1035,7 @@ qrCodesRouter.post('/:code/activate', requireAuth, async (req, res) => {
     return res.status(409).json({ error: 'This QR code has already been activated' });
   }
 
-  if (parsed.data.vehicle && (await hasVehicleWithRegistration(req.user!.id, parsed.data.vehicle.registration))) {
+  if (parsed.data.vehicle && !isPendingRegistration(parsed.data.vehicle.registration) && (await hasVehicleWithRegistration(req.user!.id, parsed.data.vehicle.registration))) {
     return res.status(409).json({
       error: 'You have already added a vehicle with this registration number. Choose it from your saved vehicles instead.',
     });

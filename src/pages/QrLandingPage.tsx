@@ -668,10 +668,10 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
 
   // Shared by both finish paths — vehicle + emergency contacts never depend
   // on whether this is a brand-new or already-registered account.
-  const activateQrCode = async (fullName: string) => {
+  const activateQrCode = async (fullName: string, skipContacts = contactsSkipped) => {
     const payload = {
       personal: { fullName },
-      emergencyContacts: contactsSkipped
+      emergencyContacts: skipContacts
         ? []
         : [
             { kind: 'new' as const, name: familyName.trim(), phone: familyPhone.trim(), role: 'Family' },
@@ -726,12 +726,12 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
   // existingFullName above) — skip "Complete Your Profile" (Step 4)
   // entirely, since asking them to set a brand-new email/password would
   // either conflict with their existing credential or be redundant.
-  const handleFinishForExistingAccount = async () => {
+  const handleFinishForExistingAccount = async (skipContacts = false) => {
     if (!existingFullName) return;
     setSubmitError('');
     setIsSubmitting(true);
     try {
-      await activateQrCode(existingFullName);
+      await activateQrCode(existingFullName, skipContacts);
     } catch (err) {
       if (err instanceof ApiError) {
         setSubmitError(err.message);
@@ -1101,7 +1101,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             onClick={() => {
               setContactsSkipped(true);
               if (existingFullName) {
-                handleFinishForExistingAccount();
+                handleFinishForExistingAccount(true);
               } else {
                 setStep(4);
               }
@@ -1479,14 +1479,25 @@ export const QrLandingPage: React.FC<{ code: string }> = ({ code }) => {
         />
       );
     }
+    // The owner chose to add their number plate later, so there is nothing for a scanner to verify against yet.
+    const platePending = detailsData.vehicle.registration === 'Not added yet';
     return (
-      <ScanResultCard
-        label={`QR Code ${code}`}
-        owner={detailsData.owner}
-        vehicle={detailsData.vehicle}
-        emergencyContacts={detailsData.emergencyContacts}
-        onChooseMethod={(target, method) => setCallChoice({ target, method })}
-      />
+      <>
+        {platePending && (
+          <p className="max-w-xl mx-auto mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
+            This owner hasn&apos;t added their vehicle number yet, so calling and messaging aren&apos;t available for this tag right now.
+          </p>
+        )}
+        <ScanResultCard
+          label={`QR Code ${code}`}
+          owner={detailsData.owner}
+          vehicle={detailsData.vehicle}
+          emergencyContacts={detailsData.emergencyContacts}
+          onChooseMethod={(target, method) => {
+            if (!platePending) setCallChoice({ target, method });
+          }}
+        />
+      </>
     );
   }
 

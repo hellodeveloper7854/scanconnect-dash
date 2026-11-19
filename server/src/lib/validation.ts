@@ -58,6 +58,10 @@ export function isValidRegistration(value: string): boolean {
   return PLATE.test(v) || BH_PLATE.test(v);
 }
 
+/** Stored as the plate while an owner hasn't added their number yet ("I'll add it later" on activation). */
+export const PENDING_REGISTRATION = 'PENDING';
+export const isPendingRegistration = (value: string | null | undefined) => value === PENDING_REGISTRATION;
+
 export const registrationSchema = z
   .string()
   .min(1)
