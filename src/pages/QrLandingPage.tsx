@@ -37,6 +37,7 @@ import {
   isValidName,
   isValidPhone,
   isValidEmail,
+  isValidPlate,
   getNewEmailError,
   getPasswordError,
   VALIDATION_MESSAGES,
@@ -491,7 +492,6 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
   // Step 1: vehicle
   const [vehicleType, setVehicleType] = useState('');
   const [registration, setRegistration] = useState('');
-  const [noRegistrationYet, setNoRegistrationYet] = useState(false);
   const [vehicleBrand, setVehicleBrand] = useState('');
   const [vehicleModel, setVehicleModel] = useState('');
   const [vehicleFuelType, setVehicleFuelType] = useState('');
@@ -557,7 +557,11 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
   const step1Errors = {
     vehicleType: vehicleType.trim() ? '' : 'Select a vehicle type',
     registration:
-      noRegistrationYet || registration.trim().length > 0 ? '' : 'Enter your vehicle registration number',
+      registration.trim().length === 0
+        ? 'Enter your vehicle registration number'
+        : isValidPlate(registration)
+          ? ''
+          : 'Enter a valid number plate, e.g. MH12AB1234',
   };
   const step1Valid = !step1Errors.vehicleType && !step1Errors.registration;
 
@@ -680,7 +684,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
               : []),
           ],
       vehicle: {
-        registration: noRegistrationYet ? 'PENDING' : registration.trim().toUpperCase(),
+        registration: registration.trim().toUpperCase(),
         vehicleType: vehicleType.trim(),
         brand: vehicleBrand.trim() || undefined,
         model: vehicleModel.trim() || undefined,
@@ -784,12 +788,11 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             <label className="text-xs font-bold text-[#5D5F5F]">Vehicle Registration Number</label>
             <input
               type="text"
-              disabled={noRegistrationYet}
               value={registration}
               onChange={(e) => setRegistration(e.target.value.toUpperCase())}
               onBlur={() => setStep1Touched((t) => ({ ...t, registration: true }))}
               placeholder="e.g. KA01AB1234"
-              className={`w-full h-[46px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 disabled:bg-[#F5F3F3] disabled:text-[#5F5E5E] ${
+              className={`w-full h-[46px] px-3 bg-white border rounded-lg text-sm outline-none focus:ring-2 ${
                 step1Touched.registration && step1Errors.registration
                   ? 'border-red-500 focus:ring-red-400'
                   : 'border-[#CCC7AA] focus:ring-[#FFED00]'
@@ -798,20 +801,6 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
             {step1Touched.registration && step1Errors.registration && (
               <p className="text-xs font-semibold text-red-600">{step1Errors.registration}</p>
             )}
-            <label className="flex items-start gap-2 pt-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={noRegistrationYet}
-                onChange={(e) => {
-                  setNoRegistrationYet(e.target.checked);
-                  if (e.target.checked) setRegistration('');
-                }}
-                className="mt-0.5 w-4 h-4 accent-[#FFED00]"
-              />
-              <span className="text-[11px] text-[#5F5E5E]">
-                I don&apos;t have my registration number yet. You can add it later from your dashboard.
-              </span>
-            </label>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -887,7 +876,7 @@ const ActivationWizard: React.FC<{ code: string; onDone: (r: DetailsData) => voi
           <div className="text-center space-y-1">
             <h1 className="font-['Rubik'] font-bold text-lg text-[#1B1C1C]">Your Details</h1>
             <p className="text-xs text-[#5F5E5E]">
-              Vehicle: <span className="font-bold text-[#1B1C1C]">{noRegistrationYet ? 'Pending' : registration}</span>
+              Vehicle: <span className="font-bold text-[#1B1C1C]">{registration}</span>
             </p>
           </div>
 
