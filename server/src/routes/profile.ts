@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth } from '../middleware/auth.js';
-import { contactPhoneSchema, fullNameSchema, normalizeRegistration, registrationSchema, vehicleTextSchema } from '../lib/validation.js';
+import { contactPhoneSchema, fullNameSchema, isPendingRegistration, normalizeRegistration, registrationSchema, vehicleTextSchema } from '../lib/validation.js';
 
 export const profileRouter = Router();
 
@@ -254,8 +254,19 @@ profileRouter.patch('/vehicles/:id', async (req, res) => {
     return res.status(404).json({ error: 'Vehicle not found' });
   }
 
+  // The number plate is locked once saved. The only exception is a plate still marked PENDING
+  // (left for later during QR activation), which the owner may fill in once.
   if (
     parsed.data.registration &&
+    !isPendingRegistration(existing.registration) &&
+    parsed.data.registration !== existing.registration
+  ) {
+    return res.status(400).json({ error: 'The registration number can’t be changed after a vehicle is added.' });
+  }
+
+  if (
+    parsed.data.registration &&
+    parsed.data.registration !== existing.registration &&
     (await hasVehicleWithRegistration(req.user!.id, parsed.data.registration, req.params.id))
   ) {
     return res.status(409).json({ error: 'Vehicle already exists: you have already added a vehicle with this registration number.' });

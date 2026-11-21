@@ -375,6 +375,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [vehicleFormError, setVehicleFormError] = useState('');
   const [vehicleRegTouched, setVehicleRegTouched] = useState(false);
 
+  // A saved vehicle's number plate is locked; only one left as "PENDING" (added later) can still be filled in.
+  const registrationLocked =
+    !!editingVehicleId && vehicles?.find((v) => v.id === editingVehicleId)?.registration !== 'PENDING';
   const normalizedPlate = vehicleRegistration.toUpperCase().replace(/[\s-]/g, '');
   const vehicleRegistrationError = !vehicleRegistration.trim()
     ? 'Vehicle registration number is required'
@@ -413,7 +416,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const handleVehicleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setVehicleRegTouched(true);
-    if (vehicleRegistrationError) {
+    if (!registrationLocked && vehicleRegistrationError) {
       setVehicleFormError('Please fix the highlighted field before continuing.');
       return;
     }
@@ -422,7 +425,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     setIsSavingVehicle(true);
     try {
       const payload = {
-        registration: vehicleRegistration.trim().toUpperCase(),
+        ...(registrationLocked ? {} : { registration: vehicleRegistration.trim().toUpperCase() }),
         nickname: vehicleNickname || undefined,
         vehicleType: vehicleType || undefined,
         brand: vehicleBrand || undefined,
@@ -1061,12 +1064,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                         className="bg-white rounded-xl p-6 border border-[#CCC7AA] shadow-sm relative space-y-4"
                       >
                         <div className="flex justify-between items-start">
-                          <span
-                            className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-tight uppercase ${
-                              vehicle.isPrimary ? 'bg-[#FFED00] text-[#1B1C1C]' : 'bg-[#EFEDED] text-[#5D5F5F]'
-                            }`}
-                          >
-                            {vehicle.isPrimary ? 'PRIMARY VEHICLE' : vehicle.vehicleType || 'VEHICLE'}
+                          <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-tight uppercase bg-[#EFEDED] text-[#5D5F5F]">
+                            {vehicle.vehicleType || 'VEHICLE'}
                           </span>
                           <div className="flex items-center gap-1">
                             <button
@@ -1465,18 +1464,23 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 <input
                   type="text"
                   required
+                  disabled={registrationLocked}
                   value={vehicleRegistration}
                   onChange={(e) => setVehicleRegistration(e.target.value)}
                   onBlur={() => setVehicleRegTouched(true)}
                   placeholder="e.g. MH12AB1234"
-                  className={`w-full h-[46px] px-3.5 bg-white border rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 ${
+                  className={`w-full h-[46px] px-3.5 bg-white border rounded-lg text-sm text-[#1B1C1C] outline-none focus:ring-2 disabled:bg-[#F5F3F3] disabled:text-[#5F5E5E] disabled:cursor-not-allowed ${
                     vehicleRegTouched && vehicleRegistrationError
                       ? 'border-red-500 focus:ring-red-400'
                       : 'border-[#CCC7AA] focus:ring-[#FFED00]'
                   }`}
                 />
-                {vehicleRegTouched && vehicleRegistrationError && (
-                  <p className="text-xs font-semibold text-red-600">{vehicleRegistrationError}</p>
+                {registrationLocked ? (
+                  <p className="text-xs text-[#5F5E5E]">The registration number can&apos;t be changed after a vehicle is added.</p>
+                ) : (
+                  vehicleRegTouched && vehicleRegistrationError && (
+                    <p className="text-xs font-semibold text-red-600">{vehicleRegistrationError}</p>
+                  )
                 )}
               </div>
 
